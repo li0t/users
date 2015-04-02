@@ -1,7 +1,5 @@
 'use strict';
 
-var Schema = mongoose.Schema;
-
 module.exports = function (Schema) {
 
     var tokenSchema = new Schema({

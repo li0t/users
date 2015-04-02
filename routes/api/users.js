@@ -91,7 +91,7 @@ module.exports = function (router, mongoose) {
     /**
      * Logs a user out.
      */
-    router.get('/signout', function (req, res, next) {
+    router.get('/logout', function (req, res, next) {
 
         delete req.session.user;
 

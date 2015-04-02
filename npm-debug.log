@@ -4,33 +4,34 @@
 3 info using node@v0.10.25
 4 verbose node symlink /usr/bin/node
 5 verbose run-script [ 'prestart', 'start', 'poststart' ]
-6 info prestart emeeter@0.0.0
-7 info start emeeter@0.0.0
-8 verbose unsafe-perm in lifecycle true
-9 info emeeter@0.0.0 Failed to exec start script
-10 verbose stack Error: emeeter@0.0.0 start: `node ./bin/www`
-10 verbose stack Exit status 8
-10 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:213:16)
-10 verbose stack     at EventEmitter.emit (events.js:98:17)
-10 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:14:12)
-10 verbose stack     at ChildProcess.EventEmitter.emit (events.js:98:17)
-10 verbose stack     at maybeClose (child_process.js:743:16)
-10 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:810:5)
-11 verbose pkgid emeeter@0.0.0
-12 verbose cwd /home/liot/Documents/emeeter
-13 error Linux 3.13.0-24-generic
-14 error argv "node" "/usr/local/bin/npm" "start"
-15 error node v0.10.25
-16 error npm  v2.7.1
-17 error code ELIFECYCLE
-18 error emeeter@0.0.0 start: `node ./bin/www`
-18 error Exit status 8
-19 error Failed at the emeeter@0.0.0 start script 'node ./bin/www'.
-19 error This is most likely a problem with the emeeter package,
-19 error not with npm itself.
-19 error Tell the author that this fails on your system:
-19 error     node ./bin/www
-19 error You can get their info via:
-19 error     npm owner ls emeeter
-19 error There is likely additional logging output above.
-20 verbose exit [ 1, true ]
+6 info prestart users@1.0.0
+7 verbose unsafe-perm in lifecycle true
+8 info start users@1.0.0
+9 verbose unsafe-perm in lifecycle true
+10 info users@1.0.0 Failed to exec start script
+11 verbose stack Error: users@1.0.0 start: `NODE_ENV=production node app`
+11 verbose stack Exit status 1
+11 verbose stack     at EventEmitter.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/lifecycle.js:213:16)
+11 verbose stack     at EventEmitter.emit (events.js:98:17)
+11 verbose stack     at ChildProcess.<anonymous> (/usr/local/lib/node_modules/npm/lib/utils/spawn.js:14:12)
+11 verbose stack     at ChildProcess.EventEmitter.emit (events.js:98:17)
+11 verbose stack     at maybeClose (child_process.js:743:16)
+11 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:810:5)
+12 verbose pkgid users@1.0.0
+13 verbose cwd /home/liot/Documents/emeeter
+14 error Linux 3.13.0-24-generic
+15 error argv "node" "/usr/local/bin/npm" "start"
+16 error node v0.10.25
+17 error npm  v2.7.1
+18 error code ELIFECYCLE
+19 error users@1.0.0 start: `NODE_ENV=production node app`
+19 error Exit status 1
+20 error Failed at the users@1.0.0 start script 'NODE_ENV=production node app'.
+20 error This is most likely a problem with the users package,
+20 error not with npm itself.
+20 error Tell the author that this fails on your system:
+20 error     NODE_ENV=production node app
+20 error You can get their info via:
+20 error     npm owner ls users
+20 error There is likely additional logging output above.
+21 verbose exit [ 1, true ]

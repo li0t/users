@@ -1,7 +1,6 @@
 'use strict';
 
 var validator = require('validator'),
-    Schema = mongoose.Schema,
     bcrypt = require('bcrypt');
 
 module.exports = function (Schema) {
