@@ -1,6 +1,7 @@
 'use strict';
 
 var validator = require('validator'),
+
     bcrypt = require('bcrypt');
 
 module.exports = function (Schema) {
@@ -80,8 +81,8 @@ module.exports = function (Schema) {
         },
 
         state: {
-            type: Schema.Types.ObjectId,
-            ref: 'static.state'
+            type: /*Schema.Types.ObjectId*/ String,
+            /*ref: 'static.state'*/
         }
 
     });

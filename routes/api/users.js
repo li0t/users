@@ -24,18 +24,21 @@ module.exports = function (router, mongoose) {
 
     /** Create a new user */
     router.post('/create', function (req, res, next) {
+
         new User({
             email: req.body.email,
             password: req.body.password,
             info: [{
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    birthdate: req.body.birthdate,
-                    gender: req.body.gender,
-                    location: req.body.location
-            }]
-                /** Implement a pending state */
+                firstname: req.body.firstname,
+                lastname: req.body.lastname,
+                birthdate: req.body.birthdate,
+                gender: req.body.gender,
+                location: req.body.location
+            }],
+            state: 'Pending'
+
         }).save(function (err, user) {
+
             if (err) {
                 /* Check for duplicated entry */
                 if (err.code && err.code === 11000)
@@ -44,8 +47,12 @@ module.exports = function (router, mongoose) {
                     res.status(400).end();
                 else next(err);
             } else {
-                /** Implement Token & set user's state to pending */
-                res.redirect('/chimp/signin/' + user._id);
+                new Token({ /* create a validation Token*/
+                    user: user._id
+                }).save(function (err, token) {
+                    if (err) next(err);
+                    else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                });
             }
         });
     });
@@ -59,7 +66,7 @@ module.exports = function (router, mongoose) {
     /**
      * Log a user in.
      */
-    router.post('/signin', function (req, res, next) {
+    router.post('/login', function (req, res, next) {
 
         var email = req.body.email,
             password = req.body.password;
@@ -75,17 +82,28 @@ module.exports = function (router, mongoose) {
                 if (err) {
                     next(err);
                 } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
-                    req.session.user = user;
-                    res.send({
-                        _id: req.session.user._id
-                    });
+
+                    if (user.state === 'Active') {
+                        req.session.user = user;
+                        res.send({
+                            _id: req.session.user._id
+                        });
+                    } else if (user.state === 'Pending') {
+                        new Token({ /* create a new validation Token*/
+                            user: user._id
+                        }).save(function (err, token) {
+                            if (err) next(err);
+                            else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                        });
+                    } else {
+                        res.render('/reactivate');
+                    }
                 } else {
                     setTimeout(function () {
                         res.status(401).end();
                     }, 1000);
                 }
             });
-
     });
 
     /**
