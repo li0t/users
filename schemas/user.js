@@ -8,27 +8,33 @@ module.exports = function (Schema) {
 
     /* Stores the user's info */
     var infoSchema = new Schema({
+
         firstname: {
             type: String,
             required: true
         },
+
         lastname: {
             type: String,
             required: true
         },
+
         birthdate: {
             type: Date,
             required: true
         },
+
         gender: {
             type: Schema.Types.ObjectId,
             ref: 'static.gender',
             required: true
         },
+
         location: {
             type: String,
             required: true
         }
+
     });
 
     var UserSchema = new Schema({
