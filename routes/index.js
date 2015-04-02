@@ -15,7 +15,7 @@ module.exports = function (router) {
 
     /* Render the default public layout */
     res.render('index', {
-      title: "Fi Seed"
+      title: "emeeter"
     });
 
   });

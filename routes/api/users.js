@@ -108,9 +108,7 @@ module.exports = function (router, mongoose) {
                 } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
                     if (user.state === 'Active') {
                         req.session.user = user;
-                        res.send({
-                            _id: req.session.user._id
-                        });
+                        res.render('/profile');
                     } else if (user.state === 'Pending') {
                         Token.remove({
                             user: user._id
@@ -144,6 +142,27 @@ module.exports = function (router, mongoose) {
         delete req.session.user;
 
         res.end();
+
+    });
+
+    /**
+     * Recover a user's password.
+     */
+    router.post('/recover', function (req, res, next) {
+
+        /* Find the user by its email address, if any */
+        User.findOne()
+            .where('email', req.body.email)
+            .exec(function (err, user) {
+                if (err) {
+                    next(err);
+                } else if (user) {
+                    /* TODO: Actually recover the user's password */
+                    res.end();
+                } else {
+                    res.status(400).end();
+                }
+            });
 
     });
 
