@@ -1,11 +1,18 @@
-extends layout
+- var err = {};
+- err.status = (error && error.status ? error.status : 500);
+- err.message = (error && error.message ? error.message : "Something bad happened...");
+- err.stack = (error && error.stack ? error.stack : "No aditional information is available.");
 
-block content
-  h1= title
-   
-  a(href='/') home
-  h1= message
-  h2= error.status
-  pre #{error.stack}
-  
-  
+doctype html
+
+html(lang='en')
+
+  head
+    include ./elements/head
+
+  body.container-fluid
+    h1
+      strong #{err.status}
+      |  - #{err.message}
+
+    pre #{err.stack}

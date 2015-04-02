@@ -1,20 +1,23 @@
-var express = require('express');
-var router = express.Router();
+/* jshint node: true */
+'use strict';
 
-/* GET home page. */
-router.get('/', function (req, res, next) {
+module.exports = function (router) {
+
+  /**
+   * Provide any route that doesn't matches /api/* or /templates/* with the default view.
+   * 
+   * You must configure the rest of the public routes in Angular. User /api/* for CRUD operations and /templates/* for the views.
+   */
+  router.get(['/', /^\/(?!api)+\/?.*/gi], function (req, res) {
+
+    /* Set the XSRF token cookie on first request */
+    res.cookie('XSRF-TOKEN', res.locals._csrf); /* The _csrf is set by lusca */
+
+    /* Render the default public layout */
     res.render('index', {
-        title: 'emeeter'
+      title: "Fi Seed"
     });
-});
 
-/* RENDER SIGN UP TEMPLATE */
-router.get('/signup', function (req, res, next) {
-    console.log('holo');
-    res.render('signup', {
-        title: 'emeeter'
-    });
-});
+  });
 
-
-module.exports = router;
+};

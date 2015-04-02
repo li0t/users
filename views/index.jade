@@ -1,8 +1,28 @@
-extends layout
+doctype html
 
-block content
-  h1= title
+//- You may want to comment the manifest attr while developing
+//html(
+//  manifest='/appcache.mf',
+//  ng-app='App',
+//  lang='en')
+  
+html(
+  ng-app='App',
+  lang='en')
 
-  ul
-    li: a(href='/signup') signup
-    li: a(href='/users') usuarios  
+  head
+    include ./elements/head
+
+  body
+    //- Navbar
+    include ./elements/navbar
+
+    main
+      //- Flash messages
+      include ./elements/flash
+      
+      //- Angular viewport
+      div.container-fluid(ng-view)
+
+    //- App scripts
+    include ./elements/scripts
