@@ -58,9 +58,33 @@ module.exports = function (router, mongoose) {
     });
 
     /** Token validation */
-    router.get('/validate/token/:token', function (req, res, next) {
-        var token = req.params.token;
-        /** Implemenet token validation & set user's state to active*/
+    router.get('/validate/token/:token/:id', function (req, res, next) {
+        var tokenParam = req.params.token,
+            id = req.params.id;
+        Token.findOne()
+            .where('user', id)
+            .exec(function (err, token) {
+                if (err) {
+                    next(err);
+                } else if (tkn.active) {
+                    if (token.code === tokenParam) {
+                        User.findById(id, function (err, user) {
+                            if (err) next(err)
+                            else {
+                                user.state = 'Active'
+                                res.redirect('/login');
+                            }
+                        });
+                    } else next(new Error("The tokens didn't match"));
+                } else {
+                    new Token({ /* create a new validation Token*/
+                        user: user._id
+                    }).save(function (err, token) {
+                        if (err) next(err);
+                        else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                    });
+                }
+            });
     });
 
     /**
@@ -82,19 +106,25 @@ module.exports = function (router, mongoose) {
                 if (err) {
                     next(err);
                 } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
-
                     if (user.state === 'Active') {
                         req.session.user = user;
                         res.send({
                             _id: req.session.user._id
                         });
                     } else if (user.state === 'Pending') {
-                        new Token({ /* create a new validation Token*/
+                        Token.remove({
                             user: user._id
-                        }).save(function (err, token) {
+                        }, function (err) {
                             if (err) next(err);
-                            else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                            else
+                                new Token({ /* create a new validation Token*/
+                                    user: user._id
+                                }).save(function (err, token) {
+                                    if (err) next(err);
+                                    else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                                });
                         });
+
                     } else {
                         res.render('/reactivate');
                     }
