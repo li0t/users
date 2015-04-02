@@ -1,8 +1,8 @@
 [
-  {
-    "name" : "Male"
+    {
+        "name": "Male"
   },
-  {
-    "name" : "Female"
+    {
+        "name": "Female"
   }
 ]

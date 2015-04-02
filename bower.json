@@ -1,13 +1,13 @@
 {
-  "name": "fi-seed",
-  "title": "Fi Seed",
-  "description": "A boilerplate for MEAN applications",
+  "name": "users",
+  "title": "users",
+  "description": "A users system base on fi-seed structure.",
   "version": "1.0.0",
   "license": "MIT",
   "author": "Final Development Studio <sorcery@finaldevstudio.com> (http://finaldevstudio.com)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FinalDevStudio/fi-seed.git"
+    "url": "https://github.com/li0t/users.git"
   },
   "license": "MIT",
   "private": false,
