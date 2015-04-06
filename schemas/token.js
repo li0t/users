@@ -1,16 +1,9 @@
+/* jshint node: true */
 'use strict';
 
 module.exports = function (Schema) {
 
     var tokenSchema = new Schema({
-
-        code: {
-            type: String,
-            unique: true,
-            default: function () {
-                return uid(124);
-            }
-        },
 
         user: {
             type: Schema.Types.ObjectId,

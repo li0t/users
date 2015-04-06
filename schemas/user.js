@@ -1,3 +1,4 @@
+/* jshint node: true */
 'use strict';
 
 var validator = require('validator'),
@@ -25,15 +26,17 @@ module.exports = function (Schema) {
         },
 
         gender: {
-            type: Schema.Types.ObjectId,
-            ref: 'static.gender',
+            type: /*Schema.Types.ObjectId*/ String,
+            /*ref: 'static.gender',*/
             required: true
         },
 
         location: {
             type: String,
             required: true
-        }
+        },
+
+        _id: false
 
     });
 

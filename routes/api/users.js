@@ -1,3 +1,4 @@
+/* jshint node: true */
 'use strict';
 
 var bcrypt = require('bcrypt');
@@ -38,7 +39,6 @@ module.exports = function (router, mongoose) {
             state: 'Pending'
 
         }).save(function (err, user) {
-
             if (err) {
                 /* Check for duplicated entry */
                 if (err.code && err.code === 11000)
@@ -47,21 +47,17 @@ module.exports = function (router, mongoose) {
                     res.status(400).end();
                 else next(err);
             } else {
-                new Token({ /* create a validation Token*/
-                    user: user._id
-                }).save(function (err, token) {
-                    if (err) next(err);
-                    else res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
-                });
+                res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
             }
         });
     });
 
+
     /** Token validation */
-    router.get('/validate/token/:token', function (req, res, next) {
-        var tokenCode = req.params.token;
+    router.get('/validate/:token', function (req, res, next) {
+        var tkn = req.params.token;
         Token.findOne()
-            .where('code', tokenCode)
+            .where('code', tkn)
             .exec(function (err, token) {
                 if (err) {
                     next(err);
@@ -69,18 +65,14 @@ module.exports = function (router, mongoose) {
                     User.findById(token.user, function (err, user) {
                         if (err) next(err)
                         else {
-                            user.state = 'Active'
+                            user.state = 'Active';
                             res.redirect('/login');
                         }
                     });
                 } else {
-                    new Token({ /* create a new validation Token*/
-                        user: user._id
-                    }).save(function (err, token) {
-                        if (err) next(err);
-                        else res.redirect('/mandrill/signin/' + token.user); /* call the email manager */
-                    });
-                }
+                    console.log('This token is not active anymore');
+                    res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
+                };
             });
     });
 
@@ -107,19 +99,8 @@ module.exports = function (router, mongoose) {
                         req.session.user = user;
                         res.render('/profile');
                     } else if (user.state === 'Pending') {
-                        Token.remove({
-                            user: user._id
-                        }, function (err) {
-                            if (err) next(err);
-                            else
-                                new Token({ /* create a new validation Token*/
-                                    user: user._id
-                                }).save(function (err, token) {
-                                    if (err) next(err);
-                                    else res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
-                                });
-                        });
-
+                        console.log("Looks like you haven't confirmed your email");
+                        res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
                     } else {
                         res.render('/reactivate');
                     }
@@ -154,8 +135,7 @@ module.exports = function (router, mongoose) {
                 if (err) {
                     next(err);
                 } else if (user) {
-                    /* TODO: Actually recover the user's password */
-                    res.end();
+                    res.redirect('/mandrill/recover/' + user._id);
                 } else {
                     res.status(400).end();
                 }
