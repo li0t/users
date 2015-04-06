@@ -51,37 +51,34 @@ module.exports = function (router, mongoose) {
                     user: user._id
                 }).save(function (err, token) {
                     if (err) next(err);
-                    else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                    else res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
                 });
             }
         });
     });
 
     /** Token validation */
-    router.get('/validate/token/:token/:id', function (req, res, next) {
-        var tokenParam = req.params.token,
-            id = req.params.id;
+    router.get('/validate/token/:token', function (req, res, next) {
+        var tokenCode = req.params.token;
         Token.findOne()
-            .where('user', id)
+            .where('code', tokenCode)
             .exec(function (err, token) {
                 if (err) {
                     next(err);
-                } else if (tkn.active) {
-                    if (token.code === tokenParam) {
-                        User.findById(id, function (err, user) {
-                            if (err) next(err)
-                            else {
-                                user.state = 'Active'
-                                res.redirect('/login');
-                            }
-                        });
-                    } else next(new Error("The tokens didn't match"));
+                } else if (token.active) {
+                    User.findById(token.user, function (err, user) {
+                        if (err) next(err)
+                        else {
+                            user.state = 'Active'
+                            res.redirect('/login');
+                        }
+                    });
                 } else {
                     new Token({ /* create a new validation Token*/
                         user: user._id
                     }).save(function (err, token) {
                         if (err) next(err);
-                        else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                        else res.redirect('/mandrill/signin/' + token.user); /* call the email manager */
                     });
                 }
             });
@@ -119,7 +116,7 @@ module.exports = function (router, mongoose) {
                                     user: user._id
                                 }).save(function (err, token) {
                                     if (err) next(err);
-                                    else res.redirect('/chimp/signin/' + user._id); /* call the email manager */
+                                    else res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
                                 });
                         });
 
