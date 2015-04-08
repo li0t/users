@@ -71,8 +71,8 @@ module.exports = function (router, mongoose) {
                     });
                 } else {
                     console.log('This token is not active anymore');
-                    res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
-                };
+                    res.redirect('/mandrill/signin/' + token.user); /* call the email manager */
+                }
             });
     });
 
