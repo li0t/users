@@ -12,72 +12,24 @@ module.exports = function (router, mongoose) {
         Token = mongoose.model('token'),
         getMessage = function (email, token) {
             var message = {
-                "html": "<a href='localhost:3030/users/validate/'" + token + ">Please confirm your email</a>",
+                "html": "<a href='http://localhost:3030/api/users/validate/" + token + "'>Please confirm your email</a>" +
+                    "<img src='http://blog.mandrill.com/images/mandrill-shield.png' alt='Mandrill'/>",
                 "text": "Bievenido a eMeeter",
                 "subject": "Confirm your email",
                 "from_email": "leonardo0ramos@gmail.com",
                 "from_name": "Leonardo Ramos",
                 "to": [{
                     "email": email,
-                    "name": "",
+                    "name": "New eMeeter user",
                     "type": "to"
                 }],
                 "headers": {
-                    "Reply-To": ""
+                    "Reply-To": "noreply@emeeter.com"
                 },
                 "important": false,
                 "track_opens": true,
                 "track_clicks": true,
-                "auto_text": false,
-                "auto_html": false,
-                "inline_css": false,
-                "url_strip_qs": false,
-                "preserve_recipients": false,
-                "view_content_link": true,
-                "bcc_address": "",
-                "tracking_domain": null,
-                "signing_domain": null,
-                "return_path_domain": null,
-                "merge": true,
-                "merge_language": "mailchimp",
-                "global_merge_vars": [{
-                    "name": "merge1",
-                    "content": "merge1 content"
-                }],
-                "merge_vars": [{
-                    "rcpt": email,
-                    "vars": [{
-                        "name": "merge2",
-                        "content": "merge2 content"
-                    }]
-                }],
-                "tags": [
-                "email-confirmation"
-                ],
-                "subaccount": "",
-                "google_analytics_domains": [
-                ""
-                ],
-                "google_analytics_campaign": "",
-                "metadata": {
-                    "website": ""
-                },
-                "recipient_metadata": [{
-                    "rcpt": "",
-                    "values": {
-                        "user_id": ""
-                    }
-                }],
-                "attachments": [{
-                    "type": "",
-                    "name": "",
-                    "content": ""
-                }],
-                "images": [{
-                    "type": "",
-                    "name": "",
-                    "content": ""
-                }]
+                "auto_text": true
             };
             return message;
         };
@@ -91,14 +43,16 @@ module.exports = function (router, mongoose) {
         }
     })();
 
+    /* Lists all users in this mandrill account */
     router.get('/users', function (req, res, next) {
         if (api) {
             api.users.info({},
                 function (users) {
-                    res.send(users);
+                    console.log(users);
                 },
                 function (err) {
-                    next(err);
+                    console.log('A mandrill error occurred: ' + err.name + ' - ' + err.message);
+                    res.end();
                 }
             );
         } else {
@@ -110,10 +64,12 @@ module.exports = function (router, mongoose) {
     /* Sends confirmation email */
     router.get('/signin/:id', function (req, res, next) {
         if (api) {
-            var mesagge = null,
-                async = false,
-                ip_pool = 'Main Pool',
-                send_at = new Date();
+            var message = null
+                /*,
+                                async = false,
+                                ip_pool = 'Main Pool',
+                                send_at = new Date()*/
+            ;
 
             User.findOne()
                 .where('_id', req.params.id)
@@ -133,18 +89,19 @@ module.exports = function (router, mongoose) {
                                     if (err) {
                                         console.log(err);
                                     } else {
-                                        mesagge = getMessage(user.email, token._id);
-                                        console.log('The message is : ' + JSON.stringify(mesagge));
+                                        message = getMessage(user.email, token._id);
                                         api.messages.send({ /* Send a confirmation email to the user */
-                                            "mesagge": mesagge,
-                                            "async": async,
-                                            "ip_pool": ip_pool,
-                                            "send_at": send_at
+                                            "message": message
+                                                /*,
+                                                                                            "async": async,
+                                                                                            "ip_pool": ip_pool,
+                                                                                            "send_at": send_at*/
                                         }, function (result) {
                                             console.log(result);
                                             res.send("You've been sent a confirmation email.");
                                         }, function (err) {
                                             console.log('A mandrill error occurred: ' + err.name + ' - ' + err.message);
+                                            res.end();
                                         });
                                     }
                                 });

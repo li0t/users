@@ -77,7 +77,7 @@ module.exports = function (router, mongoose) {
                     next(err);
                 }
             } else {
-                res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
+                res.redirect('/api/mandrill/signin/' + user._id); /* call the email manager */
             }
         });
     });
@@ -85,25 +85,33 @@ module.exports = function (router, mongoose) {
 
     /** Token validation */
     router.get('/validate/:token', function (req, res, next) {
-        var tkn = req.params.token;
-        Token.findOne()
-            .where('code', tkn)
-            .exec(function (err, token) {
-                if (err) {
-                    next(err);
-                } else if (token) {
-                    User.findById(token.user, function (err, user) {
-                        if (err) {
-                            next(err);
-                        } else {
-                            user.state = States.Active;
-                            res.redirect('/login');
-                        }
-                    });
-                } else {
-                    res.send('This token is not active anymore');
-                }
-            });
+        Token.findById(req.params.token, function (err, token) {
+            if (err) {
+                next(err);
+            } else if (token) {
+                User.findById(token.user, function (err, user) {
+                    console.log('Token.user is : ' + token.user + '\User is : ' + JSON.stringify(user));
+                    if (err) {
+                        next(err);
+                    } else if (user) {
+                        user.state = States.Active;
+                        user.save(function (err) {
+                            if (err) {
+                                console.log('Something went wrong');
+                            } else {
+                                res.send(user);
+                            }
+                        });
+
+                    } else {
+                        console.log('Something went wrong');
+                        res.send();
+                    }
+                });
+            } else {
+                res.send('This token is not active anymore');
+            }
+        });
     });
 
     /**
