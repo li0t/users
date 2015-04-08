@@ -10,30 +10,25 @@ module.exports = function (Schema) {
     /* Stores the user's info */
     var infoSchema = new Schema({
 
-        firstname: {
-            type: String,
-            required: true
-        },
+        name: {
+            type: String
 
-        lastname: {
-            type: String,
-            required: true
         },
 
         birthdate: {
-            type: Date,
-            required: true
+            type: Date
+
         },
 
         gender: {
-            type: /*Schema.Types.ObjectId*/ String,
-            /*ref: 'static.gender',*/
-            required: true
+            type: Schema.Types.ObjectId,
+            ref: 'static.gender'
+
         },
 
         location: {
-            type: String,
-            required: true
+            type: String
+
         },
 
         _id: false
@@ -58,13 +53,12 @@ module.exports = function (Schema) {
         },
 
         info: {
-            type: [infoSchema],
-            required: true
+            type: [infoSchema]
         },
 
         profilePic: {
             type: Schema.Types.ObjectId,
-            ref: 'fs.file',
+            ref: 'fs.file'
         },
 
         contactos: {
@@ -84,8 +78,8 @@ module.exports = function (Schema) {
         },
 
         state: {
-            type: /*Schema.Types.ObjectId*/ String,
-            /*ref: 'static.state'*/
+            type: Schema.Types.ObjectId,
+            ref: 'static.state'
         }
 
     });
@@ -119,4 +113,4 @@ module.exports = function (Schema) {
     });
 
     return UserSchema;
-}
+};
