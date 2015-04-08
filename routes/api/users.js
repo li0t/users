@@ -26,15 +26,14 @@ module.exports = function (router, mongoose) {
                     console.log(err);
                     result = null;
                 } else {
-                    result = result._id;
+                    States[name] = result[0]._id;
                 }
-                return result;
             });
         }
 
         for (state in States) {
             if (States.hasOwnProperty(state)) {
-                States[state] = lookup(state);
+                lookup(state);
             }
         }
 
