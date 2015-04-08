@@ -78,7 +78,7 @@ module.exports = function (router, mongoose) {
                     "name": "",
                     "content": ""
                 }]
-            }
+            };
             return message;
         };
 
@@ -91,41 +91,21 @@ module.exports = function (router, mongoose) {
         }
     })();
 
-    (function addTemplate() {
+    router.get('/users', function (req, res, next) {
         if (api) {
-            var name = "Confirm EmailTemplate",
-                from_email = "from_leonardo0ramos@gmail.com",
-                from_name = "Leonardo Ramos",
-                subject = "Email Confirmation",
-                code = "<div><a href='localhost:3030/users/validate/>CONFIRMAR</a></div>",
-                text = "Haz click en el siguiente link para confirmar tu email",
-                publish = false,
-                labels = [
-                    "confirm"
-                ];
-            api.templates.add({
-                "name": name,
-                "from_email": from_email,
-                "from_name": from_name,
-                "subject": subject,
-                "code": code,
-                "text": text,
-                "publish": publish,
-                "labels": labels
-            }, function (result) {
-                console.log(result);
-
-            }, function (err) {
-                // Mandrill returns the error as an object with name and message keys
-                console.log('A mandrill error occurred: ' + err.name + ' - ' + err.message);
-                // A mandrill error occurred: Invalid_Key - Invalid API key
-            });
+            api.users.info({},
+                function (users) {
+                    res.send(users);
+                },
+                function (err) {
+                    next(err);
+                }
+            );
         } else {
             console.log('A error occurred with the Mandrill client');
+            res.end();
         }
     });
-
-
 
     /* Sends confirmation email */
     router.get('/signin/:id', function (req, res, next) {
@@ -172,7 +152,8 @@ module.exports = function (router, mongoose) {
                         });
                     }
 
-                })
+                });
+
         } else {
             console.log('A error occurred with the Mandrill client');
             res.end();
@@ -181,4 +162,4 @@ module.exports = function (router, mongoose) {
 
 
 
-}
+};
