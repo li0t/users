@@ -6,16 +6,49 @@ var bcrypt = require('bcrypt');
 module.exports = function (router, mongoose) {
 
     var User = mongoose.model('user'),
-        Token = mongoose.model('token');
+        Token = mongoose.model('token'),
+        States = {
+            Active: null,
+            Pending: null,
+            Inactive: null
+        };
+
+    /* Looks for statics states and saves the ids */
+    (function getStates() {
+        var Sts = mongoose.model('static.state'),
+            state;
+
+        function lookup(name) {
+            Sts.find({
+                name: name
+            }, function (err, result) {
+                if (err) {
+                    console.log(err);
+                    result = null;
+                } else {
+                    result = result._id;
+                }
+                return result;
+            });
+        }
+
+        for (state in States) {
+            if (States.hasOwnProperty(state)) {
+                States[state] = lookup(state);
+            }
+        }
+
+    })();
 
     /* Get users list. */
     router.get('/', function (req, res, next) {
         User.find(function (err, users) {
-            if (err) res.render('error', {
-                title: 'emeeter',
-                error: err
-            });
-            if (users.length == 0) users = false;
+            if (err) {
+                next(err);
+            }
+            if (users.length === 0) {
+                users = false;
+            }
             res.render('list', {
                 title: 'emeeter',
                 users: users
@@ -29,14 +62,13 @@ module.exports = function (router, mongoose) {
         new User({
             email: req.body.email,
             password: req.body.password,
+            state: States.Pending,
             info: [{
-                firstname: req.body.firstname,
-                lastname: req.body.lastname,
+                name: req.body.name,
                 birthdate: req.body.birthdate,
                 gender: req.body.gender,
                 location: req.body.location
-            }],
-            state: 'Pending'
+            }]
 
         }).save(function (err, user) {
             if (err) {
