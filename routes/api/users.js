@@ -47,12 +47,9 @@ module.exports = function (router, mongoose) {
                 next(err);
             }
             if (users.length === 0) {
-                users = false;
+                res.send('The are no users');
             }
-            res.render('list', {
-                title: 'emeeter',
-                users: users
-            });
+            res.send(users);
         });
     });
 
@@ -73,11 +70,13 @@ module.exports = function (router, mongoose) {
         }).save(function (err, user) {
             if (err) {
                 /* Check for duplicated entry */
-                if (err.code && err.code === 11000)
+                if (err.code && err.code === 11000) {
                     res.status(409).end();
-                else if (err.name && err.name === 'ValidationError')
+                } else if (err.name && err.name === 'ValidationError') {
                     res.status(400).end();
-                else next(err);
+                } else {
+                    next(err);
+                }
             } else {
                 res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
             }
@@ -93,17 +92,17 @@ module.exports = function (router, mongoose) {
             .exec(function (err, token) {
                 if (err) {
                     next(err);
-                } else if (token.active) {
+                } else if (token) {
                     User.findById(token.user, function (err, user) {
-                        if (err) next(err)
-                        else {
-                            user.state = 'Active';
+                        if (err) {
+                            next(err);
+                        } else {
+                            user.state = States.Active;
                             res.redirect('/login');
                         }
                     });
                 } else {
-                    console.log('This token is not active anymore');
-                    res.redirect('/mandrill/signin/' + token.user); /* call the email manager */
+                    res.send('This token is not active anymore');
                 }
             });
     });
@@ -127,10 +126,10 @@ module.exports = function (router, mongoose) {
                 if (err) {
                     next(err);
                 } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
-                    if (user.state === 'Active') {
+                    if (user.state === States.Active) {
                         req.session.user = user;
                         res.render('/profile');
-                    } else if (user.state === 'Pending') {
+                    } else if (user.state === States.Pending) {
                         console.log("Looks like you haven't confirmed your email");
                         res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
                     } else {
@@ -179,12 +178,11 @@ module.exports = function (router, mongoose) {
     /* Get a user and renders it's profile */
     router.get('/:id', function (req, res, next) {
         User.findById(req.params.id, function (err, user) {
-            if (err) next(err);
-            else
-                res.render('profile', {
-                    title: 'emeeter',
-                    user: user
-                });
+            if (err) {
+                next(err);
+            } else {
+                res.send(user);
+            }
         });
     });
 
