@@ -72,45 +72,43 @@ module.exports = function (router, mongoose) {
                                 send_at = new Date()*/
             ;
 
-            User.findOne()
-                .where('_id', req.params.id)
-                .exec(function (err, user) {
-                    if (err) {
-                        next(err);
-                    } else {
-                        Token.remove({ /* Removes any previous tokens assigned to the user */
-                            user: user._id
-                        }, function (err) {
-                            if (err) {
-                                next(err);
-                            } else {
-                                new Token({ /* Assigns a new Token to the user */
-                                    user: user._id
-                                }).save(function (err, token) {
-                                    if (err) {
-                                        console.log(err);
-                                    } else {
-                                        message = getMessage(user.email, token._id);
-                                        api.messages.send({ /* Send a confirmation email to the user */
-                                            "message": message
-                                                /*,
-                                                                                            "async": async,
-                                                                                            "ip_pool": ip_pool,
-                                                                                            "send_at": send_at*/
-                                        }, function (result) {
-                                            console.log(result);
-                                            res.send("You've been sent a confirmation email.");
-                                        }, function (err) {
-                                            console.log('A mandrill error occurred: ' + err.name + ' - ' + err.message);
-                                            res.end();
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
+            User.findById(req.params.id, function (err, user) {
+                if (err) {
+                    next(err);
+                } else {
+                    Token.remove({ /* Removes any previous tokens assigned to the user */
+                        user: user._id
+                    }, function (err) {
+                        if (err) {
+                            next(err);
+                        } else {
+                            new Token({ /* Assigns a new Token to the user */
+                                user: user._id
+                            }).save(function (err, token) {
+                                if (err) {
+                                    next(err);
+                                } else {
+                                    message = getMessage(user.email, token._id);
+                                    api.messages.send({ /* Send a confirmation email to the user */
+                                        "message": message
+                                            /*,
+                                                                                        "async": async,
+                                                                                        "ip_pool": ip_pool,
+                                                                                        "send_at": send_at*/
+                                    }, function (result) {
+                                        console.log(result);
+                                        res.send("You've been sent a confirmation email.");
+                                    }, function (err) {
+                                        console.log('A mandrill error occurred: ' + err.name + ' - ' + err.message);
+                                        res.end();
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
 
-                });
+            });
 
         } else {
             console.log('A error occurred with the Mandrill client');

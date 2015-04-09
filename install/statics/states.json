@@ -1,12 +1,12 @@
 [
-    {
-        "name": "Pending"
+  {
+    "name": "Pending"
   },
-    {
-        "name": "Active"
+  {
+    "name": "Active"
   },
-    {
-        "name": "Inactive"
+  {
+    "name": "Disabled"
   }
 
 ]
