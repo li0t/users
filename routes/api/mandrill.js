@@ -7,12 +7,13 @@ var Mandrill = require('mandrill-api/mandrill').Mandrill;
 module.exports = function (router, mongoose) {
 
     var apiKey = 'DhTgCrDsRExbzSfSU-3dLw',
+        url = 'localhost:3030',
         api = false,
         User = mongoose.model('user'),
         Token = mongoose.model('token'),
         getMessage = function (email, token) {
             var message = {
-                "html": "<a href='http://localhost:3030/api/users/validate/" + token + "'>Please confirm your email</a>" +
+                "html": "<a href='http://" + url + "/api/users/validate/" + token + "'>Please confirm your email</a>" +
                     "<img src='http://blog.mandrill.com/images/mandrill-shield.png' alt='Mandrill'/>",
                 "text": "Bievenido a eMeeter",
                 "subject": "Confirm your email",

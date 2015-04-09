@@ -99,7 +99,8 @@ module.exports = function (router, mongoose) {
                             if (err) {
                                 console.log('Something went wrong');
                             } else {
-                                res.send(user);
+                                req.session.user = user;
+                                res.redirect('/api/users/' + user._id);
                             }
                         });
 
@@ -135,10 +136,9 @@ module.exports = function (router, mongoose) {
                 } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
                     if (user.state === States.Active) {
                         req.session.user = user;
-                        res.render('/profile');
+                        res.redirect('/api/users/' + user._id);
                     } else if (user.state === States.Pending) {
-                        console.log("Looks like you haven't confirmed your email");
-                        res.redirect('/mandrill/signin/' + user._id); /* call the email manager */
+                        res.send("Looks like you havent confirmed your email yet.");
                     } else {
                         res.render('/reactivate');
                     }
@@ -180,6 +180,19 @@ module.exports = function (router, mongoose) {
             });
 
     });
+    
+        /* UPDATE USER */
+        router.post('/edit/:id', function (req, res, next) {
+            User.update({
+                _id: req.params.id
+            }, req.body, function (err, entry) {
+                if (err) res.render('error', {
+                    title: 'emeeter',
+                    error: err
+                });
+                res.redirect('/');
+            });
+        });
 
 
     /* Get a user and renders it's profile */
@@ -193,18 +206,7 @@ module.exports = function (router, mongoose) {
         });
     });
 
-    //    /* UPDATE USER */
-    //    router.post('/edit/:id', function (req, res, next) {
-    //        User.update({
-    //            _id: req.params.id
-    //        }, req.body, function (err, entry) {
-    //            if (err) res.render('error', {
-    //                title: 'emeeter',
-    //                error: err
-    //            });
-    //            res.redirect('/');
-    //        });
-    //    });
+
     //
     //
     //
