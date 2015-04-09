@@ -6,6 +6,7 @@ var bcrypt = require('bcrypt');
 module.exports = function (router, mongoose) {
 
     var User = mongoose.model('user'),
+        Profile = mongoose.model('profile'),
         Token = mongoose.model('token'),
         States = {
             Active: null,
@@ -176,15 +177,21 @@ module.exports = function (router, mongoose) {
     });
 
     /* UPDATE USER */
-    router.post('/edit/:id', function (req, res, next) {
-        User.update({
-            _id: req.params.id
-        }, req.body, function (err, entry) {
-            if (err) res.render('error', {
-                title: 'emeeter',
-                error: err
-            });
-            res.redirect('/');
+    router.post('/info/:id', function (req, res, next) {
+        Profile.update({
+            _id: req.session.user.profile._id
+        }, {
+            name: req.body.name,
+            birthdate: req.body.birthdate,
+            gender: req.body.gender,
+            location: req.body.location,
+            metadata: req.body.metadata
+        }, function (err) {
+            if (err) {
+                next(err);
+            } else {
+                res.redirect('api/users/' + req.session.user._id);
+            }
         });
     });
 
