@@ -7,33 +7,6 @@ var validator = require('validator'),
 
 module.exports = function (Schema) {
 
-    /* Stores the user's info */
-    var infoSchema = new Schema({
-
-        name: {
-            type: String
-
-        },
-
-        birthdate: {
-            type: Date
-
-        },
-
-        gender: {
-            type: Schema.Types.ObjectId,
-            ref: 'static.gender'
-
-        },
-
-        location: {
-            type: String
-
-        },
-
-        _id: false
-
-    });
 
     var UserSchema = new Schema({
 
@@ -42,9 +15,9 @@ module.exports = function (Schema) {
             required: true,
             unique: true,
             validate: [
-          validator.isEmail,
-          "Uh oh, looks like you don't know how to write an email address. Go back to your cave."
-      ]
+                validator.isEmail,
+                "Uh oh, looks like you don't know how to write an email address. Go back to your cave."
+            ]
         },
 
         password: {
@@ -52,24 +25,14 @@ module.exports = function (Schema) {
             required: true
         },
 
-        info: {
-            type: [infoSchema]
-        },
-
-        profilePic: {
+        state: {
             type: Schema.Types.ObjectId,
-            ref: 'fs.file'
+            ref: 'static.state'
         },
 
-        contactos: {
-            type: [String]
-        },
-
-        metadata: {
-            type: [{
-                title: String,
-                content: String
-            }],
+        profile: {
+            type: Schema.Types.ObjectId,
+            ref: 'profile'
         },
 
         updated: {
@@ -77,10 +40,7 @@ module.exports = function (Schema) {
             default: Date.now
         },
 
-        state: {
-            type: Schema.Types.ObjectId,
-            ref: 'static.state'
-        }
+
 
     });
 

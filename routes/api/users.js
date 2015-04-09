@@ -14,6 +14,7 @@ module.exports = function (router, mongoose) {
         };
 
     /* Looks for statics states and saves the ids */
+    /* FALLS WHEN THERE ARE NO STATICS INSTALLED */
     (function getStates() {
         var Sts = mongoose.model('static.state'),
             state;
@@ -58,14 +59,7 @@ module.exports = function (router, mongoose) {
         new User({
             email: req.body.email,
             password: req.body.password,
-            state: States.Pending,
-            info: [{
-                name: req.body.name,
-                birthdate: req.body.birthdate,
-                gender: req.body.gender,
-                location: req.body.location
-            }]
-
+            state: States.Pending
         }).save(function (err, user) {
             if (err) {
                 /* Check for duplicated entry */
@@ -180,19 +174,19 @@ module.exports = function (router, mongoose) {
             });
 
     });
-    
-        /* UPDATE USER */
-        router.post('/edit/:id', function (req, res, next) {
-            User.update({
-                _id: req.params.id
-            }, req.body, function (err, entry) {
-                if (err) res.render('error', {
-                    title: 'emeeter',
-                    error: err
-                });
-                res.redirect('/');
+
+    /* UPDATE USER */
+    router.post('/edit/:id', function (req, res, next) {
+        User.update({
+            _id: req.params.id
+        }, req.body, function (err, entry) {
+            if (err) res.render('error', {
+                title: 'emeeter',
+                error: err
             });
+            res.redirect('/');
         });
+    });
 
 
     /* Get a user and renders it's profile */
