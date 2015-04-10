@@ -21,8 +21,8 @@ module.exports = function (router, mongoose) {
    * FALLS WHEN THERE ARE NO STATICS INSTALLED
    */
   (function getStates() {
-    var 
-    Sts = mongoose.model('static.state'),
+    var
+      Sts = mongoose.model('static.state'),
       state;
 
     function lookup(name) {
@@ -166,34 +166,43 @@ module.exports = function (router, mongoose) {
    * Changes user password
    */
   router.post('/changePassword', function (req, res, next) {
-    if (req.session.user._id) { /* Check if there's a user logged in */
-      var oldPassword = req.body.oldPassword,
-        newPassword = req.body.newPassword;
 
-      User.findById(req.session.user._id)
-        .exec(function (err, user) {
-          if (err) {
-            next(err);
-          } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
-            user.password = newPassword;
-            user.save()
-              .deepPopulate('profile.gender profile}.pictures profile.contacts') /* Retrieves data of linked schemas */
-              .exec(function (err, user) {
-                req.session.user = user;
-                res.redirect('/api/users/' + user._id);
-              });
-          } else {
-            setTimeout(function () {
-              res.status(401).end();
-            }, 1000);
-          }
-        });
-    } else {
-      console.log('You are not logged in');
-      res.status(401).end();
-    }
+    var oldPassword = req.body.oldPassword,
+      newPassword = req.body.newPassword;
+
+    User.findById(req.session.user._id)
+      .exec(function (err, user) {
+        if (err) {
+          next(err);
+        } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
+          user.password = newPassword;
+          user.save()
+            .deepPopulate('profile.gender profile}.pictures profile.contacts') /* Retrieves data of linked schemas */
+            .exec(function (err, user) {
+              req.session.user = user;
+              res.redirect('/api/users/' + user._id);
+            });
+        } else {
+          setTimeout(function () {
+            res.status(401).end();
+          }, 1000);
+        }
+      });
+
   });
 
+  /** Add contact request */
+  router.get('/addContact/:id', function (req, res, next) {
+    User.findById(req.params.id, function (err, user) {
+      if (err) {
+        next(err);
+      } else if (user) {
+
+      } else {
+        res.status(400).end();
+      }
+    });
+  });
 
   /** 
    * Token validation
@@ -234,7 +243,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:id', function (req, res, next) {
     User.findById(req.params.id)
-      .deepPopulate('profile.gender profile.pictures profile.contacts') /* Retrieves data of linked schemas */
+      .deepPopulate('profile.gender profile.contacts') /* Retrieves data of linked schemas */
       .exec(function (err, user) {
         if (err) {
           next(err);
