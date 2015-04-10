@@ -3,7 +3,7 @@
 
 module.exports = function (Schema) {
 
-    var tokenSchema = new Schema({
+    return new Schema({
 
         user: {
             type: Schema.Types.ObjectId,
@@ -19,5 +19,4 @@ module.exports = function (Schema) {
 
     });
 
-    return tokenSchema;
 };
