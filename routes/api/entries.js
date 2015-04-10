@@ -10,8 +10,10 @@ module.exports = function (router, mongoose) {
 
   var gridfs = component('gridfs');
 
-
-  router.post('/', function (req, res, next) {
+  /**
+   * Creates a new entry
+   */
+  router.post('/create', function (req, res, next) {
 
     var entry, /* This is the target schema */
       tags = [] /* The tags to be stored in the entry */ ,
@@ -22,8 +24,8 @@ module.exports = function (router, mongoose) {
      * if one is not found creates a new tag and stores the id
      */
     (function tagsLookup() {
-      if (req.params.tags && req.params.tags.length) {
-        req.params.tags.forEach(function (tag) {
+      if (req.body.tags && req.body.tags.length) {
+        req.body.tags.forEach(function (tag) {
           Tag.find()
             .where('name', tag)
             .exec(function (err, found) {
@@ -102,9 +104,9 @@ module.exports = function (router, mongoose) {
     }
 
     new Entry({
-      user: req.params._id,
-      title: req.params.title,
-      content: req.params.content /* Markdown text */ ,
+      user: req.body._id /** ¡IMPORTATE! PROVISORIO DEBE CAMBIAR POR REQ.SESSION.USER._ID */ ,
+      title: req.body.title,
+      content: req.body.content /* Markdown text */ ,
       tags: tags /* The previously processed tags array */
     }, function (err, data) {
       if (err) {
