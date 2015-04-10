@@ -1,24 +1,68 @@
 /* jshint node: true */
+/* global component */
 'use strict';
 
 module.exports = function (router, mongoose) {
 
-  var Entry = mongoose.model('entry');
-  
-  router.post('/picture', function (req, res, next) {
+  var Entry = mongoose.model('entry'),
+    Tag = mongoose.model('tag'),
+    debug = require('debug')('app:api:entries');
 
-    var profile,
-      saved = 0; /* This is the target schema */
+  var gridfs = component('gridfs');
+
+
+  router.post('/', function (req, res, next) {
+
+    var entry, /* This is the target schema */
+      tags = [] /* The tags to be stored in the entry */ ,
+      saved = 0;
+
+    /** 
+     * Looksup for tags provided by the user
+     * if one is not found creates a new tag and stores the id
+     */
+    (function tagsLookup() {
+      if (req.params.tags && req.params.tags.length) {
+        req.params.tags.forEach(function (tag) {
+          Tag.find()
+            .where('name', tag)
+            .exec(function (err, found) {
+              if (err) {
+                debug(err);
+              } else if (found) {
+                tags.push(found._id);
+              } else {
+                new Tag({
+                  name: tag
+                }, function (err, newTag) {
+                  if (err) {
+                    debug(err);
+                  } else {
+                    tags.push(newTag._id);
+                  }
+                });
+              }
+            });
+        });
+      }
+    })();
 
     /**
      * Create the document with the saved File ids
      */
-    function saveProfile() {
-      profile.save(function (err) {
+    function saveEntry() {
+      entry.save(function (err) {
         if (err) {
           next(err);
         } else {
-          res.status(204).end();
+          entry.deepPopulate('pictures tags user.contacts user.state user.profile')
+            .exec(function (err, _entry) {
+              if (err) {
+                next(err);
+              } else {
+                res.status(204).send(_entry);
+              }
+            });
         }
       });
     }
@@ -27,14 +71,14 @@ module.exports = function (router, mongoose) {
       function onclose(fsFile) {
         debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
 
-        profile.pictures.push(fsFile._id); /* Add the picture's id to the profile.pictures array */
+        entry.pictures.push(fsFile._id); /* Add the picture's id to the entry.pictures array */
 
         saved += 1;
 
         /* Check if all files where streamed to the database */
         if (saved === req.files.length) {
           debug('All files saved');
-          saveProfile();
+          saveEntry();
         }
       }
 
@@ -57,24 +101,26 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    Profile.findById(req.session.user._id, function (err, data) {
+    new Entry({
+      user: req.params._id,
+      title: req.params.title,
+      content: req.params.content /* Markdown text */ ,
+      tags: tags /* The previously processed tags array */
+    }, function (err, data) {
       if (err) {
         next(err);
-      } else if (data) {
-        profile = data;
-
+      } else {
+        entry = data;
         if (req.files && req.files.length) { /* If there are any files, save them */
           savePictures();
-        } else { /* If not, just save the profile */
-          saveProfile();
+        } else { /* If not, just save the entry */
+          saveEntry();
         }
-      } else {
-        res.status(400).end();
       }
     });
 
   });
-  
+
 
   /**
    * Get entries base on tags 
@@ -154,7 +200,7 @@ module.exports = function (router, mongoose) {
       res.status(400).end();
     }
   });
-  
+
   /**
    * Get an entry
    */
@@ -172,7 +218,7 @@ module.exports = function (router, mongoose) {
       });
   });
 
-    /**
+  /**
    * Get entries of an user
    */
   router.get('/user/:id', function (req, res, next) {

@@ -41,8 +41,8 @@ module.exports = function (router, mongoose) {
    */
   router.post('/picture', function (req, res, next) {
 
-    var profile,
-      saved = 0; /* This is the target schema */
+    var profile, /* This is the target schema */
+      saved = 0; 
 
     /**
      * Create the document with the saved File ids

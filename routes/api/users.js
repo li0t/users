@@ -177,7 +177,7 @@ module.exports = function (router, mongoose) {
         } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
           user.password = newPassword;
           user.save()
-            .deepPopulate('profile.gender profile}.pictures profile.contacts') /* Retrieves data of linked schemas */
+            .deepPopulate('profile.gender profile.pictures') /* Retrieves data of linked schemas */
             .exec(function (err, user) {
               req.session.user = user;
               res.redirect('/api/users/' + user._id);
