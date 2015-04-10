@@ -1,5 +1,6 @@
 /* jshint node: true */
 'use strict';
+var deepPopulate = require('mongoose-deep-populate'); 
 
 module.exports = function (Schema) {
 
@@ -51,6 +52,8 @@ module.exports = function (Schema) {
     next();
   });
   
+  /** Lets populate reach any level */
+  EntrySchema.plugin(deepPopulate);
 
   return EntrySchema;
 };

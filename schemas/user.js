@@ -25,6 +25,11 @@ module.exports = function (Schema) {
       required: true
     },
 
+    contacts: [{
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    }],
+
     state: {
       type: Schema.Types.ObjectId,
       ref: 'static.state'
@@ -70,7 +75,7 @@ module.exports = function (Schema) {
     }
   });
 
-  /** Let's populate reach any level */
+  /** Lets populate reach any level */
   UserSchema.plugin(deepPopulate);
 
   return UserSchema;

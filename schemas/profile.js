@@ -29,11 +29,6 @@ module.exports = function (Schema) {
       ref: 'fs.file'
         }],
 
-    contacts: [{
-      type: Schema.Types.ObjectId,
-      ref: 'user'
-        }],
-
     updated: {
       type: Date,
       default: Date.now
@@ -53,7 +48,7 @@ module.exports = function (Schema) {
   });
 
 
-  /** Let's populate reach any level */
+  /** Lets populate reach any level */
   ProfileSchema.plugin(deepPopulate);
 
 
