@@ -21,7 +21,8 @@ module.exports = function (router, mongoose) {
    * FALLS WHEN THERE ARE NO STATICS INSTALLED
    */
   (function getStates() {
-    var Sts = mongoose.model('static.state'),
+    var 
+    Sts = mongoose.model('static.state'),
       state;
 
     function lookup(name) {
@@ -63,27 +64,33 @@ module.exports = function (router, mongoose) {
    * Create a new user
    */
   router.post('/create', function (req, res, next) {
+
     new Profile()
       .save(function (err, profile) {
-        new User({
-          email: req.body.email,
-          password: req.body.password,
-          profile: profile._id,
-          state: States.Pending,
-        }).save(function (err, user) {
-          if (err) {
-            /* Check for duplicated entry */
-            if (err.code && err.code === 11000) {
-              res.status(409).end();
-            } else if (err.name && err.name === 'ValidationError') {
-              res.status(400).end();
+        if (err) { /* Not sure if should check for error here */
+          next(err);
+        } else {
+
+          new User({
+            email: req.body.email,
+            password: req.body.password,
+            profile: profile._id,
+            state: States.Pending,
+          }).save(function (err, user) {
+            if (err) {
+              /* Check for duplicated entry */
+              if (err.code && err.code === 11000) {
+                res.status(409).end();
+              } else if (err.name && err.name === 'ValidationError') {
+                res.status(400).end();
+              } else {
+                next(err);
+              }
             } else {
-              next(err);
+              res.redirect('/api/mandrill/signin/' + user._id); /* call the email manager */
             }
-          } else {
-            res.redirect('/api/mandrill/signin/' + user._id); /* call the email manager */
-          }
-        });
+          });
+        }
       });
   });
 
@@ -153,35 +160,7 @@ module.exports = function (router, mongoose) {
   });
 
 
-  /** 
-   * Update Profile linked to User
-   */
-  router.post('/info', function (req, res, next) {
-    if (req.session.user) { /* Check if there's a user logged in */
-      Profile
-        .findOneAndUpdate({
-          _id: req.session.user.profile._id
-        }, {
-          name: req.body.name,
-          birthdate: req.body.birthdate,
-          gender: req.body.gender,
-          location: req.body.location,
-          metadata: req.body.metadata
-        })
-        .deepPopulate('profile.gender profile.pictures profile.contacts') /* Retrieves data of linked schemas */
-        .exec(function (err, user) {
-          if (err) {
-            next(err);
-          } else {
-            req.session.user = user;
-            res.redirect('api/users/' + user._id);
-          }
-        });
-    } else {
-      console.log('You are not logged in');
-      res.status(401).end();
-    }
-  });
+
 
   /**
    * Changes user password
@@ -215,36 +194,6 @@ module.exports = function (router, mongoose) {
     }
   });
 
-  /**
-   * Upload a picture
-   */
-  router.post('/picture', function (req, res, next) {
-    if (req.session.user._id) { /* Check if there's a user logged in */
-      var picture = {};
-
-      Profile
-        .findById(req.session.user.profile)
-        .exec(function (err, profile) {
-          if (err) {
-            next(err);
-          } else if (profile) {
-            profile.picture.push = picture;
-            profile.save(function (err) {
-              if (err) {
-                next(err);
-              } else {
-                res.redirect('/api/users/' + req.session.user._id);
-              }
-            });
-          } else {
-            res.status(400).end();
-          }
-        });
-    } else {
-      console.log('You are not logged in');
-      res.status(401).end();
-    }
-  });
 
   /** 
    * Token validation
