@@ -54,7 +54,7 @@ app.set('view engine', configs.views.engine);
 
 if (app.get('env') === 'production') {
     app.set('trust proxy', 1); /* Trust first proxy */
-    configs.session.cookie.secure = true; /* Serve secure cookies */
+    configs.session.cookie.secure = false; /* Serve secure cookies */ /* CHANGED THIS TO FALSE TO USE REQ.SESSION.USER */
 }
 
 
