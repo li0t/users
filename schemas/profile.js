@@ -5,52 +5,53 @@ var deepPopulate = require('mongoose-deep-populate');
 
 module.exports = function (Schema) {
 
-  var ProfileSchema = new Schema({
+    var ProfileSchema = new Schema({
 
-    name: {
-      type: String
-    },
+        name: {
+            type: String
+        },
 
-    birthdate: {
-      type: Date
-    },
+        birthdate: {
+            type: Date
+        },
 
-    gender: {
-      type: Schema.Types.ObjectId,
-      ref: 'static.gender'
-    },
+        gender: {
+            type: Schema.Types.ObjectId,
+            ref: 'static.gender',
+            default: null
+        },
 
-    location: {
-      type: String
-    },
+        location: {
+            type: String
+        },
 
-    pictures: [{
-      type: Schema.Types.ObjectId,
-      ref: 'fs.file'
+        pictures: [{
+            type: Schema.Types.ObjectId,
+            ref: 'fs.file'
         }],
 
-    updated: {
-      type: Date,
-      default: Date.now
-    }
+        updated: {
+            type: Date,
+            default: Date.now
+        }
 
-  });
-
-
-  /** Show virtuals on JSON conversion */
-  ProfileSchema.set('toJSON', {
-    virtuals: true
-  });
-
-  /**  */
-  ProfileSchema.pre('save', function (next) {
-    next();
-  });
+    });
 
 
-  /** Lets populate reach any level */
-  ProfileSchema.plugin(deepPopulate);
+    /** Show virtuals on JSON conversion */
+    ProfileSchema.set('toJSON', {
+        virtuals: true
+    });
+
+    /**  */
+    ProfileSchema.pre('save', function (next) {
+        next();
+    });
 
 
-  return ProfileSchema;
+    /** Lets populate reach any level */
+    ProfileSchema.plugin(deepPopulate);
+
+
+    return ProfileSchema;
 };

@@ -5,6 +5,7 @@
 module.exports = function (router, mongoose) {
 
     var Profile = mongoose.model('profile'),
+        User = mongoose.model('user'),
         debug = require('debug');
 
     var gridfs = component('gridfs');
@@ -15,7 +16,6 @@ module.exports = function (router, mongoose) {
      * Update Profile linked to User
      */
     router.post('/', function (req, res, next) {
-
         Profile
             .findOneAndUpdate({
                     _id: req.session.user.profile
@@ -29,9 +29,16 @@ module.exports = function (router, mongoose) {
                 })
             .exec(function (err) {
                 if (err) {
-                    next(err);
+                    /* Check for duplicated entry */
+                    if (err.code && err.code === 11000) {
+                        res.status(409).end();
+                    } else if (err.name && err.name === 'ValidationError') {
+                        res.status(400).end();
+                    } else {
+                        next(err);
+                    }
                 } else {
-                    res.redirect('api/users/' + req.sesion.user._id);
+                    res.redirect('/api/users/' + req.session.user._id);
                 }
             });
     });
@@ -39,7 +46,7 @@ module.exports = function (router, mongoose) {
     /**
      * Upload a picture
      */
-    router.post('/picture', function (req, res, next) {
+    router.post('/pictures', function (req, res, next) {
 
         var profile, /* This is the target schema */
             saved = 0;
@@ -96,7 +103,6 @@ module.exports = function (router, mongoose) {
                 next(err);
             } else if (data) {
                 profile = data;
-                console.log(req.files);
                 if (req.files && req.files.length) { /* If there are any files, save them */
                     savePictures();
                 } else { /* If not, just save the profile */
@@ -110,24 +116,34 @@ module.exports = function (router, mongoose) {
 
     });
 
+
     /** 
-     * Get all the profiles pictures
+     * Get all the profiles pictures of one user
      */
-    router.get('/pictures/:id', function (req, res, next) {
-        Profile.find()
-            .where('_id', req.params.id)
-            .exec(function (err, profile) {
-                if (err) {
-                    next(err);
-                } else if (profile && profile.pictures.length) {
-                    profile.pictures.forEach(function (pictureId) {
-                        /* retrieve file by id */
+    router.get('/:id/pictures', function (req, res, next) {
+        User.findById(req.params.id, function (err, user) {
+            if (err) {
+                next(err);
+            } else if (user) {
+                Profile.find()
+                    .where('_id', user.profile)
+                    .populate('pictures')
+                    .exec(function (err, profile) {
+                        if (err) {
+                            next(err);
+                        } else if (profile && profile[0].pictures.length) {
+                            res.send(profile[0].pictures);
+                        } else {
+                            debug('No pictures found for id %s', user.profile);
+                            res.status(404).end();
+                        }
                     });
-                } else {
-                    debug('No pictures found for id %s', req.params.id);
-                    res.end();
-                }
-            });
+            } else {
+                debug('No user found for id %s', req.params.id);
+                res.status(404).end();
+            }
+        })
+
     });
 
 };
