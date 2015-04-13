@@ -87,7 +87,7 @@ module.exports = function (router, mongoose) {
                                 next(err);
                             }
                         } else {
-                            res.redirect('/api/mandrill/signin/' + user._id); /* call the email manager */
+                            res.status(201).redirect('/api/mandrill/signin/' + user._id); /* call the email manager */
                         }
                     });
                 }
@@ -171,17 +171,16 @@ module.exports = function (router, mongoose) {
             newPassword = req.body.newPassword;
 
         User.findById(req.session.user._id)
+            .deepPopulate('contacts profile.gender profile.pictures') /* Retrieves data from linked schemas */
             .exec(function (err, user) {
                 if (err) {
                     next(err);
                 } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
                     user.password = newPassword;
-                    user.save()
-                        .deepPopulate('profile.gender profile.pictures') /* Retrieves data of linked schemas */
-                        .exec(function (err, user) {
-                            req.session.user = user;
-                            res.redirect('/api/users/' + user._id);
-                        });
+                    user.save(function (err, user) {
+                        req.session.user = user;
+                        res.redirect('/api/users/' + user._id);
+                    });
                 } else {
                     setTimeout(function () {
                         res.status(401).end();
@@ -189,19 +188,6 @@ module.exports = function (router, mongoose) {
                 }
             });
 
-    });
-
-    /** Add contact request */
-    router.get('/addContact/:id', function (req, res, next) {
-        User.findById(req.params.id, function (err, user) {
-            if (err) {
-                next(err);
-            } else if (user) {
-
-            } else {
-                res.status(400).end();
-            }
-        });
     });
 
     /** 
@@ -243,228 +229,17 @@ module.exports = function (router, mongoose) {
      */
     router.get('/:id', function (req, res, next) {
         User.findById(req.params.id)
-            .deepPopulate('profile.gender profile.contacts') /* Retrieves data of linked schemas */
+            .deepPopulate('profile.gender profile.contacts') /* Retrieves data from linked schemas */
             .exec(function (err, user) {
                 if (err) {
                     next(err);
                 } else if (user) {
-                    console.log(req.session);
-                    res.send(user);
+                    res.status(200).send(user);
                 } else {
                     res.status(400).end();
                 }
             });
     });
 
-
-    //
-    //
-    //
-    //
-    //    /* ADD CONTACT */
-    //    router.get('/addContact/:idContacto/:idUser', function (req, res, next) {
-    //        User.findById(req.params.idUser, function (err, usr) {
-    //            if (!err) {
-    //                var isContact = false;
-    //
-    //                for (var i = 0; i < usr.contactos.length; i++)
-    //                    if (JSON.stringify(usr.contactos[i]) == JSON.stringify(req.params.idContacto)) {
-    //                        isContact = true;
-    //                        break;
-    //                    }
-    //                if (!isContact) {
-    //                    usr.contactos.push(req.params.idContacto);
-    //                    usr.save(function (err) {
-    //                        if (err) res.render('error', {
-    //                            title: 'emeeter',
-    //                            error: err
-    //                        });
-    //                        res.redirect('/users/' + usr._id);
-    //                    });
-    //                } else res.render('error', {
-    //                    title: 'emeeter',
-    //                    error: new Error('Ya tienes ese contacto')
-    //                });
-    //            } else res.render('error', {
-    //                title: 'emeeter',
-    //                error: err
-    //            });
-    //        });
-    //    });
-    //
-    //
-    //    /* DELETE CONTACT */
-    //    router.get('/delContact/:idContacto/:idUser', function (req, res, next) {
-    //        User.findById(req.params.idUser, function (err, usr) {
-    //            if (err) console.log('ERROR! ' + err);
-    //
-    //            for (var i = 0; i < usr.contactos.length; i++) {
-    //                if (JSON.stringify(usr.contactos[i]) === JSON.stringify(req.params.idContacto) || usr.contactos[i] == null) {
-    //                    var indexOf = i;
-    //                    break;
-    //                }
-    //            }
-    //            if (typeof indexOf === 'number') {
-    //                usr.contactos.splice(indexOf, 1);
-    //                usr.save(function (err) {
-    //                    if (err) res.render('error', {
-    //                        title: 'emeeter',
-    //                        error: err
-    //                    });
-    //                    res.redirect('/users/' + usr._id);
-    //                });
-    //            } else res.render('error', {
-    //                title: 'emeeter',
-    //                error: new Error('Este contacto no es tuyo!')
-    //            });
-    //        });
-    //    });
-    //
-    //    router.post('/search', function (req, res, next) {
-    //        User.where('username')
-    //            .equals(req.body.username)
-    //            .exec(function (err, users) {
-    //                if (err) res.render('error', {
-    //                    title: 'emeeter',
-    //                    error: err
-    //                });
-    //                else
-    //                    res.render('list', {
-    //                        title: 'emeeter',
-    //                        users: users
-    //                    });
-    //            });
-    //    });
-    //
-    //    router.post('/search/:id', function (req, res, next) {
-    //        User.findById(req.params.id, function (err, user) {
-    //            if (err) res.render('error', {
-    //                title: 'emeeter',
-    //                error: err
-    //            });
-    //            else
-    //                User
-    //                .where('username')
-    //                .equals(req.body.username)
-    //                .exec(function (err, users) {
-    //                    if (err) res.render('error', {
-    //                        title: 'emeeter',
-    //                        error: err
-    //                    });
-    //                    else {
-    //                        User.find(function (err, contacts) {
-    //                            if (err) res.render('error', {
-    //                                title: 'emeeter',
-    //                                error: err
-    //                            });
-    //                            else {
-    //                                var contactsList = [];
-    //                                /* push real users in the contactsList by their id */
-    //                                for (var i = 0; i < contacts.length; i++) {
-    //                                    for (var j = 0; j < user.contactos.length; j++)
-    //                                        if (JSON.stringify(contacts[i]._id) == JSON.stringify(user.contactos[j])) {
-    //                                            contactsList.push(contacts[i]);
-    //                                            break;
-    //                                        }
-    //                                    if (contactsList.length == user.contactos.length)
-    //                                        break;
-    //                                }
-    //                                if (contactsList.length == 0) contactsList = false;
-    //                                console.log('tu usuario es : ' + JSON.stringify(user.username));
-    //                                console.log('tus contactos son : ' + JSON.stringify(contactsList.length));
-    //                                res.render('list', {
-    //                                    title: 'emeeter',
-    //                                    user: user,
-    //                                    users: users,
-    //                                    contactos: contactsList
-    //                                });
-    //                            }
-    //                        });
-    //                    }
-    //                });
-    //        });
-    //    });
-    //
-    //
-    //    /* GET CONTACTS */
-    //    router.get('/:id', function (req, res, next) {
-    //        User.findById(req.params.id, function (err, usr) {
-    //            if (!err) {
-    //                User.find(function (err, usrs) {
-    //                    if (!err) {
-    //
-    //                        /* look out the user in the users list */
-    //                        for (var i = 0; i < usrs.length; i++)
-    //                            if (JSON.stringify(usrs[i]._id) === JSON.stringify(usr._id)) {
-    //                                var indexOf = i;
-    //                                break;
-    //                            }
-    //
-    //                            /* remove the user of the users list */
-    //                        usrs.splice(indexOf, 1);
-    //
-    //
-    //                        var contactsList = [];
-    //                        /* push real users in the contactsList by their id */
-    //                        for (var i = 0; i < usrs.length; i++) {
-    //                            for (var j = 0; j < usr.contactos.length; j++)
-    //                                if (JSON.stringify(usrs[i]._id) == JSON.stringify(usr.contactos[j])) {
-    //                                    contactsList.push(usrs[i]);
-    //                                    break;
-    //                                }
-    //                            if (contactsList.length == usr.contactos.length)
-    //                                break;
-    //                        }
-    //                        if (contactsList.length == 0) contactsList = false;
-    //                        res.render('list', { /* SAVE A NEW USER */
-    //                            title: 'emeeter',
-    //                            user: usr,
-    //                            users: usrs,
-    //                            contactos: contactsList
-    //                        });
-    //                    } else
-    //                        res.render('error', {
-    //                            title: 'emeeter',
-    //                            error: err
-    //                        });
-    //
-    //                });
-    //            } else
-    //                res.render('error', {
-    //                    title: 'emeeter',
-    //                    error: err
-    //
-    //                });
-    //
-    //        });
-    //    });
-    //
-    //    /* GET ONE USER */
-    //    router.get('/:id', function (req, res, next) {
-    //        User.findById(req.params.id, function (err, usr) {
-    //            if (err) res.render('error', {
-    //                title: 'emeeter',
-    //                error: err
-    //            });
-    //            else
-    //                res.render('list', {
-    //                    title: 'emeeter',
-    //                    user: usr
-    //                });
-    //        });
-    //    });
-    //
-    //
-    //    /* DELET*/
-    //    router.delete('/:id', function (req, res, next) {
-    //        User.findByIdAndRemove(req.params.id, function (err, usr) {
-    //            if (err) res.render('error', {
-    //                title: 'emeeter',
-    //                error: err
-    //            });
-    //            else
-    //                res.json(usr);
-    //        });
-    //    });
 
 };

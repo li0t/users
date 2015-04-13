@@ -25,10 +25,6 @@ module.exports = function (Schema) {
       required: true
     },
 
-    contacts: [{
-      type: Schema.Types.ObjectId,
-      ref: 'user'
-    }],
 
     state: {
       type: Schema.Types.ObjectId,
