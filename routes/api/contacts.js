@@ -65,11 +65,11 @@ module.exports = function (router, mongoose) {
                 } else {
                   if (sender) {
                     sender[0].contacts.push({ /* Pushes the receiver id into the sender contacts */
-                      _id: user._id,
+                      user: user._id,
                       state: States.Pending
                     });
                     receiver[0].contacts.push({ /* Pushes the sender id into the receiver contacts */
-                      _id: req.session.user._id,
+                      user: req.session.user._id,
                       state: States.Pending
                     });
                     sender[0].save(function (err) {
@@ -115,13 +115,13 @@ module.exports = function (router, mongoose) {
             next(err);
           } else if (receiver) {
             for (var i = 0; i < sender[0].contacts.length; i++) {
-              if (JSON.stringify(sender[0].contacts[i].user) === req.session.user._id) {
+              if (JSON.stringify(sender[0].contacts[i].user) === JSON.stringify(req.session.user._id)) {
                 sender[0].contacts[i].state = States.Active;
                 break;
               }
             }
             for (i = 0; i < receiver[0].contacts.length; i++) {
-              if (JSON.stringify(receiver[0].contacts[i].user) === req.params.id) {
+              if (JSON.stringify(receiver[0].contacts[i].user) === JSON.stringify(req.params.id)) {
                 receiver[0].contacts[i].state = States.Active;
                 break;
               }
