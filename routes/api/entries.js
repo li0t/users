@@ -13,13 +13,30 @@ module.exports = function (router, mongoose) {
   /**
    * Creates a new entry
    * SEPARATE FILES UPLOAD IN SEPARATED REQUEST
-   * STORE TAGS AS STRING ARRAY
+   * STORE TAGS AS STRING
    */
   router.post('/create', function (req, res, next) {
-
     var entry, /* This is the target schema */
-      tagsSaved = 0,
-      picturesSaved = 0;
+      tagsSaved = 0;
+
+    /**
+     * Save the document
+     */
+    function saveEntry() {
+      entry.save(function (err, entry) {
+        if (err) {
+          next(err);
+        } else {
+          entry.deepPopulate('user.contacts user.state user.profile', function (err) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.status(201).send(entry);
+            }
+          });
+        }
+      });
+    }
 
     /** 
      * Looksup for tags provided by the user
@@ -28,18 +45,13 @@ module.exports = function (router, mongoose) {
     function saveTags() {
       /* Check if all tags were found and/or created*/
       function onTagReady(tag) {
-        entry.tags.push(tag._id);
+        entry.tags.push(tag.name);
 
         tagsSaved += 1;
 
         if (tagsSaved === req.body.tags.length) {
-          entry.save(function (err) {
-            if (err) {
-              console.log(err);
-            }
-          });
+          saveEntry();
         }
-
       }
 
       /* Convert the tags string to array if necessary */
@@ -54,7 +66,7 @@ module.exports = function (router, mongoose) {
               console.log(err);
             } else if (found && found.length) {
               console.log('Tag found : ' + found);
-              onTagReady(found);
+              onTagReady(found[0]);
             } else {
               console.log('Creating new Tag : ' + tag);
               new Tag({
@@ -69,31 +81,53 @@ module.exports = function (router, mongoose) {
             }
           });
       });
-
     };
 
+    new Entry({
+      user: req.session.user._id,
+      title: req.body.title,
+      content: req.body.content /* Markdown text */ ,
+    }).save(function (err, data) {
+      if (err) {
+        next(err);
+      } else {
+        entry = data;
+        if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
+          saveTags()
+        } else { /* If not, just save the entry */
+          saveEntry();
+        }
+      }
+    });
+
+  });
+
+  router.post('/:id/pictures', function (req, res, next) {
+    var entry, /* This is the target schema */
+      picturesSaved = 0;
 
     /**
-     * Save the document with the saved File ids
+     * Save the document
      */
     function saveEntry() {
       entry.save(function (err, entry) {
         if (err) {
           next(err);
         } else {
-          entry.deepPopulate('pictures tags user.contacts user.state user.profile', function (err) {
+          entry.deepPopulate('pictures user.contacts user.state user.profile', function (err) {
             if (err) {
               console.log(err);
             } else {
               res.status(201).send(entry);
             }
           });
-
         }
       });
     }
 
-
+    /**
+     * Save pictures with gridfs and store de ids
+     */
     function savePictures() {
       function onclose(fsFile) {
         debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
@@ -128,28 +162,24 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    new Entry({
-      user: req.session.user._id,
-      title: req.body.title,
-      content: req.body.content /* Markdown text */ ,
-    }).save(function (err, data) {
-      if (err) {
-        next(err);
-      } else {
-        entry = data;
-        if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
-          saveTags()
+    Entry.find()
+      .where('_id', req.params.id)
+      .where('user', req.session.user._id)
+      .exec(function (err, data) {
+        if (err) {
+          next(err);
+        } else if (data) {
+          entry = data[0];
+          if (req.files && req.files.length) { /* If there are any files, save them */
+            savePictures();
+          } else { /* If not, just save the document */
+            saveEntry();
+          }
+        } else {
+          res.status(404).end();
         }
-        if (req.files && req.files.length) { /* If there are any files, save them */
-          savePictures();
-        } else { /* If not, just save the entry */
-          saveEntry();
-        }
-      }
-    });
-
+      });
   });
-
 
   /**
    * Get entries base on tags 

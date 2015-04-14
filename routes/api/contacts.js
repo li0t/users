@@ -147,7 +147,10 @@ module.exports = function (router, mongoose) {
         res.status(404).end();
       }
     });
+  });
 
+  router.get('/delete/:id', function (req, res, next) {
+    /*TODO*/
   });
 
 }

@@ -4,57 +4,53 @@ var deepPopulate = require('mongoose-deep-populate');
 
 module.exports = function (Schema) {
 
-    var EntrySchema = new Schema({
+  var EntrySchema = new Schema({
 
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
 
-        title: {
-            type: String
-        },
+    title: {
+      type: String
+    },
 
-        content: {
-            type: String
-        },
+    content: {
+      type: String
+    },
 
-        pictures: [{
-            type: Schema.Types.ObjectId,
-            ref: 'fs.file'
+    pictures: [{
+      type: Schema.Types.ObjectId,
+      ref: 'fs.file'
         }],
 
-        tags: [{
-            type: Schema.Types.ObjectId,
-            ref: 'tag',
-            default: []
-        }],
+    tags: [String],
 
-        updated: {
-            type: Date,
-            default: Date.now
-        }
+    updated: {
+      type: Date,
+      default: Date.now
+    }
 
-    });
+  });
 
 
-    /** Show virtuals on JSON conversion */
-    EntrySchema.set('toJSON', {
-        virtuals: true
-    });
+  /** Show virtuals on JSON conversion */
+  EntrySchema.set('toJSON', {
+    virtuals: true
+  });
 
-    /**  */
-    EntrySchema.virtual('created').get(function () {
-        return this._id.getTimestamp();
-    });
+  /**  */
+  EntrySchema.virtual('created').get(function () {
+    return this._id.getTimestamp();
+  });
 
-    /**  */
-    EntrySchema.pre('save', function (next) {
-        next();
-    });
+  /**  */
+  EntrySchema.pre('save', function (next) {
+    next();
+  });
 
-    /** Lets populate reach any level */
-    EntrySchema.plugin(deepPopulate);
+  /** Lets populate reach any level */
+  EntrySchema.plugin(deepPopulate);
 
-    return EntrySchema;
+  return EntrySchema;
 };
