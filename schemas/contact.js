@@ -10,21 +10,21 @@ module.exports = function (Schema) {
       type: Schema.Types.ObjectId,
       ref: 'user'
     },
-    
+
     state: {
       type: Schema.Types.ObjectId,
       ref: 'static.state'
     }
   });
 
-  var ContactSchema = = new Schema({
+  var ContactSchema = new Schema({
 
     user: {
       type: Schema.Types.ObjectId,
       ref: 'user',
       required: true
     },
-    
+
     contacts: [contact]
 
   });
@@ -42,4 +42,5 @@ module.exports = function (Schema) {
   /** Lets populate reach any level */
   ContactSchema.plugin(deepPopulate);
 
+  return ContactSchema;
 };

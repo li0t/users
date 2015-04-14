@@ -64,24 +64,24 @@ module.exports = function (router, mongoose) {
                   next(err)
                 } else {
                   if (sender) {
-                    sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
+                    sender[0].contacts.push({ /* Pushes the receiver id into the sender contacts */
                       _id: user._id,
                       state: States.Pending
                     });
-                    receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
+                    receiver[0].contacts.push({ /* Pushes the sender id into the receiver contacts */
                       _id: req.session.user._id,
                       state: States.Pending
                     });
-                    sender.save(function (err) {
+                    sender[0].save(function (err) {
                       if (err) {
                         next(err);
                       } else {
-                        receiver.save(function (err) {
+                        receiver[0].save(function (err) {
                           if (err) {
                             next(err);
                           } else {
                             //res.redirect('/api/notifications/pending/' + user._id); /* if done, redirects to notifications api */
-                            res.redirect('api/mandrill/addContact/'+user._id);
+                            res.redirect('/api/mandrill/addContact/' + user._id);
                           }
                         });
                       }
@@ -105,7 +105,7 @@ module.exports = function (router, mongoose) {
   /** 
    *  Confirm request
    */
-  router.get('confirm/:id', function (req, res, next) {
+  router.get('/confirm/:id', function (req, res, next) {
     Contact.find().where('user', req.params.id).exec(function (err, sender) {
       if (err) {
         next(err);
@@ -114,23 +114,23 @@ module.exports = function (router, mongoose) {
           if (err) {
             next(err);
           } else if (receiver) {
-            for (var i = 0; i < sender.contacts.length; i++) {
-              if (JSON.stringify(sender.contacs[i].user) === req.session.user._id) {
-                sender.contacts[i]._state = States.Active;
+            for (var i = 0; i < sender[0].contacts.length; i++) {
+              if (JSON.stringify(sender[0].contacts[i].user) === req.session.user._id) {
+                sender[0].contacts[i].state = States.Active;
                 break;
               }
             }
-            for (i = 0; i < receiver.contacts.length; i++) {
-              if (JSON.stringify(receiver.contacs[i].user) === req.params.id) {
-                receiver.contacts[i]._state = States.Active;
+            for (i = 0; i < receiver[0].contacts.length; i++) {
+              if (JSON.stringify(receiver[0].contacts[i].user) === req.params.id) {
+                receiver[0].contacts[i].state = States.Active;
                 break;
               }
             }
-            sender.save(function (err) {
+            sender[0].save(function (err) {
               if (err) {
-                next(err); -
+                next(err);
               } else {
-                receiver.save(function (err) {
+                receiver[0].save(function (err) {
                   if (err) {
                     next(err)
                   } else {
