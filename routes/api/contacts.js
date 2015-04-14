@@ -12,7 +12,7 @@ module.exports = function (router, mongoose) {
     States = {
       Active: null,
       Pending: null,
-      Inactive: null
+      Disabled: null
     };
 
   /** 

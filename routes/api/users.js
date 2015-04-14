@@ -13,7 +13,7 @@ module.exports = function (router, mongoose) {
     States = {
       Active: null,
       Pending: null,
-      Inactive: null
+      Disabled: null
     };
 
   /** 
@@ -198,6 +198,22 @@ module.exports = function (router, mongoose) {
 
   });
 
+  /**
+   * Disable the user's account
+   */
+  router.get('/disable', function (req, res, next) {
+    User.findById(req.session.user._id, function (err, user) {
+      if (err) {
+        next(err);
+      } else if (user) {
+        user.state = States.Disabled;
+        delete req.session.user;
+        res.redirect('/');
+      } else {
+        res.status.(404).end();
+      }
+    })
+  });
   /** 
    * Token validation
    */
