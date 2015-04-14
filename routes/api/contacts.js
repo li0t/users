@@ -80,7 +80,8 @@ module.exports = function (router, mongoose) {
                           if (err) {
                             next(err);
                           } else {
-                            res.redirect('/api/notifications/pending/' + user._id); /* if done, redirects to notifications api */
+                            //res.redirect('/api/notifications/pending/' + user._id); /* if done, redirects to notifications api */
+                            res.redirect('api/mandrill/addContact/'+user._id);
                           }
                         });
                       }
@@ -127,7 +128,7 @@ module.exports = function (router, mongoose) {
             }
             sender.save(function (err) {
               if (err) {
-                next(err);
+                next(err); -
               } else {
                 receiver.save(function (err) {
                   if (err) {
