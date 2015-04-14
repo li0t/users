@@ -106,6 +106,7 @@ module.exports = function (router, mongoose) {
 
 
   router.get('/addContact/:id', function (req, res, next) {
+    var message = null;
     User.findById(req.params.id, function (err, user) {
       if (err) {
         next(err);
