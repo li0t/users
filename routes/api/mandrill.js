@@ -116,34 +116,43 @@ module.exports = function (router, mongoose) {
      */
     router.get('/addContact/:id', function (req, res, next) {
         if (api) {
-            var message = null;
             User.findById(req.params.id, function (err, user) {
                 if (err) {
                     next(err);
                 } else if (user) {
-                    message = {
-                        "html": "<a href='http://" + url + "/api/users/" + user._id + "'>Go to emeeter</a>",
-                        "text": "Someone wants to contact you",
-                        "subject": "Someone wants to contact you",
-                        "from_email": senderEmail,
-                        "from_name": sender,
+                    var template_name = "Friend Request";
+                    var template_content = [{
+                        "name": "",
+                        "content": ""
+                                    }];
+                    var message = {
                         "to": [{
                             "email": user.email,
-                            "name": user.email,
-                            "type": "to"
-                      }],
-                        "headers": {
-                            "Reply-To": "noreply@emeeter.com"
-                        },
+                                            }],
                         "track_opens": true,
                         "track_clicks": true,
-                        "auto_text": true,
+                        "inline_css": true,
+                        "merge": true,
+                        "merge_language": "mailchimp",
+                        "global_merge_vars": [{
+                            "name": "USERID",
+                            "content": req.session.user._id
+                                            }, {
+                            "name": "URL",
+                            "content": 'localhost:3030'
+                                            }, {
+                            "name": "NAME",
+                            "content": user.name
+                                            }],
                         "tags": [
-                            "email-confirmation"
-                                ],
+                                  "friend-request"
+                                ]
+
                     };
-                    api.messages.send({ /* Send a confirmation email to the user */
-                        "message": message
+                    api.messages.sendTemplate({
+                        "template_name": template_name,
+                        "template_content": template_content,
+                        "message": message,
                     }, function (result) {
                         console.log(result);
                         res.send("You have sent a contact request! Good!");
