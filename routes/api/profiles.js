@@ -142,7 +142,7 @@ module.exports = function (router, mongoose) {
                 debug('No user found for id %s', req.params.id);
                 res.status(404).end();
             }
-        })
+        });
 
     });
 

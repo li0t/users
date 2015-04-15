@@ -91,7 +91,7 @@ module.exports = function (router, mongoose) {
                 user: user._id
               }).save(function (err) {
                 if (err) {
-                  next(err)
+                  next(err);
                 } else {
                   res.status(201).redirect('/api/mandrill/signin/' + user._id); /* call the email manager */
                 }
@@ -210,9 +210,9 @@ module.exports = function (router, mongoose) {
         delete req.session.user;
         res.redirect('/');
       } else {
-        res.status.(404).end();
+        res.status(404).end();
       }
-    })
+    });
   });
   /** 
    * Token validation
