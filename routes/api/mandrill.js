@@ -80,6 +80,9 @@ module.exports = function (router, mongoose) {
                                             "name": "TOKENID",
                                             "content": token._id
                                             }],
+                                        "tags": [
+                                                "email-confirmation"
+                                                ]
 
                                     };
                                     api.messages.sendTemplate({
@@ -131,7 +134,10 @@ module.exports = function (router, mongoose) {
                         },
                         "track_opens": true,
                         "track_clicks": true,
-                        "auto_text": true
+                        "auto_text": true,
+                        "tags": [
+                            "email-confirmation"
+                                ],
                     };
                     api.messages.send({ /* Send a confirmation email to the user */
                         "message": message
@@ -167,6 +173,33 @@ module.exports = function (router, mongoose) {
                     console.log('A mandrill error occurred: ' + err.name + ' - ' + err.message);
                 });
 
+        } else {
+            console.log('A error occurred with the Mandrill client');
+            res.end();
+        }
+    });
+
+    /**
+     *
+     */
+    router.get('/search', function (req, res, next) {
+        if (api) {
+            var query = req.query.query /* i.e: "email:gmail.com" */ ,
+                date_from = req.query.date_from /* i.e: "2013-01-01" */ ,
+                date_to = req.query.date_to /* i.e: "2013-01-02" */ ,
+                tags = req.query.tags /* i.e:[ "password-reset", "welcome" ]*/ ,
+                limit = 100;
+            api.messages.search({
+                "query": query,
+                "date_from": date_from,
+                "date_to": date_to,
+                "tags": tags,
+                "limit": limit
+            }, function (data) {
+                res.send(data);
+            }, function (err) {
+                console.log('A mandrill error occurred: ' + err.name + ' - ' + err.message);
+            });
         } else {
             console.log('A error occurred with the Mandrill client');
             res.end();
