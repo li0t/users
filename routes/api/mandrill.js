@@ -79,6 +79,9 @@ module.exports = function (router, mongoose) {
                                         "global_merge_vars": [{
                                             "name": "TOKENID",
                                             "content": token._id
+                                            }, {
+                                            "name": "URL",
+                                            "content": 'localhost:3030'
                                             }],
                                         "tags": [
                                                 "email-confirmation"
