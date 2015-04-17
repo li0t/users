@@ -265,7 +265,7 @@ module.exports = function (router, mongoose) {
           } else {
 
             req.session.user = user;
-            res.redirect('/api/users/' + user._id);
+            res.send(user._id);
 
             Token.remove({
               user: user._id
@@ -289,7 +289,7 @@ module.exports = function (router, mongoose) {
   router.get('/:id', function (req, res, next) {
 
     User.findById(req.params.id).
-    deepPopulate('profile.gender profile.contacts'). /* Retrieves data from linked schemas */
+    deepPopulate('state profile.gender profile.contacts profile.pictures'). /* Retrieves data from linked schemas */
     exec(function (err, user) {
       if (err) {
         next(err);

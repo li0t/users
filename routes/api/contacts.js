@@ -115,7 +115,7 @@ module.exports = function (router, mongoose) {
         next(err);
       } else if (sender) {
 
-        Contact.find().
+        Contact.findOne().
         where('user', req.session.user._id).
         exec(function (err, receiver) {
           if (err) {
@@ -160,12 +160,33 @@ module.exports = function (router, mongoose) {
     });
 
   });
-
+  
   /**
    * Delete a contact
    */
   router.get('/delete/:id', function (req, res, next) {
     /*TODO*/
+  });
+  
+  /**
+   * Get contacts of a user
+   */ 
+  router.get('/:id', function(req, res, next){
+    
+    Contact.findOne().
+    
+    where('user', req.params.id).
+    deepPopulate('user contacts.user contacts.state').
+    
+    exec(function(err, contacts){
+      if(err){
+        next(err);
+      } else if(contacts){
+        res.send(contacts);
+      } else {
+        res.status(404).end();
+      }
+    });
   });
 
 };

@@ -31,7 +31,7 @@ module.exports = function (router, mongoose) {
             if (err) {
               console.log(err);
             } else {
-              res.status(201).send(entry);
+              res.status(201).send(entry._id);
             }
           });
         }
@@ -123,7 +123,7 @@ module.exports = function (router, mongoose) {
             if (err) {
                debug('Error! : %s', err);
             } else {
-              res.status(201).send(entry);
+              res.status(201).send(entry._id);
             }
           });
         }
@@ -193,7 +193,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:id', function (req, res, next) {
     Entry.findById(req.params.id)
-      .deepPopulate('tags pictures user.state user.profile') /* Retrieves data from linked schemas */
+      .deepPopulate('tags pictures user.profile') /* Retrieves data from linked schemas */
       .exec(function (err, entry) {
       if (err) {
         next(err);
@@ -212,7 +212,7 @@ module.exports = function (router, mongoose) {
   router.get('/user/:id', function (req, res, next) {
     Entry.find()
       .where('user', req.params.id)
-      .deepPopulate('tags pictures user.state user.profile') /* Retrieves data from linked schemas */
+      .deepPopulate('tags pictures user.profile') /* Retrieves data from linked schemas */
       .exec(function (err, entries) {
       if (err) {
         next(err);

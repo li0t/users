@@ -147,7 +147,7 @@ module.exports = function (router, mongoose) {
             },
             "track_opens": true,
             "track_clicks": true,
-            "important": true
+            "important": false
           };
 
           api.messages.send({ /* Send a confirmation email to the user */
