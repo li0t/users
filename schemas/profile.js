@@ -37,7 +37,6 @@ module.exports = function (Schema) {
 
     });
 
-
     /** Show virtuals on JSON conversion */
     ProfileSchema.set('toJSON', {
         virtuals: true
@@ -48,10 +47,9 @@ module.exports = function (Schema) {
         next();
     });
 
-
     /** Lets populate reach any level */
     ProfileSchema.plugin(deepPopulate);
 
-
     return ProfileSchema;
+  
 };

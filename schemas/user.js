@@ -7,7 +7,6 @@ var validator = require('validator'),
 
 module.exports = function (Schema) {
 
-
   var UserSchema = new Schema({
 
     email: {
@@ -24,7 +23,6 @@ module.exports = function (Schema) {
       type: String,
       required: true
     },
-
 
     state: {
       type: Schema.Types.ObjectId,
@@ -69,10 +67,12 @@ module.exports = function (Schema) {
     } else {
       next();
     }
+    
   });
 
   /** Lets populate reach any level */
   UserSchema.plugin(deepPopulate);
 
   return UserSchema;
+  
 };

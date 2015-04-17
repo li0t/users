@@ -1,19 +1,16 @@
 /* jshint node: true */
 'use strict';
 
-var bcrypt = require('bcrypt'),
-  _ = require('underscore');
-
-module.exports = function (router, mongoose) {
-
-  var Contact = mongoose.model('contact'),
-    User = mongoose.model('user'),
-    Token = mongoose.model('token'),
+var debug = require('debug')('app:api:contacts'),
     States = {
       Active: null,
       Pending: null,
       Disabled: null
     };
+
+module.exports = function (router, mongoose) {
+
+  var Contact = mongoose.model('contact');
 
   /** 
    * Looks for statics states and saves the ids
@@ -21,18 +18,18 @@ module.exports = function (router, mongoose) {
    * FALLS WHEN THERE ARE NO STATICS INSTALLED
    */
   (function getStates() {
-    var
-      Sts = mongoose.model('static.state'),
-      state;
+    var Sts = mongoose.model('static.state'),
+        state;
 
     function lookup(name) {
-      Sts.find({
-        name: name
-      }, function (err, result) {
+
+      Sts.findOne({ name: name }, function (err, found) {
         if (err) {
-          console.log(err);
+          debug('Error! : %s', err);
+        } else if(found){
+          States[name] = found._id;
         } else {
-          States[name] = result[0]._id;
+          debug('No state found with name %s', name);
         }
       });
     }
@@ -50,95 +47,109 @@ module.exports = function (router, mongoose) {
    * Add contact
    */
   router.get('/add/:id', function (req, res, next) {
-    User.findById(req.params.id, function (err, user) { /* The user recieving the request */
+
+    Contact.findOne().
+    where('user', req.params.id).
+    exec(function (err, receiver) { /* The ContactSchema of the receiver */
       if (err) {
         next(err);
-      } else if (user) {
-        Contact.find().where('user', user._id).exec(function (err, receiver) { /* The ContactSchema of the receiver */
-          if (err) {
-            next(err)
-          } else {
-            if (receiver) {
-              Contact.find().where('user', req.session.user._id).exec(function (err, sender) { /* The ContactSchema of the sender */
-                if (err) {
-                  next(err)
-                } else {
-                  if (sender) {
-                    sender[0].contacts.push({ /* Pushes the receiver id into the sender contacts */
-                      user: user._id,
-                      state: States.Pending
-                    });
-                    receiver[0].contacts.push({ /* Pushes the sender id into the receiver contacts */
-                      user: req.session.user._id,
-                      state: States.Pending
-                    });
-                    sender[0].save(function (err) {
+      } else {
+        if (receiver) {
+
+          Contact.findOne().
+          where('user', req.session.user._id).
+          exec(function (err, sender) { /* The ContactSchema of the sender */
+            if (err) {
+              next(err);
+            } else {
+              if (sender) {
+
+                sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
+                  user: req.params.id,
+                  state: States.Pending /* The contact state is pending for confirmation */
+                });
+
+                receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
+                  user: req.session.user._id,
+                  state: States.Pending /* The contact state is pending for confirmation */
+                });
+
+                sender.save(function (err) {
+                  if (err) {
+                    next(err);
+                  } else {
+
+                    receiver.save(function (err) {
                       if (err) {
                         next(err);
                       } else {
-                        receiver[0].save(function (err) {
-                          if (err) {
-                            next(err);
-                          } else {
-                            //res.redirect('/api/notifications/pending/' + user._id); /* if done, redirects to notifications api */
-                            res.redirect('/api/mandrill/addContact/' + user._id);
-                          }
-                        });
+                        res.status(204).end();
                       }
                     });
-                  } else {
-                    res.status(404).end();
                   }
-                }
-              });
-            } else {
-              res.status(404).end();
+                });
+              } else {
+                debug('No contacs list found for user with id %s', req.session.user._id);
+                res.status(404).end();
+              }
             }
-          }
-        });
-      } else {
-        res.status(404).end();
+          });
+        } else {
+          debug('No contacs list found for user with id %s', req.params.id);
+          res.status(404).end();
+        }
       }
     });
+
   });
 
   /** 
    *  Confirm request
    */
   router.get('/confirm/:id', function (req, res, next) {
-    Contact.find().where('user', req.params.id).exec(function (err, sender) {
+
+    Contact.findOne().
+    where('user', req.params.id).
+    exec(function (err, sender) {
       if (err) {
         next(err);
       } else if (sender) {
-        Contact.find().where('user', req.session.user._id).exec(function (err, receiver) {
+
+        Contact.find().
+        where('user', req.session.user._id).
+        exec(function (err, receiver) {
           if (err) {
             next(err);
           } else if (receiver) {
-            for (var i = 0; i < sender[0].contacts.length; i++) {
-              if (JSON.stringify(sender[0].contacts[i].user) === JSON.stringify(req.session.user._id)) {
-                sender[0].contacts[i].state = States.Active;
+
+            for (var i = 0; i < sender.contacts.length; i++) {
+              if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.session.user._id)) {
+                sender.contacts[i].state = States.Active;
                 break;
               }
             }
-            for (i = 0; i < receiver[0].contacts.length; i++) {
-              if (JSON.stringify(receiver[0].contacts[i].user) === JSON.stringify(req.params.id)) {
-                receiver[0].contacts[i].state = States.Active;
+
+            for (i = 0; i < receiver.contacts.length; i++) {
+              if (JSON.stringify(receiver.contacts[i].user) === JSON.stringify(req.params.id)) {
+                receiver.contacts[i].state = States.Active;
                 break;
               }
             }
-            sender[0].save(function (err) {
+
+            sender.save(function (err) {
               if (err) {
                 next(err);
               } else {
-                receiver[0].save(function (err) {
+
+                receiver.save(function (err) {
                   if (err) {
-                    next(err)
+                    next(err);
                   } else {
-                    res.status(200).send(receiver);
+                    res.status(204).end();
                   }
                 });
               }
-            })
+            });
           } else {
             res.status(404).end();
           }
@@ -147,10 +158,14 @@ module.exports = function (router, mongoose) {
         res.status(404).end();
       }
     });
+
   });
 
+  /**
+   * Delete a contact
+   */
   router.get('/delete/:id', function (req, res, next) {
     /*TODO*/
   });
 
-}
+};

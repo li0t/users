@@ -1,5 +1,6 @@
 /* jshint node: true */
 'use strict';
+
 var deepPopulate = require('mongoose-deep-populate');
 
 module.exports = function (Schema) {
@@ -33,7 +34,6 @@ module.exports = function (Schema) {
 
   });
 
-
   /** Show virtuals on JSON conversion */
   EntrySchema.set('toJSON', {
     virtuals: true
@@ -53,4 +53,5 @@ module.exports = function (Schema) {
   EntrySchema.plugin(deepPopulate);
 
   return EntrySchema;
+  
 };

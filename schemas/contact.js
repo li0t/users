@@ -15,6 +15,7 @@ module.exports = function (Schema) {
       type: Schema.Types.ObjectId,
       ref: 'static.state'
     }
+    
   });
 
   var ContactSchema = new Schema({
@@ -43,4 +44,5 @@ module.exports = function (Schema) {
   ContactSchema.plugin(deepPopulate);
 
   return ContactSchema;
+  
 };

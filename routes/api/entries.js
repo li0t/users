@@ -2,22 +2,22 @@
 /* global component */
 'use strict';
 
+var debug = require('debug')('app:api:entries');
+
+var gridfs = component('gridfs');
+
 module.exports = function (router, mongoose) {
 
   var Entry = mongoose.model('entry'),
-    Tag = mongoose.model('tag'),
-    debug = require('debug')('app:api:entries');
-
-  var gridfs = component('gridfs');
+      Tag = mongoose.model('tag');
 
   /**
-   * Creates a new entry
-   * SEPARATE FILES UPLOAD IN SEPARATED REQUEST
-   * STORE TAGS AS STRING
+   * Create a new entry
    */
   router.post('/create', function (req, res, next) {
+
     var entry, /* This is the target schema */
-      tagsSaved = 0;
+        tagsSaved = 0;
 
     /**
      * Save the document
@@ -39,11 +39,12 @@ module.exports = function (router, mongoose) {
     }
 
     /** 
-     * Looksup for tags provided by the user
-     * if one is not found creates a new tag and stores the id
+     * Lookup for tags provided by the user
+     * If one is not found create a new tag and store the id
      */
     function saveTags() {
-      /* Check if all tags were found and/or created*/
+
+      /* Check if all tags were found and/or created */
       function onTagReady(tag) {
         entry.tags.push(tag.name);
 
@@ -59,41 +60,41 @@ module.exports = function (router, mongoose) {
         req.body.tags = [req.body.tags];
       }
       req.body.tags.forEach(function (tag) {
-        Tag.find()
+        Tag.findOne()
           .where('name', tag)
           .exec(function (err, found) {
-            if (err) {
-              console.log(err);
-            } else if (found && found.length) {
-              console.log('Tag found : ' + found);
-              onTagReady(found[0]);
-            } else {
-              console.log('Creating new Tag : ' + tag);
-              new Tag({
-                name: tag
-              }).save(function (err, newTag) {
-                if (err) {
-                  debug(err);
-                } else {
-                  onTagReady(newTag);
-                }
-              });
-            }
-          });
+          if (err) {
+           debug('Error! : %s', err);
+          } else if (found) {
+            debug('Tag found : %s' , found);
+            onTagReady(found);
+          } else {
+            debug('Creating new Tag : %s', tag);
+            new Tag({
+              name: tag
+            }).save(function (err, newTag) {
+              if (err) {
+                 debug('Error! : %s', err);
+              } else {
+                onTagReady(newTag);
+              }
+            });
+          }
+        });
       });
-    };
+    }
 
     new Entry({
       user: req.session.user._id,
       title: req.body.title,
-      content: req.body.content /* Markdown text */ ,
+      content: req.body.content /* Markdown text */ 
     }).save(function (err, data) {
       if (err) {
         next(err);
       } else {
         entry = data;
         if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
-          saveTags()
+          saveTags();
         } else { /* If not, just save the entry */
           saveEntry();
         }
@@ -102,9 +103,13 @@ module.exports = function (router, mongoose) {
 
   });
 
+  /**
+   * Upload pictures to an entry
+   */ 
   router.post('/:id/pictures', function (req, res, next) {
+
     var entry, /* This is the target schema */
-      picturesSaved = 0;
+        picturesSaved = 0;
 
     /**
      * Save the document
@@ -116,7 +121,7 @@ module.exports = function (router, mongoose) {
         } else {
           entry.deepPopulate('pictures user.contacts user.state user.profile', function (err) {
             if (err) {
-              console.log(err);
+               debug('Error! : %s', err);
             } else {
               res.status(201).send(entry);
             }
@@ -129,10 +134,11 @@ module.exports = function (router, mongoose) {
      * Save pictures with gridfs and store de ids
      */
     function savePictures() {
+
       function onclose(fsFile) {
         debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
 
-        entry.pictures.push(fsFile._id); /* Add the picture's id to the entry.pictures array */
+        entry.pictures.push(fsFile._id); 
 
         picturesSaved += 1;
 
@@ -162,104 +168,25 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    Entry.find()
+    Entry.findOne()
       .where('_id', req.params.id)
       .where('user', req.session.user._id)
       .exec(function (err, data) {
-        if (err) {
-          next(err);
-        } else if (data) {
-          entry = data[0];
-          if (req.files && req.files.length) { /* If there are any files, save them */
-            savePictures();
-          } else { /* If not, just save the document */
-            saveEntry();
-          }
-        } else {
-          res.status(404).end();
+      if (err) {
+        next(err);
+      } else if (data) {
+        entry = data;
+        if (req.files && req.files.length) { /* If there are any files, save them */
+          savePictures();
+        } else { /* If not, just save the document */
+          saveEntry();
         }
-      });
-  });
-
-  /**
-   * Get entries base on tags 
-   + Only works for a perfect match
-   */
-  router.get('/tags', function (req, res, next) { /* NOT WORKING */
-
-    var tags = req.query.tags;
-
-    /** 
-     * Finds entries related with tags
-     */
-    function findEntries() {
-      Entry.find()
-        .where('tags', tags)
-        .populate('tags')
-        .exec(function (err, entries) {
-          if (err) {
-            next(err);
-          } else if (entries && entries.length) {
-            res.send(entries);
-          } else {
-            res.status(404).end();
-          }
-        });
-    }
-
-    /* Convert the tags string to array if necessary */
-    if (typeof tags === 'string') {
-      tags = [tags];
-    }
-
-    /* Check if there are entries-based-on-tags to find */
-    if (Array.isArray(tags) && tags.length) {
-      findEntries();
-    } else {
-      res.status(400).end();
-    }
+      } else {
+        res.status(404).end();
+      }
+    });
 
   });
-
-  /**
-   * Get entries base on tags
-   * Returns every entry which contains any of the tags
-   */
-  router.get('/tags/any', function (req, res, next) { /* NOT WORKING */
-    var tags = req.query.tags;
-
-    function findEntries() {
-      Entry
-        .find({
-          tags: {
-            $in: tags
-          }
-        })
-        .populate('tags')
-        .exec(function (err, entries) {
-          if (err) {
-            next(err);
-          } else if (entries && entries.length) {
-            res.send(entries);
-          } else {
-            res.status(404).end();
-          }
-        });
-    }
-
-    /* Convert the tags string to array if necessary */
-    if (typeof tags === 'string') {
-      tags = [tags];
-    }
-
-    /* Check if there are entries to find */
-    if (Array.isArray(tags) && tags.length) {
-      findEntries();
-    } else {
-      res.status(400).end();
-    }
-  });
-
 
   /**
    * Get an entry
@@ -268,14 +195,15 @@ module.exports = function (router, mongoose) {
     Entry.findById(req.params.id)
       .deepPopulate('tags pictures user.state user.profile') /* Retrieves data from linked schemas */
       .exec(function (err, entry) {
-        if (err) {
-          next(err);
-        } else if (entry) {
-          res.send(entry);
-        } else {
-          res.status(404).end();
-        }
-      });
+      if (err) {
+        next(err);console.log
+      } else if (entry) {
+        res.send(entry);
+      } else {
+        res.status(404).end();
+      }
+    });
+
   });
 
   /**
@@ -286,14 +214,15 @@ module.exports = function (router, mongoose) {
       .where('user', req.params.id)
       .deepPopulate('tags pictures user.state user.profile') /* Retrieves data from linked schemas */
       .exec(function (err, entries) {
-        if (err) {
-          next(err);
-        } else if (entries && entries.length) {
-          res.send(entries);
-        } else {
-          res.status(404).end();
-        }
-      });
+      if (err) {
+        next(err);
+      } else if (entries && entries.length) {
+        res.send(entries);
+      } else {
+        res.status(404).end();
+      }
+    });
+
   });
 
 };
