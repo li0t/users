@@ -193,27 +193,31 @@ module.exports = function (router, mongoose) {
 
     var oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;
+    
+    if(newPassword !== oldPassword){
+      
+      User.findById(req.session.user._id).
+      exec(function (err, user) {
+        if (err) {
+          next(err);
+        } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
 
-    User.findById(req.session.user._id).
-    deepPopulate('contacts profile.gender profile.pictures'). /* Retrieves data from linked schemas */
-    exec(function (err, user) {
-      if (err) {
-        next(err);
-      } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
+          user.password = newPassword;
 
-        user.password = newPassword;
-
-        user.save(function (err, user) {
-          req.session.user = user;
-          res.send(user._id);
-        });
-      } else {
-        setTimeout(function () {
-          res.status(401).end();
-        }, 1000);
-      }
-    });
-
+          user.save(function (err, user) {
+            req.session.user = user;
+            res.send(user._id);
+          });
+        } else {
+          setTimeout(function () {
+            res.status(401).end();
+          }, 1000);
+        }
+      }); 
+    } else {
+      res.status(403).send('The new password should be different');
+    }
+    
   });
 
   /**
