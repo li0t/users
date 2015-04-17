@@ -53,6 +53,7 @@ module.exports = function (router, mongoose) {
      * Create the document with the saved File ids
      */
     function saveProfile() {
+      
       profile.save(function (err) {
         if (err) {
           next(err);
@@ -65,6 +66,7 @@ module.exports = function (router, mongoose) {
     function savePictures() {
 
       function onclose(fsFile) {
+        
         debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
 
         profile.pictures.push(fsFile._id);
@@ -101,7 +103,9 @@ module.exports = function (router, mongoose) {
       if (err) {
         next(err);
       } else if (data) {
+        
         profile = data;
+        
         if (req.files && req.files.length) { /* If there are any files, save them */
           savePictures();
         } else { /* If not, just save the profile */

@@ -64,7 +64,7 @@ module.exports = function (router, mongoose) {
         } else {
 
           Token.remove({ user: user._id }, function (err) { /* Remove any previous tokens assigned to the user */
-            if (err) debug(err);
+            if (err){ debug(err); }
           });
 
           new Token({ /* Assign a new Token to the user */

@@ -196,7 +196,7 @@ module.exports = function (router, mongoose) {
       .deepPopulate('tags pictures user.state user.profile') /* Retrieves data from linked schemas */
       .exec(function (err, entry) {
       if (err) {
-        next(err);console.log
+        next(err);
       } else if (entry) {
         res.send(entry);
       } else {
