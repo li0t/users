@@ -27,16 +27,11 @@ module.exports = function (router, mongoose) {
         if (err) {
           next(err);
         } else {
-          entry.deepPopulate('user.contacts user.state user.profile', function (err) {
-            if (err) {
-              console.log(err);
-            } else {
-              res.status(201).send(entry._id);
-            }
-          });
+          res.status(201).send(entry._id);
         }
       });
     }
+
 
     /** 
      * Lookup for tags provided by the user
@@ -64,7 +59,7 @@ module.exports = function (router, mongoose) {
           .where('name', tag)
           .exec(function (err, found) {
           if (err) {
-           debug('Error! : %s', err);
+            debug('Error! : %s', err);
           } else if (found) {
             debug('Tag found : %s' , found);
             onTagReady(found);
@@ -74,7 +69,7 @@ module.exports = function (router, mongoose) {
               name: tag
             }).save(function (err, newTag) {
               if (err) {
-                 debug('Error! : %s', err);
+                debug('Error! : %s', err);
               } else {
                 onTagReady(newTag);
               }
@@ -119,16 +114,11 @@ module.exports = function (router, mongoose) {
         if (err) {
           next(err);
         } else {
-          entry.deepPopulate('pictures user.contacts user.state user.profile', function (err) {
-            if (err) {
-               debug('Error! : %s', err);
-            } else {
-              res.status(201).send(entry._id);
-            }
-          });
+          res.status(201).send(entry._id);
         }
       });
     }
+
 
     /**
      * Save pictures with gridfs and store de ids
@@ -193,7 +183,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:id', function (req, res, next) {
     Entry.findById(req.params.id)
-      .deepPopulate('tags pictures user.profile') /* Retrieves data from linked schemas */
+      .populate('tags pictures') /* Retrieves data from linked schemas */
       .exec(function (err, entry) {
       if (err) {
         next(err);
@@ -212,7 +202,7 @@ module.exports = function (router, mongoose) {
   router.get('/user/:id', function (req, res, next) {
     Entry.find()
       .where('user', req.params.id)
-      .deepPopulate('tags pictures user.profile') /* Retrieves data from linked schemas */
+      .populate('tags pictures') /* Retrieves data from linked schemas */
       .exec(function (err, entries) {
       if (err) {
         next(err);
