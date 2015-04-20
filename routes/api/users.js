@@ -27,13 +27,13 @@ module.exports = function (router, mongoose) {
         state;
 
     function lookup(name) {
-      Sts.find({
+      Sts.findOne({
         name: name
-      }, function (err, result) {
+      }, function (err, found) {
         if (err) {
           debug('Error! : %s', err);
         } else {
-          States[name] = result[0]._id;
+          States[name] = found._id;
         }
       });
     }
@@ -51,11 +51,14 @@ module.exports = function (router, mongoose) {
    */
   router.get('/', function (req, res, next) {
 
-    User.find(function (err, users) {
+    User.find().
+
+    where('state' , States.Active).
+
+    exec(function (err, users) {
       if (err) {
         next(err);
-      }
-      if (users && users.length) {
+      } else if (users && users.length) {
         res.send(users);
       } else {
         res.status(404).end();
@@ -193,9 +196,9 @@ module.exports = function (router, mongoose) {
 
     var oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;
-    
+
     if(newPassword !== oldPassword){
-      
+
       User.findById(req.session.user._id).
       exec(function (err, user) {
         if (err) {
@@ -217,7 +220,7 @@ module.exports = function (router, mongoose) {
     } else {
       res.status(403).send('The new password should be different');
     }
-    
+
   });
 
   /**
