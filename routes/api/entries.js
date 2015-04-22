@@ -172,7 +172,7 @@ module.exports = function (router, mongoose) {
           saveEntry();
         }
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 
@@ -190,7 +190,7 @@ module.exports = function (router, mongoose) {
       } else if (entry) {
         res.send(entry);
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 
@@ -209,7 +209,7 @@ module.exports = function (router, mongoose) {
       } else if (entries && entries.length) {
         res.send(entries);
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 

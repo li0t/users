@@ -37,21 +37,21 @@ module.exports = function (router, mongoose) {
         profile.gender = req.body.gender || profile.gender;
 
         profile.location = req.body.location || profile.location;
-        
+
         profile.save(function (err) {
-        
+
           if (err) {
             next(err);
           } else {
             res.sendStatus(204);
           }
         });
-        
+
       } else {
         res.sendStatus(404);
       }
     });
-    
+
   });
 
   /**
@@ -71,7 +71,7 @@ module.exports = function (router, mongoose) {
         if (err) {
           next(err);
         } else {
-          res.status(204).end();
+          res.sendStatus(204);
         }
       });
     }
@@ -126,7 +126,7 @@ module.exports = function (router, mongoose) {
           saveProfile();
         }
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 
@@ -139,29 +139,35 @@ module.exports = function (router, mongoose) {
   router.get('/:id/pictures', function (req, res, next) {
 
     User.findById(req.params.id, function (err, user) {
+      
       if (err) {
         next(err);
       } else if (user) {
 
-        Profile.findOne()
-          .where('_id', user.profile)
-          .populate('pictures')
-          .exec(function (err, profile) {
+        Profile.findOne().
+        
+        where('_id', user.profile).
+        populate('pictures').
+        
+        exec(function (err, profile) {
+          
           if (err) {
             next(err);
+            
           } else if (profile && profile.pictures.length) {
             res.send(profile.pictures);
+            
           } else {
             debug('No pictures found for id %s', user.profile);
-            res.status(404).end();
+            res.sendStatus(404);
           }
         });
+        
       } else {
         debug('No user found for id %s', req.params.id);
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
-
   });
 
 };

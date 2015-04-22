@@ -61,7 +61,7 @@ module.exports = function (router, mongoose) {
       } else if (users && users.length) {
         res.send(users);
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 
@@ -90,9 +90,9 @@ module.exports = function (router, mongoose) {
           if (err) {
             /* Check for duplicated entry */
             if (err.code && err.code === 11000) {
-              res.status(409).end();
+              res.sendStatus(409);
             } else if (err.name && err.name === 'ValidationError') {
-              res.status(400).end();
+              res.sendStatus(400);
             } else {
               next(err);
             }
@@ -151,7 +151,7 @@ module.exports = function (router, mongoose) {
         }
       } else {
         setTimeout(function () {
-          res.status(401).end();
+          res.sendStatus(401);
         }, 1000);
       }
     });
@@ -183,7 +183,7 @@ module.exports = function (router, mongoose) {
       } else if (user) {
         res.redirect('/mandrill/recover/' + user._id);
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 
@@ -213,7 +213,7 @@ module.exports = function (router, mongoose) {
           });
         } else {
           setTimeout(function () {
-            res.status(401).end();
+            res.sendStatus(401);
           }, 1000);
         }
       }); 
@@ -240,11 +240,11 @@ module.exports = function (router, mongoose) {
             next(err);
           } else {
             delete req.session.user;
-            res.status(204).end();
+            res.sendStatus(204);
           }
         });
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 
@@ -303,7 +303,7 @@ module.exports = function (router, mongoose) {
       } else if (user) {
         res.send(user);
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 

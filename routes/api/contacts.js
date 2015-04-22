@@ -83,20 +83,20 @@ module.exports = function (router, mongoose) {
                       if (err) {
                         next(err);
                       } else {
-                        res.status(204).end();
+                        res.sendStatus(204);
                       }
                     });
                   }
                 });
               } else {
                 debug('No contacs list found for user with id %s', req.session.user._id);
-                res.status(404).end();
+                res.sendStatus(404);
               }
             }
           });
         } else {
           debug('No contacs list found for user with id %s', req.params.id);
-          res.status(404).end();
+          res.sendStatus(404);
         }
       }
     });
@@ -145,17 +145,17 @@ module.exports = function (router, mongoose) {
                   if (err) {
                     next(err);
                   } else {
-                    res.status(204).end();
+                    res.sendStatus(204);
                   }
                 });
               }
             });
           } else {
-            res.status(404).end();
+            res.sendStatus(404);
           }
         });
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
 
@@ -184,7 +184,7 @@ module.exports = function (router, mongoose) {
       } else if(contacts){
         res.send(contacts);
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
     });
   });

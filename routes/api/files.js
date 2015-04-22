@@ -27,7 +27,7 @@ module.exports = function (router, mongoose) {
         res.set('Content-Type', fsfile.contentType);
         stream.pipe(res);
       } else {
-        res.status(404).end();
+        res.sendStatus(404);
       }
 
     });
@@ -70,7 +70,7 @@ module.exports = function (router, mongoose) {
         result = fileman.validate(file, validated);
       });
     } else {
-      res.status(400).end();
+      res.sendStatus(400);
     }
 
   });

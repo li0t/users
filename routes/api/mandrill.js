@@ -39,12 +39,12 @@ module.exports = function (router, mongoose) {
 
       },function (err) {
         debug('A mandrill error occurred %s : %s', + err.nam, err.message);
-        res.status(500).end();
+        res.sendStatus(500);
       });
 
     } else {
       debug('A error occurred with the Mandrill client');
-      res.status(500).end();
+      res.sendStatus(500);
     }
 
   });
@@ -59,17 +59,19 @@ module.exports = function (router, mongoose) {
       var message = null;
 
       User.findById(req.params.id, function (err, user) {
+
         if (err) {
           next(err);
-        } else {
+        } else if (user) {
 
           Token.remove({ user: user._id }, function (err) { /* Remove any previous tokens assigned to the user */
             if (err){ debug(err); }
           });
 
-          new Token({ /* Assign a new Token to the user */
-            user: user._id
-          }).save(function (err, token) {
+          new Token({ user: user._id }). /* Assign a new Token to the user */
+
+          save(function (err, token) {
+            
             if (err) {
               next(err);
             } else {
@@ -103,15 +105,21 @@ module.exports = function (router, mongoose) {
 
               }, function (err) {
                 debug('A mandrill error occurred %s : %s', + err.nam, err.message);
-                res.status(500).end();
+                res.sendStatus(500);
               });
             }
+
           });
+
+        } else {
+          debug('No user found with id %s ', + req.params.id);
+          res.sendStatus(404);
         }
       });
+
     } else {
       debug('A error occurred with the Mandrill client');
-      res.status(500).end();
+      res.sendStatus(500);
     }
 
   });
@@ -159,16 +167,18 @@ module.exports = function (router, mongoose) {
 
           }, function (err) {
             debug('A mandrill error occurred %s : %s', + err.nam, err.message);
-            res.status(500).end();
+            res.sendStatus(500);
           });
+
         } else {
-          debug('A mandrill error occurred %s : %s', + err.nam, err.message);
-          res.status(404).end();
+          debug('No user found with id %s ', + req.params.id);
+          res.sendStatus(404);
         }
       });
+
     } else {
       debug('A error occurred with the Mandrill client');
-      res.status(500).end();
+      res.sendStatus(500);
     }
   });
 
