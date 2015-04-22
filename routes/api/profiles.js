@@ -16,29 +16,42 @@ module.exports = function (router, mongoose) {
    */
   router.post('/', function (req, res, next) {
 
-    Profile.findOneAndUpdate({
-      _id: req.session.user.profile
-    },{
-      name: req.body.name,
-      birthdate: req.body.birthdate,
-      gender: req.body.gender,
-      location: req.body.location,
-    }).
-    exec(function (err) {
+    Profile.findById(req.session.user.profile , function(err, profile){
+
       if (err) {
         /* Check for duplicated entry */
         if (err.code && err.code === 11000) {
-          res.status(409).end();
+          res.sendStatus(409);
         } else if (err.name && err.name === 'ValidationError') {
-          res.status(400).end();
+          res.sendStatus(400);
         } else {
           next(err);
         }
+
+      } else if(profile){
+
+        profile.name = req.body.name || profile.name;
+
+        profile.birthdate = req.body.birthdate || profile.birthdate;
+
+        profile.gender = req.body.gender || profile.gender;
+
+        profile.location = req.body.location || profile.location;
+        
+        profile.save(function (err) {
+        
+          if (err) {
+            next(err);
+          } else {
+            res.sendStatus(204);
+          }
+        });
+        
       } else {
-        res.status(204).end();
+        res.sendStatus(404);
       }
     });
-
+    
   });
 
   /**
@@ -53,7 +66,7 @@ module.exports = function (router, mongoose) {
      * Create the document with the saved File ids
      */
     function saveProfile() {
-      
+
       profile.save(function (err) {
         if (err) {
           next(err);
@@ -66,7 +79,7 @@ module.exports = function (router, mongoose) {
     function savePictures() {
 
       function onclose(fsFile) {
-        
+
         debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
 
         profile.pictures.push(fsFile._id);
@@ -103,9 +116,9 @@ module.exports = function (router, mongoose) {
       if (err) {
         next(err);
       } else if (data) {
-        
+
         profile = data;
-        
+
         if (req.files && req.files.length) { /* If there are any files, save them */
           savePictures();
         } else { /* If not, just save the profile */
