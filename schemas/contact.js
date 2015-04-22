@@ -15,9 +15,26 @@ module.exports = function (Schema) {
       type: Schema.Types.ObjectId,
       ref: 'static.state'
     }
-    
+
+  });
+  
+   /** Lets populate reach any level */
+  contact.plugin(deepPopulate, {
+   populate :{
+
+      'user' : {
+        select : 'email profile'
+      },
+
+      'user.profile' : {
+        select : 'name birthdate gender location'
+      }
+
+    }
+
   });
 
+  
   var ContactSchema = new Schema({
 
     user: {
@@ -41,8 +58,22 @@ module.exports = function (Schema) {
   });
 
   /** Lets populate reach any level */
-  ContactSchema.plugin(deepPopulate);
+  ContactSchema.plugin(deepPopulate, {
+   populate :{
+
+      'contacts.user' : {
+        select : 'email profile'
+      },
+
+      'contacts.user.profile' : {
+        select : 'name birthdate gender location'
+      }
+
+    }
+
+  });
+  
 
   return ContactSchema;
-  
+
 };

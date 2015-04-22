@@ -1,7 +1,8 @@
 /* jshint node: true */
 'use strict';
 
-var debug = require('debug')('app:api:contacts'),
+var  _ = require('underscore'),
+    debug = require('debug')('app:api:contacts'),
     States = {
       Active: null,
       Pending: null,
@@ -14,8 +15,6 @@ module.exports = function (router, mongoose) {
 
   /** 
    * Looks for statics states and saves the ids
-   *
-   * FALLS WHEN THERE ARE NO STATICS INSTALLED
    */
   (function getStates() {
     var Sts = mongoose.model('static.state'),
@@ -160,29 +159,70 @@ module.exports = function (router, mongoose) {
     });
 
   });
-  
+
   /**
    * Delete a contact
    */
   router.get('/delete/:id', function (req, res, next) {
     /*TODO*/
   });
-  
+
   /**
-   * Get contacts of a user
+   * Get contacts of session user
    */ 
-  router.get('/:id', function(req, res, next){
-    
+  router.get('/', function(req, res, next){
+
+    var checked = 0,
+        toCheck = 0,
+        toPopulate = 0,
+        populated = 0,
+
+        send = function (found) {
+
+          if(checked === toCheck && populated === toPopulate){
+            res.send(found);
+          }
+        };
+
     Contact.findOne().
-    
-    where('user', req.params.id).
-    deepPopulate('user contacts.user contacts.state').
-    
-    exec(function(err, contacts){
+
+    where('user', req.session.user._id).
+
+    exec(function(err, found){
+
       if(err){
         next(err);
-      } else if(contacts){
-        res.send(contacts);
+      } else if(found.contacts.length){
+
+        toCheck = found.contacts.length;
+
+        found.contacts.forEach(function(contact){
+
+          checked +=1;
+
+          if(_.isEqual(contact.state, States.Active)){
+
+            toPopulate +=1;
+
+            contact.deepPopulate('user.profile', function(err){
+              
+              if(err){
+                debug(err);
+              } else {
+
+                populated +=1;
+
+                if(populated === toPopulate){
+                  send(found);
+                }
+              }
+            }); 
+
+          } else if(checked === toCheck){
+            send(found);
+          }
+        });
+        
       } else {
         res.sendStatus(404);
       }

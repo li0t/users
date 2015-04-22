@@ -197,7 +197,7 @@ module.exports = function (router, mongoose) {
     var oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;
 
-    if(newPassword !== oldPassword){
+    if(newPassword && (newPassword !== oldPassword)){
 
       User.findById(req.session.user._id).
       exec(function (err, user) {
