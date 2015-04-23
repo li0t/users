@@ -164,7 +164,58 @@ module.exports = function (router, mongoose) {
    * Delete a contact
    */
   router.get('/delete/:id', function (req, res, next) {
-    /*TODO*/
+
+    Contact.findOne().
+    where('user', req.params.id).
+    exec(function (err, contact) {
+      if (err) {
+        next(err);
+      } else if (contact) {
+
+        Contact.findOne().
+        where('user', req.session.user._id).
+        exec(function (err, user) {
+          if (err) {
+            next(err);
+          } else if (user) {
+
+            for (var i = 0; i < contact.contacts.length; i++) {
+              if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user._id)) {
+                contact.contacts[i].state = States.Disabled;
+                break;
+              }
+            }
+
+            for (i = 0; i < user.contacts.length; i++) {
+              if (JSON.stringify(user.contacts[i].user) === JSON.stringify(req.params.id)) {
+                user.contacts[i].state = States.Disabled;
+                break;
+              }
+            }
+
+            contact.save(function (err) {
+              if (err) {
+                next(err);
+              } else {
+
+                user.save(function (err) {
+                  if (err) {
+                    next(err);
+                  } else {
+                    res.sendStatus(204);
+                  }
+                });
+              }
+            });
+          } else {
+            res.sendStatus(404);
+          }
+        });
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
   });
 
   /**
@@ -205,7 +256,7 @@ module.exports = function (router, mongoose) {
             toPopulate +=1;
 
             contact.deepPopulate('user.profile', function(err){
-              
+
               if(err){
                 debug(err);
               } else {
@@ -222,7 +273,7 @@ module.exports = function (router, mongoose) {
             send(found);
           }
         });
-        
+
       } else {
         res.sendStatus(404);
       }
