@@ -7,7 +7,7 @@ var Mandrill = require('mandrill-api/mandrill').Mandrill,
     url = 'localhost:3030',
     api = false,
     sender = "emeeter",
-    senderEmail = "leonardo0ramos@gmail.com";
+    senderEmail = "infoemeeter@gmail.com";
 
 
 module.exports = function (router, mongoose) {
@@ -71,7 +71,7 @@ module.exports = function (router, mongoose) {
           new Token({ user: user._id }). /* Assign a new Token to the user */
 
           save(function (err, token) {
-            
+
             if (err) {
               next(err);
             } else {
@@ -180,6 +180,65 @@ module.exports = function (router, mongoose) {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
     }
+
   });
 
+  /**
+   * Send an invite
+   */
+  router.get('/:id/invite/:email', function (req, res, next) {
+
+    if(api){
+
+      var message = null;
+
+      User.findById(req.params.id, function (err, user) {
+        if (err) {
+          next(err);
+        } else if (user) {
+
+          message = {
+            "html": "<a href='http://" + url + "/'>Go to emeeter</a>",
+            "text": "Have you tried emeeter? Check it now!",
+            "subject": "emeeter invitation",
+            "from_email": senderEmail,
+            "from_name": user.email,
+            "to": [{
+              "email": req.params.email,
+              "name": req.params.email,
+              "type": "to"
+            }],
+            "headers": {
+              "Reply-To": "noreply@emeeter.com"
+            },
+            "track_opens": true,
+            "track_clicks": true,
+            "important": false
+          };
+
+          api.messages.send({ /* Send a invite email*/
+            "message": message
+
+          }, function (result) {
+            debug(result);
+            res.send("You have sent an invite, Great!");
+
+          }, function (err) {
+            debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+            res.sendStatus(500);
+          });
+
+        } else {
+          debug('No user found with id %s ', + req.params.id);
+          res.sendStatus(404);
+        }
+      });
+
+    } else {
+      debug('A error occurred with the Mandrill client');
+      res.sendStatus(500);
+    }
+
+  });
+  
 };

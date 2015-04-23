@@ -124,37 +124,42 @@ module.exports = function (router, mongoose) {
     var email = req.body.email,
         password = req.body.password;
 
-    /* Logout any previous user */
-    delete req.session.user;
-    delete req.session.workplace;
+    if(email && password){
+      /* Logout any previous user */
+      delete req.session.user;
+      delete req.session.workplace;
 
-    /* Find the user by its email address */
-    User.findOne().
-    where('email', email).
-    exec(function (err, user) {
-      if (err) {
-        next(err);
-      } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
+      /* Find the user by its email address */
+      User.findOne().
+      where('email', email).
+      exec(function (err, user) {
+        if (err) {
+          next(err);
+        } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
 
-        if (_.isEqual(user.state, States.Active)) { /* Check if the user has confirmed it's email */
+          if (_.isEqual(user.state, States.Active)) { /* Check if the user has confirmed it's email */
 
-          req.session.user = user;
-          res.send(user._id);
+            req.session.user = user;
+            res.send(user._id);
 
-        } else if (_.isEqual(user.state, States.Pending)) {
+          } else if (_.isEqual(user.state, States.Pending)) {
 
-          res.status(409).send("Looks like you havent confirmed your email yet.");
+            res.status(409).send("Looks like you havent confirmed your email yet.");
 
+          } else {
+
+            res.status(409).send("Looks like you have disabled your account.");
+          }
         } else {
-
-          res.status(409).send("Looks like you have disabled your account.");
+          setTimeout(function () {
+            res.sendStatus(401);
+          }, 1000);
         }
-      } else {
-        setTimeout(function () {
-          res.sendStatus(401);
-        }, 1000);
-      }
-    });
+      });
+      
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 

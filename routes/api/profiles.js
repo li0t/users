@@ -19,16 +19,13 @@ module.exports = function (router, mongoose) {
     Profile.findById(req.session.user.profile , function(err, profile){
 
       if (err) {
-        /* Check for duplicated entry */
-        if (err.code && err.code === 11000) {
-          res.sendStatus(409);
-        } else if (err.name && err.name === 'ValidationError') {
+        if (err.name && err.name === 'ValidationError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
-
-      } else if(profile){
+        
+      } else if (profile){
 
         profile.name = req.body.name || profile.name;
 
@@ -139,30 +136,30 @@ module.exports = function (router, mongoose) {
   router.get('/:id/pictures', function (req, res, next) {
 
     User.findById(req.params.id, function (err, user) {
-      
+
       if (err) {
         next(err);
       } else if (user) {
 
         Profile.findOne().
-        
+
         where('_id', user.profile).
         populate('pictures').
-        
+
         exec(function (err, profile) {
-          
+
           if (err) {
             next(err);
-            
+
           } else if (profile && profile.pictures.length) {
             res.send(profile.pictures);
-            
+
           } else {
             debug('No pictures found for id %s', user.profile);
             res.sendStatus(404);
           }
         });
-        
+
       } else {
         debug('No user found for id %s', req.params.id);
         res.sendStatus(404);
