@@ -156,7 +156,7 @@ module.exports = function (router, mongoose) {
           }, 1000);
         }
       });
-      
+
     } else {
       res.sendStatus(400);
     }
@@ -238,6 +238,8 @@ module.exports = function (router, mongoose) {
         next(err);
       } else if (user) {
 
+        /** TODO: Implement disable in contacts's lists */
+
         user.state = States.Disabled;
 
         user.save(function(err){
@@ -256,7 +258,137 @@ module.exports = function (router, mongoose) {
   });
 
   /** 
-   * Token validation
+   * Create a new user and invite it to emeeter
+   */
+  router.get('/createAndInvite/:email', function(req, res ,next){
+
+    var email = req.params.email;
+
+    if(email){
+
+      new Profile().
+      save(function(err, profile){
+
+        new User({
+          email : email,
+          password: Math.random().toString(36).slice(-8), /** Randomized alphanumeric password */
+          profile: profile._id,
+          state: States.Pending
+        }). 
+
+        save(function(err, user){
+
+          if(err){
+            /* Check for duplicated entry */
+            if (err.code && err.code === 11000) {
+            } else {
+              next(err);
+            }
+          } else {
+
+            new Contact({user: user._id}).
+
+            save(function(err){
+
+              if(err){
+                next(err);
+              } else {
+
+                res.redirect('/api/mandrill/invite/'+user._id);
+
+              }
+            });
+          }
+        });
+      });
+
+    } else {
+      res.sendStatus(400);
+    }
+
+  });
+
+  /**
+   * Invited user activation
+   */
+  router.post('/invited/signin',  function(req, res , next){
+
+    var token = req.session.token;
+
+    if(token.user && token.sender){
+
+      User.findById(token.user, function(err, user){
+
+        if(err){
+          next(err);
+
+        } else if(user){
+
+          if(req.body.password){
+
+            user.password = req.body.password;
+
+            user.state = States.Active;
+
+            user.save(function(err){
+
+              if(err){
+                next(err);
+              } else {
+
+                req.session.user = user;
+
+                res.redirect('/api/contacts/confirm/'+token.sender);
+                
+                delete req.session.token;
+
+                Token.remove({_id : token._id}, function(err){
+                  if(err){
+                    debug(err);
+                  }
+                });    
+              }
+            });
+          } else {
+            res.sendStatus(400);
+          }
+        } else {
+          res.sendStatus(404);
+        }
+      });
+    } else {
+      res.sendStatus(403);
+    }
+
+  });
+
+
+  /**
+   * Invited user Token validation
+   */
+  router.get('/invited/signin/:token', function(req, res , next){
+
+    Token.findById(req.params.token, function(err, token){
+
+      if(err){
+        next(err);
+
+      } else if (token){
+
+        req.session.token = token;
+
+        res.send('Thanks for signing up, Please choose a password');
+
+      }else {
+
+        res.status(498).send('This token is not active anymore');
+      }
+    });
+
+  });
+
+  /** 
+   * Email confirmation Token validation
    */
   router.get('/validate/:token', function (req, res, next) {
 
@@ -301,12 +433,16 @@ module.exports = function (router, mongoose) {
   router.get('/:id', function (req, res, next) {
 
     User.findById(req.params.id).
+
     deepPopulate('state profile.gender profile.contacts profile.pictures'). /* Retrieves data from linked schemas */
+
     exec(function (err, user) {
       if (err) {
         next(err);
       } else if (user) {
+
         res.send(user);
+
       } else {
         res.sendStatus(404);
       }

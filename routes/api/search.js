@@ -64,7 +64,7 @@ module.exports = function (router, mongoose) {
         res.send(user._id);
         
       } else {
-        res.redirect('/api/mandrill/'+ req.session.user._id +'/invite/' + req.body.email); 
+        res.redirect('/api/users/createAndInvite/' + req.body.email); 
       }
     });
     

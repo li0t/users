@@ -186,7 +186,7 @@ module.exports = function (router, mongoose) {
   /**
    * Send an invite
    */
-  router.get('/:id/invite/:email', function (req, res, next) {
+  router.get('/invite/:id', function (req, res, next) {
 
     if(api){
 
@@ -197,35 +197,51 @@ module.exports = function (router, mongoose) {
           next(err);
         } else if (user) {
 
-          message = {
-            "html": "<a href='http://" + url + "/'>Go to emeeter</a>",
-            "text": "Have you tried emeeter? Check it now!",
-            "subject": "emeeter invitation",
-            "from_email": senderEmail,
-            "from_name": user.email,
-            "to": [{
-              "email": req.params.email,
-              "name": req.params.email,
-              "type": "to"
-            }],
-            "headers": {
-              "Reply-To": "noreply@emeeter.com"
-            },
-            "track_opens": true,
-            "track_clicks": true,
-            "important": false
-          };
+          new Token({
+            user : user._id,
+            sender : req.session.user._id
+          }).
+          
+          save(function(err, token){
 
-          api.messages.send({ /* Send a invite email*/
-            "message": message
+            if(err){
+              next(err);
+            } else {
 
-          }, function (result) {
-            debug(result);
-            res.send("You have sent an invite, Great!");
+              debug(token);
 
-          }, function (err) {
-            debug('A mandrill error occurred %s : %s', + err.nam, err.message);
-            res.sendStatus(500);
+              message = {
+                "html": "<a href='http://" + url + "/api/users/invited/signin/"+token._id+"'/>Go to emeeter</a>",
+                "text": "Have you tried emeeter? Check it now!",
+                "subject": "emeeter invitation",
+                "from_email": senderEmail,
+                "from_name": req.session.user.email,
+                "to": [{
+                  "email": user.email,
+                  "name": user.email,
+                  "type": "to"
+                }],
+                "headers": {
+                  "Reply-To": "noreply@emeeter.com"
+                },
+                "track_opens": true,
+                "track_clicks": true,
+                "important": false
+              };
+
+              api.messages.send({ /* Send a invite email*/
+                "message": message
+
+              }, function (result) {
+
+                debug(result);
+                res.redirect('/api/contacts/add/'+user._id);
+
+              }, function (err) {
+                debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+                res.sendStatus(500);
+              });
+            }
           });
 
         } else {
@@ -240,5 +256,5 @@ module.exports = function (router, mongoose) {
     }
 
   });
-  
+
 };

@@ -3,20 +3,26 @@
 
 module.exports = function (Schema) {
 
-    return new Schema({
+  return new Schema({
 
-        user: {
-            type: Schema.Types.ObjectId,
-            ref: 'user',
-            required: true
-        },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true
+    },
 
-        createdAt: {
-            type: Date,
-            expires: '1d',
-            default: Date.now
-        }
+    sender : {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      default: null
+    },
 
-    });
+    createdAt: {
+      type: Date,
+      expires: '365d',
+      default: Date.now
+    }
+
+  });
 
 };
