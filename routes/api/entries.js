@@ -9,14 +9,16 @@ var gridfs = component('gridfs');
 module.exports = function (router, mongoose) {
 
   var Entry = mongoose.model('entry'),
+      Group = mongoose.model('group'),
       Tag = mongoose.model('tag');
 
   /**
    * Create a new entry
    */
-  router.post('/create', function (req, res, next) {
+  router.post('/create/:groupId?', function (req, res, next) {
 
     var entry, /* This is the target schema */
+        group = req.params.groupId || null,
         tagsSaved = 0;
 
     /**
@@ -31,7 +33,6 @@ module.exports = function (router, mongoose) {
         }
       });
     }
-
 
     /** 
      * Lookup for tags provided by the user
@@ -79,23 +80,47 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    new Entry({
-      user: req.session.user._id,
-      title: req.body.title,
-      content: req.body.content /* Markdown text */ 
-    }).save(function (err, data) {
-      if (err) {
-        next(err);
-      } else {
-        entry = data;
-        if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
-          saveTags();
-        } else { /* If not, just save the entry */
-          saveEntry();
-        }
-      }
-    });
+    function createEntry() {
+      
+      new Entry({
+        user: req.session.user._id,
+        group : group,
+        title: req.body.title,
+        content: req.body.content /* Markdown text */ 
+      }).
 
+      save(function (err, data) {
+        if (err) {
+          next(err);
+        } else {
+          entry = data;
+          if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
+            saveTags();
+          } else { /* If not, just save the entry */
+            saveEntry();
+          }
+        }
+      });
+      
+    }
+    
+    if(group){
+      
+      Group.findById(group, function(err, found){
+        if (err) {
+          next(err);   
+        } else if (found){
+          
+          createEntry();
+          
+        } else {
+          res.status(404).send('No group found with id ' + group);
+        }
+      });
+    } else {
+      createEntry();
+    }
+    
   });
 
   /**
@@ -158,10 +183,12 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    Entry.findOne()
-      .where('_id', req.params.id)
-      .where('user', req.session.user._id)
-      .exec(function (err, data) {
+    Entry.
+    findOne().
+    where('_id', req.params.id).
+    where('user', req.session.user._id).
+
+    exec(function (err, data) {
       if (err) {
         next(err);
       } else if (data) {
@@ -182,9 +209,12 @@ module.exports = function (router, mongoose) {
    * Get an entry
    */
   router.get('/:id', function (req, res, next) {
-    Entry.findById(req.params.id)
-      .populate('tags pictures') /* Retrieves data from linked schemas */
-      .exec(function (err, entry) {
+
+    Entry.
+    findById(req.params.id).    
+    populate('pictures'). /* Retrieves data from linked schemas */
+
+    exec(function (err, entry) {
       if (err) {
         next(err);
       } else if (entry) {
@@ -200,10 +230,13 @@ module.exports = function (router, mongoose) {
    * Get entries of an user
    */
   router.get('/user/:id', function (req, res, next) {
-    Entry.find()
-      .where('user', req.params.id)
-      .populate('tags pictures') /* Retrieves data from linked schemas */
-      .exec(function (err, entries) {
+    
+    Entry.
+    find().
+    where('user', req.params.id).
+    populate('pictures'). /* Retrieves data from linked schemas */
+
+    exec(function (err, entries) {
       if (err) {
         next(err);
       } else if (entries && entries.length) {
@@ -214,5 +247,28 @@ module.exports = function (router, mongoose) {
     });
 
   });
+  
+   /**
+   * Get entries of a group
+   */
+  router.get('/group/:id', function (req, res, next) {
+    
+    Entry.
+    find().
+    where('group', req.params.id).
+    populate('pictures'). /* Retrieves data from linked schemas */
+
+    exec(function (err, entries) {
+      if (err) {
+        next(err);
+      } else if (entries && entries.length) {
+        res.send(entries);
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
 
 };

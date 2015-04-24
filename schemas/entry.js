@@ -13,9 +13,9 @@ module.exports = function (Schema) {
       required: true
     },
 
-    gruop : {
+    group : {
       type: Schema.Types.ObjectId,
-      ref: 'user'
+      ref: 'group'
     },
 
     title: {

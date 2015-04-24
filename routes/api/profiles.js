@@ -9,7 +9,8 @@ var gridfs = component('gridfs');
 module.exports = function (router, mongoose) {
 
   var Profile = mongoose.model('profile'),
-      User = mongoose.model('user');
+      User = mongoose.model('user'),
+      Group = mongoose.model('group');
 
   /** 
    * Update Profile linked to User
@@ -19,12 +20,8 @@ module.exports = function (router, mongoose) {
     Profile.findById(req.session.user.profile , function(err, profile){
 
       if (err) {
-        if (err.name && err.name === 'ValidationError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
-        
+        next(err);
+
       } else if (profile){
 
         profile.name = req.body.name || profile.name;
@@ -129,42 +126,139 @@ module.exports = function (router, mongoose) {
 
   });
 
-
   /** 
-   * Get all the profiles pictures of one user
+   * Update group profile
    */
-  router.get('/:id/pictures', function (req, res, next) {
+  router.post('/group/:id', function (req, res, next) {
 
-    User.findById(req.params.id, function (err, user) {
+    Group.findById(req.params.id , function(err, group){
 
       if (err) {
         next(err);
-      } else if (user) {
 
-        Profile.findOne().
+      } else if (group){
 
-        where('_id', user.profile).
-        populate('pictures').
+        if(JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)){
 
-        exec(function (err, profile) {
+          Profile.findById(group.profile, function(err, profile){
 
-          if (err) {
-            next(err);
+            if(err){
+              next(err);
 
-          } else if (profile && profile.pictures.length) {
-            res.send(profile.pictures);
+            } else {
 
-          } else {
-            debug('No pictures found for id %s', user.profile);
-            res.sendStatus(404);
-          }
-        });
+              profile.name = req.body.name || profile.name;
 
+              profile.location = req.body.location || profile.location;
+
+              profile.save(function (err) {
+
+                if (err) {
+                  next(err);
+
+                } else {
+                  res.sendStatus(204);
+                }
+
+              });
+            }
+          });
+        } else {
+          res.sendStatus(403);
+        }
       } else {
-        debug('No user found for id %s', req.params.id);
         res.sendStatus(404);
       }
     });
+
+  });
+
+  /**
+   * Upload a group picture
+   */
+  router.post('/group/:id/pictures', function (req, res, next) {
+
+    var profile, /* This is the target schema */
+        saved = 0;
+
+    /**
+     * Create the document with the saved File ids
+     */
+    function saveProfile() {
+
+      profile.save(function (err) {
+        if (err) {
+          next(err);
+        } else {
+          res.sendStatus(204);
+        }
+      });
+    }
+
+    function savePictures() {
+
+      function onclose(fsFile) {
+
+        debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
+
+        profile.pictures.push(fsFile._id);
+
+        saved += 1;
+
+        /* Check if all files where streamed to the database */
+        if (saved === req.files.length) {
+          debug('All files saved');
+          saveProfile();
+        }
+      }
+
+      function onerror(err) {
+        debug('Error streaming file!');
+        next(err);
+      }
+
+      req.files.forEach(function (file) {
+        debug('Saving %s', file.filename);
+
+        var writestream = gridfs.save(file.data, {
+          content_type: file.mimetype,
+          filename: file.filename,
+          mode: 'w'
+        });
+
+        writestream.on('close', onclose); /* The stream has finished */
+        writestream.on('error', onerror); /* Oops! */
+      });
+    }
+
+    Group.findById(req.params.id, function(err, group){
+      
+      if (err) {
+        next(err);
+
+      } else if (group) {
+
+        if(JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)){
+
+          Profile.findById(group.profile, function (err, data) {
+
+            profile = data;
+
+            if (req.files && req.files.length) { /* If there are any files, save them */
+              savePictures();
+            } else { /* If not, just save the profile */
+              debug('No files saved');
+              saveProfile();
+            }
+          });
+        } else {
+          res.sendStatus(403);
+        }
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
   });
 
 };
