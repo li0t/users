@@ -17,10 +17,10 @@ module.exports = function (Schema) {
     }
 
   });
-  
-   /** Lets populate reach any level */
+
+  /** Lets populate reach any level */
   contact.plugin(deepPopulate, {
-   populate :{
+    populate :{
 
       'user' : {
         select : 'email profile'
@@ -34,7 +34,6 @@ module.exports = function (Schema) {
 
   });
 
-  
   var ContactSchema = new Schema({
 
     user: {
@@ -59,7 +58,7 @@ module.exports = function (Schema) {
 
   /** Lets populate reach any level */
   ContactSchema.plugin(deepPopulate, {
-   populate :{
+    populate :{
 
       'contacts.user' : {
         select : 'email profile'
@@ -72,7 +71,6 @@ module.exports = function (Schema) {
     }
 
   });
-  
 
   return ContactSchema;
 

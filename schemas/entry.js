@@ -9,21 +9,29 @@ module.exports = function (Schema) {
 
     user: {
       type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true
+    },
+
+    gruop : {
+      type: Schema.Types.ObjectId,
       ref: 'user'
     },
 
     title: {
-      type: String
+      type: String,
+      required: true
     },
 
     content: {
-      type: String
+      type: String,
+      required: true
     },
 
     pictures: [{
       type: Schema.Types.ObjectId,
       ref: 'fs.file'
-        }],
+    }],
 
     tags: [String],
 
@@ -53,5 +61,5 @@ module.exports = function (Schema) {
   EntrySchema.plugin(deepPopulate);
 
   return EntrySchema;
-  
+
 };

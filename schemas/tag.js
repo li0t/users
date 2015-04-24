@@ -3,13 +3,13 @@
 
 module.exports = function (Schema) {
 
-    return new Schema({
+  return new Schema({
 
-        name: {
-            type: String,
-            required: true
-        }
+    name: {
+      type: String,
+      required: true
+    }
 
-    });
-  
+  });
+
 };

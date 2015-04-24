@@ -2,8 +2,8 @@
 'use strict';
 
 var validator = require('validator'),
-  bcrypt = require('bcrypt'),
-  deepPopulate = require('mongoose-deep-populate');
+    bcrypt = require('bcrypt'),
+    deepPopulate = require('mongoose-deep-populate');
 
 module.exports = function (Schema) {
 
@@ -14,9 +14,9 @@ module.exports = function (Schema) {
       required: true,
       unique: true,
       validate: [
-                validator.isEmail,
-                "Uh oh, looks like you don't know how to write an email address. Go back to your cave."
-            ]
+        validator.isEmail,
+        "Uh oh, looks like you don't know how to write an email address. Go back to your cave."
+      ]
     },
 
     password: {
@@ -26,12 +26,14 @@ module.exports = function (Schema) {
 
     state: {
       type: Schema.Types.ObjectId,
-      ref: 'static.state'
+      ref: 'static.state',
+      required: true
     },
 
     profile: {
       type: Schema.Types.ObjectId,
-      ref: 'profile'
+      ref: 'profile',
+      required: true
     },
 
     updated: {
@@ -67,12 +69,12 @@ module.exports = function (Schema) {
     } else {
       next();
     }
-    
+
   });
 
   /** Lets populate reach any level */
   UserSchema.plugin(deepPopulate);
 
   return UserSchema;
-  
+
 };

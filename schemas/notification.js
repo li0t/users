@@ -5,54 +5,54 @@ var deepPopulate = require('mongoose-deep-populate');
 
 module.exports = function (Schema) {
 
-    var NotificationSchema = new Schema({
+  var NotificationSchema = new Schema({
 
-        recipient: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        },
+    recipient: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
 
-        sender: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        },
-
-
-        purpose: {
-            type: Schema.Types.ObjectId,
-            ref: 'static.purpose',
-            default: null
-        },
-
-        viewed: {
-            type: Date
-        },
-
-        accepted: {
-            type: Date
-        },
-
-        declined: {
-            type: Date
-        },
-
-    });
+    sender: {
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    },
 
 
-    /** Show virtuals on JSON conversion */
-    NotificationSchema.set('toJSON', {
-        virtuals: true
-    });
+    purpose: {
+      type: Schema.Types.ObjectId,
+      ref: 'static.purpose',
+      default: null
+    },
 
-    /**  */
-    NotificationSchema.pre('save', function (next) {
-        next();
-    });
+    viewed: {
+      type: Date
+    },
+
+    accepted: {
+      type: Date
+    },
+
+    declined: {
+      type: Date
+    },
+
+  });
 
 
-    /** Lets populate reach any level */
-    NotificationSchema.plugin(deepPopulate);
+  /** Show virtuals on JSON conversion */
+  NotificationSchema.set('toJSON', {
+    virtuals: true
+  });
+
+  /**  */
+  NotificationSchema.pre('save', function (next) {
+    next();
+  });
 
 
-    return NotificationSchema;
+  /** Lets populate reach any level */
+  NotificationSchema.plugin(deepPopulate);
+
+
+  return NotificationSchema;
 };
