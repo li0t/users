@@ -27,12 +27,14 @@ module.exports = function (router, mongoose) {
         next(err);
       } else {
 
-        new Group({
+        var group =  new Group({
           profile : profile._id,
           admin : req.session.user._id
-        }).
+        });
 
-        save(function(err, group){
+        group.members.push(req.session.user._id);
+
+        group.save(function(err){
 
           if (err) {
             next(err);
@@ -53,13 +55,15 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:groupId/addMember/:id', function(req, res, next) {
 
+    var i, index = -1;
+
     Group.findById(req.params.groupId, function(err, group) {
 
       if (err) {
         next(err);
       } else if (group) {
 
-        if(_.isEqual(group.admin, req.session.user._id)) { /** Check if logged user is the group admin */
+        if(JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)){ /** Check if logged user is the group admin */
 
           User.findById(req.params.id, function(err, user) {
 
@@ -67,19 +71,33 @@ module.exports = function (router, mongoose) {
               next(err);
             } else if (user) {
 
-              group.members.push(user._id);
-
-              group.save(function(err) {
-
-                if (err) {
-                  next(err);
-                } else {
-
-                  debug('User %s added to group %s' , group._id, user._id);
-                  res.sendStatus(204);
-
+              for (i = 0; i < group.members.length; i++) {
+                
+                if (JSON.stringify(group.members[i]) === JSON.stringify(user._id)) { /** Look for user index in members array */
+                  index = i;
+                  break;
                 }
-              });
+              }
+              
+              if(index === -1){
+
+                group.members.push(user._id);
+
+                group.save(function(err) {
+
+                  if (err) {
+                    next(err);
+                  } else {
+
+                    debug('User %s added to group %s' , group._id, user._id);
+                    res.sendStatus(204);
+
+                  }
+                });
+              }else {
+                res.status(409).send('That user already belongs to the group');
+              }
+
             } else {
               debug('No user found with id %s' , req.params.id);
               res.sendStatus(404);
@@ -108,13 +126,13 @@ module.exports = function (router, mongoose) {
       if (err) {
         next(err);
       } else if (group) {
-        
+
         /** Check if the user removing is the group admin or itself */
-        if (_.isEqual(group.admin, req.session.user._id) || _.isEqual(req.session.user._id, req.params.id)) { 
+        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id) || req.session.user._id === req.params.id) { 
 
           for (i = 0; i < group.members.length; i++) {
 
-            if (_.isEqual(group.members[i], req.params.id)) { /** Look for user index in members array */
+            if (JSON.stringify(group.members[i]) === JSON.stringify(req.params.id)) { /** Look for user index in members array */
               index = i;
               break;
             }
@@ -163,11 +181,11 @@ module.exports = function (router, mongoose) {
         next(err);
       } else if (group) {
 
-        if (_.isEqual(group.admin, req.session.user._id)) { /** Check if logged user is the group admin */
+        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) { /** Check if logged user is the group admin */
 
           for (i = 0; i < group.members.length; i++) {
 
-            if (_.isEqual(group.members[i], req.params.id)) { /** Look for user index in members array */
+            if (JSON.stringify(group.members[i]) === JSON.stringify(req.params.id)) { /** Look for user index in members array */
               index = i;
               break;
             }
@@ -202,34 +220,67 @@ module.exports = function (router, mongoose) {
     });
 
   });
-  
+
   /**
    * Get group members
    */
-  router.get(':groupId/members', function(req, res, next) {
+  router.get('/:groupId/members', function(req, res, next) {
 
     Group.
-    
+
     findOne().
-    where('_id', req.params.id).
+    where('_id', req.params.groupId).
     where('members', req.session.user._id).
-    
-    deepPopulate('members.email members.profile').
-    
+
+    deepPopulate('members.profile').
+
     exec(function(err, group){
-      
+
       if (err) {
         next(err);
       } else if (group) {
-        
-        res.send(group);
-        
+
+        res.send(group.members);
+
       } else {
         res.sendStatus(404);
       }
     });
 
   });
+
+  /**
+   * Get user groups
+   */
+  router.get('/me', function(req, res, next) {
+
+    Group.
+
+    find().
+
+    where('members', req.session.user._id).
+
+    sort('created').
+
+    select('id profile members created').
+
+    populate('profile').
+
+    exec(function(err, group){
+
+      if (err) {
+        next(err);
+      } else if (group) {
+
+        res.send(group);
+
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
 
 
 };
