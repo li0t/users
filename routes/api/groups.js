@@ -1,8 +1,8 @@
 /* jshint node: true */
 'use strict';
 
-var    _ = require('underscore'),
-    debug = require('debug')('app:api:groups');
+var   // _ = require('underscore'),
+debug = require('debug')('app:api:groups');
 
 
 module.exports = function (router, mongoose) {
@@ -23,7 +23,7 @@ module.exports = function (router, mongoose) {
 
     save(function(err, profile){
 
-      if(err) {
+      if (err) {
         next(err);
       } else {
 
@@ -34,7 +34,7 @@ module.exports = function (router, mongoose) {
 
         group.members.push(req.session.user._id);
 
-        group.save(function(err){
+        group.save(function(err) {
 
           if (err) {
             next(err);
@@ -63,7 +63,7 @@ module.exports = function (router, mongoose) {
         next(err);
       } else if (group) {
 
-        if(JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)){ /** Check if logged user is the group admin */
+        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) { /** Check if logged user is the group admin */
 
           User.findById(req.params.id, function(err, user) {
 
@@ -72,14 +72,14 @@ module.exports = function (router, mongoose) {
             } else if (user) {
 
               for (i = 0; i < group.members.length; i++) {
-                
+
                 if (JSON.stringify(group.members[i]) === JSON.stringify(user._id)) { /** Look for user index in members array */
                   index = i;
                   break;
                 }
               }
-              
-              if(index === -1){
+
+              if (index === -1) {
 
                 group.members.push(user._id);
 
@@ -234,7 +234,7 @@ module.exports = function (router, mongoose) {
 
     deepPopulate('members.profile').
 
-    exec(function(err, group){
+    exec(function(err, group) {
 
       if (err) {
         next(err);
@@ -266,7 +266,7 @@ module.exports = function (router, mongoose) {
 
     populate('profile').
 
-    exec(function(err, group){
+    exec(function(err, group) {
 
       if (err) {
         next(err);
@@ -280,7 +280,5 @@ module.exports = function (router, mongoose) {
     });
 
   });
-
-
 
 };

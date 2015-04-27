@@ -25,7 +25,7 @@ module.exports = function (router, mongoose) {
       Sts.findOne({ name: name }, function (err, found) {
         if (err) {
           debug('Error! : %s', err);
-        } else if(found){
+        } else if(found) {
           States[name] = found._id;
         } else {
           debug('No state found with name %s', name);
@@ -230,7 +230,7 @@ module.exports = function (router, mongoose) {
 
         send = function (found) {
 
-          if(checked === toCheck && populated === toPopulate){
+          if (checked === toCheck && populated === toPopulate) {
             res.send(found);
           }
         };
@@ -239,37 +239,37 @@ module.exports = function (router, mongoose) {
 
     where('user', req.session.user._id).
 
-    exec(function(err, found){
+    exec(function(err, found) {
 
-      if(err){
+      if (err) {
         next(err);
-      } else if(found.contacts.length){
+      } else if(found.contacts.length) {
 
         toCheck = found.contacts.length;
 
-        found.contacts.forEach(function(contact){
+        found.contacts.forEach(function(contact) {
 
           checked +=1;
 
-          if(_.isEqual(contact.state, States.Active)){
+          if (_.isEqual(contact.state, States.Active)) {
 
             toPopulate +=1;
 
-            contact.deepPopulate('user.profile', function(err){
+            contact.deepPopulate('user.profile', function(err) {
 
-              if(err){
+              if(err) {
                 debug(err);
-              } else {
 
+              } else {
                 populated +=1;
 
-                if(populated === toPopulate){
+                if (populated === toPopulate) {
                   send(found);
                 }
               }
             }); 
 
-          } else if(checked === toCheck){
+          } else if (checked === toCheck) {
             send(found);
           }
         });
@@ -278,6 +278,7 @@ module.exports = function (router, mongoose) {
         res.sendStatus(404);
       }
     });
+
   });
 
 };

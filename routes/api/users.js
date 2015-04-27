@@ -3,7 +3,7 @@
 
 var bcrypt = require('bcrypt'),
     _ = require('underscore'),
-    debug = require('debug')('app:api:profiles'),
+    debug = require('debug')('app:api:users'),
     States = {
       Active: null,
       Pending: null,
@@ -83,7 +83,7 @@ module.exports = function (router, mongoose) {
           email: req.body.email,
           password: req.body.password,
           profile: profile._id,
-          state: States.Pending,
+          state: States.Pending
         }).
 
         save(function (err, user) {
@@ -166,7 +166,7 @@ module.exports = function (router, mongoose) {
   /**
    * Logs a user out.
    */
-  router.get('/logout', function (req, res, next) {
+  router.get('/logout', function (req, res/*, next*/) {
 
     delete req.session.user;
 
@@ -177,7 +177,7 @@ module.exports = function (router, mongoose) {
   /**
    * Begin password reset.
    */
-  router.post('/recover', function (req, res, next) {
+  router.post('/recover', function (req, res/*, next*/) {
 
     res.redirect('/api/mandrill/recover/'+req.body.email);
 
@@ -192,19 +192,19 @@ module.exports = function (router, mongoose) {
 
       if (err) {
 
-        if(err.name && err.name === 'CastError') {
+        if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
 
-      } else if(token){
+      } else if (token){
 
         req.session.token = token;
         res.send('Please choose a new password.');
 
       } else {
-        res.sendStatus(498).send('This token is not active anymore');
+        res.status(498).send('This token is not active anymore');
       }
     });
 
@@ -213,7 +213,7 @@ module.exports = function (router, mongoose) {
   /**
    * Reset user's password
    */
-  router.post('/resetPassword', function(req, res, next){
+  router.post('/resetPassword', function(req, res, next) {
 
     var token = req.session.token,
         password = req.body.password;
@@ -241,9 +241,9 @@ module.exports = function (router, mongoose) {
 
                 res.send('Password reset successful');
 
-                delete req.session.token;
+                delete req.session.token; /** IMPORTANT! Token seems to survive this action */
 
-                Token.remove({_id : token._id}, function(err){
+                Token.remove({_id : token._id}, function(err) {
                   if (err) {
                     debug('Error! ' + err); 
                   }
@@ -312,8 +312,10 @@ module.exports = function (router, mongoose) {
         user.state = States.Disabled;
 
         user.save(function(err){
+
           if(err){
             next(err);
+
           } else {
             delete req.session.user;
             res.sendStatus(204);

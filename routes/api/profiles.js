@@ -9,7 +9,7 @@ var gridfs = component('gridfs');
 module.exports = function (router, mongoose) {
 
   var Profile = mongoose.model('profile'),
-      User = mongoose.model('user'),
+      //User = mongoose.model('user'),
       Group = mongoose.model('group');
 
   /** 
@@ -17,12 +17,12 @@ module.exports = function (router, mongoose) {
    */
   router.post('/', function (req, res, next) {
 
-    Profile.findById(req.session.user.profile , function(err, profile){
+    Profile.findById(req.session.user.profile , function(err, profile) {
 
       if (err) {
         next(err);
 
-      } else if (profile){
+      } else if (profile) {
 
         profile.name = req.body.name || profile.name;
 
@@ -35,12 +35,11 @@ module.exports = function (router, mongoose) {
         profile.save(function (err) {
 
           if (err) {
-            next(err);
+            next(err);  
           } else {
             res.sendStatus(204);
           }
         });
-
       } else {
         res.sendStatus(404);
       }
@@ -131,18 +130,18 @@ module.exports = function (router, mongoose) {
    */
   router.post('/group/:id', function (req, res, next) {
 
-    Group.findById(req.params.id , function(err, group){
+    Group.findById(req.params.id , function(err, group) {
 
       if (err) {
         next(err);
 
-      } else if (group){
+      } else if (group) {
 
-        if(JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)){
+        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) {
 
           Profile.findById(group.profile, function(err, profile){
 
-            if(err){
+            if (err) {
               next(err);
 
             } else {
@@ -231,14 +230,14 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    Group.findById(req.params.id, function(err, group){
-      
+    Group.findById(req.params.id, function(err, group) {
+
       if (err) {
         next(err);
 
       } else if (group) {
 
-        if(JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)){
+        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) {
 
           Profile.findById(group.profile, function (err, data) {
 

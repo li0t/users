@@ -1,9 +1,9 @@
 /* jshint node: true */
 'use strict';
 
-var bcrypt = require('bcrypt'),
-    _ = require('underscore'),
-    debug = require('debug')('app:api:profiles'),
+var //bcrypt = require('bcrypt'),
+//_ = require('underscore'),
+debug = require('debug')('app:api:profiles'),
     States = {
       Active: null,
       Pending: null,
@@ -12,9 +12,8 @@ var bcrypt = require('bcrypt'),
 
 module.exports = function (router, mongoose) {
 
-  var User = mongoose.model('user'),
-      Profile = mongoose.model('profile'),
-      Contact = mongoose.model('contact');
+  var User = mongoose.model('user')/*,
+      Contact = mongoose.model('contact')*/;
 
   /** 
    * Looks for statics states and saves the ids
@@ -51,23 +50,23 @@ module.exports = function (router, mongoose) {
 
     where('email', req.body.email).
 
-    exec(function(err, user){
-      
-      if(err){
+    exec(function(err, user) {
+
+      if (err) {
         if (err.name && err.name === 'ValidationError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
-        
+
       } else if (user) {
         res.send(user._id);
-        
+
       } else {
         res.redirect('/api/users/createAndInvite/' + req.body.email); 
       }
     });
-    
+
   });
 
 };

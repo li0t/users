@@ -81,7 +81,7 @@ module.exports = function (router, mongoose) {
     }
 
     function createEntry() {
-      
+
       new Entry({
         user: req.session.user._id,
         group : group,
@@ -101,18 +101,18 @@ module.exports = function (router, mongoose) {
           }
         }
       });
-      
+
     }
-    
-    if(group){
-      
-      Group.findById(group, function(err, found){
+
+    if (group) {
+
+      Group.findById(group, function(err, found) {
         if (err) {
           next(err);   
-        } else if (found){
-          
+        } else if (found) {
+
           createEntry();
-          
+
         } else {
           res.status(404).send('No group found with id ' + group);
         }
@@ -120,7 +120,7 @@ module.exports = function (router, mongoose) {
     } else {
       createEntry();
     }
-    
+
   });
 
   /**
@@ -217,8 +217,10 @@ module.exports = function (router, mongoose) {
     exec(function (err, entry) {
       if (err) {
         next(err);
+
       } else if (entry) {
         res.send(entry);
+
       } else {
         res.sendStatus(404);
       }
@@ -230,7 +232,7 @@ module.exports = function (router, mongoose) {
    * Get entries of an user
    */
   router.get('/user/:id', function (req, res, next) {
-    
+
     Entry.
     find().
     where('user', req.params.id).
@@ -239,20 +241,22 @@ module.exports = function (router, mongoose) {
     exec(function (err, entries) {
       if (err) {
         next(err);
+
       } else if (entries && entries.length) {
         res.send(entries);
+
       } else {
         res.sendStatus(404);
       }
     });
 
   });
-  
-   /**
+
+  /**
    * Get entries of a group
    */
   router.get('/group/:id', function (req, res, next) {
-    
+
     Entry.
     find().
     where('group', req.params.id).
@@ -261,14 +265,15 @@ module.exports = function (router, mongoose) {
     exec(function (err, entries) {
       if (err) {
         next(err);
+
       } else if (entries && entries.length) {
         res.send(entries);
+
       } else {
         res.sendStatus(404);
       }
     });
 
   });
-
 
 };

@@ -28,16 +28,16 @@ module.exports = function (router, mongoose) {
   /** 
    * List all users in this mandrill account 
    */
-  router.get('/users', function (req, res, next) {
+  router.get('/users', function (req, res/*, next*/) {
 
     if (api) {
 
       api.users.info({
 
-      },function (users) {
+      }, function (users) {
         debug(users);
 
-      },function (err) {
+      }, function (err) {
         debug('A mandrill error occurred %s : %s', + err.nam, err.message);
         res.sendStatus(500);
       });
@@ -130,7 +130,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/addContact/:id', function (req, res, next) {
 
-    if(api){
+    if (api) {
 
       var message = null;
 
@@ -188,7 +188,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/invite/:id', function (req, res, next) {
 
-    if(api){
+    if (api) {
 
       var message = null;
 
@@ -204,7 +204,7 @@ module.exports = function (router, mongoose) {
 
           save(function(err, token){
 
-            if(err){
+            if (err) {
               next(err);
             } else {
 
@@ -231,7 +231,6 @@ module.exports = function (router, mongoose) {
                 "message": message
 
               }, function (result) {
-
                 debug(result);
                 res.redirect('/api/contacts/add/'+user._id);
 
@@ -260,7 +259,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/recover/:email', function(req, res, next){
 
-    if(api){
+    if (api) {
 
       var message;
 
@@ -269,16 +268,16 @@ module.exports = function (router, mongoose) {
       findOne().
       where('email', req.params.email).
 
-      exec(function(err, user){
-        if(err){
+      exec(function(err, user) {
+        if (err) {
           next(err);
         } else if (user) {
 
           new Token({user : user._id}).
-          
-          save(function(err, token){
 
-            if(err){
+          save(function(err, token) {
+
+            if (err) {
               next(err);
             } else {
 
@@ -323,7 +322,7 @@ module.exports = function (router, mongoose) {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
     }
-    
+
   });
 
 };
