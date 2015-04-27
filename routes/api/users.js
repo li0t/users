@@ -124,7 +124,7 @@ module.exports = function (router, mongoose) {
     var email = req.body.email,
         password = req.body.password;
 
-    if(email && password){
+    if (email && password) {
       /* Logout any previous user */
       delete req.session.user;
       delete req.session.workplace;
@@ -175,23 +175,92 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Recover a user's password.
+   * Begin password reset.
    */
   router.post('/recover', function (req, res, next) {
 
-    /* Find the user by its email address, if any */
-    User.findOne().
-    where('email', req.body.email).  
-    exec(function (err, user) {
+    res.redirect('/api/mandrill/recover/'+req.body.email);
+
+  });
+
+  /**
+   * Set session token for password reset
+   */
+  router.get('/recover/:token', function (req, res, next) {
+
+    Token.findById(req.params.token, function(err, token){
+
       if (err) {
-        next(err);
-      } else if (user) {
-        res.redirect('/mandrill/recover/' + user._id);
+
+        if(err.name && err.name === 'CastError') {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
+      } else if(token){
+
+        req.session.token = token;
+        res.send('Please choose a new password.');
+
       } else {
-        res.sendStatus(404);
+        res.sendStatus(498).send('This token is not active anymore');
       }
     });
 
+  });
+
+  /**
+   * Reset user's password
+   */
+  router.post('/resetPassword', function(req, res, next){
+
+    var token = req.session.token,
+        password = req.body.password;
+
+    if (token) {
+
+      if (password) { 
+
+        User.findById(token.user, function(err, user) { /** Find user that sent the reset request */
+          if (err) {
+            next(err);
+
+          } else if (user) {
+
+            user.password = password;
+
+            user.save(function(err) {
+
+              if (err) {
+                next(err);
+
+              } else {
+
+                req.session.user = user;
+
+                res.send('Password reset successful');
+
+                delete req.session.token;
+
+                Token.remove({_id : token._id}, function(err){
+                  if (err) {
+                    debug('Error! ' + err); 
+                  }
+                });
+              }
+            });
+          } else {
+            debug('No user found for id ' + req.session.token.user);
+            res.sendStatus(404);  
+          }
+        });
+      } else {
+        res.status(400).send('You must set a new password');
+      }
+    } else {
+      res.sendStatus(403);
+    }
   });
 
   /**
@@ -202,7 +271,7 @@ module.exports = function (router, mongoose) {
     var oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;
 
-    if(newPassword && (newPassword !== oldPassword)){
+    if (newPassword && (newPassword !== oldPassword)) {
 
       User.findById(req.session.user._id).
       exec(function (err, user) {
@@ -260,14 +329,14 @@ module.exports = function (router, mongoose) {
   /** 
    * Create a new user and invite it to emeeter
    */
-  router.get('/createAndInvite/:email', function(req, res ,next){
+  router.get('/createAndInvite/:email', function(req, res ,next) {
 
     var email = req.params.email;
 
-    if(email){
+    if (email) {
 
       new Profile().
-      save(function(err, profile){
+      save(function(err, profile) {
 
         new User({
           email : email,
@@ -276,9 +345,9 @@ module.exports = function (router, mongoose) {
           state: States.Pending
         }). 
 
-        save(function(err, user){
+        save(function(err, user) {
 
-          if(err){
+          if (err) {
             /* Check for duplicated entry */
             if (err.code && err.code === 11000) {
             } else {
@@ -288,9 +357,9 @@ module.exports = function (router, mongoose) {
 
             new Contact({user: user._id}).
 
-            save(function(err){
+            save(function(err) {
 
-              if(err){
+              if (err) {
                 next(err);
               } else {
 
@@ -309,20 +378,49 @@ module.exports = function (router, mongoose) {
   });
 
   /**
+   * Invited user Token validation
+   */
+  router.get('/invited/signin/:token', function(req, res , next){
+
+    Token.findById(req.params.token, function(err, token){
+
+      if (err) {
+
+        if(err.name && err.name === 'CastError') {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
+      } else if (token) {
+
+        req.session.token = token;
+
+        res.send('Thanks for signing up, Please choose a password');
+
+      } else {
+
+        res.status(498).send('This token is not active anymore');
+      }
+    });
+
+  });
+
+  /**
    * Invited user activation
    */
-  router.post('/invited/signin',  function(req, res , next){
+  router.post('/invited/signin',  function(req, res , next) {
 
     var token = req.session.token;
 
-    if(token.user && token.sender){
+    if (token.user && token.sender) {
 
-      User.findById(token.user, function(err, user){
+      User.findById(token.user, function(err, user) {
 
-        if(err){
+        if (err) {
           next(err);
 
-        } else if(user){
+        } else if (user) {
 
           if(req.body.password){
 
@@ -339,12 +437,12 @@ module.exports = function (router, mongoose) {
                 req.session.user = user;
 
                 res.redirect('/api/contacts/confirm/'+token.sender);
-                
+
                 delete req.session.token;
 
-                Token.remove({_id : token._id}, function(err){
-                  if(err){
-                    debug(err);
+                Token.remove({_id : token._id}, function(err) {
+                  if (err) {
+                    debug('Error! ' + err); 
                   }
                 });    
               }
@@ -363,38 +461,20 @@ module.exports = function (router, mongoose) {
   });
 
 
-  /**
-   * Invited user Token validation
-   */
-  router.get('/invited/signin/:token', function(req, res , next){
-
-    Token.findById(req.params.token, function(err, token){
-
-      if(err){
-        next(err);
-
-      } else if (token){
-
-        req.session.token = token;
-
-        res.send('Thanks for signing up, Please choose a password');
-
-      }else {
-
-        res.status(498).send('This token is not active anymore');
-      }
-    });
-
-  });
-
   /** 
-   * Email confirmation Token validation
+   * Validate email by token
    */
   router.get('/validate/:token', function (req, res, next) {
 
     Token.findById(req.params.token, function (err, token) {
       if (err) {
-        next(err);
+
+        if(err.name && err.name === 'CastError') {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
       } else if (token) {
 
         User.findOneAndUpdate({
@@ -438,7 +518,13 @@ module.exports = function (router, mongoose) {
 
     exec(function (err, user) {
       if (err) {
-        next(err);
+
+        if(err.name && err.name === 'CastError') {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
       } else if (user) {
 
         res.send(user);

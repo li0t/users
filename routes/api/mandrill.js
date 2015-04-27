@@ -201,14 +201,12 @@ module.exports = function (router, mongoose) {
             user : user._id,
             sender : req.session.user._id
           }).
-          
+
           save(function(err, token){
 
             if(err){
               next(err);
             } else {
-
-              debug(token);
 
               message = {
                 "html": "<a href='http://" + url + "/api/users/invited/signin/"+token._id+"'/>Go to emeeter</a>",
@@ -255,6 +253,77 @@ module.exports = function (router, mongoose) {
       res.sendStatus(500);
     }
 
+  });
+
+  /**
+   * Provide a reset password link
+   */
+  router.get('/recover/:email', function(req, res, next){
+
+    if(api){
+
+      var message;
+
+      User.
+
+      findOne().
+      where('email', req.params.email).
+
+      exec(function(err, user){
+        if(err){
+          next(err);
+        } else if (user) {
+
+          new Token({user : user._id}).
+          
+          save(function(err, token){
+
+            if(err){
+              next(err);
+            } else {
+
+              message = {
+                "html": "<a href='http://" + url + "/api/users/recover/" + token._id + "'>Reset your password</a>",
+                "text": "Reset your password",
+                "subject": "Reset your password",
+                "from_email": senderEmail,
+                "from_name": sender,
+                "to": [{
+                  "email": user.email,
+                  "name": user.email,
+                  "type": "to"
+                }],
+                "headers": {
+                  "Reply-To": "noreply@emeeter.com"
+                },
+                "track_opens": true,
+                "track_clicks": true,
+                "important": false
+              };
+
+              api.messages.send({ /* Send a recovery email to the user */
+                "message": message
+
+              }, function (result) {
+                debug(result);
+                res.send("A recovery email has been sent to " + user.email);
+
+              }, function (err) {
+                debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+                res.sendStatus(500);
+              });
+            }
+          });
+        } else {
+          debug('No user found for ' + req.params.email);
+          res.send("A recovery email has been sent to " + req.params.email);
+        }
+      });
+    } else {
+      debug('A error occurred with the Mandrill client');
+      res.sendStatus(500);
+    }
+    
   });
 
 };
