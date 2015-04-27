@@ -307,18 +307,62 @@ module.exports = function (router, mongoose) {
         next(err);
       } else if (user) {
 
-        /** TODO: Implement disable in contacts's lists */
-
-        user.state = States.Disabled;
-
-        user.save(function(err){
-
-          if(err){
+        Contact.findOne().
+        where('user', user._id). /** Find user collaborators list*/
+        exec(function (err, userContact) {
+          
+          if (err) {
             next(err);
-
           } else {
-            delete req.session.user;
-            res.sendStatus(204);
+
+            userContact.contacts.forEach(function(contact){ /** For each user contact */
+
+              if(_.isEqual(contact.state, States.Active)){ /** Check if it's an active contact */
+
+                Contact.findOne(). 
+                where('user', contact.user). /** Find contact collaborators list*/
+                exec(function (err, contact) {
+
+                  if (err) {
+                    next(err);
+                  } else if (contact) {
+
+                    for (var i = 0; i < contact.contacts.length; i++) { /** Look itself in contact's collaborators list */
+                      if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(user._id)) { 
+                        contact.contacts[i].state = States.Disabled; /** And set itself disabled */
+                        break;
+                      }
+                    }
+                    
+                    contact.save(function(err){
+                      if (err) {debug(err); }
+                    });
+                  }
+                });
+
+                contact.state = States.Disabled;  /** Finally set the user's contact as disabled */
+              }
+            });
+
+            userContact.save(function(err){
+
+              if (err) { 
+                next(err);
+              } else {
+                user.state = States.Disabled;
+
+                user.save(function(err){
+
+                  if(err){
+                    next(err);
+
+                  } else {
+                    delete req.session.user;
+                    res.sendStatus(204);
+                  }
+                });
+              }
+            });
           }
         });
       } else {
