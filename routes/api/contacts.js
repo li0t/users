@@ -47,19 +47,24 @@ module.exports = function (router, mongoose) {
    */
   router.get('/add/:id', function (req, res, next) {
 
-    var i, isContact;
+    var i, isContact, contactState;
 
     Contact.findOne().
     where('user', req.session.user._id).
     exec(function (err, sender) { /* The ContactSchema of the sender */
       if (err) {
-        next(err);
+        if(err.name && err.name === 'CastError'){
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
       } else {
         if (sender) {
 
           for (i = 0; i < sender.contacts.length; i++) {
             if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.params.id)) {
               isContact = true;
+              contactState = sender.contacts[i].state;
               break;
             }
           }
@@ -93,7 +98,7 @@ module.exports = function (router, mongoose) {
                         if (err) {
                           next(err);
                         } else {
-                          res.redirect('/api/mandrill/addContact/'+req.params.id); 
+                          res.send('Great! Send the email to generate token'); 
                         }
                       });
                     }
@@ -105,7 +110,11 @@ module.exports = function (router, mongoose) {
               }
             });
           } else {
-            res.send();
+            if(_.isEqual(contactState, States.Active)){
+              res.send('You are already contacts!');
+            } else {
+              res.send('Waiting for confirmation...');
+            }
           }
         } else {
           debug('No contacs list found for user with id %s', req.params.id);
@@ -156,7 +165,7 @@ module.exports = function (router, mongoose) {
                 }
 
                 for (i = 0; i < receiver.contacts.length; i++) {
-                  if (JSON.stringify(receiver.contacts[i].user) === JSON.stringify(req.params.id)) {
+                  if (JSON.stringify(receiver.contacts[i].user) === JSON.stringify(token.sender)) {
                     receiver.contacts[i].state = States.Active;
                     break;
                   }
@@ -171,7 +180,14 @@ module.exports = function (router, mongoose) {
                       if (err) {
                         next(err);
                       } else {
+                        
                         res.sendStatus(204);
+
+                        Token.remove({_id : token._id}, function(err) {
+                          if (err) {
+                            debug('Error! ' + err); 
+                          }
+                        }); 
                       }
                     });
                   }
@@ -200,7 +216,11 @@ module.exports = function (router, mongoose) {
     where('user', req.params.id).
     exec(function (err, contact) {
       if (err) {
-        next(err);
+        if(err.name && err.name === 'CastError'){
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
       } else if (contact) {
 
         Contact.findOne().

@@ -43,7 +43,7 @@ module.exports = function (router, mongoose) {
         lookup(state);
       }
     }
-
+    debug(JSON.stringify(States));
   })();
 
   /** 
@@ -456,9 +456,11 @@ module.exports = function (router, mongoose) {
    * Invited user activation
    */
   router.post('/invited/signin',  function(req, res , next) {
-
+    
     var token = req.session.token;
-
+    
+    debug(JSON.stringify(token));
+    
     if (token.user && token.sender) {
 
       User.findById(token.user, function(err, user) {
@@ -482,15 +484,10 @@ module.exports = function (router, mongoose) {
 
                 req.session.user = user;
 
-                res.redirect('/api/contacts/confirm/'+token.sender);
+                res.redirect('/api/contacts/confirm/'+token._id);
 
                 delete req.session.token;
-
-                Token.remove({_id : token._id}, function(err) {
-                  if (err) {
-                    debug('Error! ' + err); 
-                  }
-                });    
+   
               }
             });
           } else {
