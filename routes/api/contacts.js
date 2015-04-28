@@ -11,7 +11,8 @@ var  _ = require('underscore'),
 
 module.exports = function (router, mongoose) {
 
-  var Contact = mongoose.model('contact');
+  var Contact = mongoose.model('contact'),
+      Token = mongoose.model('token');
 
   /** 
    * Looks for statics states and saves the ids
@@ -41,37 +42,125 @@ module.exports = function (router, mongoose) {
 
   })();
 
-
   /** 
    * Add contact
    */
   router.get('/add/:id', function (req, res, next) {
 
+    var i, isContact;
+
     Contact.findOne().
-    where('user', req.params.id).
-    exec(function (err, receiver) { /* The ContactSchema of the receiver */
+    where('user', req.session.user._id).
+    exec(function (err, sender) { /* The ContactSchema of the sender */
       if (err) {
         next(err);
       } else {
-        if (receiver) {
+        if (sender) {
 
-          Contact.findOne().
-          where('user', req.session.user._id).
-          exec(function (err, sender) { /* The ContactSchema of the sender */
-            if (err) {
-              next(err);
-            } else {
-              if (sender) {
+          for (i = 0; i < sender.contacts.length; i++) {
+            if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.params.id)) {
+              isContact = true;
+              break;
+            }
+          }
 
-                sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
-                  user: req.params.id,
-                  state: States.Pending /* The contact state is pending for confirmation */
-                });
+          if(!isContact){
+            Contact.findOne().
+            where('user', req.params.id).
+            exec(function (err, receiver) { /* The ContactSchema of the receiver */
+              if (err) {
+                next(err);
+              } else {
+                if (receiver) {
 
-                receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
-                  user: req.session.user._id,
-                  state: States.Pending /* The contact state is pending for confirmation */
-                });
+
+                  sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
+                    user: req.params.id,
+                    state: States.Pending /* The contact state is pending for confirmation */
+                  });
+
+                  receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
+                    user: req.session.user._id,
+                    state: States.Pending /* The contact state is pending for confirmation */
+                  });
+
+                  sender.save(function (err) {
+                    if (err) {
+                      next(err);
+                    } else {
+
+                      receiver.save(function (err) { 
+                        if (err) {
+                          next(err);
+                        } else {
+                          res.redirect('/api/mandrill/addContact/'+req.params.id); 
+                        }
+                      });
+                    }
+                  });
+                } else {
+                  debug('No contacs list found for user with id %s', req.session.user._id);
+                  res.sendStatus(404);
+                }
+              }
+            });
+          } else {
+            res.send();
+          }
+        } else {
+          debug('No contacs list found for user with id %s', req.params.id);
+          res.sendStatus(404);
+        }
+      }
+    });
+
+  });
+
+  /** 
+   *  Confirm request
+   */
+  router.get('/confirm/:token', function (req, res, next) {
+
+    Token.findById(req.params.token, function(err,token){
+
+      if (err) {
+        if(err.name && err.name === 'CastError'){
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
+      } else if(token && token.sender){
+
+        Contact.
+        findOne().
+        where('user', token.sender).
+        exec(function (err, sender) {
+          if (err) {
+            next(err);
+          } else if (sender) {
+
+            Contact.
+            findOne().
+            where('user', req.session.user._id). 
+            exec(function (err, receiver) {
+              if (err) {
+                next(err);
+              } else if (receiver) {
+
+                for (var i = 0; i < sender.contacts.length; i++) {
+                  if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.session.user._id)) {
+                    sender.contacts[i].state = States.Active;
+                    break;
+                  }
+                }
+
+                for (i = 0; i < receiver.contacts.length; i++) {
+                  if (JSON.stringify(receiver.contacts[i].user) === JSON.stringify(req.params.id)) {
+                    receiver.contacts[i].state = States.Active;
+                    break;
+                  }
+                }
 
                 sender.save(function (err) {
                   if (err) {
@@ -88,65 +177,7 @@ module.exports = function (router, mongoose) {
                   }
                 });
               } else {
-                debug('No contacs list found for user with id %s', req.session.user._id);
                 res.sendStatus(404);
-              }
-            }
-          });
-        } else {
-          debug('No contacs list found for user with id %s', req.params.id);
-          res.sendStatus(404);
-        }
-      }
-    });
-
-  });
-
-  /** 
-   *  Confirm request
-   */
-  router.get('/confirm/:id', function (req, res, next) {
-
-    Contact.findOne().
-    where('user', req.params.id).
-    exec(function (err, sender) {
-      if (err) {
-        next(err);
-      } else if (sender) {
-
-        Contact.findOne().
-        where('user', req.session.user._id).
-        exec(function (err, receiver) {
-          if (err) {
-            next(err);
-          } else if (receiver) {
-
-            for (var i = 0; i < sender.contacts.length; i++) {
-              if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.session.user._id)) {
-                sender.contacts[i].state = States.Active;
-                break;
-              }
-            }
-
-            for (i = 0; i < receiver.contacts.length; i++) {
-              if (JSON.stringify(receiver.contacts[i].user) === JSON.stringify(req.params.id)) {
-                receiver.contacts[i].state = States.Active;
-                break;
-              }
-            }
-
-            sender.save(function (err) {
-              if (err) {
-                next(err);
-              } else {
-
-                receiver.save(function (err) {
-                  if (err) {
-                    next(err);
-                  } else {
-                    res.sendStatus(204);
-                  }
-                });
               }
             });
           } else {
@@ -154,7 +185,7 @@ module.exports = function (router, mongoose) {
           }
         });
       } else {
-        res.sendStatus(404);
+        res.status(498).send('No active token found.');
       }
     });
 

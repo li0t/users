@@ -139,43 +139,53 @@ module.exports = function (router, mongoose) {
           next(err);
         } else if (user) {
 
-          message = {
-            "html": "<a href='http://" + url + "/api/users/" + user._id + "'>Go to emeeter</a>",
-            "text": "Someone wants to contact you",
-            "subject": "Someone wants to contact you",
-            "from_email": senderEmail,
-            "from_name": sender,
-            "to": [{
-              "email": user.email,
-              "name": user.email,
-              "type": "to"
-            }],
-            "headers": {
-              "Reply-To": "noreply@emeeter.com"
-            },
-            "track_opens": true,
-            "track_clicks": true,
-            "important": false
-          };
+          new Token({ /** Create token to allow contact confirmation */
+            user: user._id,
+            sender: req.session.user._id
+          }). 
 
-          api.messages.send({ /* Send a confirmation email to the user */
-            "message": message
+          save(function(err){
+            if (err) {
+              next(err);
+            } else {
 
-          }, function (result) {
-            debug(result);
-            res.send("You have sent a contact request! Good!");
+              message = {
+                "html": "<a href='http://" + url + "/api/users/" + user._id + "'>Go to emeeter</a>",
+                "text": "Someone wants to contact you",
+                "subject": "Someone wants to contact you",
+                "from_email": senderEmail,
+                "from_name": sender,
+                "to": [{
+                  "email": user.email,
+                  "name": user.email,
+                  "type": "to"
+                }],
+                "headers": {
+                  "Reply-To": "noreply@emeeter.com"
+                },
+                "track_opens": true,
+                "track_clicks": true,
+                "important": false
+              };
 
-          }, function (err) {
-            debug('A mandrill error occurred %s : %s', + err.nam, err.message);
-            res.sendStatus(500);
+              api.messages.send({ /* Send a confirmation email to the user */
+                "message": message
+
+              }, function (result) {
+                debug(result);
+                res.send("You have sent a contact request! Good!");
+
+              }, function (err) {
+                debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+                res.sendStatus(500);
+              });
+            }
           });
-
         } else {
           debug('No user found with id %s ', + req.params.id);
           res.sendStatus(404);
         }
       });
-
     } else {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
