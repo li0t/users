@@ -43,7 +43,6 @@ module.exports = function (router, mongoose) {
         lookup(state);
       }
     }
-    debug(JSON.stringify(States));
   })();
 
   /** 
