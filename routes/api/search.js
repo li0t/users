@@ -53,13 +53,15 @@ module.exports = function (router, mongoose) {
     exec(function(err, user) {
 
       if (err) {
-        if (err.name && err.name === 'ValidationError') {
+
+        if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
           res.sendStatus(400);
         } else {
           next(err);
         }
 
       } else if (user) {
+
         res.send(user._id);
 
       } else {

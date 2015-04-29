@@ -53,11 +53,13 @@ module.exports = function (router, mongoose) {
     where('user', req.session.user._id).
     exec(function (err, sender) { /* The ContactSchema of the sender */
       if (err) {
-        if(err.name && err.name === 'CastError'){
+
+        if (err.name && err.name === 'ValidationError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
+
       } else {
         if (sender) {
 
@@ -74,7 +76,13 @@ module.exports = function (router, mongoose) {
             where('user', req.params.id).
             exec(function (err, receiver) { /* The ContactSchema of the receiver */
               if (err) {
-                next(err);
+
+                if (err.name && err.name === 'CastError') {
+                  res.sendStatus(400);
+                } else {
+                  next(err);
+                }
+
               } else {
                 if (receiver) {
 
@@ -110,7 +118,7 @@ module.exports = function (router, mongoose) {
               }
             });
           } else {
-            if(_.isEqual(contactState, States.Active)){
+            if (_.isEqual(contactState, States.Active)) {
               res.send('You are already contacts!');
             } else {
               res.send('Waiting for confirmation...');
@@ -132,8 +140,9 @@ module.exports = function (router, mongoose) {
 
     Token.findById(req.params.token, function(err,token){
 
-      if (err) {
-        if(err.name && err.name === 'CastError'){
+      if (err) { 
+
+        if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
@@ -180,7 +189,7 @@ module.exports = function (router, mongoose) {
                       if (err) {
                         next(err);
                       } else {
-                        
+
                         res.sendStatus(204);
 
                         Token.remove({_id : token._id}, function(err) {
@@ -215,19 +224,28 @@ module.exports = function (router, mongoose) {
     Contact.findOne().
     where('user', req.params.id).
     exec(function (err, contact) {
+
       if (err) {
-        if(err.name && err.name === 'CastError'){
+
+        if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
+
       } else if (contact) {
 
         Contact.findOne().
         where('user', req.session.user._id).
         exec(function (err, user) {
           if (err) {
-            next(err);
+
+            if (err.name && err.name === 'ValidationError') {
+              res.sendStatus(400);
+            } else {
+              next(err);
+            }
+
           } else if (user) {
 
             for (var i = 0; i < contact.contacts.length; i++) {

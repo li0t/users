@@ -55,10 +55,14 @@ module.exports = function (router, mongoose) {
     where('state' , States.Active).
 
     exec(function (err, users) {
+
       if (err) {
         next(err);
+
       } else if (users && users.length) {
+
         res.send(users);
+
       } else {
         res.sendStatus(404);
       }
@@ -124,16 +128,27 @@ module.exports = function (router, mongoose) {
         password = req.body.password;
 
     if (email && password) {
+
       /* Logout any previous user */
       delete req.session.user;
       delete req.session.workplace;
 
       /* Find the user by its email address */
-      User.findOne().
+      User.
+
+      findOne().
       where('email', email).
+
       exec(function (err, user) {
+
         if (err) {
-          next(err);
+
+          if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
+
         } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
 
           if (_.isEqual(user.state, States.Active)) { /* Check if the user has confirmed it's email */
@@ -183,7 +198,7 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Set session token for password reset
+   * Validate token for password reset
    */
   router.get('/recover/:token', function (req, res, next) {
 
@@ -210,7 +225,7 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Reset user's password
+   * Reset password of user that already validated token
    */
   router.post('/resetPassword', function(req, res, next) {
 
@@ -272,17 +287,24 @@ module.exports = function (router, mongoose) {
 
     if (newPassword && (newPassword !== oldPassword)) {
 
-      User.findById(req.session.user._id).
+      User.
+
+      findById(req.session.user._id).
+
       exec(function (err, user) {
+
         if (err) {
           next(err);
+
         } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
 
           user.password = newPassword;
 
           user.save(function (err, user) {
+
             req.session.user = user;
             res.send(user._id);
+
           });
         } else {
           setTimeout(function () {
@@ -302,14 +324,19 @@ module.exports = function (router, mongoose) {
   router.get('/disable', function (req, res, next) {
 
     User.findById(req.session.user._id, function (err, user) {
+
       if (err) {
         next(err);
+
       } else if (user) {
 
-        Contact.findOne().
+        Contact.
+
+        findOne().
         where('user', user._id). /** Find user collaborators list*/
+
         exec(function (err, userContact) {
-          
+
           if (err) {
             next(err);
           } else {
@@ -318,12 +345,16 @@ module.exports = function (router, mongoose) {
 
               if(_.isEqual(contact.state, States.Active)){ /** Check if it's an active contact */
 
-                Contact.findOne(). 
+                Contact.
+
+                findOne(). 
                 where('user', contact.user). /** Find contact collaborators list*/
+
                 exec(function (err, contact) {
 
                   if (err) {
                     next(err);
+
                   } else if (contact) {
 
                     for (var i = 0; i < contact.contacts.length; i++) { /** Look itself in contact's collaborators list */
@@ -332,7 +363,7 @@ module.exports = function (router, mongoose) {
                         break;
                       }
                     }
-                    
+
                     contact.save(function(err){
                       if (err) {debug(err); }
                     });
@@ -395,9 +426,12 @@ module.exports = function (router, mongoose) {
           if (err) {
             /* Check for duplicated entry */
             if (err.code && err.code === 11000) {
+            } else if(err.name && err.name === 'ValidationError'){
+              res.sendStatus(400);
             } else {
               next(err);
             }
+
           } else {
 
             new Contact({user: user._id}).
@@ -452,14 +486,12 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Invited user activation
+   * Activation of invited user that already validated token
    */
   router.post('/invited/signin',  function(req, res , next) {
-    
+
     var token = req.session.token;
-    
-    debug(JSON.stringify(token));
-    
+
     if (token.user && token.sender) {
 
       User.findById(token.user, function(err, user) {
@@ -479,6 +511,7 @@ module.exports = function (router, mongoose) {
 
               if(err){
                 next(err);
+
               } else {
 
                 req.session.user = user;
@@ -486,7 +519,7 @@ module.exports = function (router, mongoose) {
                 res.redirect('/api/contacts/confirm/'+token._id);
 
                 delete req.session.token;
-   
+
               }
             });
           } else {
@@ -504,11 +537,12 @@ module.exports = function (router, mongoose) {
 
 
   /** 
-   * Validate email by token
+   * Validate email of new user
    */
   router.get('/validate/:token', function (req, res, next) {
 
     Token.findById(req.params.token, function (err, token) {
+
       if (err) {
 
         if(err.name && err.name === 'CastError') {
@@ -519,15 +553,19 @@ module.exports = function (router, mongoose) {
 
       } else if (token) {
 
-        User.findOneAndUpdate({
+        User.
+
+        findOneAndUpdate({
           _id: token.user
         },{
           state: States.Active
         }).
 
         exec(function (err, user) {
+
           if (err) {
             next(err);
+
           } else {
 
             req.session.user = user;
@@ -554,11 +592,13 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:id', function (req, res, next) {
 
-    User.findById(req.params.id).
+    User.
 
+    findById(req.params.id).
     deepPopulate('state profile.gender profile.contacts profile.pictures'). /* Retrieves data from linked schemas */
 
     exec(function (err, user) {
+
       if (err) {
 
         if(err.name && err.name === 'CastError') {

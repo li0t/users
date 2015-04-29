@@ -133,7 +133,12 @@ module.exports = function (router, mongoose) {
     Group.findById(req.params.id , function(err, group) {
 
       if (err) {
-        next(err);
+
+        if (err.name && err.name === 'CastError') {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
 
       } else if (group) {
 
@@ -163,6 +168,7 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
+          debug('User %s is not admin of group %s',req.session.user.id, group._id);
           res.sendStatus(403);
         }
       } else {
@@ -233,7 +239,12 @@ module.exports = function (router, mongoose) {
     Group.findById(req.params.id, function(err, group) {
 
       if (err) {
-        next(err);
+
+        if (err.name && err.name === 'CastError') {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
 
       } else if (group) {
 
@@ -251,6 +262,7 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
+          debug('User %s is not admin of group %s',req.session.user.id, group._id);
           res.sendStatus(403);
         }
       } else {
