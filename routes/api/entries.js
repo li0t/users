@@ -237,6 +237,36 @@ module.exports = function (router, mongoose) {
     find().
     where('user', req.params.id).
     populate('pictures'). /* Retrieves data from linked schemas */
+    sort('created').
+
+    exec(function (err, entries) {
+      if (err) {
+        next(err);
+
+      } else if (entries && entries.length) {
+        res.send(entries);
+
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
+  });
+  
+  /**
+   * Get entries with files of an user
+   */
+  router.get('/user/:id/files', function (req, res, next) {
+
+    Entry.
+    
+    find( { $where : 'this.pictures.length > 0' } ).
+    
+    where('user', req.params.id).
+    
+    populate('pictures'). /* Retrieves data from linked schemas */
+    
+    sort('created').
 
     exec(function (err, entries) {
       if (err) {
@@ -258,9 +288,14 @@ module.exports = function (router, mongoose) {
   router.get('/group/:id', function (req, res, next) {
 
     Entry.
+    
     find().
+    
     where('group', req.params.id).
+    
     populate('pictures'). /* Retrieves data from linked schemas */
+    
+    sort('created').
 
     exec(function (err, entries) {
       if (err) {
@@ -275,5 +310,36 @@ module.exports = function (router, mongoose) {
     });
 
   });
+  
+  /**
+   * Get entries with files of a group
+   */
+  router.get('/group/:id/files', function (req, res, next) {
+
+    Entry.
+    
+    find( { $where : 'this.pictures.length > 0' } ).
+    
+    where('group', req.params.id).
+    
+    populate('pictures'). /* Retrieves data from linked schemas */
+    
+    sort('created').
+
+    exec(function (err, entries) {
+      if (err) {
+        next(err);
+
+      } else if (entries && entries.length) {
+        res.send(entries);
+
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
+
 
 };
