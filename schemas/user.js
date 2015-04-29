@@ -73,7 +73,15 @@ module.exports = function (Schema) {
   });
 
   /** Lets populate reach any level */
-  UserSchema.plugin(deepPopulate);
+  UserSchema.plugin(deepPopulate, {
+    populate :{
+
+      'profile' : {
+        select : 'name birthdate gender location'
+      }
+
+    }
+  });
 
   return UserSchema;
 

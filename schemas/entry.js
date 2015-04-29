@@ -58,7 +58,31 @@ module.exports = function (Schema) {
   });
 
   /** Lets populate reach any level */
-  EntrySchema.plugin(deepPopulate);
+  EntrySchema.plugin(deepPopulate, {
+    populate :{
+
+      'user' : {
+        select : 'email profile'
+      },
+
+      'user.profile' : {
+        select : 'name birthdate gender location'
+      },
+
+      'group' : {
+        select : 'members profile'
+      },
+
+      'group.members' : {
+        select : 'email profile'
+      },
+
+      'group.profile' : {
+        select : 'name birthdate gender location'
+      }
+
+    }
+  });
 
   return EntrySchema;
 

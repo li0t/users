@@ -25,8 +25,8 @@ module.exports = function (Schema) {
     }]
 
   });
-  
-    /** User's sign up date */
+
+  /** User's sign up date */
   GroupSchema.virtual('created').get(function () {
     return this._id.getTimestamp();
   });
@@ -44,15 +44,22 @@ module.exports = function (Schema) {
   /** Lets populate reach any level */
   GroupSchema.plugin(deepPopulate,{
     populate :{
-      
+
+      'admin' : {
+        select : 'email profile'
+      },
+
       'members' : {
         select : 'email profile'
-      }
-      
-    }
+      },
 
+      'members.profile' : {
+        select : 'name birthdate gender location'
+      }
+
+    }
   });
 
   return GroupSchema;
-  
+
 };
