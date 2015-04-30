@@ -30,20 +30,22 @@ var schemas = component('schemas');
 var routes = component('routes');
 var gridfs = component('gridfs');
 var auth = component('auth');
+var statics = component('statics');
 
 
 /**** Configuration ****/
 var configs = {
-    server: getconf('server'),
-    security: getconf('security'),
-    database: getconf('database'),
-    session: getconf('session')(session),
-    routes: getconf('routes'), // Routes must be compiled later
-    schemas: getconf('schemas'),
-    views: getconf('views')(app),
-    errors: getconf('errors'),
-    static: getconf('static'),
-    auth: getconf('auth')
+  server: getconf('server'),
+  security: getconf('security'),
+  database: getconf('database'),
+  session: getconf('session')(session),
+  routes: getconf('routes'), // Routes must be compiled later
+  schemas: getconf('schemas'),
+  views: getconf('views')(app),
+  errors: getconf('errors'),
+  statics: getconf('statics'),
+  static: getconf('static'),
+  auth: getconf('auth')
 };
 
 
@@ -53,8 +55,8 @@ app.set('views', path.join(process.cwd(), configs.views.basedir));
 app.set('view engine', configs.views.engine);
 
 if (app.get('env') === 'production') {
-    app.set('trust proxy', 1); /* Trust first proxy */
-    configs.session.cookie.secure = false; /* Serve secure cookies */ /* CHANGED THIS TO FALSE TO USE REQ.SESSION.USER */
+  app.set('trust proxy', 1); /* Trust first proxy */
+  configs.session.cookie.secure = false; /* Serve secure cookies */ /* CHANGED THIS TO FALSE TO USE REQ.SESSION.USER */
 }
 
 
@@ -79,7 +81,7 @@ app.use(express.static(configs.static.basedir)); /* Serve static content */
 app.use(configs.session.cookieParser); /* Cookie parser */
 app.use(bodyParser.json()); /* Form json body parser */
 app.use(bodyParser.urlencoded({
-    extended: false
+  extended: false
 })); /* Form URL encoded body parser */
 app.use(multiParser()); /* Form multipart body parser */
 app.use(session(configs.session)); /* Session */
@@ -105,16 +107,19 @@ configs.errors(app); /* Error handlers */
 /**** Initialization *****/
 configs.database(function (err) {
 
-    if (err) {
-        panic("Couldn't connect to the database");
-    } else {
-        /* Initialize GridFS component */
-        gridfs.init(mongoose.connection.db, mongoose.mongo);
+  if (err) {
+    panic("Couldn't connect to the database");
+  } else {
+    /* Initialize GridFS component */
+    gridfs.init(mongoose.connection.db, mongoose.mongo);
 
-        http.listen(app.get('port'), function () {
-            console.log('Server listening on port \x1b[1m' + app.get('port') + '\x1b[0m');
-            sockets(io, configs.session); /* Initialize sockets */
-        });
-    }
+    statics.load(configs.statics, function () {
+      http.listen(app.get('port'), function () {
+        console.log('Server listening on port \x1b[1m' + app.get('port') + '\x1b[0m');
+        sockets(io, configs.session); /* Initialize sockets */
+      });
+    });
+  }
+
 
 });
