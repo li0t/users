@@ -9,7 +9,6 @@ var _ = require('underscore'),
       Disabled: null
     };
 
-
 module.exports = function (router, mongoose) {
 
   var Group = mongoose.model('group'),
@@ -129,13 +128,14 @@ module.exports = function (router, mongoose) {
               });
 
               saveGroup();
-            }
+            } 
           });
         } else {
           saveGroup();
         }
       }
     });
+    
   });
 
   /**
@@ -229,7 +229,9 @@ module.exports = function (router, mongoose) {
           if (index > -1) { /** Check if user was found */
 
             group.members.splice(index, 1); /** Remove user from members array */
-
+            
+            /** TODO: Assign new admin if necessary */
+            
             group.save(function(err) {
 
               if (err) {

@@ -29,17 +29,19 @@ module.exports = function (Schema) {
       required: true
     },
 
+    dateTime : Date,
+
+    notes: [String],
+
+    entries: [{ 
+      type: Schema.Types.ObjectId,
+      ref: 'entry'
+    }]/*,
+
     relatedMeetings: [{
       type: Schema.Types.ObjectId,
       //  ref: ''
-    }],
-
-    relatedObjects: [{ /** Are this entries? */
-      type: Schema.Types.ObjectId,
-      //  ref: ''
-    }],
-
-    notes: [String],
+    }],*/
 
   });
 

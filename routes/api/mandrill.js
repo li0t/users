@@ -9,12 +9,10 @@ var Mandrill = require('mandrill-api/mandrill').Mandrill,
     sender = "emeeter",
     senderEmail = "infoemeeter@gmail.com";
 
-
 module.exports = function (router, mongoose) {
 
   var User = mongoose.model('user'),
       Token = mongoose.model('token');
-
 
   (function connectToMandrill() {
     try {

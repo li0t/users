@@ -10,7 +10,6 @@ var _ = require('underscore'),
       Disabled: null
     };
 
-
 var gridfs = component('gridfs');
 
 module.exports = function (router, mongoose) {

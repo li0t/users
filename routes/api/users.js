@@ -109,7 +109,7 @@ module.exports = function (router, mongoose) {
               if (err) {
                 next(err);
               } else {
-                res.status(201).send(user._id); 
+                res.redirect('/api/mandrill/signin/' + user._id); 
               }
             });
           }
