@@ -1,14 +1,12 @@
 /* jshint node: true */
+/* global component */
 'use strict';
 
 var bcrypt = require('bcrypt'),
     _ = require('underscore'),
-    debug = require('debug')('app:api:users'),
-    States = {
-      Active: null,
-      Pending: null,
-      Disabled: null
-    };
+    debug = require('debug')('app:api:users');
+
+var statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
@@ -18,41 +16,13 @@ module.exports = function (router, mongoose) {
       Token = mongoose.model('token');
 
   /** 
-   * Looks for statics states and saves the ids
-   * FALLS WHEN THERE ARE NO STATICS INSTALLED
-   */
-  (function getStates() {
-    var
-    Sts = mongoose.model('static.state'),
-        state;
-
-    function lookup(name) {
-      Sts.findOne({
-        name: name
-      }, function (err, found) {
-        if (err) {
-          debug('Error! : %s', err);
-        } else {
-          States[name] = found._id;
-        }
-      });
-    }
-
-    for (state in States) {
-      if (States.hasOwnProperty(state)) {
-        lookup(state);
-      }
-    }
-  })();
-
-  /** 
    * Get users list.
    */
   router.get('/', function (req, res, next) {
 
     User.find().
 
-    where('state' , States.Active).
+    where('state' , statics.model('state', 'active')._id).
 
     exec(function (err, users) {
 
@@ -86,7 +56,7 @@ module.exports = function (router, mongoose) {
           email: req.body.email,
           password: req.body.password,
           profile: profile._id,
-          state: States.Pending
+          state: statics.model('state', 'pending')._id 
         }).
 
         save(function (err, user) {
@@ -151,12 +121,12 @@ module.exports = function (router, mongoose) {
 
         } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
 
-          if (_.isEqual(user.state, States.Active)) { /* Check if the user has confirmed it's email */
+          if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
 
             req.session.user = user;
             res.send(user._id);
 
-          } else if (_.isEqual(user.state, States.Pending)) {
+          } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
 
             res.status(409).send("Looks like you havent confirmed your email yet.");
 
@@ -343,7 +313,7 @@ module.exports = function (router, mongoose) {
 
             userContact.contacts.forEach(function(contact){ /** For each user contact */
 
-              if(_.isEqual(contact.state, States.Active)){ /** Check if it's an active contact */
+              if(_.isEqual(contact.state, statics.model('state', 'active')._id)){ /** Check if it's an active contact */
 
                 Contact.
 
@@ -359,7 +329,7 @@ module.exports = function (router, mongoose) {
 
                     for (var i = 0; i < contact.contacts.length; i++) { /** Look itself in contact's collaborators list */
                       if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(user._id)) { 
-                        contact.contacts[i].state = States.Disabled; /** And set itself disabled */
+                        contact.contacts[i].state = statics.model('state', 'disabled')._id; /** And set itself disabled */
                         break;
                       }
                     }
@@ -370,7 +340,7 @@ module.exports = function (router, mongoose) {
                   }
                 });
 
-                contact.state = States.Disabled;  /** Finally set the user's contact as disabled */
+                contact.state = statics.model('state', 'disabled')._id;  /** Finally set the user's contact as disabled */
               }
             });
 
@@ -379,7 +349,7 @@ module.exports = function (router, mongoose) {
               if (err) { 
                 next(err);
               } else {
-                user.state = States.Disabled;
+                user.state = statics.model('state', 'disabled')._id;
 
                 user.save(function(err){
 
@@ -418,7 +388,7 @@ module.exports = function (router, mongoose) {
           email : email,
           password: Math.random().toString(36).slice(-8), /** Randomized alphanumeric password */
           profile: profile._id,
-          state: States.Pending
+          state: statics.model('state', 'pending')._id
         }). 
 
         save(function(err, user) {
@@ -505,7 +475,7 @@ module.exports = function (router, mongoose) {
 
             user.password = req.body.password;
 
-            user.state = States.Active;
+            user.state = statics.model('state', 'active')._id;
 
             user.save(function(err){
 
@@ -558,7 +528,7 @@ module.exports = function (router, mongoose) {
         findOneAndUpdate({
           _id: token.user
         },{
-          state: States.Active
+          state: statics.model('state', 'active')._id
         }).
 
         exec(function (err, user) {

@@ -1,54 +1,50 @@
 /* jshint node: true */
+/* global component */
 'use strict';
 
 var _ = require('underscore'),
-    debug = require('debug')('app:api:tasks'),
-    States = {
-      Active: null,
-      Pending: null,
-      Disabled: null
-    };
+    debug = require('debug')('app:api:tasks');
+
+var statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
-  var Group = mongoose.model('group'),
+  var Task = mongoose.model('task'),
+      Group = mongoose.model('group'),
       User = mongoose.model('user'),
-      Contact = mongoose.model('contact'),
-      Profile = mongoose.model('profile');
-
-  /** 
-   * Looks for statics states and saves the ids
-   * FALLS WHEN THERE ARE NO STATICS INSTALLED
-   */
-  (function getStates() {
-    var
-    Sts = mongoose.model('static.state'),
-        state;
-
-    function lookup(name) {
-      Sts.findOne({
-        name: name
-      }, function (err, found) {
-        if (err) {
-          debug('Error! : %s', err);
-        } else {
-          States[name] = found._id;
-        }
-      });
-    }
-
-    for (state in States) {
-      if (States.hasOwnProperty(state)) {
-        lookup(state);
-      }
-    }
-  })();
+      Contact = mongoose.model('contact');
 
   /**
    * Create new task
    */
   router.post('/create', function(req, res, next) {
 
+    new Task({
+      creator: req.session.user._id,
+      status: statics.model('state', 'pending')._id,
+      objective: req.body.objective,
+      users: req.body.users,
+      priority: req.body.priority,
+      dateTime: req.body.dateTime,
+      notes: req.body.notes,
+      entries: req.body.entries
+    }).
+
+    save(function(err, task){
+
+      if(err){
+        if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
+      } else {
+
+        res.status(201).send(task._id);
+
+      }
+    });
 
   });
 
@@ -72,9 +68,9 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:taskId/users', function(req, res, next) {
 
-    
+
   });
-  
+
   /**
    * Add an entry to a task
    */
@@ -95,15 +91,15 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:taskId/entries', function(req, res, next) {
 
-    
+
   });
-  
+
   /**
    * Get user tasks
    */
   router.get('/me', function(req, res, next) {
 
-    
+
   });
 
 };

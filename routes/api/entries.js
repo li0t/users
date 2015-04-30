@@ -3,14 +3,10 @@
 'use strict';
 
 var _ = require('underscore'),
-    debug = require('debug')('app:api:entries'),
-    States = {
-      Active: null,
-      Pending: null,
-      Disabled: null
-    };
+    debug = require('debug')('app:api:entries');
 
-var gridfs = component('gridfs');
+var statics = component('statics'),
+    gridfs = component('gridfs');
 
 module.exports = function (router, mongoose) {
 
@@ -18,34 +14,6 @@ module.exports = function (router, mongoose) {
       Group = mongoose.model('group'),
       Contact = mongoose.model('contact'),
       Tag = mongoose.model('tag');
-
-  /** 
-   * Looks for statics states and saves the ids
-   * FALLS WHEN THERE ARE NO STATICS INSTALLED
-   */
-  (function getStates() {
-    var
-    Sts = mongoose.model('static.state'),
-        state;
-
-    function lookup(name) {
-      Sts.findOne({
-        name: name
-      }, function (err, found) {
-        if (err) {
-          debug('Error! : %s', err);
-        } else {
-          States[name] = found._id;
-        }
-      });
-    }
-
-    for (state in States) {
-      if (States.hasOwnProperty(state)) {
-        lookup(state);
-      }
-    }
-  })();
 
   /**
    * Create a new entry
@@ -200,7 +168,6 @@ module.exports = function (router, mongoose) {
       });
     }
 
-
     /**
      * Save pictures with gridfs and store de ids
      */
@@ -300,7 +267,7 @@ module.exports = function (router, mongoose) {
 
             for (i = 0; i < contact.contacts.length; i++) {
               if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user.id)) {
-                if (_.isEqual(contact.contacts[i].state, States.Active)) {
+                if (_.isEqual(contact.contacts[i].state, statics.model('state', 'active')._id)) {
                   isContact = true;
                   break;
                 }
@@ -350,7 +317,7 @@ module.exports = function (router, mongoose) {
 
         for (i = 0; i < contact.contacts.length; i++) {
           if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user.id)) {
-            if(_.isEqual(contact.contacts[i].state, States.Active)){
+            if(_.isEqual(contact.contacts[i].state, statics.model('state', 'active')._id)){
               isContact = true;
               break;
             }
@@ -414,7 +381,7 @@ module.exports = function (router, mongoose) {
 
         for (i = 0; i < contact.contacts.length; i++) {
           if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user.id)) {
-            if (_.isEqual(contact.contacts[i].state, States.Active)) {
+            if (_.isEqual(contact.contacts[i].state, statics.model('state', 'active')._id)) {
               isContact = true;
               break;
             }
@@ -504,7 +471,7 @@ module.exports = function (router, mongoose) {
         }
       }
     });
-    
+
   });
 
   /**

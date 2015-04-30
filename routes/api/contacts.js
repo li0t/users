@@ -1,46 +1,16 @@
 /* jshint node: true */
+/* global component */
 'use strict';
 
 var  _ = require('underscore'),
-    debug = require('debug')('app:api:contacts'),
-    States = {
-      Active: null,
-      Pending: null,
-      Disabled: null
-    };
+    debug = require('debug')('app:api:contacts');
+
+var statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
   var Contact = mongoose.model('contact'),
       Token = mongoose.model('token');
-
-  /** 
-   * Looks for statics states and saves the ids
-   */
-  (function getStates() {
-    var Sts = mongoose.model('static.state'),
-        state;
-
-    function lookup(name) {
-
-      Sts.findOne({ name: name }, function (err, found) {
-        if (err) {
-          debug('Error! : %s', err);
-        } else if(found) {
-          States[name] = found._id;
-        } else {
-          debug('No state found with name %s', name);
-        }
-      });
-    }
-
-    for (state in States) {
-      if (States.hasOwnProperty(state)) {
-        lookup(state);
-      }
-    }
-
-  })();
 
   /** 
    * Add contact
@@ -89,12 +59,12 @@ module.exports = function (router, mongoose) {
 
                   sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
                     user: req.params.id,
-                    state: States.Pending /* The contact state is pending for confirmation */
+                    state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
                   });
 
                   receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
                     user: req.session.user._id,
-                    state: States.Pending /* The contact state is pending for confirmation */
+                    state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
                   });
 
                   sender.save(function (err) {
@@ -118,7 +88,7 @@ module.exports = function (router, mongoose) {
               }
             });
           } else {
-            if (_.isEqual(contactState, States.Active)) {
+            if (_.isEqual(contactState, statics.model('state', 'active')._id)) {
               res.send('You are already contacts!');
             } else {
               res.send('Waiting for confirmation...');
@@ -168,14 +138,14 @@ module.exports = function (router, mongoose) {
 
                 for (var i = 0; i < sender.contacts.length; i++) {
                   if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.session.user._id)) {
-                    sender.contacts[i].state = States.Active;
+                    sender.contacts[i].state = statics.model('state', 'active')._id;
                     break;
                   }
                 }
 
                 for (i = 0; i < receiver.contacts.length; i++) {
                   if (JSON.stringify(receiver.contacts[i].user) === JSON.stringify(token.sender)) {
-                    receiver.contacts[i].state = States.Active;
+                    receiver.contacts[i].state = statics.model('state', 'active')._id;
                     break;
                   }
                 }
@@ -250,14 +220,14 @@ module.exports = function (router, mongoose) {
 
             for (var i = 0; i < contact.contacts.length; i++) {
               if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user._id)) {
-                contact.contacts[i].state = States.Disabled;
+                contact.contacts[i].state = statics.model('state', 'disabled')._id;
                 break;
               }
             }
 
             for (i = 0; i < user.contacts.length; i++) {
               if (JSON.stringify(user.contacts[i].user) === JSON.stringify(req.params.id)) {
-                user.contacts[i].state = States.Disabled;
+                user.contacts[i].state = statics.model('state', 'disabled')._id;
                 break;
               }
             }
@@ -320,7 +290,7 @@ module.exports = function (router, mongoose) {
 
           checked +=1;
 
-          if (_.isEqual(contact.state, States.Active)) {
+          if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
 
             toPopulate +=1;
 

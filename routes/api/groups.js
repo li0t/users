@@ -1,13 +1,11 @@
 /* jshint node: true */
+/* global component */
 'use strict';
 
 var _ = require('underscore'),
-    debug = require('debug')('app:api:groups'),
-    States = {
-      Active: null,
-      Pending: null,
-      Disabled: null
-    };
+    debug = require('debug')('app:api:groups');
+
+var statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
@@ -15,34 +13,6 @@ module.exports = function (router, mongoose) {
       User = mongoose.model('user'),
       Contact = mongoose.model('contact'),
       Profile = mongoose.model('profile');
-
-  /** 
-   * Looks for statics states and saves the ids
-   * FALLS WHEN THERE ARE NO STATICS INSTALLED
-   */
-  (function getStates() {
-    var
-    Sts = mongoose.model('static.state'),
-        state;
-
-    function lookup(name) {
-      Sts.findOne({
-        name: name
-      }, function (err, found) {
-        if (err) {
-          debug('Error! : %s', err);
-        } else {
-          States[name] = found._id;
-        }
-      });
-    }
-
-    for (state in States) {
-      if (States.hasOwnProperty(state)) {
-        lookup(state);
-      }
-    }
-  })();
 
   /**
    * Create new group
@@ -107,7 +77,7 @@ module.exports = function (router, mongoose) {
 
                   for (i = 0; i < user.contacts.length; i++) {
                     if (JSON.stringify(user.contacts[i].user) === JSON.stringify(member)) {
-                      if (_.isEqual(user.contacts[i].state, States.Active)) {
+                      if (_.isEqual(user.contacts[i].state, statics.model('state', 'active')._id)) {
                         isContact = true;
                         break;
                       }
@@ -135,7 +105,7 @@ module.exports = function (router, mongoose) {
         }
       }
     });
-    
+
   });
 
   /**
@@ -229,9 +199,9 @@ module.exports = function (router, mongoose) {
           if (index > -1) { /** Check if user was found */
 
             group.members.splice(index, 1); /** Remove user from members array */
-            
+
             /** TODO: Assign new admin if necessary */
-            
+
             group.save(function(err) {
 
               if (err) {

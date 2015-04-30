@@ -7,6 +7,12 @@ module.exports = function (Schema) {
 
   var TaskSchema = new Schema({
 
+    creator: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true
+    },
+
     status: {
       type: Schema.Types.ObjectId,
       ref: 'static.state',
