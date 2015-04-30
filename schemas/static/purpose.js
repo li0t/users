@@ -1,10 +1,18 @@
 /* jshint node: true */
 'use strict';
-
+ 
 module.exports = function (Schema) {
-
-    return new Schema({
-        name: String
-    });
-
+ 
+  return new Schema({
+ 
+    slug: {
+      type: String,
+      required: true,
+      unique: true
+    },
+ 
+    name: String
+ 
+  });
+ 
 };
