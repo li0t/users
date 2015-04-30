@@ -1,21 +1,72 @@
 /* jshint node: true */
 'use strict';
 
-var   // _ = require('underscore'),
-debug = require('debug')('app:api:groups');
+var _ = require('underscore'),
+    debug = require('debug')('app:api:groups'),
+    States = {
+      Active: null,
+      Pending: null,
+      Disabled: null
+    };
 
 
 module.exports = function (router, mongoose) {
 
   var Group = mongoose.model('group'),
       User = mongoose.model('user'),
+      Contact = mongoose.model('contact'),
       Profile = mongoose.model('profile');
 
+  /** 
+   * Looks for statics states and saves the ids
+   * FALLS WHEN THERE ARE NO STATICS INSTALLED
+   */
+  (function getStates() {
+    var
+    Sts = mongoose.model('static.state'),
+        state;
+
+    function lookup(name) {
+      Sts.findOne({
+        name: name
+      }, function (err, found) {
+        if (err) {
+          debug('Error! : %s', err);
+        } else {
+          States[name] = found._id;
+        }
+      });
+    }
+
+    for (state in States) {
+      if (States.hasOwnProperty(state)) {
+        lookup(state);
+      }
+    }
+  })();
 
   /**
    * Create new group
    */
   router.post('/create', function(req, res, next) {
+
+    var members = req.body.members,
+        group,
+        i, isContact,
+        saveGroup = function(){
+
+          group.save(function(err) {
+
+            if (err) {
+              next(err);
+            } else {
+
+              debug('Saved group %s with %s new members' , group._id, group.members.length);
+              res.status(201).send(group._id);
+
+            }
+          });
+        };
 
     new Profile({
       name : req.body.name
@@ -25,29 +76,66 @@ module.exports = function (router, mongoose) {
 
       if (err) {
         next(err);
+
       } else {
 
-        var group =  new Group({
+        group =  new Group({
           profile : profile._id,
           admin : req.session.user._id
         });
 
         group.members.push(req.session.user._id);
 
-        group.save(function(err) {
+        if (members && members.length) { /** Check if are member ids to save */ 
 
-          if (err) {
-            next(err);
-          } else {
+          Contact.
 
-            debug('Saved group with id %s' , group._id);
-            res.status(201).send(group._id);
+          findOne().
+          where('user', req.session.user._id).
 
-          }
-        });
+          exec(function(err, user){
+
+            if (err) {
+              next(err);
+
+            } else {
+
+              members.forEach(function(member){
+
+                if(mongoose.Types.ObjectId.isValid(member)){
+
+                  isContact = false;
+
+                  for (i = 0; i < user.contacts.length; i++) {
+                    if (JSON.stringify(user.contacts[i].user) === JSON.stringify(member)) {
+                      if (_.isEqual(user.contacts[i].state, States.Active)) {
+                        isContact = true;
+                        break;
+                      }
+                    }
+                  }
+
+                  if(isContact){
+
+                    debug('Pushing %s into group members', member);
+                    group.members.push(member);
+
+                  } else {
+                    debug('User %s and %s are not contacts with each other', user.user, member);
+                  }
+                } else {
+                  debug('%s is not a valid ObjectId', member);
+                }
+              });
+
+              saveGroup();
+            }
+          });
+        } else {
+          saveGroup();
+        }
       }
     });
-
   });
 
   /**
