@@ -23,6 +23,12 @@ module.exports = function (Schema) {
       ref: 'user'
     }],
 
+    priority : {
+      type: Schema.Types.ObjectId,
+      ref: 'static.priority',
+      required: true
+    },
+
     relatedMeetings: [{
       type: Schema.Types.ObjectId,
       //  ref: ''
@@ -57,7 +63,7 @@ module.exports = function (Schema) {
   /** Lets populate reach any level */
   TaskSchema.plugin(deepPopulate, {
     populate :{
-      
+
       'users' : {
         select : 'email profile'
       },
