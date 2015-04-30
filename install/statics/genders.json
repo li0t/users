@@ -1,8 +1,10 @@
 [
-    {
-        "name": "Male"
+  {   
+    "slug": "male",
+    "name": "Male"
   },
-    {
-        "name": "Female"
+  {
+    "slug": "female",
+    "name": "Female"
   }
 ]

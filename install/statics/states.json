@@ -1,14 +1,18 @@
 [
   {
+    "slug": "pending",
     "name": "Pending"
   },
   {
+    "slug": "active",
     "name": "Active"
   },
   {
+    "slug": "disabled",
     "name": "Disabled"
   },
   {
+    "slug": "completed",
     "name": "Completed"
   }
 

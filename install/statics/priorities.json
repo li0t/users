@@ -1,14 +1,18 @@
 [ 
   {
+    "slug": "urgent",
     "name": "Urgent"
   },
-  {
+  { 
+    "slug": "high",
     "name": "High"
   },
   {
+    "slug": "medium",
     "name": "Medium"
   },
   {
+    "slug": "low",
     "name": "Low"
   }
 ]
