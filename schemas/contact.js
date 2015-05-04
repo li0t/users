@@ -56,6 +56,21 @@ module.exports = function (Schema) {
     next();
   });
 
+  /** Check for be-contact-of-myself attempt */
+  ContactSchema.path('contacts').validate(function(contacts, cb){
+    
+    var self = this;
+    
+    contacts.forEach(function(contact){
+      if (JSON.stringify(contact.user) === JSON.stringify(self.user)) {
+        cb(false); 
+      }
+    });
+    
+    cb(true);
+    
+  }, 'You cannot be contact of yourself. Come on!');
+
   /** Lets populate reach any level */
   ContactSchema.plugin(deepPopulate, {
     populate :{
