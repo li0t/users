@@ -5,7 +5,8 @@
 var  _ = require('underscore'),
     debug = require('debug')('app:api:contacts');
 
-var statics = component('statics');
+var relations = component('relations'),
+    statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
@@ -17,45 +18,32 @@ module.exports = function (router, mongoose) {
    */
   router.get('/add/:id', function (req, res, next) {
 
-    var i, isContact, contactState;
+    var sender = null;
 
-    Contact.findOne().
-    where('user', req.session.user._id).
-    exec(function (err, sender) { /* The ContactSchema of the sender */
-      if (err) {
+    relations.contact(req.session.user._id, req.params.id, function(relation) { /** Check the relation between two users */
 
-        if (err.name && err.name === 'ValidationError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+      if (relation.contact) { /** Check if the session.user contact list was found */
 
-      } else {
-        if (sender) {
+        sender = relation.contact;
 
-          for (i = 0; i < sender.contacts.length; i++) {
-            if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.params.id)) {
-              isContact = true;
-              contactState = sender.contacts[i].state;
-              break;
-            }
-          }
+        if (!relation.isContact) { /** Check if the users are not contacts already */
 
-          if(!isContact){
-            Contact.findOne().
+          if (!_.isEqual(relation.state, statics.model('state', 'pending')._id )) { /** Check if the user is not waiting for confirmation */
+
+            Contact.
+            findOne().
             where('user', req.params.id).
             exec(function (err, receiver) { /* The ContactSchema of the receiver */
-              if (err) {
 
+              if (err) {
                 if (err.name && err.name === 'CastError') {
                   res.sendStatus(400);
                 } else {
                   next(err);
                 }
-
               } else {
-                if (receiver) {
 
+                if (receiver) {
 
                   sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
                     user: req.params.id,
@@ -82,22 +70,20 @@ module.exports = function (router, mongoose) {
                     }
                   });
                 } else {
-                  debug('No contacs list found for user with id %s', req.session.user._id);
+                  debug('No contacs list found for user with id %s', req.params.id);
                   res.sendStatus(404);
                 }
               }
             });
           } else {
-            if (_.isEqual(contactState, statics.model('state', 'active')._id)) {
-              res.send('You are already contacts!');
-            } else {
-              res.send('Waiting for confirmation...');
-            }
+            res.send('Waiting for confirmation!');
           }
         } else {
-          debug('No contacs list found for user with id %s', req.params.id);
-          res.sendStatus(404);
+          res.send('You are already contacts!');
         }
+      } else {
+        debug('No contacs list found for user with id %s', req.session.user._id);
+        res.sendStatus(404);
       }
     });
 

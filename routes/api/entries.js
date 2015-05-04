@@ -2,17 +2,16 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
-    debug = require('debug')('app:api:entries');
+var // _ = require('underscore'),
+debug = require('debug')('app:api:entries');
 
-var statics = component('statics'),
+var relations = component('relations'),
+    // statics = component('statics'),
     gridfs = component('gridfs');
 
 module.exports = function (router, mongoose) {
 
   var Entry = mongoose.model('entry'),
-      Group = mongoose.model('group'),
-      Contact = mongoose.model('contact'),
       Tag = mongoose.model('tag');
 
   /**
@@ -22,7 +21,6 @@ module.exports = function (router, mongoose) {
 
     var entry, /* This is the target schema */
         group = req.params.groupId || null,
-        i, isMember = false,
         tagsSaved = 0;
 
     /**
@@ -110,37 +108,22 @@ module.exports = function (router, mongoose) {
 
     if (group) {
 
-      Group.findById(group, function(err, found) {
-        if (err) {
+      relations.membership(req.session.user.id, group, function(relation) {
 
-          if (err.name && err.name === 'CastError') {
-            res.sendStatus(400);
-          } else {
-            next(err);
-          }
+        if (relation.group) {
 
-        } else if (found) {
-
-          for (i = 0; i < group.members.length; i++) {
-            if (JSON.stringify(group.members[i]) === JSON.stringify(req.session.user.id)) {
-              isMember = true;
-              break;
-            }
-          }
-
-          if (isMember) {
+          if (relation.isMember) {
 
             createEntry();
 
           } else {
-            debug('User %s is not part of group %s',req.session.user.id, group._id);
+            debug('User %s is not part of group %s',req.session.user.id, group);
             res.sendStatus(403);
           }
         } else {
           res.status(404).send('No group found with id ' + group);
         }
       });
-
     } else {
       createEntry();
     }
@@ -238,10 +221,10 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:id', function (req, res, next) {
 
-    var i, isContact = false;
-
     Entry.
-    findById(req.params.id).    
+
+    findById(req.params.id).
+
     populate('pictures'). /* Retrieves data from linked schemas */
 
     exec(function (err, entry) {
@@ -256,32 +239,15 @@ module.exports = function (router, mongoose) {
 
       } else if (entry) {
 
-        Contact.
-        findOne().
-        where('user', entry.user).
-        exec(function(err, contact){
+        relations.contact(req.session.user.id, entry.user, function(relation) {
 
-          if(err){
-            next(err);
+          if (relation.isContact || JSON.stringify(entry.user) === JSON.stringify(req.session.user.id)) {
+
+            res.send(entry);
+
           } else {
-
-            for (i = 0; i < contact.contacts.length; i++) {
-              if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user.id)) {
-                if (_.isEqual(contact.contacts[i].state, statics.model('state', 'active')._id)) {
-                  isContact = true;
-                  break;
-                }
-              }
-            }
-
-            if (isContact || JSON.stringify(entry.user) === JSON.stringify(req.session.user.id)) {
-
-              res.send(entry);
-
-            } else {
-              debug('User %s and %s are not contacts with each other', entry.user, req.session.user.id);
-              res.sendStatus(403); 
-            }
+            debug('User %s and %s are not contacts with each other', entry.user, req.session.user.id);
+            res.sendStatus(403); 
           }
         });
       } else {
@@ -296,60 +262,35 @@ module.exports = function (router, mongoose) {
    */
   router.get('/user/:id', function (req, res, next) {
 
-    var i, user = req.params.id , isContact = false;
+    var user = req.params.id;
 
-    Contact.
+    relations.contact(req.session.user.id, req.params.id, function(relation) {
 
-    findOne().
-    where('user',user).
+      if (relation.isContact || user === req.session.user.id) { 
 
-    exec(function(err, contact) {
+        Entry.
 
-      if (err) {
+        find().
+        where('user', user).
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+        populate('pictures'). /* Retrieves data from linked schemas */
+        sort('created').
 
+        exec(function (err, entries) {
+          if (err) {
+            next(err);
+
+          } else if (entries && entries.length) {
+
+            res.send(entries);
+
+          } else {
+            res.sendStatus(404);
+          } 
+        });
       } else {
-
-        for (i = 0; i < contact.contacts.length; i++) {
-          if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user.id)) {
-            if(_.isEqual(contact.contacts[i].state, statics.model('state', 'active')._id)){
-              isContact = true;
-              break;
-            }
-          }
-        }
-
-        if (isContact || user === req.session.user.id) {
-
-          Entry.
-
-          find().
-          where('user', req.params.id).
-
-          populate('pictures'). /* Retrieves data from linked schemas */
-          sort('created').
-
-          exec(function (err, entries) {
-            if (err) {
-              next(err);
-
-            } else if (entries && entries.length) {
-
-              res.send(entries);
-
-            } else {
-              res.sendStatus(404);
-            } 
-          });
-        } else {
-          debug('User %s and %s are not contacts with each other', user, req.session.user.id);
-          res.sendStatus(403); 
-        }
+        debug('User %s and %s are not contacts with each other', user, req.session.user.id);
+        res.sendStatus(403); 
       }
     });
 
@@ -360,59 +301,34 @@ module.exports = function (router, mongoose) {
    */
   router.get('/user/:id/files', function (req, res, next) {
 
-    var i, user = req.params.id , isContact = false;
+    var user = req.params.id;
 
-    Contact.
+    relations.contact(req.session.user.id, req.params.id, function(relation) {
 
-    findOne().
-    where('user',user).
+      if (relation.isContact || user === req.session.user.id) {
 
-    exec(function(err, contact) {
+        Entry.
 
-      if(err){
+        find( { $where : 'this.pictures.length > 0' } ).
+        where('user', user).
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+        populate('pictures'). /* Retrieves data from linked schemas */
+        sort('created').
 
-      } else {
+        exec(function (err, entries) {
+          if (err) {
+            next(err);
 
-        for (i = 0; i < contact.contacts.length; i++) {
-          if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user.id)) {
-            if (_.isEqual(contact.contacts[i].state, statics.model('state', 'active')._id)) {
-              isContact = true;
-              break;
-            }
+          } else if (entries && entries.length) {
+            res.send(entries);
+
+          } else {
+            res.sendStatus(404);
           }
-        }
-
-        if (isContact || user === req.session.user.id) {
-
-          Entry.
-
-          find( { $where : 'this.pictures.length > 0' } ).
-          where('user', req.params.id).
-
-          populate('pictures'). /* Retrieves data from linked schemas */
-          sort('created').
-
-          exec(function (err, entries) {
-            if (err) {
-              next(err);
-
-            } else if (entries && entries.length) {
-              res.send(entries);
-
-            } else {
-              res.sendStatus(404);
-            }
-          });
-        } else {
-          debug('User %s and %s are not contacts with each other', user, req.session.user.id);
-          res.sendStatus(403); 
-        }
+        });
+      } else {
+        debug('User %s and %s are not contacts with each other', user, req.session.user.id);
+        res.sendStatus(403); 
       }
     });
 
@@ -423,52 +339,37 @@ module.exports = function (router, mongoose) {
    */
   router.get('/group/:id', function (req, res, next) {
 
-    var i, group = req.params.id, isMember = false;
+    var group = req.params.id;
 
-    Group.findById(group, function(err, group) {
+    relations.membership(req.session.user.id, group, function(relation) {
 
-      if (err) {
+      if (relation.isMember) {
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+        Entry.
 
-      } else {
+        find().
 
-        for (i = 0; i < group.members.length; i++) {
-          if (JSON.stringify(group.members[i]) === JSON.stringify(req.session.user.id)) {
-            isMember = true;
-            break;
+        where('group', group).
+
+        populate('pictures'). /* Retrieves data from linked schemas */
+
+        sort('created').
+
+        exec(function (err, entries) {
+
+          if (err) {
+            next(err);
+
+          } else if (entries && entries.length) {
+            res.send(entries);
+
+          } else {
+            res.sendStatus(404);
           }
-        }
-
-        if (isMember) {
-
-          Entry.
-
-          find().
-          where('group', group).
-
-          populate('pictures'). /* Retrieves data from linked schemas */
-          sort('created').
-
-          exec(function (err, entries) {
-            if (err) {
-              next(err);
-
-            } else if (entries && entries.length) {
-              res.send(entries);
-
-            } else {
-              res.sendStatus(404);
-            }
-          });
-        } else {
-          debug('User %s is not part of group %s',req.session.user.id, group._id);
-          res.sendStatus(403);
-        }
+        });
+      } else {
+        debug('User %s is not part of group %s', req.session.user.id, group);
+        res.sendStatus(403);
       }
     });
 
@@ -479,58 +380,40 @@ module.exports = function (router, mongoose) {
    */
   router.get('/group/:id/files', function (req, res, next) {
 
-    var i, group = req.params.id, isMember = false;
+    var group = req.params.id;
 
-    Group.findById(group, function(err, group) {
+    relations.membership(req.session.user.id, group, function(relation) {
 
-      if (err) {
+      if (relation.isMember) {
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+        Entry.
 
-      } else {
+        find( { $where : 'this.pictures.length > 0' } ).
 
-        for (i = 0; i < group.members.length; i++) {
-          if (JSON.stringify(group.members[i]) === JSON.stringify(req.session.user.id)) {
-            isMember = true;
-            break;
+        where('group', group).
+
+        populate('pictures'). /* Retrieves data from linked schemas */
+
+        sort('created').
+
+        exec(function (err, entries) {
+
+          if (err) {
+            next(err);
+
+          } else if (entries && entries.length) {
+
+            res.send(entries);
+
+          } else {
+            res.sendStatus(404);
           }
-        }
-
-        if (isMember) {
-
-          Entry.
-
-          find( { $where : 'this.pictures.length > 0' } ).
-
-          where('group', req.params.id).
-
-          populate('pictures'). /* Retrieves data from linked schemas */
-
-          sort('created').
-
-          exec(function (err, entries) {
-            if (err) {
-              next(err);
-
-            } else if (entries && entries.length) {
-
-              res.send(entries);
-
-            } else {
-              res.sendStatus(404);
-            }
-          });
-        } else {
-          debug('User %s is not part of group %s',req.session.user.id, group._id);
-          res.sendStatus(403);
-        }
+        });
+      } else {
+        debug('User %s is not part of group %s', req.session.user.id, group);
+        res.sendStatus(403);
       }
     });
-
   });
 
 };
