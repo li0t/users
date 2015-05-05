@@ -9,7 +9,8 @@ var mongoose = require('mongoose'),
 var statics = component('statics');
 
 var Contact = mongoose.model('contact'),
-    Group = mongoose.model('group');
+    Group = mongoose.model('group'),
+    Task = mongoose.model('task');
 
 function contact(userId, cb) { /** Returns a contact model with a isContact method */
 
@@ -81,7 +82,9 @@ function contact(userId, cb) { /** Returns a contact model with a isContact meth
 
 
 function membership(groupId, cb) {
+
   var i, 
+
       relation = {
 
         group : null,
@@ -95,7 +98,7 @@ function membership(groupId, cb) {
             for (i = 0; i < relation.group.members.length; i++) {
 
               if (JSON.stringify(relation.group.members[i]) === JSON.stringify(id)) {
-                
+
                 member = { member:  relation.group.members[i] , index : i };
 
                 if (JSON.stringify(relation.group.admin) === JSON.stringify(id)) {
@@ -107,7 +110,7 @@ function membership(groupId, cb) {
           } else {
             debug('Error! No group found');
           }
-          
+
           return member;
         }
       };
@@ -134,10 +137,64 @@ function membership(groupId, cb) {
 
 }
 
+function collaboration(taskId, cb) {
+
+  var i, 
+
+      relation = {
+
+        task : null,
+
+        isCollaborator : function(id) { /** Looks for a member of a task */
+
+          var collaborator = null;
+
+          if (relation.task) {
+
+            for (i = 0; i < relation.task.users.length; i++) {
+
+              if (JSON.stringify(relation.task.users[i]) === JSON.stringify(id)) {
+
+                collaborator = { collaborator:  relation.task.users[i] , index : i };
+
+              }
+            }
+          } else {
+            debug('Error! No task found');
+          }
+
+          return collaborator;
+        }
+      };
+
+  Task.findById(taskId, function(err, task) {
+
+    if (err) {
+      debug(err);
+
+    } else if (task) {
+
+      relation.task = task;
+
+    } else {
+      debug('No task found');
+    }
+
+    if(cb){
+      cb(relation);
+    } else {
+      debug('No callback provided');
+    }
+  });
+
+}
+
 module.exports = {
 
   contact : contact,
 
-  membership : membership
+  membership : membership,
+
+  collaboration: collaboration
 
 };
