@@ -169,11 +169,11 @@ function collaboration(taskId, cb) {
 
           if (relation.task) {
 
-            for (i = 0; i < relation.task.users.length; i++) {
+            for (i = 0; i < relation.task.collaborators.length; i++) {
 
-              if (JSON.stringify(relation.task.users[i]) === JSON.stringify(id)) {
+              if (JSON.stringify(relation.task.collaborators[i]) === JSON.stringify(id)) {
 
-                collaborator = { collaborator:  relation.task.users[i] , index : i };
+                collaborator = { collaborator:  relation.task.collaborators[i] , index : i };
 
               }
             }

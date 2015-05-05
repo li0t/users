@@ -80,12 +80,12 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Add users to a task
+   * Add collaborators to a task
    */
-  router.post('/:taskId/addUsers', function(req, res, next) {
+  router.post('/:taskId/addCollaborators', function(req, res, next) {
 
     var inviter = req.session.user._id,
-        users = req.body.users,
+        collaborators = req.body.collaborators,
         saved = 0;
 
     Task.findById(req.params.taskId, function(err, task) {
@@ -105,10 +105,10 @@ module.exports = function (router, mongoose) {
 
             relations.contact(inviter, function(relation) {
 
-              users.forEach(function(user) {
+              collaborators.forEach(function(collaborator) {
 
-                if (relation.isContact(user)) {
-                  task.users.push(user);
+                if (relation.isContact(collaborator)) {
+                  task.collaborators.push(collaborator);
                   saved += 1;
 
                 } else {
@@ -121,7 +121,7 @@ module.exports = function (router, mongoose) {
                   next(err);
                 } else {
 
-                  debug('Pushed %s users of %s', saved, users.length);
+                  debug('Pushed %s users of %s', saved, collaborators.length);
                   res.sendStatus(204);
 
                 }
@@ -141,16 +141,16 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Remove user from task
+   * Remove collaborators from task
    */
-  router.post('/:taskId/removeUsers', function(req, res, next) { /** Who's allow to do this? */
+  router.post('/:taskId/removeCollaborators', function(req, res, next) { /** Who's allow to do this? */
 
     var toRemove, removed = 0,
         remover = req.session.user._id, 
         task = req.params.taskId,
-        users = req.body.users;
+        collaborators = req.body.collaborators;
 
-    if (users && users.length) { 
+    if (collaborators && collaborators.length) { 
 
       relations.collaboration(task, function(relation) {
 
@@ -162,15 +162,15 @@ module.exports = function (router, mongoose) {
 
           if (remover) { /** Check if remover is part of the task collaborators array */
 
-            users.forEach(function(user) {
+            collaborators.forEach(function(collaborator) {
 
-              toRemove = relation.isCollaborator(user);
+              toRemove = relation.isCollaborator(collaborator);
 
               if (toRemove) { /** Check if user is part of the task collaborators array */
 
                 removed += 1;
-                debug('User %s removed from task %s' , user, task._id);
-                task.users.splice(toRemove.index, 1); /** Remove user from collaborators array */
+                debug('Collaborator %s removed from task %s' , collaborator, task._id);
+                task.collaborators.splice(toRemove.index, 1); /** Remove user from collaborators array */
 
               } else {
                 debug('No user with id %s found in group %s' , req.params.id, req.params.groupId);
@@ -204,9 +204,9 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Get task users
+   * Get task collaborators
    */
-  router.get('/:taskId/users', function(req, res, next) {
+  router.get('/:taskId/collaborators', function(req, res, next) {
 
     var user = req.session.user._id; 
 
@@ -214,7 +214,7 @@ module.exports = function (router, mongoose) {
 
     findById(req.params.groupId).
 
-    deepPopulate('users.profile').
+    deepPopulate('collaborators.profile').
 
     exec(function(err, task) {
 
@@ -226,7 +226,7 @@ module.exports = function (router, mongoose) {
 
           if (membership.isMember(user)) {
 
-            res.send(task.users);
+            res.send(task.collaborators);
 
           } else {
             debug('User %s is not allow to get information about task %s', user, task._id);
@@ -419,15 +419,27 @@ module.exports = function (router, mongoose) {
    * Update entry info
    */
   router.post('/:taskId', function(req, res, next) {
-
-
+    /** TODO */
   });
 
   /**
-   * Get user tasks
+   * Get session user tasks
    */
   router.get('/me', function(req, res, next) {
 
+    Task.
+
+    find().
+    where('collaborators', req.session.user._id).
+
+    exec(function(err, tasks) {
+
+      if (err) { 
+        next(err);
+      } else {
+        res.send(tasks);
+      }
+    });
 
   });
 

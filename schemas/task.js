@@ -30,7 +30,7 @@ module.exports = function (Schema) {
       required: true
     },
 
-    users: [{
+    collaborators: [{
       type: Schema.Types.ObjectId,
       ref: 'user'
     }],
