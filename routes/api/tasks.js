@@ -3,7 +3,7 @@
 'use strict';
 
 var //_ = require('underscore'),
-    debug = require('debug')('app:api:tasks');
+debug = require('debug')('app:api:tasks');
 
 var relations = component('relations'),
     statics = component('statics');
@@ -95,7 +95,7 @@ module.exports = function (router, mongoose) {
         } else {
           next(err);
         }
-        
+
       } else if (task) {
 
         relations.membership(task.group, function(membership) {
@@ -119,10 +119,10 @@ module.exports = function (router, mongoose) {
                 if (err) {
                   next(err);
                 } else {
-                  
+
                   debug('Pushed %s users of %s', saved, users.length);
                   res.sendStatus(204);
-                  
+
                 }
               });
             });
@@ -143,6 +143,62 @@ module.exports = function (router, mongoose) {
    * Remove user from task
    */
   router.post('/:taskId/removeUsers', function(req, res, next) {
+
+    var toRemove, removed = 0,
+        remover = req.session.user._id, 
+        task = req.params.taskId,
+        users = req.body.users;
+
+    if (users && users.length) { 
+
+      relations.collaboration(task, function(relation) {
+
+        task = relation.task; /** The task model */
+
+        if (task) { 
+          
+          remover = relation.isCollaborator(remover);
+          
+          if (remover) { /** Check if remover is part of the task collaborators array */
+
+            users.forEach(function(user) {
+
+              toRemove = relation.isCollaborator(user);
+
+              if (toRemove) { /** Check if user is part of the task collaborators array */
+
+                removed += 1;
+                debug('User %s removed from task %s' , user, task._id);
+                task.users.splice(toRemove.index, 1); /** Remove user from collaborators array */
+
+              } else {
+                debug('No user with id %s found in group %s' , req.params.id, req.params.groupId);
+              }
+            });
+
+            task.save(function(err) {
+              if (err) {
+                next(err);
+
+              } else {
+
+                debug('%s users removed from task %s' , removed, task._id);
+                res.sendStatus(204);
+
+              }
+            });
+          } else {
+            debug('No user with id %s found in task %s' , req.session.user._id, task._id);
+            res.sendStatus(403);
+          }
+        } else {
+          debug('No task found with id %s' , req.params.taskId);
+          res.sendStatus(404);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 

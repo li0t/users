@@ -167,14 +167,15 @@ module.exports = function (router, mongoose) {
         group = req.params.groupId,
         members = req.body.members;
 
-    if(members && members.length){ 
+    if (members && members.length) { 
 
       relations.membership(group, function(membership) {
 
         group = membership.group; /** The group model */
-        remover = membership.isMember(remover);
-
+        
         if(group) { 
+          
+          remover = membership.isMember(remover);
 
           if (remover) { /** Check if remover is part of group */
 

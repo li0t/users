@@ -344,33 +344,39 @@ module.exports = function (router, mongoose) {
 
     relations.membership(group, function(relation) {
 
-      if (relation.isMember(user)) {
+      if (relation.group) {
 
-        Entry.
+        if (relation.isMember(user)) {
 
-        find().
+          Entry.
 
-        where('group', group).
+          find().
 
-        populate('pictures'). /* Retrieves data from linked schemas */
+          where('group', group).
 
-        sort('created').
+          populate('pictures'). /* Retrieves data from linked schemas */
 
-        exec(function (err, entries) {
+          sort('created').
 
-          if (err) {
-            next(err);
+          exec(function (err, entries) {
 
-          } else if (entries && entries.length) {
-            res.send(entries);
+            if (err) {
+              next(err);
 
-          } else {
-            res.sendStatus(404);
-          }
-        });
+            } else if (entries && entries.length) {
+              res.send(entries);
+
+            } else {
+              res.sendStatus(404);
+            }
+          });
+        } else {
+          debug('User %s is not part of group %s', req.session.user.id, group);
+          res.sendStatus(403);
+        }
       } else {
-        debug('User %s is not part of group %s', req.session.user.id, group);
-        res.sendStatus(403);
+        debug('Group  %s was not found', group);
+        res.sendStatus(404);
       }
     });
 
@@ -386,36 +392,43 @@ module.exports = function (router, mongoose) {
 
     relations.membership(group, function(relation) {
 
-      if (relation.isMember(user)) {
+      if (relation.group) {
 
-        Entry.
+        if (relation.isMember(user)) {
 
-        find( { $where : 'this.pictures.length > 0' } ).
+          Entry.
 
-        where('group', group).
+          find( { $where : 'this.pictures.length > 0' } ).
 
-        populate('pictures'). /* Retrieves data from linked schemas */
+          where('group', group).
 
-        sort('created').
+          populate('pictures'). /* Retrieves data from linked schemas */
 
-        exec(function (err, entries) {
+          sort('created').
 
-          if (err) {
-            next(err);
+          exec(function (err, entries) {
 
-          } else if (entries && entries.length) {
+            if (err) {
+              next(err);
 
-            res.send(entries);
+            } else if (entries && entries.length) {
 
-          } else {
-            res.sendStatus(404);
-          }
-        });
+              res.send(entries);
+
+            } else {
+              res.sendStatus(404);
+            }
+          });
+        } else {
+          debug('User %s is not part of group %s', req.session.user.id, group);
+          res.sendStatus(403);
+        }
       } else {
-        debug('User %s is not part of group %s', req.session.user.id, group);
-        res.sendStatus(403);
+        debug('Group  %s was not found', group);
+        res.sendStatus(404);
       }
     });
+    
   });
 
 };
