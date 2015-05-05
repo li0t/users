@@ -18,68 +18,68 @@ module.exports = function (router, mongoose) {
    */
   router.get('/add/:id', function (req, res, next) {
 
-    var sender = null;
+    var user = req.params.id,
+        sender = null,
+        isContact;
 
-    relations.contact(req.session.user._id, req.params.id, function(relation) { /** Check the relation between two users */
+    relations.contact(req.session.user._id, function(relation) { /** Get the contact model of the user */
 
       if (relation.contact) { /** Check if the session.user contact list was found */
 
         sender = relation.contact;
+        isContact = relation.isContact(user, true);
 
-        if (!relation.isContact) { /** Check if the users are not contacts already */
+        if (!isContact) { /** Check if the users are contacts already */
 
-          if (!_.isEqual(relation.state, statics.model('state', 'pending')._id )) { /** Check if the user is not waiting for confirmation */
+          Contact.
+          findOne().
+          where('user', user).
+          exec(function (err, receiver) { /* The ContactSchema of the receiver */
 
-            Contact.
-            findOne().
-            where('user', req.params.id).
-            exec(function (err, receiver) { /* The ContactSchema of the receiver */
-
-              if (err) {
-                if (err.name && err.name === 'CastError') {
-                  res.sendStatus(400);
-                } else {
-                  next(err);
-                }
+            if (err) {
+              if (err.name && err.name === 'CastError') {
+                res.sendStatus(400);
               } else {
-
-                if (receiver) {
-
-                  sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
-                    user: req.params.id,
-                    state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
-                  });
-
-                  receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
-                    user: req.session.user._id,
-                    state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
-                  });
-
-                  sender.save(function (err) {
-                    if (err) {
-                      next(err);
-                    } else {
-
-                      receiver.save(function (err) { 
-                        if (err) {
-                          next(err);
-                        } else {
-                          res.send('Great! Send the email to generate token'); 
-                        }
-                      });
-                    }
-                  });
-                } else {
-                  debug('No contacs list found for user with id %s', req.params.id);
-                  res.sendStatus(404);
-                }
+                next(err);
               }
-            });
-          } else {
-            res.send('Waiting for confirmation!');
-          }
-        } else {
+            } else {
+
+              if (receiver) {
+                
+                sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
+                  user: receiver.user,
+                  state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
+                });
+
+                receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
+                  user: sender.user,
+                  state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
+                });
+
+                sender.save(function (err) {
+                  if (err) {
+                    next(err);
+                  } else {
+
+                    receiver.save(function (err) { 
+                      if (err) {
+                        next(err);
+                      } else {
+                        res.send('Great! Send the email to generate token'); 
+                      }
+                    });
+                  }
+                });
+              } else {
+                debug('No contacs list found for user with id %s', req.params.id);
+                res.sendStatus(404);
+              }
+            }
+          });
+        } else if(_.isEqual(isContact.state, statics.model('state', 'active')._id)){ /** If contact state is Active */
           res.send('You are already contacts!');
+        } else {
+          res.send('You are waiting for confirmation!'); 
         }
       } else {
         debug('No contacs list found for user with id %s', req.session.user._id);
@@ -87,7 +87,7 @@ module.exports = function (router, mongoose) {
       }
     });
 
-  });
+  }); 
 
   /** 
    *  Confirm request
