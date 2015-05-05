@@ -4,13 +4,12 @@
 
 var debug = require('debug')('app:api:profiles');
 
-var gridfs = component('gridfs');
+var gridfs = component('gridfs'),
+    relations = component('relations');
 
 module.exports = function (router, mongoose) {
 
-  var Profile = mongoose.model('profile'),
-      //User = mongoose.model('user'),
-      Group = mongoose.model('group');
+  var Profile = mongoose.model('profile');
 
   /** 
    * Update Profile linked to User
@@ -130,20 +129,17 @@ module.exports = function (router, mongoose) {
    */
   router.post('/group/:id', function (req, res, next) {
 
-    Group.findById(req.params.id , function(err, group) {
+    var user = req.session.user._id,
+        group = req.params.id;
 
-      if (err) {
+    relations.membership(group, function(membership) {
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+      group = membership.group;
 
-      } else if (group) {
+      if (group) {
 
-        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) {
-
+        if (membership.isMember(user).isAdmin) {
+          
           Profile.findById(group.profile, function(err, profile){
 
             if (err) {
@@ -168,10 +164,11 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
-          debug('User %s is not admin of group %s',req.session.user.id, group._id);
+          debug('User %s is not admin of group %s',user, group._id);
           res.sendStatus(403);
         }
       } else {
+        debug('No group found with id %s' , req.params.id);
         res.sendStatus(404);
       }
     });
@@ -183,7 +180,9 @@ module.exports = function (router, mongoose) {
    */
   router.post('/group/:id/pictures', function (req, res, next) {
 
-    var profile, /* This is the target schema */
+    var user = req.session.user._id,
+        group = req.params.id,
+        profile, /* This is the target schema */
         saved = 0;
 
     /**
@@ -236,19 +235,13 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    Group.findById(req.params.id, function(err, group) {
+    relations.membership(group, function(membership) {
+      
+      group = membership.group; /** The group model */
+      
+      if (group) {
 
-      if (err) {
-
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
-
-      } else if (group) {
-
-        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) {
+        if (membership.isMember(user).isAdmin) {
 
           Profile.findById(group.profile, function (err, data) {
 
@@ -262,10 +255,11 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
-          debug('User %s is not admin of group %s',req.session.user.id, group._id);
+          debug('User %s is not admin of group %s',user, group._id);
           res.sendStatus(403);
         }
       } else {
+        debug('No group found with id %s' , req.params.id);
         res.sendStatus(404);
       }
     });

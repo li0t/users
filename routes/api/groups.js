@@ -2,17 +2,15 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
+var //_ = require('underscore'),
     debug = require('debug')('app:api:groups');
 
-var relations = component('relations'),
-    statics = component('statics');
+var relations = component('relations')/*,
+    statics = component('statics')*/;
 
 module.exports = function (router, mongoose) {
 
   var Group = mongoose.model('group'),
-      User = mongoose.model('user'),
-      Contact = mongoose.model('contact'),
       Profile = mongoose.model('profile');
 
   /**
@@ -148,7 +146,7 @@ module.exports = function (router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('No group found with id %s' , req.params.gruopId);
+          debug('No group found with id %s' , req.params.groupId);
           res.sendStatus(404);
         }
       });
@@ -201,7 +199,7 @@ module.exports = function (router, mongoose) {
                   res.sendStatus(403);
                 }
               } else {
-                debug('No user with id %s found in group %s' , req.params.id, req.params.gruopId);
+                debug('No user with id %s found in group %s' , req.params.id, req.params.groupId);
               }
             });
 
@@ -240,7 +238,7 @@ module.exports = function (router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('No group found with id %s' , req.params.gruopId);
+          debug('No group found with id %s' , req.params.groupId);
           res.sendStatus(404);
         }
       });
@@ -283,14 +281,14 @@ module.exports = function (router, mongoose) {
               }
             });
           } else {
-            debug('No user with id %s found in group %s' , req.params.id, req.params.gruopId);
+            debug('No user with id %s found in group %s' , req.params.id, req.params.groupId);
             res.sendStatus(404);
           }
         } else {
           res.sendStatus(403);
         }
       } else {
-        debug('No group found with id %s' , req.params.gruopId);
+        debug('No group found with id %s' , req.params.groupId);
         res.sendStatus(404);
       }
     });
