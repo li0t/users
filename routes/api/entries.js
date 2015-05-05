@@ -108,11 +108,11 @@ module.exports = function (router, mongoose) {
 
     if (group) {
 
-      relations.membership(req.session.user.id, group, function(relation) {
+      relations.membership(group, function(relation) { /** Get the group model */
 
         if (relation.group) {
 
-          if (relation.isMember) {
+          if (relation.isMember(req.session.user._id)) {
 
             createEntry();
 
@@ -239,9 +239,9 @@ module.exports = function (router, mongoose) {
 
       } else if (entry) {
 
-        relations.contact(req.session.user.id, entry.user, function(relation) {
+        relations.contact(req.session.user.id, function(relation) {
 
-          if (relation.isContact || JSON.stringify(entry.user) === JSON.stringify(req.session.user.id)) {
+          if (relation.isContact(entry.user) || JSON.stringify(entry.user) === JSON.stringify(req.session.user.id)) {
 
             res.send(entry);
 
@@ -264,9 +264,9 @@ module.exports = function (router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(req.session.user.id, req.params.id, function(relation) {
+    relations.contact(req.session.user.id, function(relation) {
 
-      if (relation.isContact || user === req.session.user.id) { 
+      if (relation.isContact(user) || user === req.session.user.id) { 
 
         Entry.
 
@@ -303,9 +303,9 @@ module.exports = function (router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(req.session.user.id, req.params.id, function(relation) {
+    relations.contact(req.session.user.id, function(relation) {
 
-      if (relation.isContact || user === req.session.user.id) {
+      if (relation.isContact(user) || user === req.session.user.id) {
 
         Entry.
 
@@ -339,11 +339,12 @@ module.exports = function (router, mongoose) {
    */
   router.get('/group/:id', function (req, res, next) {
 
-    var group = req.params.id;
+    var user = req.session.user.id,
+        group = req.params.id;
 
-    relations.membership(req.session.user.id, group, function(relation) {
+    relations.membership(group, function(relation) {
 
-      if (relation.isMember) {
+      if (relation.isMember(user)) {
 
         Entry.
 
@@ -380,11 +381,12 @@ module.exports = function (router, mongoose) {
    */
   router.get('/group/:id/files', function (req, res, next) {
 
-    var group = req.params.id;
+    var user = req.session.user.id,
+        group = req.params.id;
 
-    relations.membership(req.session.user.id, group, function(relation) {
+    relations.membership(group, function(relation) {
 
-      if (relation.isMember) {
+      if (relation.isMember(user)) {
 
         Entry.
 
