@@ -5,7 +5,8 @@
 var _ = require('underscore'),
     debug = require('debug')('app:api:groups');
 
-var statics = component('statics');
+var relations = component('relations'),
+    statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
@@ -19,9 +20,10 @@ module.exports = function (router, mongoose) {
    */
   router.post('/create', function(req, res, next) {
 
-    var members = req.body.members,
-        group,
-        i, isContact,
+    var creator = req.session.user._id,
+        members = req.body.members,
+        group, name = req.body.name,
+
         saveGroup = function(){
 
           group.save(function(err) {
@@ -37,60 +39,39 @@ module.exports = function (router, mongoose) {
           });
         };
 
-    new Profile({
-      name : req.body.name
-    }).
+    if (name) {
 
-    save(function(err, profile){
+      new Profile({  name : name }).
 
-      if (err) {
-        next(err);
+      save(function(err, profile) {
 
-      } else {
+        if (err) {
+          next(err);
 
-        group =  new Group({
-          profile : profile._id,
-          admin : req.session.user._id
-        });
+        } else {
 
-        group.members.push(req.session.user._id);
+          group =  new Group({
+            profile : profile._id,
+            admin : creator
+          });
 
-        if (members && members.length) { /** Check if are member ids to save */ 
+          group.members.push(creator);
 
-          Contact.
+          if (members && members.length) { /** Check if are member ids to save */ 
 
-          findOne().
-          where('user', req.session.user._id).
-
-          exec(function(err, user){
-
-            if (err) {
-              next(err);
-
-            } else {
+            relations.contact(creator, function(relation){
 
               members.forEach(function(member){
 
-                if(mongoose.Types.ObjectId.isValid(member)){
+                if (mongoose.Types.ObjectId.isValid(member)) {
 
-                  isContact = false;
-
-                  for (i = 0; i < user.contacts.length; i++) {
-                    if (JSON.stringify(user.contacts[i].user) === JSON.stringify(member)) {
-                      if (_.isEqual(user.contacts[i].state, statics.model('state', 'active')._id)) {
-                        isContact = true;
-                        break;
-                      }
-                    }
-                  }
-
-                  if(isContact){
+                  if (relation.isContact(member)) {
 
                     debug('Pushing %s into group members', member);
                     group.members.push(member);
 
                   } else {
-                    debug('User %s and %s are not contacts with each other', user.user, member);
+                    debug('User %s and %s are not contacts with each other', creator, member);
                   }
                 } else {
                   debug('%s is not a valid ObjectId', member);
@@ -98,133 +79,174 @@ module.exports = function (router, mongoose) {
               });
 
               saveGroup();
-            } 
-          });
-        } else {
-          saveGroup();
+
+            });
+          } else {
+            saveGroup();
+          }
         }
-      }
-    });
+      });
+    } else {
+      res.status(400).send('The group must have a name');
+    }
 
   });
 
   /**
    * Add member to a group
    */
-  router.get('/:groupId/addMember/:id', function(req, res, next) {
+  router.get('/:groupId/addMembers', function(req, res, next) {
 
-    var i, index = -1;
+    var user = req.session.user._id,
+        group = req.params.groupId,
+        members = req.body.members, 
+        saved = 0;
 
-    Group.findById(req.params.groupId, function(err, group) {
+    if (members && members.length) {
 
-      if (err) {
-        next(err);
-      } else if (group) {
+      relations.membership(group, function(membership) {
 
-        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) { /** Check if logged user is the group admin */
+        group = membership.group;
 
-          User.findById(req.params.id, function(err, user) {
+        if (group) {
 
-            if (err) {
-              next(err);
-            } else if (user) {
+          if (membership.isMember(user).isAdmin) {
 
-              for (i = 0; i < group.members.length; i++) {
+            relations.contact(user, function(relation) {
 
-                if (JSON.stringify(group.members[i]) === JSON.stringify(user._id)) { /** Look for user index in members array */
-                  index = i;
-                  break;
-                }
-              }
+              members.forEach(function(member) {
 
-              if (index === -1) {
+                if (relation.isContact(member)) { 
 
-                group.members.push(user._id);
+                  if (!membership.isMember(member)) {
 
-                group.save(function(err) {
+                    saved += 1;
+                    debug('Pushing %s into group members', member);
+                    group.members.push(member);
 
-                  if (err) {
-                    next(err);
                   } else {
+                    debug('User %s already belongs to the group' , member);
+                  }   
+                } else {
+                  debug('User %s and %s are not contacts with each other', user, member);
+                }
+              });
 
-                    debug('User %s added to group %s' , group._id, user._id);
-                    res.sendStatus(204);
+              group.save(function(err) {
+                if (err) {
+                  next(err);
 
-                  }
-                });
-              }else {
-                res.status(409).send('That user already belongs to the group');
-              }
+                } else {
 
-            } else {
-              debug('No user found with id %s' , req.params.id);
-              res.sendStatus(404);
-            }
-          });
+                  debug('Saved group %s with %s new members' , group._id, saved);
+                  res.sendStatus(204);
+
+                }
+              });
+            });
+          } else {
+            res.sendStatus(403);
+          }
         } else {
-          res.sendStatus(403);
+          debug('No group found with id %s' , req.params.gruopId);
+          res.sendStatus(404);
         }
-      } else {
-        debug('No group found with id %s' , req.params.gruopId);
-        res.sendStatus(404);
-      }
-    });
+      });
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 
   /**
    * Remove member from group
    */
-  router.get('/:groupId/removeMember/:id', function(req, res, next) {
+  router.get('/:groupId/removeMembers', function(req, res, next) {
 
-    var i, index = -1;
+    var toRemove, removed = 0,
+        lostAdmin = false,
+        remover = req.session.user._id, 
+        group = req.params.groupId,
+        members = req.body.members;
 
-    Group.findById(req.params.groupId, function(err, group) {
+    if(members && members.length){ 
 
-      if (err) {
-        next(err);
-      } else if (group) {
+      relations.membership(group, function(membership) {
 
-        /** Check if the user removing is the group admin or itself */
-        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id) || req.session.user._id === req.params.id) { 
+        group = membership.group; /** The group model */
+        remover = membership.isMember(remover);
 
-          for (i = 0; i < group.members.length; i++) {
+        if(group) { 
 
-            if (JSON.stringify(group.members[i]) === JSON.stringify(req.params.id)) { /** Look for user index in members array */
-              index = i;
-              break;
-            }
-          }
+          if (remover) { /** Check if remover is part of group */
 
-          if (index > -1) { /** Check if user was found */
+            members.forEach(function(member) {
 
-            group.members.splice(index, 1); /** Remove user from members array */
+              toRemove = membership.isMember(member);
 
-            /** TODO: Assign new admin if necessary */
+              if (toRemove) { /** Check if user is member of group */
 
-            group.save(function(err) {
+                if  (remover.isAdmin || member === remover.member) {  /** Check if remover has enough privileges */
 
-              if (err) {
-                next(err);
+                  removed += 1;
+                  debug('User %s removed from group %s' , member, group._id);
+                  group.members.splice(toRemove.index, 1); /** Remove user from members array */
+
+                  if (toRemove.isAdmin) {
+                    lostAdmin = true;
+                  }
+
+                } else {
+                  debug('User %s does not have enough privileges in group %s', remover.member, group._id);
+                  res.sendStatus(403);
+                }
               } else {
-
-                debug('User %s removed from group %s' , group._id, req.params.id);
-                res.sendStatus(204);
-
+                debug('No user with id %s found in group %s' , req.params.id, req.params.gruopId);
               }
             });
+
+            if (group.members.length > 0) {
+
+              if (lostAdmin) {
+                group.admin = group.members[0];
+              }
+
+              group.save(function(err) {
+                if (err) {
+                  next(err);
+
+                } else {
+
+                  debug('%s members removed from group %s' , removed, group._id);
+                  res.sendStatus(204);
+
+                }
+              });
+
+            } else {
+
+              res.sendStatus(410);
+
+              Group.remove({_id : group._id}, function(err){
+                if(err) { 
+                  debug(err);
+                }
+
+              });
+
+            }
           } else {
-            debug('No user with id %s found in group %s' , req.params.id, req.params.gruopId);
-            res.sendStatus(404);
+            debug('No user with id %s found in group %s' , req.session.user._id, group._id);
+            res.sendStatus(403);
           }
         } else {
-          res.sendStatus(403);
+          debug('No group found with id %s' , req.params.gruopId);
+          res.sendStatus(404);
         }
-      } else {
-        debug('No group found with id %s' , req.params.gruopId);
-        res.sendStatus(404);
-      }
-    });
+      });
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 
@@ -233,27 +255,21 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:groupId/changeAdmin/:id', function(req, res, next) {
 
-    var i, index = -1;
+    var group = req.params.groupId,
+        sessionUser = req.session.user._id,
+        user = req.params.id;
 
-    Group.findById(req.params.groupId, function(err, group) {
+    relations.membership(group, function(membership) {
 
-      if (err) {
-        next(err);
-      } else if (group) {
+      group = membership.group;
 
-        if (JSON.stringify(group.admin) === JSON.stringify(req.session.user._id)) { /** Check if logged user is the group admin */
+      if (group) {
 
-          for (i = 0; i < group.members.length; i++) {
+        if (membership.isMember(sessionUser).isAdmin) { /** Check if logged user is the group admin */
 
-            if (JSON.stringify(group.members[i]) === JSON.stringify(req.params.id)) { /** Look for user index in members array */
-              index = i;
-              break;
-            }
-          }
+          if (membership.isMember(user)) {
 
-          if (index > -1) { /** Check if user was found */
-
-            group.admin = req.params.id;
+            group.admin = user;
 
             group.save(function(err) {
 
@@ -261,7 +277,7 @@ module.exports = function (router, mongoose) {
                 next(err);
               } else {
 
-                debug('The group %s, has a new admin with id %s' , group._id, req.params.id);
+                debug('The group %s, has a new admin with id %s' , group._id, user);
                 res.sendStatus(204);
 
               }

@@ -96,7 +96,7 @@ function membership(groupId, cb) {
 
               if (JSON.stringify(relation.group.members[i]) === JSON.stringify(id)) {
                 
-                member = { member:  relation.group.members[i] };
+                member = { member:  relation.group.members[i] , index : i };
 
                 if (JSON.stringify(relation.group.admin) === JSON.stringify(id)) {
                   member.isAdmin = true;
