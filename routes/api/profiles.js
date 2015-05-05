@@ -140,7 +140,7 @@ module.exports = function (router, mongoose) {
 
         if (membership.isMember(user).isAdmin) {
           
-          Profile.findById(group.profile, function(err, profile){
+          Profile.findById(group.profile, function(err, profile) {
 
             if (err) {
               next(err);

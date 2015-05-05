@@ -2,74 +2,72 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
+var //_ = require('underscore'),
     debug = require('debug')('app:api:tasks');
 
-var statics = component('statics');
+var relations = component('relations'),
+    statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
-  var Task = mongoose.model('task'),
-      Group = mongoose.model('group'),
-      //User = mongoose.model('user'),
-      //Entry = mongoose.model('entry'),
-      Contact = mongoose.model('contact');
+  var Task = mongoose.model('task');
 
   /**
    * Create new task
    */
   router.post('/create', function(req, res, next) {
 
-    var i, isMember = false;
-    /** TODO: Check if priority exists */
+    var creator = req.session.user._id,
+        group = req.body.group,
+        priority = null;
 
-    Group.
-    findById(req.body.group, function(err, group){
+    relations.membership(group, function(membership) {
 
-      if (err) {
-        if (err.name && (err.name === "CastError" || err.name === "ValidationError")) {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+      group = membership.group;
 
-      } else if (group) {
+      if (group) {
 
-        for (i = 0; i < group.members.length; i++) {
-          if (JSON.stringify(group.members[i].user) === JSON.stringify(req.session.user._id)) { /** Lookup the user in the group */
-            isMember = true;
-            break;
-          }
-        }
+        if (membership.isMember(creator)) { 
 
-        if (isMember) { 
+          statics.models.priority.forEach(function(slug) { /** Search the priority id in the priority static model */
 
-          new Task({
-            group: group._id,
-            creator: req.session.user._id,
-            status: statics.model('state', 'pending')._id,
-            objective: req.body.objective,
-            priority: req.body.priority,
-            dateTime: req.body.dateTime,
-            notes: req.body.notes,
-          }).
-
-          save(function(err, task) {
-
-            if( err) {
-              if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
-                res.sendStatus(400);
-              } else {
-                next(err);
-              }
-
-            } else {
-              debug('Task %s created', task._id);
-              res.status(201).send(task._id);
+            if (JSON.stringify(slug._id) === JSON.stringify(req.body.priority)){
+              priority = slug._id;
             }
+
           });
+
+          if (priority) {
+
+            new Task({
+              group: group._id,
+              creator: creator,
+              status: statics.model('state', 'pending')._id,
+              objective: req.body.objective,
+              priority: req.body.priority,
+              dateTime: req.body.dateTime,
+              notes: req.body.notes,
+            }).
+
+            save(function(err, task) {
+
+              if( err) {
+                if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
+                  res.sendStatus(400);
+                } else {
+                  next(err);
+                }
+
+              } else {
+                debug('Task %s created', task._id);
+                res.status(201).send(task._id);
+              }
+            });
+          } else {
+            res.status(400).send('You must set a valid priority');
+          }
         } else {
-          debug('User is not part of group %s', req.session.user._id, group._id);
+          debug('User is not part of group %s', creator, group._id);
           res.sendStatus(403);
         }
       } else {
@@ -85,10 +83,9 @@ module.exports = function (router, mongoose) {
    */
   router.post('/:taskId/addUsers', function(req, res, next) {
 
-    var users = req.body.users,
-        i, saved = 0,
-        isMember = false,
-        isContact;
+    var inviter = req.session.user._id,
+        users = req.body.users,
+        saved = 0;
 
     Task.findById(req.params.taskId, function(err, task) {
 
@@ -98,75 +95,40 @@ module.exports = function (router, mongoose) {
         } else {
           next(err);
         }
+        
       } else if (task) {
 
-        Group.findById(task.group, function(err, group) {
+        relations.membership(task.group, function(membership) {
 
-          if (err) {
-            next(err);
-          } else {
+          if (membership.isMember(inviter)) { 
 
-            for (i = 0; i < group.members.length; i++) {
-              if (JSON.stringify(group.members[i].user) === JSON.stringify(req.session.user._id)) { /** Lookup the user in the task group */
-                isMember = true;
-                break;
-              }
-            }
+            relations.contact(inviter, function(relation) {
 
-            if (isMember) { 
+              users.forEach(function(user) {
 
-              Contact.
+                if (relation.isContact(user)) {
+                  task.users.push(user);
+                  saved += 1;
 
-              findOne().
-              where('user', req.session.user._id).
+                } else {
+                  debug('Users %s and %s are not contacts with each other', inviter, user);
+                }
+              });
 
-              exec(function(err, inviter) {
-
+              task.save(function(err) {
                 if (err) {
                   next(err);
                 } else {
-
-                  users.forEach(function(user) {
-
-                    isContact = false;
-
-                    if (mongoose.Types.ObjectId.isValid(user)) {
-
-                      for (i = 0; i < inviter.contacts.length; i++) {
-                        if (JSON.stringify(inviter.contacts[i].user) === JSON.stringify(user)) { /** Check if the user is contact of the creator */
-                          if (_.isEqual(inviter.contacts[i].state, statics.model('state', 'active')._id)) { 
-                            isContact = true;
-                            break;
-                          }
-                        }
-                      }
-
-                      if (isContact) {
-                        task.users.push(user);
-                        saved += 1;
-
-                      } else {
-                        debug('Users %s and %s are not contacts with each other', inviter.user, user);
-                        res.sendStatus(403);
-                      }
-                    }
-                  });
-
+                  
                   debug('Pushed %s users of %s', saved, users.length);
-
-                  task.save(function(err) {
-                    if (err) {
-                      next(err);
-                    } else {
-                      res.sendStatus(204);
-                    }
-                  });
+                  res.sendStatus(204);
+                  
                 }
               });
-            } else {
-              debug('User is not part of group %s', req.session.user._id, group._id);
-              res.sendStatus(403); 
-            }
+            });
+          } else {
+            debug('User is not part of group %s', inviter, task.group);
+            res.sendStatus(403); 
           }
         });
       } else {
