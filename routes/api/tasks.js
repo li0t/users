@@ -143,7 +143,7 @@ module.exports = function (router, mongoose) {
   /**
    * Remove user from task
    */
-  router.post('/:taskId/removeUsers', function(req, res, next) {
+  router.post('/:taskId/removeUsers', function(req, res, next) { /** Who's allow to do this? */
 
     var toRemove, removed = 0,
         remover = req.session.user._id, 
@@ -158,7 +158,7 @@ module.exports = function (router, mongoose) {
 
         if (task) { 
 
-          remover = relation.isCollaborator(remover);
+          remover = relation.isCreator(remover);
 
           if (remover) { /** Check if remover is part of the task collaborators array */
 
@@ -208,11 +208,11 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:taskId/users', function(req, res, next) {
 
+    var user = req.session.user._id; 
+
     Task.
 
-    findOne().
-    where('_id', req.params.taskId).
-    where('users', req.session.user._id).
+    findById(req.params.groupId).
 
     deepPopulate('users.profile').
 
@@ -222,8 +222,17 @@ module.exports = function (router, mongoose) {
         next(err);
       } else if (task) {
 
-        res.send(task.users);
+        relations.membership(task.group, function(membership) {
 
+          if (membership.isMember(user)) {
+
+            res.send(task.users);
+
+          } else {
+            debug('User %s is not allow to get information about task %s', user, task._id);
+            res.sendStatus(403);
+          }
+        });
       } else {
         res.sendStatus(404);
       }
@@ -236,63 +245,64 @@ module.exports = function (router, mongoose) {
    */
   router.post('/:taskId/addEntries', function(req, res, next) {
 
-    var user = req.session.user._id,
+    var task = req.params.taskId,
+        user = req.session.user._id,
         entries = req.body.entries,
         checked = 0, 
         saved = 0;
 
     if (entries && entries.length) {
 
-      Task.
+      relations.collaboration(task, function(collaboration) {
 
-      findOne().
-      where('_id', req.params.taskId).
-      where('users', user).
+        task = collaboration.task;
 
-      exec(function(err, task) {
+        if (task) {
 
-        if (err) {
-          next(err);
-        } else if (task) {
+          if(collaboration.isCollaborator(user) || collaboration.isCreator(user)) {
 
-          relations.contact(user, function(relation) {
+            relations.contact(user, function(relation) {
 
-            entries.forEach(function(entry) { 
+              entries.forEach(function(entry) { 
 
-              Entry.findById(entry, function(err, _entry) {
-                if (err) {
-                  debug(err);
+                Entry.findById(entry, function(err, _entry) {
+                  if (err) {
+                    debug(err);
 
-                } else if (_entry) {
+                  } else if (_entry) {
 
-                  if (relation.isContact(_entry.user)) {
-                    saved += 1;
-                    task.entries.push(_entry._id);
+                    if (relation.isContact(_entry.user)) {
+                      saved += 1;
+                      task.entries.push(_entry._id);
 
-                  } else {
-                    debug('Users %s and %s are not contacts with each other', user, _entry.user);
-                  }
-                } else {
-                  debug('Entry %s was no found', entry);
-                }
-
-                checked += 1;
-                if (checked === entries.length) {
-
-                  task.save(function(err) {
-                    if (err) {
-                      next(err);
                     } else {
-
-                      debug('%s new entries saved into task %s', saved, task._id);
-                      res.sendStatus(204);
-
+                      debug('Users %s and %s are not contacts with each other', user, _entry.user);
                     }
-                  });
-                }
+                  } else {
+                    debug('Entry %s was no found', entry);
+                  }
+
+                  checked += 1;
+                  if (checked === entries.length) {
+
+                    task.save(function(err) {
+                      if (err) {
+                        next(err);
+                      } else {
+
+                        debug('%s new entries saved into task %s', saved, task._id);
+                        res.sendStatus(204);
+
+                      }
+                    });
+                  }
+                });
               });
             });
-          });
+          } else {
+            debug('User %s is not allow to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
         } else {
           res.sendStatus(404);
         }
@@ -308,52 +318,54 @@ module.exports = function (router, mongoose) {
    */
   router.post('/:taskId/removeEntries', function(req, res, next) {
 
-    var entries = req.body.entries,
+    var user = req.session.user._id,
+        task = req.params.taskId, 
+        entries = req.body.entries,
         i, index,
         removed = 0;
 
     if (entries && entries.length) {
-      
-      Task.
 
-      findOne().
-      where('_id', req.params.taskId).
-      where('users', req.session.user._id).
+      relations.collaboration(task, function(collaboration) {
 
-      exec(function(err, task) {
+        task = collaboration.task;
 
-        if (err) {
-          next(err);
-        } else if (task) {
+        if (task) {
 
-          entries.forEach(function(entry) {
-            
-            index = -1;
-            
-            for (i = 0; i < task.entries.length; i++) {
+          if(collaboration.isCollaborator(user) || collaboration.isCreator(user)) {
 
-              if (JSON.stringify(task.entries[i]) === JSON.stringify(entry)) {
-                index = i;
-                break;
+            entries.forEach(function(entry) {
+
+              index = -1;
+
+              for (i = 0; i < task.entries.length; i++) {
+
+                if (JSON.stringify(task.entries[i]) === JSON.stringify(entry)) {
+                  index = i;
+                  break;
+                }
+              } 
+
+              if (index > -1) {
+                removed += 1;
+                task.entries.splice(index, 1);
               }
-            } 
-            
-            if (index > -1) {
-              removed += 1;
-              task.entries.splice(index, 1);
-            }
-            
-          });
-          
-          task.save(function(err) {
-            if (err) {
-              next(err);
-            } else {
-              
-              debug('%s entries removed from task %s', removed, task._id);
-              res.sendStatus(204);
-            }
-          });
+
+            });
+
+            task.save(function(err) {
+              if (err) {
+                next(err);
+              } else {
+
+                debug('%s entries removed from task %s', removed, task._id);
+                res.sendStatus(204);
+              }
+            });
+          } else {
+            debug('User %s is not allow to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
         } else {
           res.sendStatus(404);
         }
@@ -365,10 +377,41 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Get task entries
+   * Get task entries 
    */
   router.get('/:taskId/entries', function(req, res, next) {
 
+    var user = req.session.user._id; 
+
+    Task.
+
+    findById(req.params.groupId).
+
+    deepPopulate('entries.user entries.group entries.pictures').
+
+    sort('created').
+
+    exec(function(err, task) {
+
+      if (err) {
+        next(err);
+      } else if (task) {
+
+        relations.membership(task.group, function(membership) {
+
+          if (membership.isMember(user)) {
+
+            res.send(task.entries);
+
+          } else {
+            debug('User %s is not allow to get information about task %s', user, task._id);
+            res.sendStatus(403);
+          }
+        });
+      } else {
+        res.sendStatus(404);
+      }
+    });
 
   });
 

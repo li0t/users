@@ -145,6 +145,24 @@ function collaboration(taskId, cb) {
 
         task : null,
 
+        isCreator : function(id){
+          
+          var isCreator = false;
+          
+          if (relation.task) {
+            
+            if (id === relation.task.creator) {
+              isCreator = true;
+            }
+            
+          } else {
+            debug('Error! No task found');
+          }
+          
+          return isCreator;
+          
+        },
+
         isCollaborator : function(id) { /** Looks for a member of a task */
 
           var collaborator = null;
