@@ -10,7 +10,8 @@ var relations = component('relations'),
 
 module.exports = function (router, mongoose) {
 
-  var Task = mongoose.model('task');
+  var Task = mongoose.model('task'),
+      Entry = mongoose.model('entry');
 
   /**
    * Create new task
@@ -156,9 +157,9 @@ module.exports = function (router, mongoose) {
         task = relation.task; /** The task model */
 
         if (task) { 
-          
+
           remover = relation.isCollaborator(remover);
-          
+
           if (remover) { /** Check if remover is part of the task collaborators array */
 
             users.forEach(function(user) {
@@ -207,19 +208,103 @@ module.exports = function (router, mongoose) {
    */
   router.get('/:taskId/users', function(req, res, next) {
 
+    Task.
+
+    findOne().
+    where('_id', req.params.taskId).
+    where('users', req.session.user._id).
+
+    deepPopulate('users.profile').
+
+    exec(function(err, task) {
+
+      if (err) {
+        next(err);
+      } else if (task) {
+
+        res.send(task.users);
+
+      } else {
+        res.sendStatus(404);
+      }
+    });
 
   });
 
   /**
-   * Add an entry to a task
+   * Add entries to a task
    */
   router.post('/:taskId/addEntries', function(req, res, next) {
 
+    var user = req.session.user._id,
+        entries = req.body.entries,
+        checked = 0, 
+        saved = 0;
+
+    if (entries && entries.length) {
+
+      Task.
+
+      findOne().
+      where('_id', req.params.taskId).
+      where('users', user).
+
+      exec(function(err, task) {
+
+        if (err) {
+          next(err);
+        } else if (task) {
+
+          relations.contact(user, function(relation) {
+
+            entries.forEach(function(entry) { 
+
+              Entry.findById(entry, function(err, _entry) {
+                if (err) {
+                  debug(err);
+
+                } else if (_entry) {
+
+                  if (relation.isContact(_entry.user)) {
+                    saved += 1;
+                    task.entries.push(_entry._id);
+
+                  } else {
+                    debug('Users %s and %s are not contacts with each other', user, _entry.user);
+                  }
+                } else {
+                  debug('Entry %s was no found', entry);
+                }
+
+                checked += 1;
+                if (checked === entries.length) {
+
+                  task.save(function(err) {
+                    if (err) {
+                      next(err);
+                    } else {
+                      
+                      debug('%s new entries saved into task %s', saved, task._id);
+                      res.sendStatus(204);
+                      
+                    }
+                  });
+                }
+              });
+            });
+          });
+        } else {
+          res.sendStatus(404);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 
   /**
-   * Remove an entry from task
+   * Remove entries from task
    */
   router.post('/:taskId/removeEntries', function(req, res, next) {
 
