@@ -283,10 +283,10 @@ module.exports = function (router, mongoose) {
                     if (err) {
                       next(err);
                     } else {
-                      
+
                       debug('%s new entries saved into task %s', saved, task._id);
                       res.sendStatus(204);
-                      
+
                     }
                   });
                 }
@@ -307,6 +307,60 @@ module.exports = function (router, mongoose) {
    * Remove entries from task
    */
   router.post('/:taskId/removeEntries', function(req, res, next) {
+
+    var entries = req.body.entries,
+        i, index,
+        removed = 0;
+
+    if (entries && entries.length) {
+      
+      Task.
+
+      findOne().
+      where('_id', req.params.taskId).
+      where('users', req.session.user._id).
+
+      exec(function(err, task) {
+
+        if (err) {
+          next(err);
+        } else if (task) {
+
+          entries.forEach(function(entry) {
+            
+            index = -1;
+            
+            for (i = 0; i < task.entries.length; i++) {
+
+              if (JSON.stringify(task.entries[i]) === JSON.stringify(entry)) {
+                index = i;
+                break;
+              }
+            } 
+            
+            if (index > -1) {
+              removed += 1;
+              task.entries.splice(index, 1);
+            }
+            
+          });
+          
+          task.save(function(err) {
+            if (err) {
+              next(err);
+            } else {
+              
+              debug('%s entries removed from task %s', removed, task._id);
+              res.sendStatus(204);
+            }
+          });
+        } else {
+          res.sendStatus(404);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 
