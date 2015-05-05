@@ -11,17 +11,51 @@ var statics = component('statics');
 var Contact = mongoose.model('contact'),
     Group = mongoose.model('group');
 
-function contact(id1, id2, cb) {
-  var i, 
+function contact(userId, cb) { /** Returns a contact model with a isContact method */
+
+  var  i, 
+
       relation = {
+
         contact : null,
-        isContact : false,
-        state : null
+
+        isContact : function(id, pending) { /** Looks for an active contact, if pending === true, looks for a pending contact */
+
+          var contact = null;
+
+          if (relation.contact) {
+
+            if (relation.contact.contacts.length) {
+
+              for (i = 0; i < relation.contact.contacts.length; i++) {
+
+                if (JSON.stringify(relation.contact.contacts[i].user) === JSON.stringify(id)) {
+
+                  if (_.isEqual(relation.contact.contacts[i].state, statics.model('state', 'active')._id)) { /** Is an active contact */
+                    contact =  relation.contact.contacts[i];
+
+                  } else if (pending && _.isEqual(relation.contact.contacts[i].state, statics.model('state', 'pending')._id)) {/** Is a pending contact */
+                    contact =  relation.contact.contacts[i];
+
+                  }
+                  break;
+                }
+              }
+            } else {
+              debug('Contact list %s has no contacts', contact._id);
+            }
+          } else {
+            debug('Error! No contact list found');
+          }
+
+          return contact;
+        }
+
       };
 
   Contact.
   findOne().
-  where('user', id1).
+  where('user', userId).
   exec(function(err, contact){
 
     if(err){
@@ -31,26 +65,14 @@ function contact(id1, id2, cb) {
 
       relation.contact = contact;
 
-      for (i = 0; i < contact.contacts.length; i++) {
-
-        if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(id2)) {
-          relation.state = contact.contacts[i].state;
-
-          if (_.isEqual(contact.contacts[i].state, statics.model('state', 'active')._id)) {
-            relation.isContact = true;
-          }          
-          break;
-        }
-      } 
-      
     } else {
-      debug('No contact found with id %s' , id1);
+      debug('Contact list for user %s was not found', userId);
     }
 
     if(cb){
       cb(relation);
     } else {
-      debug('No callback provided');
+      debug('Error! No callback provided');
     }
 
   });
@@ -58,14 +80,37 @@ function contact(id1, id2, cb) {
 }
 
 
-function membership(userId, groupId, cb) {
+function membership(groupId, cb) {
   var i, 
       relation = {
-        group : null,
-        isMember : false,
-        isAdmin : false
-      };
 
+        group : null,
+
+        isMember : function(id) { /** Looks for a member of a group */
+
+          var member = null;
+
+          if (relation.group) {
+
+            for (i = 0; i < relation.group.members.length; i++) {
+
+              if (JSON.stringify(relation.group.members[i]) === JSON.stringify(id)) {
+                
+                member = { member:  relation.group.members[i] };
+
+                if (JSON.stringify(relation.group.admin) === JSON.stringify(id)) {
+                  member.isAdmin = true;
+                } 
+                break;
+              }
+            }
+          } else {
+            debug('Error! No group found');
+          }
+          
+          return member;
+        }
+      };
 
   Group.findById(groupId, function(err, group) {
 
@@ -75,18 +120,6 @@ function membership(userId, groupId, cb) {
     } else if (group) {
 
       relation.group = group;
-
-      for (i = 0; i < group.members.length; i++) {
-
-        if (JSON.stringify(group.members[i]) === JSON.stringify(userId)) {
-          relation.isMember = true;
-
-          if (JSON.stringify(group.admin) === JSON.stringify(userId)) {
-            relation.isAdmin = true;
-          } 
-          break;
-        }
-      }
 
     } else {
       debug('No group found');
