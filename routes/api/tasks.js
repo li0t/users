@@ -18,8 +18,10 @@ module.exports = function (router, mongoose) {
    */
   router.post('/create', function(req, res, next) {
 
-    var creator = req.session.user._id,
-        group = req.body.group,
+    var group = req.body.group,
+        creator = req.session.user._id,
+        priorities = statics.models.priority,
+        _priority,
         priority = null;
 
     relations.membership(group, function(membership) {
@@ -30,19 +32,24 @@ module.exports = function (router, mongoose) {
 
         if (membership.isMember(creator)) { 
 
-          statics.models.priority.forEach(function(slug) { /** Search the priority id in the priority static model */
+          for (_priority in priorities) { /** Search the priority id and check that exists */
 
-            if (JSON.stringify(slug._id) === JSON.stringify(req.body.priority)){
-              priority = slug._id;
+            if (priorities.hasOwnProperty(_priority)) {
+
+              if (JSON.stringify(priorities[_priority]._id) === JSON.stringify(req.body.gender)) {
+
+                priority = req.body.gender;
+                break;
+
+              }
             }
-
-          });
-
+          }
+          
           if (priority) {
 
             new Task({
               group: group._id,
-              creator: creator,
+              creator: creator, 
               status: statics.model('state', 'pending')._id,
               objective: req.body.objective,
               priority: req.body.priority,
