@@ -5,7 +5,8 @@
 var debug = require('debug')('app:api:profiles');
 
 var gridfs = component('gridfs'),
-    relations = component('relations');
+    relations = component('relations'), 
+    statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
@@ -15,6 +16,23 @@ module.exports = function (router, mongoose) {
    * Update Profile linked to User
    */
   router.post('/', function (req, res, next) {
+
+    var genders = statics.models.gender,
+        _gender,
+        gender = null;
+    
+    for (_gender in genders) { /** Search the gender id and check that exists */
+      
+      if (genders.hasOwnProperty(_gender)) {
+        
+        if (JSON.stringify(genders[_gender]._id) === JSON.stringify(req.body.gender)) {
+          
+          gender = req.body.gender;
+          break;
+          
+        }
+      }
+    }
 
     Profile.findById(req.session.user.profile , function(err, profile) {
 
@@ -27,16 +45,23 @@ module.exports = function (router, mongoose) {
 
         profile.birthdate = req.body.birthdate || profile.birthdate;
 
-        profile.gender = req.body.gender || profile.gender;
+        profile.gender = gender || profile.gender;
 
         profile.location = req.body.location || profile.location;
 
         profile.save(function (err) {
 
           if (err) {
-            next(err);  
+            if(err.name && err.name === 'CastError') { 
+              res.sendStatus(400);
+            } else {
+              next(err);  
+            }
+
           } else {
+
             res.sendStatus(204);
+
           }
         });
       } else {
@@ -139,7 +164,7 @@ module.exports = function (router, mongoose) {
       if (group) {
 
         if (membership.isMember(user).isAdmin) {
-          
+
           Profile.findById(group.profile, function(err, profile) {
 
             if (err) {
@@ -236,9 +261,9 @@ module.exports = function (router, mongoose) {
     }
 
     relations.membership(group, function(membership) {
-      
+
       group = membership.group; /** The group model */
-      
+
       if (group) {
 
         if (membership.isMember(user).isAdmin) {
