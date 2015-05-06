@@ -280,13 +280,11 @@ module.exports = function (router, mongoose) {
           if (err) {
             next(err);
 
-          } else if (entries && entries.length) {
+          } else {
 
             res.send(entries);
 
-          } else {
-            res.sendStatus(404);
-          } 
+          }
         });
       } else {
         debug('User %s and %s are not contacts with each other', user, req.session.user.id);
@@ -319,12 +317,11 @@ module.exports = function (router, mongoose) {
           if (err) {
             next(err);
 
-          } else if (entries && entries.length) {
+          } else {
+            
             res.send(entries);
 
-          } else {
-            res.sendStatus(404);
-          }
+          } 
         });
       } else {
         debug('User %s and %s are not contacts with each other', user, req.session.user.id);
@@ -363,11 +360,10 @@ module.exports = function (router, mongoose) {
             if (err) {
               next(err);
 
-            } else if (entries && entries.length) {
+            } else {
+              
               res.send(entries);
 
-            } else {
-              res.sendStatus(404);
             }
           });
         } else {
@@ -411,13 +407,11 @@ module.exports = function (router, mongoose) {
             if (err) {
               next(err);
 
-            } else if (entries && entries.length) {
+            } else {
 
               res.send(entries);
 
-            } else {
-              res.sendStatus(404);
-            }
+            } 
           });
         } else {
           debug('User %s is not part of group %s', req.session.user.id, group);

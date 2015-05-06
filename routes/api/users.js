@@ -29,13 +29,11 @@ module.exports = function (router, mongoose) {
       if (err) {
         next(err);
 
-      } else if (users && users.length) {
+      } else {
 
         res.send(users);
-
-      } else {
-        res.sendStatus(404);
       }
+
     });
 
   });
