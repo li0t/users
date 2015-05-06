@@ -18,71 +18,107 @@ module.exports = function (router, mongoose) {
    */
   router.get('/add/:id', function (req, res, next) {
 
-    var user = req.params.id,
-        sender = null,
-        isContact;
+    var sender = null,
+        receiver = null,
+        senderIsContact,
+        receiverIsContact;
 
-    relations.contact(req.session.user._id, function(relation) { /** Get the contact model of the user */
+    relations.contact(req.params.id, function(receiverRelation) { 
 
-      if (relation.contact) { /** Check if the session.user contact list was found */
+      receiver = receiverRelation.contact; /** The contact model of the receiver user */
 
-        sender = relation.contact;
-        isContact = relation.isContact(user, true);
+      if (receiver) { 
 
-        if (!isContact) { /** Check if the users are contacts already */
+        relations.contact(req.session.user._id, function(senderRelation) { 
 
-          Contact.
-          findOne().
-          where('user', user).
-          exec(function (err, receiver) { /* The ContactSchema of the receiver */
+          sender = senderRelation.contact; /** The contact model of the sender user */
 
-            if (err) {
-              if (err.name && err.name === 'CastError') {
-                res.sendStatus(400);
-              } else {
-                next(err);
-              }
-            } else {
+          if (sender) { 
 
-              if (receiver) {
-                
-                sender.contacts.push({ /* Pushes the receiver id into the sender contacts */
-                  user: receiver.user,
-                  state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
-                });
+            receiverIsContact = senderRelation.isContact(receiver.user, true);
 
-                receiver.contacts.push({ /* Pushes the sender id into the receiver contacts */
-                  user: sender.user,
-                  state: statics.model('state', 'pending')._id  /* The contact state is pending for confirmation */
-                });
+            if (!receiverIsContact) { /** Check if the users are contacts already */
 
-                sender.save(function (err) {
-                  if (err) {
-                    next(err);
-                  } else {
+              sender.contacts.push({ 
+                user: receiver.user,
+                state: statics.model('state', 'pending')._id  
+              });
+              /** Push each other id's and set te the contact as pending*/
+              receiver.contacts.push({ 
+                user: sender.user,
+                state: statics.model('state', 'pending')._id  
+              });
 
-                    receiver.save(function (err) { 
-                      if (err) {
-                        next(err);
-                      } else {
-                        res.send('Great! Send the email to generate token'); 
-                      }
-                    });
-                  }
-                });
-              } else {
-                debug('No contacs list found for user with id %s', req.params.id);
-                res.sendStatus(404);
-              }
+              sender.save(function (err) {
+                if (err) {
+                  next(err);
+                } else {
+
+                  receiver.save(function (err) { 
+                    if (err) {
+                      next(err);
+                    } else {
+
+                      Token.
+                      findOne().
+                      where('user', receiver.user).
+                      exec(function(err, token) {
+                        if (err) {
+                          next(err);
+
+                        } else if (token) { /** The user is not part of emeeter and the invitation email is already been sent */
+
+                          res.send('Great! You have invited a collaborator to emeeter'); 
+
+                        } else { /** The user is part of emeeter and a contact request email is going to be sent */
+
+                          res.redirect('/api/mandrill/addContact/' + receiver.user);
+
+                        }                   
+                      });
+                    }
+                  });
+                }
+              });
+            } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'active')._id)) { /** The contact state is Active */
+
+              res.send('You are already contacts!');
+
+            } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'pending')._id)) { /** The contact state is Pending */
+
+              res.send('Waiting for confirmation!'); 
+
+            } else { /** The users were contacts, but in some point one of them disabled the relation */
+
+              senderIsContact = receiverRelation.isContact(req.session.user._id, true);
+
+              sender.contacts[receiverIsContact.index].state = statics.model('state', 'pending')._id;
+              receiver.contacts[senderIsContact.index].state = statics.model('state', 'pending')._id;
+
+              sender.save(function(err) {
+                if (err) {
+                  next(err);
+                } else {
+
+                  receiver.save(function(err) {
+                    if (err) {
+                      next(err);
+                    } else {
+
+                      res.redirect('/api/mandrill/addContact/' + receiver.user);
+
+                    }
+                  });
+                }
+              });
             }
-          });
-        } else if(_.isEqual(isContact.state, statics.model('state', 'active')._id)){ /** If contact state is Active */
-          res.send('You are already contacts!');
-        } else {
-          res.send('You are waiting for confirmation!'); 
-        }
+          } else {
+            debug('No contacts list found for user with id %s', req.session.user._id);
+            res.sendStatus(404);
+          }
+        });
       } else {
-        debug('No contacs list found for user with id %s', req.session.user._id);
+        debug('No contacts list found for user with id %s', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -94,6 +130,11 @@ module.exports = function (router, mongoose) {
    */
   router.get('/confirm/:token', function (req, res, next) {
 
+    var sender = null,
+        receiver = null,
+        senderIsContact,
+        receiverIsContact;
+
     Token.findById(req.params.token, function(err,token){
 
       if (err) { 
@@ -104,64 +145,59 @@ module.exports = function (router, mongoose) {
           next(err);
         }
 
-      } else if(token && token.sender){
+      } else if (token && token.sender) {
 
-        Contact.
-        findOne().
-        where('user', token.sender).
-        exec(function (err, sender) {
-          if (err) {
-            next(err);
-          } else if (sender) {
+        relations.contact(token.user, function(receiverRelation) {
 
-            Contact.
-            findOne().
-            where('user', req.session.user._id). 
-            exec(function (err, receiver) {
-              if (err) {
-                next(err);
-              } else if (receiver) {
+          receiver = receiverRelation.contact;
 
-                for (var i = 0; i < sender.contacts.length; i++) {
-                  if (JSON.stringify(sender.contacts[i].user) === JSON.stringify(req.session.user._id)) {
-                    sender.contacts[i].state = statics.model('state', 'active')._id;
-                    break;
-                  }
+          if (receiver) {
+
+            relations.contact(token.sender, function(senderRelation) { 
+
+              sender = senderRelation.contact;
+
+              if (sender) {
+
+                senderIsContact = receiverRelation.isContact(sender.user, true);
+                receiverIsContact = senderRelation.isContact(receiver.user, true);
+
+                if (senderIsContact && receiverIsContact) { 
+
+                  receiver.contacts[senderIsContact.index].state = statics.model('state', 'active')._id;
+                  sender.contacts[receiverIsContact.index].state = statics.model('state', 'active')._id;
+
+                  receiver.save(function (err) {
+                    if (err) {
+                      next(err);
+                    } else {
+
+                      sender.save(function (err) {
+                        if (err) {
+                          next(err);
+                        } else {
+
+                          res.sendStatus(204);
+
+                          Token.remove({ _id: token._id}, function(err) { 
+                            if(err) { 
+                              debug(err);
+                            }
+                          });
+                        }
+                      });
+                    }
+                  });
+                } else {
+                  res.sendStatus(400);
                 }
-
-                for (i = 0; i < receiver.contacts.length; i++) {
-                  if (JSON.stringify(receiver.contacts[i].user) === JSON.stringify(token.sender)) {
-                    receiver.contacts[i].state = statics.model('state', 'active')._id;
-                    break;
-                  }
-                }
-
-                sender.save(function (err) {
-                  if (err) {
-                    next(err);
-                  } else {
-
-                    receiver.save(function (err) {
-                      if (err) {
-                        next(err);
-                      } else {
-
-                        res.sendStatus(204);
-
-                        Token.remove({_id : token._id}, function(err) {
-                          if (err) {
-                            debug('Error! ' + err); 
-                          }
-                        }); 
-                      }
-                    });
-                  }
-                });
               } else {
+                debug('No contacts list found for user with id %s', req.session.user._id);
                 res.sendStatus(404);
               }
             });
           } else {
+            debug('No contacts list found for user with id %s', req.params.id);
             res.sendStatus(404);
           }
         });
@@ -177,66 +213,55 @@ module.exports = function (router, mongoose) {
    */
   router.get('/delete/:id', function (req, res, next) {
 
-    Contact.findOne().
-    where('user', req.params.id).
-    exec(function (err, contact) {
+    var sender = null,
+        receiver = null,
+        senderIsContact,
+        receiverIsContact;
 
-      if (err) {
+    relations.contact(req.params.id, function(receiverRelation) {
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+      receiver = receiverRelation.contact;
 
-      } else if (contact) {
+      if (receiver) {
 
-        Contact.findOne().
-        where('user', req.session.user._id).
-        exec(function (err, user) {
-          if (err) {
+        relations.contact(req.session.user._id, function(senderRelation) { 
 
-            if (err.name && err.name === 'ValidationError') {
-              res.sendStatus(400);
+          sender = senderRelation.contact;
+
+          if (sender) {
+
+            senderIsContact = receiverRelation.isContact(sender.user);
+            receiverIsContact = senderRelation.isContact(receiver.user);
+
+            if (receiverIsContact) {
+
+              receiver.contacts[senderIsContact.index].state = statics.model('state', 'disabled')._id;
+              sender.contacts[receiverIsContact.index].state = statics.model('state', 'disabled')._id;
+
+              receiver.save(function (err) {
+                if (err) {
+                  next(err);
+                } else {
+
+                  sender.save(function (err) {
+                    if (err) {
+                      next(err);
+                    } else {
+                      res.sendStatus(204);
+                    }
+                  });
+                }
+              });
             } else {
-              next(err);
+              res.sendStatus(400);
             }
-
-          } else if (user) {
-
-            for (var i = 0; i < contact.contacts.length; i++) {
-              if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(req.session.user._id)) {
-                contact.contacts[i].state = statics.model('state', 'disabled')._id;
-                break;
-              }
-            }
-
-            for (i = 0; i < user.contacts.length; i++) {
-              if (JSON.stringify(user.contacts[i].user) === JSON.stringify(req.params.id)) {
-                user.contacts[i].state = statics.model('state', 'disabled')._id;
-                break;
-              }
-            }
-
-            contact.save(function (err) {
-              if (err) {
-                next(err);
-              } else {
-
-                user.save(function (err) {
-                  if (err) {
-                    next(err);
-                  } else {
-                    res.sendStatus(204);
-                  }
-                });
-              }
-            });
           } else {
+            debug('No contacts list found for user with id %s', req.session.user._id);
             res.sendStatus(404);
           }
         });
       } else {
+        debug('No contacts list found for user with id %s', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -289,18 +314,18 @@ module.exports = function (router, mongoose) {
                 populated +=1;
 
                 if (populated === toPopulate) {
-                  send(found);
+                  send(found.contacts);
                 }
               }
             }); 
 
           } else if (checked === toCheck) {
-            send(found);
+            send(found.contacts);
           }
         });
 
       } else {
-        res.sendStatus(404);
+        res.send(found.contacts);
       }
     });
 
