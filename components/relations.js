@@ -20,7 +20,7 @@ function contact(userId, cb) { /** Returns a contact model with a isContact meth
 
         contact : null,
 
-        isContact : function(id, pending) { /** Looks for an active contact, if pending === true, looks for a pending contact */
+        isContact : function(id, notActive) { /** Looks for an active contact, if notActive === true, looks for a pending or disabled contact */
 
           var contact = null;
 
@@ -33,17 +33,20 @@ function contact(userId, cb) { /** Returns a contact model with a isContact meth
                 if (JSON.stringify(relation.contact.contacts[i].user) === JSON.stringify(id)) {
 
                   if (_.isEqual(relation.contact.contacts[i].state, statics.model('state', 'active')._id)) { /** Is an active contact */
-                    contact =  relation.contact.contacts[i];
 
-                  } else if (pending && _.isEqual(relation.contact.contacts[i].state, statics.model('state', 'pending')._id)) {/** Is a pending contact */
-                    contact =  relation.contact.contacts[i];
+                    contact =  relation.contact.contacts[i].toObject();
+                    contact.index = i;
+
+                  } else if (notActive &&  (_.isEqual(relation.contact.contacts[i].state, statics.model('state', 'pending')._id) ||                                                                 _.isEqual(relation.contact.contacts[i].state, statics.model('state', 'disabled')._id))) {
+                    contact =  relation.contact.contacts[i].toObject();
+                    contact.index = i;
 
                   }
                   break;
                 }
               }
             } else {
-              debug('Contact list %s has no contacts', contact._id);
+              debug('Contact list %s has no contacts', relation.contact._id);
             }
           } else {
             debug('Error! No contact list found');
@@ -146,21 +149,21 @@ function collaboration(taskId, cb) {
         task : null,
 
         isCreator : function(id){
-          
+
           var isCreator = false;
-          
+
           if (relation.task) {
-            
+
             if (id === relation.task.creator) {
               isCreator = true;
             }
-            
+
           } else {
             debug('Error! No task found');
           }
-          
+
           return isCreator;
-          
+
         },
 
         isCollaborator : function(id) { /** Looks for a member of a task */
