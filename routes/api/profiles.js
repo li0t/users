@@ -163,7 +163,7 @@ module.exports = function (router, mongoose) {
 
       if (group) {
 
-        if (membership.isMember(user).isAdmin) {
+        if (membership.isAdmin(user)) {
 
           Profile.findById(group.profile, function(err, profile) {
 
@@ -266,7 +266,7 @@ module.exports = function (router, mongoose) {
 
       if (group) {
 
-        if (membership.isMember(user).isAdmin) {
+        if (membership.isAdmin(user)) {
 
           Profile.findById(group.profile, function (err, data) {
 

@@ -108,9 +108,7 @@ module.exports = function (router, mongoose) {
 
         if (group) {
 
-          adder = membership.isMember(adder);
-
-          if (adder && adder.isAdmin) {
+          if (membership.isAdmin(adder) || membership.isMember(adder)) { /** Check if adder is admin or member of the group */
 
             relations.contact(adder.member, function(relation) {
 
@@ -128,7 +126,7 @@ module.exports = function (router, mongoose) {
                     debug('User %s already belongs to the group %s' , member, group._id);
                   }   
                 } else {
-                  debug('User %s and %s are not contacts with each other', adder.member, member);
+                  debug('User %s and %s are not contacts with each other', adder, member);
                 }
               });
 
@@ -186,15 +184,15 @@ module.exports = function (router, mongoose) {
 
               toRemove = membership.isMember(member);
 
-              if (toRemove) { /** Check if user is member of group */
+              if (toRemove) { /** Check if user to remove is member of group */
 
-                if  (remover.isAdmin || JSON.stringify(member) === JSON.stringify(remover.member)) {  /** Check if remover has enough privileges */
+                if (membership.isAdmin(remover) || JSON.stringify(member) === JSON.stringify(remover.member)) { /** Check if remover has enough privileges */
 
                   removed += 1;
                   debug('User %s removed from group %s' , member, group._id);
                   group.members.splice(toRemove.index, 1); /** Remove user from members array */
 
-                  if (toRemove.isAdmin) {
+                  if (membership.isAdmin(toRemove)) {
                     lostAdmin = true;
                   }
 
@@ -258,8 +256,7 @@ module.exports = function (router, mongoose) {
 
     var group = req.params.groupId,
         sessionUser = req.session.user._id,
-        user = req.params.id,
-        member;
+        user = req.params.id;
 
     relations.membership(group, function(membership) {
 
@@ -267,9 +264,7 @@ module.exports = function (router, mongoose) {
 
       if (group) {
 
-        member = membership.isMember(sessionUser);
-
-        if (member && member.isAdmin) { /** Check if logged user is the group admin */
+        if (membership.isAdmin(sessionUser)) { /** Check if logged user is the group admin */
 
           if (membership.isMember(user)) {
 

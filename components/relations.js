@@ -12,7 +12,7 @@ var Contact = mongoose.model('contact'),
     Group = mongoose.model('group'),
     Task = mongoose.model('task');
 
-function contact(userId, cb) { /** Returns a contact model with a isContact method */
+function contact(userId, cb) { /** Returns a relation object with the contact model and a isContact method */
 
   var  i, 
 
@@ -20,7 +20,7 @@ function contact(userId, cb) { /** Returns a contact model with a isContact meth
 
         contact : null,
 
-        isContact : function(id, notActive) { /** Looks for an active contact, if notActive === true, looks for a pending or disabled contact */
+        isContact : function(id, notActive) { /** Looks for an active contact, if notActive === true, looks for a pending or disabled contact also */
 
           var contact = null;
 
@@ -84,13 +84,31 @@ function contact(userId, cb) { /** Returns a contact model with a isContact meth
 }
 
 
-function membership(groupId, cb) {
+function membership(groupId, cb) { /** Returns a relation object with the group model and a isMember method */
 
   var i, 
 
       relation = {
 
         group : null,
+        
+        isAdmin : function(id) {
+
+          var isAdmin = false;
+
+          if (relation.group) {
+
+            if (JSON.stringify(relation.group.admin) === JSON.stringify(id)) {
+              isAdmin = true;
+            }
+
+          } else {
+            debug('Error! No group found');
+          }
+
+          return isAdmin;
+
+        },
 
         isMember : function(id) { /** Looks for a member of a group */
 
@@ -103,10 +121,7 @@ function membership(groupId, cb) {
               if (JSON.stringify(relation.group.members[i]) === JSON.stringify(id)) {
 
                 member = { member:  relation.group.members[i] , index : i };
-
-                if (JSON.stringify(relation.group.admin) === JSON.stringify(id)) {
-                  member.isAdmin = true;
-                } 
+               
                 break;
               }
             }
@@ -148,13 +163,13 @@ function collaboration(taskId, cb) {
 
         task : null,
 
-        isCreator : function(id){
+        isCreator : function(id) {
 
           var isCreator = false;
 
           if (relation.task) {
 
-            if (id === relation.task.creator) {
+            if (JSON.stringify(relation.task.creator) === JSON.stringify(id)) {
               isCreator = true;
             }
 
