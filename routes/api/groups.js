@@ -3,7 +3,7 @@
 'use strict';
 
 var //_ = require('underscore'),
-    debug = require('debug')('app:api:groups');
+debug = require('debug')('app:api:groups');
 
 var relations = component('relations')/*,
     statics = component('statics')*/;
@@ -93,9 +93,9 @@ module.exports = function (router, mongoose) {
   /**
    * Add member to a group
    */
-  router.get('/:groupId/addMembers', function(req, res, next) {
+  router.post('/:groupId/addMembers', function(req, res, next) {
 
-    var user = req.session.user._id,
+    var adder = req.session.user._id,
         group = req.params.groupId,
         members = req.body.members, 
         saved = 0;
@@ -108,9 +108,11 @@ module.exports = function (router, mongoose) {
 
         if (group) {
 
-          if (membership.isMember(user).isAdmin) {
+          adder = membership.isMember(adder);
 
-            relations.contact(user, function(relation) {
+          if (adder && adder.isAdmin) {
+
+            relations.contact(adder.member, function(relation) {
 
               members.forEach(function(member) {
 
@@ -119,14 +121,14 @@ module.exports = function (router, mongoose) {
                   if (!membership.isMember(member)) {
 
                     saved += 1;
-                    debug('Pushing %s into group members', member);
+                    debug('Pushing %s into group %s members', member, group._id);
                     group.members.push(member);
 
                   } else {
-                    debug('User %s already belongs to the group' , member);
+                    debug('User %s already belongs to the group %s' , member, group._id);
                   }   
                 } else {
-                  debug('User %s and %s are not contacts with each other', user, member);
+                  debug('User %s and %s are not contacts with each other', adder.member, member);
                 }
               });
 
@@ -137,12 +139,13 @@ module.exports = function (router, mongoose) {
                 } else {
 
                   debug('Saved group %s with %s new members' , group._id, saved);
-                  res.sendStatus(204);
+                  res.send('Added ' + saved + ' new members to group ' + group._id);
 
                 }
               });
             });
           } else {
+            debug('User %s does not have enough privileges in group %s' , req.session.user._id, group._id);
             res.sendStatus(403);
           }
         } else {
@@ -159,7 +162,7 @@ module.exports = function (router, mongoose) {
   /**
    * Remove member from group
    */
-  router.get('/:groupId/removeMembers', function(req, res, next) {
+  router.post('/:groupId/removeMembers', function(req, res, next) {
 
     var toRemove, removed = 0,
         lostAdmin = false,
@@ -172,9 +175,9 @@ module.exports = function (router, mongoose) {
       relations.membership(group, function(membership) {
 
         group = membership.group; /** The group model */
-        
+
         if(group) { 
-          
+
           remover = membership.isMember(remover);
 
           if (remover) { /** Check if remover is part of group */
@@ -185,7 +188,7 @@ module.exports = function (router, mongoose) {
 
               if (toRemove) { /** Check if user is member of group */
 
-                if  (remover.isAdmin || member === remover.member) {  /** Check if remover has enough privileges */
+                if  (remover.isAdmin || JSON.stringify(member) === JSON.stringify(remover.member)) {  /** Check if remover has enough privileges */
 
                   removed += 1;
                   debug('User %s removed from group %s' , member, group._id);
@@ -197,10 +200,9 @@ module.exports = function (router, mongoose) {
 
                 } else {
                   debug('User %s does not have enough privileges in group %s', remover.member, group._id);
-                  res.sendStatus(403);
                 }
               } else {
-                debug('No user with id %s found in group %s' , req.params.id, req.params.groupId);
+                debug('No user with id %s found in group %s' , member, req.params.groupId);
               }
             });
 
@@ -217,7 +219,7 @@ module.exports = function (router, mongoose) {
                 } else {
 
                   debug('%s members removed from group %s' , removed, group._id);
-                  res.sendStatus(204);
+                  res.send(removed + ' members removed from group ' + group._id);
 
                 }
               });
@@ -256,7 +258,8 @@ module.exports = function (router, mongoose) {
 
     var group = req.params.groupId,
         sessionUser = req.session.user._id,
-        user = req.params.id;
+        user = req.params.id,
+        member;
 
     relations.membership(group, function(membership) {
 
@@ -264,7 +267,9 @@ module.exports = function (router, mongoose) {
 
       if (group) {
 
-        if (membership.isMember(sessionUser).isAdmin) { /** Check if logged user is the group admin */
+        member = membership.isMember(sessionUser);
+
+        if (member && member.isAdmin) { /** Check if logged user is the group admin */
 
           if (membership.isMember(user)) {
 
@@ -283,7 +288,7 @@ module.exports = function (router, mongoose) {
             });
           } else {
             debug('No user with id %s found in group %s' , req.params.id, req.params.groupId);
-            res.sendStatus(404);
+            res.sendStatus(400);
           }
         } else {
           res.sendStatus(403);
@@ -312,7 +317,11 @@ module.exports = function (router, mongoose) {
     exec(function(err, group) {
 
       if (err) {
-        next(err);
+        if (err.name && err.name === 'CastError') { 
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
       } else if (group) {
 
         res.send(group.members);

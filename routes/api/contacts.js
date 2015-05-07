@@ -271,7 +271,7 @@ module.exports = function (router, mongoose) {
   /**
    * Get contacts of session user
    */ 
-  router.get('/', function(req, res, next){
+  router.get('/', function(req, res, next) {
 
     var checked = 0,
         toCheck = 0,
@@ -285,7 +285,9 @@ module.exports = function (router, mongoose) {
           }
         };
 
-    Contact.findOne().
+    Contact.
+    
+    findOne().
 
     where('user', req.session.user._id).
 
@@ -293,25 +295,25 @@ module.exports = function (router, mongoose) {
 
       if (err) {
         next(err);
-      } else if(found.contacts.length) {
+      } else if (found.contacts.length) {
 
         toCheck = found.contacts.length;
 
         found.contacts.forEach(function(contact) {
 
-          checked +=1;
+          checked += 1;
 
           if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
 
-            toPopulate +=1;
+            toPopulate += 1;
 
             contact.deepPopulate('user.profile', function(err) {
-
-              if(err) {
+ 
+              if (err) {
                 debug(err);
 
               } else {
-                populated +=1;
+                populated += 1;
 
                 if (populated === toPopulate) {
                   send(found.contacts);

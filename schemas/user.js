@@ -75,7 +75,7 @@ module.exports = function (Schema) {
   /** Lets populate reach any level */
   UserSchema.plugin(deepPopulate, {
     populate :{
-
+      
       'profile' : {
         select : 'name birthdate gender location'
       }

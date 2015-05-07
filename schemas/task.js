@@ -50,7 +50,7 @@ module.exports = function (Schema) {
       ref: 'entry'
     }]/*,
 
-    relatedMeetings: [{
+    meetings: [{
       type: Schema.Types.ObjectId,
       //  ref: ''
     }],*/
@@ -79,11 +79,11 @@ module.exports = function (Schema) {
   TaskSchema.plugin(deepPopulate, {
     populate :{
 
-      'users' : {
+      'collaborators' : {
         select : 'email profile'
       },
 
-      'users.profile' : {
+      'collaborators.profile' : {
         select : 'name birthdate gender location'
       }
 
