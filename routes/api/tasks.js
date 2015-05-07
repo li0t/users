@@ -98,7 +98,7 @@ module.exports = function (router, mongoose) {
 
     if (collaborators && collaborators.length) {
 
-      relations.collaboration(task._id, function(relation) {
+      relations.collaboration(task, function(relation) {
 
         task = relation.task;
 
@@ -268,7 +268,7 @@ module.exports = function (router, mongoose) {
         saved = 0,
 
         checkAndSave = function() {
-          debug('checked %s', checked);
+
           if (checked === entries.length) {
             task.save(function(err) {
               if (err) {
@@ -300,23 +300,24 @@ module.exports = function (router, mongoose) {
 
                 entries.forEach(function(entry) { 
 
-                  debug('Entry %s', entry);
-
                   Entry.findById(entry, function(err, entry) {
+
+                    checked += 1;
+
                     if (err) {
-                      checked += 1;
                       debug(err);
 
                     } else if (entry) {
+                      /** Check if user is contact of entry creator or is itself */
+                      if (relation.isContact(entry.user) || JSON.stringify(user) === JSON.stringify(entry.user)) { 
 
-                      if (relation.isContact(entry.user)) { /** Check if user is contact of entry creator */
-
-                        checked += 1;
                         saved += 1;
                         debug('Entry %s saved into task %s', entry._id, task._id);
                         task.entries.push(entry._id);
 
                       } else if (entry.group) {
+
+                        checked -= 1;
 
                         relations.membership(entry.group, function(entryGroup) { 
 
@@ -332,14 +333,12 @@ module.exports = function (router, mongoose) {
 
                           checked += 1;
                           checkAndSave();
-                          
+
                         });
                       } else {
-                        checked += 1;
                         debug('User %s and the creator of the entry %s are not contacts with each other', user, entry.user);
                       }
                     } else {
-                      checked += 1;
                       debug('Entry was not found');
                     }
                     checkAndSave();
