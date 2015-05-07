@@ -341,7 +341,7 @@ module.exports = function (router, mongoose) {
 
     sort('created').
 
-    select('id profile members created').
+    select('id admin profile members created').
 
     populate('profile').
 

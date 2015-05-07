@@ -148,7 +148,7 @@ module.exports = function (router, mongoose) {
     } else {
       res.sendStatus(400);
     }
-    
+
   });
 
   /**
@@ -268,7 +268,7 @@ module.exports = function (router, mongoose) {
         saved = 0,
 
         checkAndSave = function() {
-
+          debug('checked %s', checked);
           if (checked === entries.length) {
             task.save(function(err) {
               if (err) {
@@ -300,17 +300,21 @@ module.exports = function (router, mongoose) {
 
                 entries.forEach(function(entry) { 
 
-                  Entry.findById(entry, function(err, _entry) {
+                  debug('Entry %s', entry);
+
+                  Entry.findById(entry, function(err, entry) {
                     if (err) {
+                      checked += 1;
                       debug(err);
 
-                    } else if (_entry) {
+                    } else if (entry) {
 
-                      if (relation.isContact(_entry.user)) { /** Check if user is contact of entry creator */
+                      if (relation.isContact(entry.user)) { /** Check if user is contact of entry creator */
 
                         checked += 1;
                         saved += 1;
-                        task.entries.push(_entry._id);
+                        debug('Entry %s saved into task %s', entry._id, task._id);
+                        task.entries.push(entry._id);
 
                       } else if (entry.group) {
 
@@ -319,7 +323,8 @@ module.exports = function (router, mongoose) {
                           if (entryGroup.isMember(user)) { /** Check if user is part of entry group */
 
                             saved += 1;
-                            task.entries.push(_entry._id);
+                            debug('Entry %s saved into task %s', entry._id, task._id);
+                            task.entries.push(entry._id);
 
                           } else {
                             debug('User %s is not part of the entry group %s', user, entry.group);
@@ -327,21 +332,19 @@ module.exports = function (router, mongoose) {
 
                           checked += 1;
                           checkAndSave();
-
+                          
                         });
                       } else {
                         checked += 1;
-                        debug('User %s and the creator of the entry are not contacts with each other', user);
+                        debug('User %s and the creator of the entry %s are not contacts with each other', user, entry.user);
                       }
                     } else {
                       checked += 1;
-                      debug('Entry %s was no found', entry);
+                      debug('Entry was not found');
                     }
+                    checkAndSave();
                   });
-                });
-
-                checkAndSave();
-
+                });    
               });
             } else {
               debug('User %s is not allow to modify task %s', user, task._id);
