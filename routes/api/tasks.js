@@ -189,6 +189,7 @@ module.exports = function (router, mongoose) {
 
                   if (!relation.isCollaborator(collaborator)) {
 
+                    debug('New collaborator %s added to task %s' , collaborator, task._id);
                     task.collaborators.push(collaborator);
                     saved += 1;
 
@@ -234,7 +235,8 @@ module.exports = function (router, mongoose) {
     var removed = 0,
         remover = req.session.user._id, 
         task = req.params.taskId,
-        collaborators = req.body.collaborators;
+        collaborators = req.body.collaborators,
+        collaborator;
 
     if (collaborators && collaborators.length) { 
 
@@ -254,18 +256,18 @@ module.exports = function (router, mongoose) {
 
             if (taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
 
-              collaborators.forEach(function(collaborator) {
+              collaborators.forEach(function(_collaborator) {
 
-                collaborator = relation.isCollaborator(collaborator);
+                collaborator = relation.isCollaborator(_collaborator);
 
                 if (collaborator) { /** Check if user is part of the task collaborators array */
 
                   removed += 1;
-                  debug('Collaborator %s removed from task %s' , collaborator, task._id);
+                  debug('Collaborator %s removed from task %s', _collaborator, task._id);
                   task.collaborators.splice(collaborator.index, 1); /** Remove user from collaborators array */
 
                 } else {
-                  debug('User is not collaborator of task %s',  task._id);
+                  debug('User %s is not collaborator of task %s', _collaborator,  task._id);
                 }
               });
 
@@ -494,10 +496,14 @@ module.exports = function (router, mongoose) {
                 } 
 
                 if (index > -1) {
-                  removed += 1;
-                  task.entries.splice(index, 1);
-                }
 
+                  removed += 1;
+                  debug('Entry %s removed from task %s', entry, task._id);
+                  task.entries.splice(index, 1);
+
+                } else {
+                  debug('Entry %s was not found in task %s', entry, task._id);
+                }
               });
 
               task.save(function(err) {
@@ -597,8 +603,11 @@ module.exports = function (router, mongoose) {
               notes.forEach(function(note) { 
 
                 if (note) {
+
                   saved += 1;
+                  debug('Note -> %s added to task %s', note, task._id);
                   task.notes.push(note);
+
                 }
 
               });
@@ -637,7 +646,8 @@ module.exports = function (router, mongoose) {
     var task = req.params.taskId,
         user = req.session.user._id,
         notes = req.body.notes,
-        removed = 0;
+        removed = 0,
+        i, index;
 
     if (notes && notes.length) {
 
@@ -660,10 +670,27 @@ module.exports = function (router, mongoose) {
               notes.forEach(function(note) { 
 
                 if (note) {
-                  removed += 1;
-                  task.notes.splice(task.notes.indexOf(note), 1);
-                }
 
+                  index = -1;
+
+                  for (i = 0; i < task.notes.length; i++) {
+
+                    if (task.notes[i] === note) {
+                      index = i;
+                      break;
+                    }
+                  } 
+
+                  if (index > -1) {
+
+                    removed += 1;
+                    debug('Note -> %s removed from task %s', note, task._id);
+                    task.notes.splice(index, 1);
+
+                  } else {
+                    debug('Note -> %s was not found in task %s', note, task._id);
+                  }
+                }
               });
 
               task.save(function(err) {

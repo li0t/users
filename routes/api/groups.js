@@ -55,7 +55,12 @@ module.exports = function (router, mongoose) {
 
           group.members.push(creator);
 
-          if (members && members.length) { /** Check if are member ids to save */ 
+          if (members && members.length) { /** Check if are member ids to save */
+
+            /** Prevent a mistype error */
+            if (typeof members === 'string') {
+              members = [members];
+            }
 
             relations.contact(creator, function(relation){
 
@@ -315,9 +320,9 @@ module.exports = function (router, mongoose) {
     Group.
 
     findOne().
-    
+
     where('_id', req.params.groupId).
-    
+
     where('members', req.session.user._id).
 
     deepPopulate('members.profile').

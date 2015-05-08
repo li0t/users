@@ -264,33 +264,39 @@ module.exports = function (router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(req.session.user._id, function(relation) {
+    relations.contact(user, function(relation) {
 
-      if (relation.isContact(user) || user === req.session.user._id) { 
+      if (relation.contact) { 
 
-        Entry.
+        if (relation.isContact(req.session.user._id) || user === req.session.user._id) {
 
-        find().
-        
-        where('user', user).
+          Entry.
 
-        populate('pictures'). /* Retrieves data from linked schemas */
-        
-        sort('-created').
+          find().
 
-        exec(function (err, entries) {
-          if (err) {
-            next(err);
+          where('user', user).
 
-          } else {
+          populate('pictures'). /* Retrieves data from linked schemas */
 
-            res.send(entries);
+          sort('-created').
 
-          }
-        });
+          exec(function (err, entries) {
+            if (err) {
+              next(err);
+
+            } else {
+
+              res.send(entries);
+
+            }
+          });
+        } else {
+          debug('User %s and %s are not contacts with each other', user, req.session.user._id);
+          res.sendStatus(403); 
+        }
       } else {
-        debug('User %s and %s are not contacts with each other', user, req.session.user._id);
-        res.sendStatus(403); 
+        debug('User %s was not found', user);
+        res.sendStatus(404);
       }
     });
 
@@ -303,33 +309,39 @@ module.exports = function (router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(req.session.user._id, function(relation) {
+    relations.contact(user, function(relation) {
 
-      if (relation.isContact(user) || user === req.session.user._id) {
+      if (relation.contact) { 
 
-        Entry.
+        if (relation.isContact(req.session.user._id) || user === req.session.user._id) {
 
-        find( { $where : 'this.pictures.length > 0' } ).
-        
-        where('user', user).
+          Entry.
 
-        populate('pictures'). /* Retrieves data from linked schemas */
-        
-        sort('-created').
+          find( { $where : 'this.pictures.length > 0' } ).
 
-        exec(function (err, entries) {
-          if (err) {
-            next(err);
+          where('user', user).
 
-          } else {
-            
-            res.send(entries);
+          populate('pictures'). /* Retrieves data from linked schemas */
 
-          } 
-        });
+          sort('-created').
+
+          exec(function (err, entries) {
+            if (err) {
+              next(err);
+
+            } else {
+
+              res.send(entries);
+
+            } 
+          });
+        } else {
+          debug('User %s and %s are not contacts with each other', user, req.session.user._id);
+          res.sendStatus(403); 
+        }
       } else {
-        debug('User %s and %s are not contacts with each other', user, req.session.user._id);
-        res.sendStatus(403); 
+        debug('User %s was not found', user);
+        res.sendStatus(404);
       }
     });
 
@@ -365,7 +377,7 @@ module.exports = function (router, mongoose) {
               next(err);
 
             } else {
-              
+
               res.send(entries);
 
             }
@@ -426,7 +438,7 @@ module.exports = function (router, mongoose) {
         res.sendStatus(404);
       }
     });
-    
+
   });
 
 };
