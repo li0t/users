@@ -26,9 +26,9 @@ module.exports = function (router, mongoose) {
 
     relations.membership(group, function(membership) {
 
-      group = membership.group;
+      group = membership.group; /** The group model */
 
-      if (group) {
+      if (group) { 
 
         if (membership.isMember(creator)) { 
 
@@ -59,7 +59,7 @@ module.exports = function (router, mongoose) {
 
             save(function(err, task) {
 
-              if( err) {
+              if ( err) {
                 if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
                   res.status(400).send(err);
                 } else {
@@ -100,7 +100,7 @@ module.exports = function (router, mongoose) {
 
       relations.collaboration(task, function(relation) {
 
-        task = relation.task;
+        task = relation.task; /** The task model */
 
         if (task) {
 
@@ -141,7 +141,7 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
-          debug('Task %s not found', req.params.taskId);
+          debug('Task %s was not found' , req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -205,7 +205,7 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
-          debug('No task found with id %s' , req.params.taskId);
+          debug('Task %s was not found' , req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -245,11 +245,12 @@ module.exports = function (router, mongoose) {
             res.send(task.collaborators);
 
           } else {
-            debug('User %s is not allow to get information about task %s', user, task._id);
+            debug('User %s is not allowed to get information about task %s', user, task._id);
             res.sendStatus(403);
           }
         });
       } else {
+        debug('Task %s was not found' , req.params.taskId);
         res.sendStatus(404);
       }
     });
@@ -276,7 +277,7 @@ module.exports = function (router, mongoose) {
               } else {
 
                 debug('%s of %s new entries added to task %s', saved, entries.length, task._id);
-                res.send(saved + ' of '+ entries.length +' new entries added to task ' +  task._id);
+                res.send(saved + ' of ' + entries.length + ' new entries added to task ' +  task._id);
 
               }
             });
@@ -288,47 +289,48 @@ module.exports = function (router, mongoose) {
 
       relations.collaboration(task, function(collaboration) {
 
-        task = collaboration.task;
+        task = collaboration.task; /** The task model */
 
         if (task) {
 
-          relations.membership(task.group, function(taskGroup){
+          relations.membership(task.group, function(taskGroup) {
 
             if (taskGroup.isMember(user)) {  /** Check if user is part of task group */
 
-              relations.contact(user, function(relation) {
+              relations.
+              contact(user, function(relation) {
 
                 entries.forEach(function(entry) { 
 
-                  Entry.findById(entry, function(err, entry) {
+                  Entry.findById(entry, function(err, _entry) {
 
                     checked += 1;
 
                     if (err) {
                       debug(err);
 
-                    } else if (entry) {
+                    } else if (_entry) {
                       /** Check if user is contact of entry creator or is itself */
-                      if (relation.isContact(entry.user) || JSON.stringify(user) === JSON.stringify(entry.user)) { 
+                      if (relation.isContact(_entry.user) || JSON.stringify(user) === JSON.stringify(_entry.user)) { 
 
                         saved += 1;
-                        debug('Entry %s saved into task %s', entry._id, task._id);
-                        task.entries.push(entry._id);
+                        debug('Entry %s saved into task %s', entry, task._id);
+                        task.entries.push(entry);
 
-                      } else if (entry.group) {
+                      } else if (_entry.group) {
 
-                        checked -= 1;
+                        checked -= 1; /** Wait for asynchronous method to check this entry */
 
-                        relations.membership(entry.group, function(entryGroup) { 
+                        relations.membership(_entry.group, function(entryGroup) { 
 
                           if (entryGroup.isMember(user)) { /** Check if user is part of entry group */
 
                             saved += 1;
-                            debug('Entry %s saved into task %s', entry._id, task._id);
-                            task.entries.push(entry._id);
+                            debug('Entry %s saved into task %s', entry, task._id);
+                            task.entries.push(entry);
 
                           } else {
-                            debug('User %s is not part of the entry group %s', user, entry.group);
+                            debug('User %s is not part of the entry group %s', user, _entry.group);
                           }
 
                           checked += 1;
@@ -339,18 +341,21 @@ module.exports = function (router, mongoose) {
                         debug('User %s and the creator of the entry %s are not contacts with each other', user, entry.user);
                       }
                     } else {
-                      debug('Entry was not found');
+                      debug('Entry %s was not found', entry);
                     }
+
                     checkAndSave();
+
                   });
                 });    
               });
             } else {
-              debug('User %s is not allow to modify task %s', user, task._id);
+              debug('User %s is not allowed to modify task %s', user, task._id);
               res.sendStatus(403);
             } 
           });
         } else {
+          debug('Task %s was not found' , req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -375,7 +380,7 @@ module.exports = function (router, mongoose) {
 
       relations.collaboration(task, function(collaboration) {
 
-        task = collaboration.task;
+        task = collaboration.task; /** The task model */
 
         if (task) {
 
@@ -418,6 +423,7 @@ module.exports = function (router, mongoose) {
             } 
           });
         } else {
+          debug('Task %s was not found' , req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -455,11 +461,12 @@ module.exports = function (router, mongoose) {
             res.send(task.entries);
 
           } else {
-            debug('User %s is not allow to get information about task %s', user, task._id);
+            debug('User %s is not allowed to get information about task %s', user, task._id);
             res.sendStatus(403);
           }
         });
       } else {
+        debug('Task %s was not found' , req.params.taskId);
         res.sendStatus(404);
       }
     });
@@ -480,7 +487,7 @@ module.exports = function (router, mongoose) {
 
       relations.collaboration(task, function(collaboration) {
 
-        task = collaboration.task;
+        task = collaboration.task; /** The task model */
 
         if (task) {
 
@@ -508,11 +515,12 @@ module.exports = function (router, mongoose) {
                 }
               });
             } else {
-              debug('User %s is not allow to modify task %s', user, task._id);
+              debug('User %s is not allowed to modify task %s', user, task._id);
               res.sendStatus(403);
             } 
           });
         } else {
+          debug('Task %s was not found' , req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -536,7 +544,7 @@ module.exports = function (router, mongoose) {
 
       relations.collaboration(task, function(collaboration) {
 
-        task = collaboration.task;
+        task = collaboration.task; /** The task model */
 
         if (task) {
 
@@ -564,11 +572,12 @@ module.exports = function (router, mongoose) {
                 }
               });
             } else {
-              debug('User %s is not allow to modify task %s', user, task._id);
+              debug('User %s is not allowed to modify task %s', user, task._id);
               res.sendStatus(403);
             } 
           });
         } else {
+          debug('Task %s was not found' , req.params.taskId);
           res.sendStatus(404);
         }
       });
