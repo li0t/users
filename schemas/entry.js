@@ -66,7 +66,7 @@ module.exports = function (Schema) {
       },
 
       'user.profile' : {
-        select : 'name birthdate gender location'
+        select : 'name'
       },
 
       'group' : {
@@ -78,7 +78,7 @@ module.exports = function (Schema) {
       },
 
       'group.profile' : {
-        select : 'name birthdate gender location'
+        select : 'name'
       }
 
     }

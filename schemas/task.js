@@ -78,13 +78,17 @@ module.exports = function (Schema) {
   /** Lets populate reach any level */
   TaskSchema.plugin(deepPopulate, {
     populate :{
-
-      'collaborators' : {
-        select : 'email profile'
+      
+      'group' : {
+        select: 'name location pictures'
       },
-
-      'collaborators.profile' : {
-        select : 'name birthdate gender location'
+      
+      'entries.user' : {
+        select: 'email'
+      },
+      
+      'collaborators' : {
+        select : 'email'
       }
 
     }

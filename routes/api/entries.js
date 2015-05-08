@@ -2,17 +2,18 @@
 /* global component */
 'use strict';
 
-var // _ = require('underscore'),
-debug = require('debug')('app:api:entries');
+var  _ = require('underscore'),
+    debug = require('debug')('app:api:entries');
 
 var relations = component('relations'),
-    // statics = component('statics'),
+    statics = component('statics'),
     gridfs = component('gridfs');
 
 module.exports = function (router, mongoose) {
 
   var Entry = mongoose.model('entry'),
-      Tag = mongoose.model('tag');
+      Tag = mongoose.model('tag'),
+      Task = mongoose.model('task');
 
   /**
    * Create a new entry
@@ -435,6 +436,238 @@ module.exports = function (router, mongoose) {
         }
       } else {
         debug('Group  %s was not found', group);
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
+  /**
+   * Add entries to a task
+   */
+  router.post('/task/:taskId/add', function(req, res, next) {
+
+    var task = req.params.taskId,
+        user = req.session.user._id,
+        entries = req.body.entries,
+        checked = 0, 
+        saved = 0,
+
+        checkAndSave = function() {
+
+          if (checked === entries.length) {
+            task.save(function(err) {
+              if (err) {
+                next(err);
+              } else {
+
+                debug('%s of %s new entries added to task %s', saved, entries.length, task._id);
+                res.send(saved + ' of ' + entries.length + ' new entries added to task ' +  task._id);
+
+              }
+            });
+          }
+
+        };
+
+    if (entries && entries.length) {
+
+      /** Prevent a mistype error */
+      if (typeof entries === 'string') {
+        entries = [entries];
+      }
+
+      relations.collaboration(task, function(collaboration) {
+
+        task = collaboration.task; /** The task model */
+
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+
+          relations.membership(task.group, function(taskGroup) {
+
+            if (taskGroup.isMember(user)) {  /** Check if user is part of task group */
+
+              relations.
+              contact(user, function(relation) {
+
+                entries.forEach(function(entry) { 
+
+                  Entry.findById(entry, function(err, _entry) {
+
+                    checked += 1;
+
+                    if (err) {
+                      debug(err);
+
+                    } else if (_entry) {
+                      /** Check if user is contact of entry creator or is itself */
+                      if (relation.isContact(_entry.user) || JSON.stringify(user) === JSON.stringify(_entry.user)) { 
+
+                        saved += 1;
+                        debug('Entry %s saved into task %s', entry, task._id);
+                        task.entries.push(entry);
+
+                      } else if (_entry.group) {
+
+                        checked -= 1; /** Wait for asynchronous method to check this entry */
+
+                        relations.membership(_entry.group, function(entryGroup) { 
+
+                          if (entryGroup.isMember(user)) { /** Check if user is part of entry group */
+
+                            saved += 1;
+                            debug('Entry %s saved into task %s', entry, task._id);
+                            task.entries.push(entry);
+
+                          } else {
+                            debug('User %s is not part of the entry group %s', user, _entry.group);
+                          }
+
+                          checked += 1;
+                          checkAndSave();
+
+                        });
+                      } else {
+                        debug('User %s and the creator of the entry %s are not contacts with each other', user, entry.user);
+                      }
+                    } else {
+                      debug('Entry %s was not found', entry);
+                    }
+
+                    checkAndSave();
+
+                  });
+                });    
+              });
+            } else {
+              debug('User %s is not allowed to modify task %s', user, task._id);
+              res.sendStatus(403);
+            } 
+          });
+        } else {
+          debug('Task %s was not found' , req.params.taskId);
+          res.sendStatus(404);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
+
+  });
+
+  /**
+   * Remove entries from task
+   */
+  router.post('/task/:taskId/remove', function(req, res, next) {
+
+    var remover = req.session.user._id,
+        task = req.params.taskId, 
+        entries = req.body.entries,
+        i, index,
+        removed = 0;
+
+    if (entries && entries.length) {
+
+      /** Prevent a mistype error */
+      if (typeof entries === 'string') {
+        entries = [entries];
+      }
+
+      relations.collaboration(task, function(collaboration) {
+
+        task = collaboration.task; /** The task model */
+
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+
+          relations.membership(task.group, function(taskGroup) {
+
+            if (taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
+
+              entries.forEach(function(entry) {
+
+                index = -1;
+
+                for (i = 0; i < task.entries.length; i++) {
+
+                  if (JSON.stringify(task.entries[i]) === JSON.stringify(entry)) {
+                    index = i;
+                    break;
+                  }
+                } 
+
+                if (index > -1) {
+
+                  removed += 1;
+                  debug('Entry %s removed from task %s', entry, task._id);
+                  task.entries.splice(index, 1);
+
+                } else {
+                  debug('Entry %s was not found in task %s', entry, task._id);
+                }
+              });
+
+              task.save(function(err) {
+                if (err) {
+                  next(err);
+                } else {
+
+                  debug('%s of %s entries removed from task %s', removed, entries.length, task._id);
+                  res.send(removed + ' of '+ entries.length +' entries removed from task ' +  task._id);
+
+                }
+              });
+            } else {
+              debug('User %s is not part of task %s group' , remover, task.group);
+              res.sendStatus(403);
+            } 
+          });
+        } else {
+          debug('Task %s was not found' , req.params.taskId);
+          res.sendStatus(404);
+        }
+      });
+    } else {
+      res.sendStatus(400);
+    }
+
+  });
+
+  /**
+   * Get task entries 
+   */
+  router.get('/task/:taskId', function(req, res, next) {
+
+    var user = req.session.user._id; 
+
+    Task.
+
+    findById(req.params.taskId).
+
+    deepPopulate('entries.user entries.pictures').
+
+    sort('created').
+
+    exec(function(err, task) {
+
+      if (err) {
+        next(err);
+      } else if (task) {
+
+        relations.membership(task.group, function(taskGroup) {
+
+          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+            res.send(task.entries);
+
+          } else {
+            debug('User %s is not allowed to get information about task %s', user, task._id);
+            res.sendStatus(403);
+          }
+        });
+      } else {
+        debug('Task %s was not found' , req.params.taskId);
         res.sendStatus(404);
       }
     });
