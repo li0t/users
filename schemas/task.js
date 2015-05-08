@@ -15,11 +15,11 @@ module.exports = function (Schema) {
 
     creator: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'user', 
       required: true
     },
 
-    status: {
+    state: {
       type: Schema.Types.ObjectId,
       ref: 'static.state',
       required: true
@@ -41,19 +41,19 @@ module.exports = function (Schema) {
       required: true
     },
 
-    dateTime : Date,
-
-    notes: [String],
-
     entries: [{ 
       type: Schema.Types.ObjectId,
       ref: 'entry'
-    }]/*,
+    }],
 
-    meetings: [{
+    /*meetings: [{
       type: Schema.Types.ObjectId,
       //  ref: ''
     }],*/
+    
+    dateTime : Date,
+
+    notes: [String]
 
   });
 
