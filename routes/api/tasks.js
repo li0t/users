@@ -597,23 +597,141 @@ module.exports = function (router, mongoose) {
    * Set entry as completed
    */
   router.get('/:taskId/complete', function(req, res, next) {
-    /** TODO */
+
+    var task = req.params.taskId,
+        user = req.session.user._id;
+
+    relations.collaboration(task, function(collaboration) {
+
+      task = collaboration.task; /** The task model */
+
+      /** Check if task exists and is available for changes */
+      if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+
+        relations.membership(task.group, function(taskGroup) {
+
+          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+            task.state = statics.model('state', 'completed')._id;
+
+            task.save(function(err) {
+              if (err) {
+                next(err);
+              } else {
+
+                debug('Task %s is now set as completed', task._id);
+                res.send('Task ' + task._id + ' is now set as completed');
+
+              }
+            });
+          } else {
+            debug('User %s is not allowed to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
+        });
+      } else {
+        debug('Task %s was not found' , req.params.taskId);
+        res.sendStatus(404);
+      }
+    });
+
   });
-  
+
   /**
    * Set entry as disabled
    */
   router.get('/:taskId/delete', function(req, res, next) {
-    /** TODO */
+
+    var task = req.params.taskId,
+        user = req.session.user._id;
+
+    relations.collaboration(task, function(collaboration) {
+
+      task = collaboration.task; /** The task model */
+
+      /** Check if task exists and is available for changes */
+      if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+
+        relations.membership(task.group, function(taskGroup) {
+
+          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+            task.state = statics.model('state', 'disabled')._id;
+
+            task.save(function(err) {
+              if (err) {
+                next(err);
+              } else {
+
+                debug('Task %s is now set as disabled', task._id);
+                res.send('Task ' + task._id + ' was deleted');
+
+              }
+            });
+          } else {
+            debug('User %s is not allowed to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
+        });
+      } else {
+        debug('Task %s was not found' , req.params.taskId);
+        res.sendStatus(404);
+      }
+    });
+
   });
-  
-   /**
+
+  /**
+   * Re-open entry
+   */
+  router.get('/:taskId/reOpen', function(req, res, next) {
+
+    var task = req.params.taskId,
+        user = req.session.user._id;
+
+    relations.collaboration(task, function(collaboration) {
+
+      task = collaboration.task; /** The task model */
+
+      /** Check if task exists and is available for changes */
+      if (task && (_.isEqual(task.state, statics.model('state', 'completed')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'disabled')._id))) {
+
+        relations.membership(task.group, function(taskGroup) {
+
+          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+            task.state = statics.model('state', 'active')._id;
+
+            task.save(function(err) {
+              if (err) {
+                next(err);
+              } else {
+
+                debug('Task %s was reopened', task._id);
+                res.send('Task ' + task._id + ' was reopened');
+
+              }
+            });
+          } else {
+            debug('User %s is not allowed to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
+        });
+      } else {
+        debug('Task %s was not found' , req.params.taskId);
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
+  /**
    * Set entry datetime
    */
   router.get('/:taskId/dateTime/:dateTime', function(req, res, next) {
     /** TODO */
   });
-  
+
   /**
    * Edit entry 
    */
