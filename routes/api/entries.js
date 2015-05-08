@@ -117,7 +117,7 @@ module.exports = function (router, mongoose) {
             createEntry();
 
           } else {
-            debug('User %s is not part of group %s',req.session.user.id, group);
+            debug('User %s is not part of group %s',req.session.user._id, group);
             res.sendStatus(403);
           }
         } else {
@@ -239,14 +239,14 @@ module.exports = function (router, mongoose) {
 
       } else if (entry) {
 
-        relations.contact(req.session.user.id, function(relation) {
+        relations.contact(req.session.user._id, function(relation) {
 
-          if (relation.isContact(entry.user) || JSON.stringify(entry.user) === JSON.stringify(req.session.user.id)) {
+          if (relation.isContact(entry.user) || JSON.stringify(entry.user) === JSON.stringify(req.session.user._id)) {
 
             res.send(entry);
 
           } else {
-            debug('User %s and %s are not contacts with each other', entry.user, req.session.user.id);
+            debug('User %s and %s are not contacts with each other', entry.user, req.session.user._id);
             res.sendStatus(403); 
           }
         });
@@ -264,17 +264,19 @@ module.exports = function (router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(req.session.user.id, function(relation) {
+    relations.contact(req.session.user._id, function(relation) {
 
-      if (relation.isContact(user) || user === req.session.user.id) { 
+      if (relation.isContact(user) || user === req.session.user._id) { 
 
         Entry.
 
         find().
+        
         where('user', user).
 
         populate('pictures'). /* Retrieves data from linked schemas */
-        sort('created').
+        
+        sort('-created').
 
         exec(function (err, entries) {
           if (err) {
@@ -287,7 +289,7 @@ module.exports = function (router, mongoose) {
           }
         });
       } else {
-        debug('User %s and %s are not contacts with each other', user, req.session.user.id);
+        debug('User %s and %s are not contacts with each other', user, req.session.user._id);
         res.sendStatus(403); 
       }
     });
@@ -301,17 +303,19 @@ module.exports = function (router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(req.session.user.id, function(relation) {
+    relations.contact(req.session.user._id, function(relation) {
 
-      if (relation.isContact(user) || user === req.session.user.id) {
+      if (relation.isContact(user) || user === req.session.user._id) {
 
         Entry.
 
         find( { $where : 'this.pictures.length > 0' } ).
+        
         where('user', user).
 
         populate('pictures'). /* Retrieves data from linked schemas */
-        sort('created').
+        
+        sort('-created').
 
         exec(function (err, entries) {
           if (err) {
@@ -324,7 +328,7 @@ module.exports = function (router, mongoose) {
           } 
         });
       } else {
-        debug('User %s and %s are not contacts with each other', user, req.session.user.id);
+        debug('User %s and %s are not contacts with each other', user, req.session.user._id);
         res.sendStatus(403); 
       }
     });
@@ -336,7 +340,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/group/:id', function (req, res, next) {
 
-    var user = req.session.user.id,
+    var user = req.session.user._id,
         group = req.params.id;
 
     relations.membership(group, function(relation) {
@@ -353,7 +357,7 @@ module.exports = function (router, mongoose) {
 
           populate('pictures'). /* Retrieves data from linked schemas */
 
-          sort('created').
+          sort('-created').
 
           exec(function (err, entries) {
 
@@ -367,7 +371,7 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
-          debug('User %s is not part of group %s', req.session.user.id, group);
+          debug('User %s is not part of group %s', req.session.user._id, group);
           res.sendStatus(403);
         }
       } else {
@@ -383,7 +387,7 @@ module.exports = function (router, mongoose) {
    */
   router.get('/group/:id/files', function (req, res, next) {
 
-    var user = req.session.user.id,
+    var user = req.session.user._id,
         group = req.params.id;
 
     relations.membership(group, function(relation) {
@@ -400,7 +404,7 @@ module.exports = function (router, mongoose) {
 
           populate('pictures'). /* Retrieves data from linked schemas */
 
-          sort('created').
+          sort('-created').
 
           exec(function (err, entries) {
 
@@ -414,7 +418,7 @@ module.exports = function (router, mongoose) {
             } 
           });
         } else {
-          debug('User %s is not part of group %s', req.session.user.id, group);
+          debug('User %s is not part of group %s', req.session.user._id, group);
           res.sendStatus(403);
         }
       } else {

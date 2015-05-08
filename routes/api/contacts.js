@@ -177,7 +177,8 @@ module.exports = function (router, mongoose) {
                           next(err);
                         } else {
 
-                          res.sendStatus(204);
+                          debug('User %s and %s are now contacts!', receiver.user, sender.user);
+                          res.send('User ' + receiver.user + ' and ' + sender.user + ' are now contacts!');
 
                           Token.remove({ _id: token._id}, function(err) { 
                             if(err) { 
@@ -247,7 +248,10 @@ module.exports = function (router, mongoose) {
                     if (err) {
                       next(err);
                     } else {
-                      res.sendStatus(204);
+
+                      debug('User %s and %s are no longer contacts!', receiver.user, sender.user);
+                      res.send('User ' + receiver.user + ' and ' + sender.user + ' are no longer contacts!');
+
                     }
                   });
                 }
@@ -286,7 +290,7 @@ module.exports = function (router, mongoose) {
         };
 
     Contact.
-    
+
     findOne().
 
     where('user', req.session.user._id).
@@ -308,7 +312,7 @@ module.exports = function (router, mongoose) {
             toPopulate += 1;
 
             contact.deepPopulate('user.profile', function(err) {
- 
+
               if (err) {
                 debug(err);
 

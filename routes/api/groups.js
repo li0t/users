@@ -102,15 +102,20 @@ module.exports = function (router, mongoose) {
 
     if (members && members.length) {
 
+      /** Prevent a mistype error */
+      if (typeof members === 'string') {
+        members = [members];
+      }
+
       relations.membership(group, function(membership) {
 
         group = membership.group;
 
         if (group) {
 
-          if (membership.isAdmin(adder) || membership.isMember(adder)) { /** Check if adder is admin or member of the group */
+          if (membership.isMember(adder)) { /** Check if adder is member of the group */
 
-            relations.contact(adder.member, function(relation) {
+            relations.contact(adder, function(relation) {
 
               members.forEach(function(member) {
 
@@ -143,11 +148,11 @@ module.exports = function (router, mongoose) {
               });
             });
           } else {
-            debug('User %s does not have enough privileges in group %s' , req.session.user._id, group._id);
+            debug('User %s was not found in group %s', adder, group._id);
             res.sendStatus(403);
           }
         } else {
-          debug('No group found with id %s' , req.params.groupId);
+          debug('No group found with id %s', req.params.groupId);
           res.sendStatus(404);
         }
       });
@@ -170,6 +175,11 @@ module.exports = function (router, mongoose) {
 
     if (members && members.length) { 
 
+      /** Prevent a mistype error */
+      if (typeof members === 'string') {
+        members = [members];
+      }
+
       relations.membership(group, function(membership) {
 
         group = membership.group; /** The group model */
@@ -186,7 +196,8 @@ module.exports = function (router, mongoose) {
 
               if (toRemove) { /** Check if user to remove is member of group */
 
-                if (membership.isAdmin(remover) || JSON.stringify(member) === JSON.stringify(remover.member)) { /** Check if remover has enough privileges */
+                /** Check if remover has enough privileges */
+                if (membership.isAdmin(remover.member) || JSON.stringify(member) === JSON.stringify(remover.member)) { 
 
                   removed += 1;
                   debug('User %s removed from group %s' , member, group._id);
@@ -216,8 +227,8 @@ module.exports = function (router, mongoose) {
 
                 } else {
 
-                  debug('%s members removed from group %s' , removed, group._id);
-                  res.send(removed + ' members removed from group ' + group._id);
+                  debug('%s of %s members removed from group %s' , removed, members.length, group._id);
+                  res.send(removed + ' of ' + members.length + ' members removed from group ' + group._id);
 
                 }
               });
@@ -235,7 +246,7 @@ module.exports = function (router, mongoose) {
 
             }
           } else {
-            debug('No user with id %s found in group %s' , req.session.user._id, group._id);
+            debug('User %s was not found in group %s' , req.session.user._id, group._id);
             res.sendStatus(403);
           }
         } else {
@@ -277,7 +288,7 @@ module.exports = function (router, mongoose) {
               } else {
 
                 debug('The group %s, has a new admin with id %s' , group._id, user);
-                res.sendStatus(204);
+                res.send('The group ' + group._id + ' has a new admin with id ' + user);
 
               }
             });
@@ -304,7 +315,9 @@ module.exports = function (router, mongoose) {
     Group.
 
     findOne().
+    
     where('_id', req.params.groupId).
+    
     where('members', req.session.user._id).
 
     deepPopulate('members.profile').
@@ -345,13 +358,13 @@ module.exports = function (router, mongoose) {
 
     populate('profile').
 
-    exec(function(err, group) {
+    exec(function(err, groups) {
 
       if (err) {
         next(err);
-      } else if (group) {
+      } else if (groups) {
 
-        res.send(group);
+        res.send(groups);
 
       } else {
         res.sendStatus(404);

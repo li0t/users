@@ -87,6 +87,75 @@ module.exports = function (router, mongoose) {
   });
 
   /**
+   * Get session user tasks
+   */
+  router.get('/me', function(req, res, next) {
+
+    Task.
+
+    find().
+
+    where('collaborators', req.session.user._id).
+
+    sort('-created').
+
+    exec(function(err, tasks) {
+
+      if (err) { 
+        next(err);
+      } else {
+        res.send(tasks);
+      }
+    });
+
+  });
+
+  /**
+   * Get tasks of a group
+   */
+  router.get('/group/:id', function (req, res, next) {
+
+    var user = req.session.user._id,
+        group = req.params.id;
+
+    relations.membership(group, function(relation) {
+
+      if (relation.group) {
+
+        if (relation.isMember(user)) {
+
+          Task.
+
+          find().
+
+          where('group', group).
+
+          sort('-created').
+
+          exec(function (err, tasks) {
+
+            if (err) {
+              next(err);
+
+            } else {
+
+              res.send(tasks);
+
+            }
+          });
+        } else {
+          debug('User %s is not part of group %s', req.session.user._id, group);
+          res.sendStatus(403);
+        }
+      } else {
+        debug('Group  %s was not found', group);
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
+  /**
    * Add collaborators to a task
    */
   router.post('/:taskId/addCollaborators', function(req, res, next) {
@@ -97,6 +166,11 @@ module.exports = function (router, mongoose) {
         saved = 0;
 
     if (collaborators && collaborators.length) {
+
+      /** Prevent a mistype error */
+      if (typeof collaborators === 'string') {
+        collaborators = [collaborators];
+      }
 
       relations.collaboration(task, function(relation) {
 
@@ -163,6 +237,11 @@ module.exports = function (router, mongoose) {
         collaborators = req.body.collaborators;
 
     if (collaborators && collaborators.length) { 
+
+      /** Prevent a mistype error */
+      if (typeof collaborators === 'string') {
+        collaborators = [collaborators];
+      }
 
       relations.collaboration(task, function(relation) {
 
@@ -289,6 +368,11 @@ module.exports = function (router, mongoose) {
 
     if (entries && entries.length) {
 
+      /** Prevent a mistype error */
+      if (typeof entries === 'string') {
+        entries = [entries];
+      }
+
       relations.collaboration(task, function(collaboration) {
 
         task = collaboration.task; /** The task model */
@@ -380,6 +464,11 @@ module.exports = function (router, mongoose) {
         removed = 0;
 
     if (entries && entries.length) {
+
+      /** Prevent a mistype error */
+      if (typeof entries === 'string') {
+        entries = [entries];
+      }
 
       relations.collaboration(task, function(collaboration) {
 
@@ -489,6 +578,11 @@ module.exports = function (router, mongoose) {
 
     if (notes && notes.length) {
 
+      /** Prevent a mistype error */
+      if (typeof notes === 'string') {
+        notes = [notes];
+      }
+
       relations.collaboration(task, function(collaboration) {
 
         task = collaboration.task; /** The task model */
@@ -546,6 +640,11 @@ module.exports = function (router, mongoose) {
         removed = 0;
 
     if (notes && notes.length) {
+
+      /** Prevent a mistype error */
+      if (typeof notes === 'string') {
+        notes = [notes];
+      }
 
       relations.collaboration(task, function(collaboration) {
 
@@ -739,25 +838,5 @@ module.exports = function (router, mongoose) {
     /** TODO */
   });
 
-  /**
-   * Get session user tasks
-   */
-  router.get('/me', function(req, res, next) {
-
-    Task.
-
-    find().
-    where('collaborators', req.session.user._id).
-
-    exec(function(err, tasks) {
-
-      if (err) { 
-        next(err);
-      } else {
-        res.send(tasks);
-      }
-    });
-
-  });
 
 };
