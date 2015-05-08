@@ -13,7 +13,7 @@ module.exports = function (router, mongoose) {
   var Task = mongoose.model('task');
 
   /**
-   * Create new task
+   * Create a new task
    */
   router.post('/create', function(req, res, next) {
 
@@ -58,7 +58,8 @@ module.exports = function (router, mongoose) {
 
             save(function(err, task) {
 
-              if ( err) {
+              if (err) {
+
                 if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
                   res.status(400).send(err);
                 } else {
@@ -66,8 +67,10 @@ module.exports = function (router, mongoose) {
                 }
 
               } else {
+
                 debug('Task %s created', task._id);
                 res.status(201).send(task._id);
+
               }
             });
           } else {
@@ -487,7 +490,7 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Set entry as completed
+   * Set task as completed
    */
   router.get('/:taskId/complete', function(req, res, next) {
 
@@ -531,7 +534,7 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Set entry as disabled
+   * Set task as disabled
    */
   router.get('/:taskId/delete', function(req, res, next) {
 
@@ -575,7 +578,7 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Re-open entry
+   * Re-open task
    */
   router.get('/:taskId/reOpen', function(req, res, next) {
 
@@ -619,17 +622,97 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Set entry datetime
+   * Set task datetime
    */
   router.get('/:taskId/dateTime/:dateTime', function(req, res, next) {
-    /** TODO */
+
+    var task = req.params.taskId,
+        user = req.session.user._id;
+
+    relations.collaboration(task, function(collaboration) {
+
+      task = collaboration.task; /** The task model */
+
+      /** Check if task exists and is available for changes */
+      if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+
+        relations.membership(task.group, function(taskGroup) {
+
+          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+            task.dateTime = req.params.dateTime;
+
+            task.save(function(err) {
+
+              if (err) {
+
+                if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
+                  res.status(400).send(err);
+                } else {
+                  next(err);
+                }
+
+              } else {
+                debug('Task %s dateTime was set to %s', task._id, task.dateTime);
+                res.send('Task ' + task._id + ' dateTime was set to ' + task.dateTime);
+
+              }
+            });
+          } else {
+            debug('User %s is not allowed to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
+        });
+      } else {
+        debug('Task %s was not found' , req.params.taskId);
+        res.sendStatus(404);
+      }
+    });
+
   });
 
   /**
-   * Edit entry 
+   * Edit task objective 
    */
-  router.post('/:taskId', function(req, res, next) {
-    /** TODO */
+  router.post('/:taskId/objective', function(req, res, next) {
+
+    var task = req.params.taskId,
+        user = req.session.user._id;
+
+    relations.collaboration(task, function(collaboration) {
+
+      task = collaboration.task; /** The task model */
+
+      /** Check if task exists and is available for changes */
+      if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+
+        relations.membership(task.group, function(taskGroup) {
+
+          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+            task.objective = req.body.objective || task.objective;
+
+            task.save(function(err) {
+
+              if (err) {
+                next(err);
+
+              } else {
+                debug('Task %s objective changed to %s', task._id, task.objective);
+                res.send('Task ' + task._id + ' objective changed to ' + task.objective);
+
+              }
+            });
+          } else {
+            debug('User %s is not allowed to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
+        });
+      } else {
+        debug('Task %s was not found' , req.params.taskId);
+        res.sendStatus(404);
+      }
+    });
   });
 
 
