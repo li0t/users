@@ -2,8 +2,8 @@
 /* global component */
 'use strict';
 
-var //_ = require('underscore'),
-debug = require('debug')('app:api:tasks');
+var _ = require('underscore'),
+    debug = require('debug')('app:api:tasks');
 
 var relations = component('relations'),
     statics = component('statics');
@@ -50,7 +50,7 @@ module.exports = function (router, mongoose) {
             new Task({
               group: group._id,
               creator: creator, 
-              status: statics.model('state', 'pending')._id,
+              state: statics.model('state', 'pending')._id,
               objective: req.body.objective,
               priority: req.body.priority,
               dateTime: req.body.dateTime,
@@ -102,7 +102,8 @@ module.exports = function (router, mongoose) {
 
         task = relation.task; /** The task model */
 
-        if (task) {
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -167,7 +168,8 @@ module.exports = function (router, mongoose) {
 
         task = relation.task; /** The task model */
 
-        if (task) { 
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) { 
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -291,7 +293,8 @@ module.exports = function (router, mongoose) {
 
         task = collaboration.task; /** The task model */
 
-        if (task) {
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -382,7 +385,8 @@ module.exports = function (router, mongoose) {
 
         task = collaboration.task; /** The task model */
 
-        if (task) {
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -489,7 +493,8 @@ module.exports = function (router, mongoose) {
 
         task = collaboration.task; /** The task model */
 
-        if (task) {
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -546,7 +551,8 @@ module.exports = function (router, mongoose) {
 
         task = collaboration.task; /** The task model */
 
-        if (task) {
+        /** Check if task exists and is available for changes */
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -588,7 +594,28 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Update entry info
+   * Set entry as completed
+   */
+  router.get('/:taskId/complete', function(req, res, next) {
+    /** TODO */
+  });
+  
+  /**
+   * Set entry as disabled
+   */
+  router.get('/:taskId/delete', function(req, res, next) {
+    /** TODO */
+  });
+  
+   /**
+   * Set entry datetime
+   */
+  router.get('/:taskId/dateTime/:dateTime', function(req, res, next) {
+    /** TODO */
+  });
+  
+  /**
+   * Edit entry 
    */
   router.post('/:taskId', function(req, res, next) {
     /** TODO */
