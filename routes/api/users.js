@@ -289,7 +289,7 @@ module.exports = function (router, mongoose) {
   /**
    * Disable the user's account
    */
-  router.get('/disable', function (req, res, next) {
+  router.get('/disable', function (req, res, next) { /** TODO: Check asynchronous method */
 
     User.findById(req.session.user._id, function (err, user) {
 

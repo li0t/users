@@ -8,7 +8,7 @@ var _ = require('underscore'),
 var relations = component('relations'),
     statics = component('statics');
 
-module.exports = function (router, mongoose) {
+module.exports = function (router, mongoose) { /** TODO: Implement link to meetings */
 
   var Poll = mongoose.model('poll');
 

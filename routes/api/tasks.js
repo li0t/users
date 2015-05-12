@@ -674,7 +674,7 @@ module.exports = function (router, mongoose) {
   /**
    * Edit task objective 
    */
-  router.post('/:taskId/objective', function(req, res, next) {
+  router.post('/:taskId/objective', function(req, res, next) { /** TODO: CHANGE PRIORITY */
 
     var task = req.params.taskId,
         user = req.session.user._id;

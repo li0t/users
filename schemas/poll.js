@@ -5,7 +5,7 @@ var deepPopulate = require('mongoose-deep-populate');
 
 module.exports = function (Schema) {
 
-  var PollSchema = new Schema({
+  var PollSchema = new Schema({ /** TODO: Implement link to meetings */
 
     task: {
       type: Schema.Types.ObjectId,
