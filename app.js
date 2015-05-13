@@ -56,7 +56,7 @@ app.set('view engine', configs.views.engine);
 
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1); /* Trust first proxy */
-  configs.session.cookie.secure = false; /* Serve secure cookies */ /* CHANGED THIS TO FALSE TO USE REQ.SESSION.USER */
+  configs.session.cookie.secure = false; /* Serve secure cookies */ /* SET AS FALSE FOR DEV PURPOSE */
 }
 
 
@@ -87,10 +87,10 @@ app.use(multiParser()); /* Form multipart body parser */
 app.use(session(configs.session)); /* Session */
 //app.use(security.csrf(configs.security.csrf)); /* CSRF security */
 //app.use(security.csp(configs.security.csp)); /* CSP security */
-app.use(security.xframe(configs.security.xframe)); /* XFRAME security */
+//app.use(security.xframe(configs.security.xframe)); /* XFRAME security */
 //app.use(security.p3p(configs.security.p3p)); /* P3P security */
-app.use(security.hsts(configs.security.hsts)); /* HSTS security */
-app.use(security.xssProtection(configs.security.xssProtection)); /* XSS protection security */
+//app.use(security.hsts(configs.security.hsts)); /* HSTS security */
+//app.use(security.xssProtection(configs.security.xssProtection)); /* XSS protection security */
 app.use(compression()); /* Data compression */
 
 
