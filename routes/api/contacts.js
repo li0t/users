@@ -212,7 +212,7 @@ module.exports = function (router, mongoose) {
   /**
    * Delete a contact
    */
-  router.get('/delete/:id', function (req, res, next) {
+  router.get('/delete/:id', function (req, res, next) { /** TODO: Delete contact request tokens */
 
     var sender = null,
         receiver = null,
@@ -257,7 +257,37 @@ module.exports = function (router, mongoose) {
                 }
               });
             } else {
-              res.sendStatus(400);
+
+              senderIsContact = receiverRelation.isContact(sender.user, true);
+              receiverIsContact = senderRelation.isContact(receiver.user, true);
+
+              /** Check if the contact is present in a pending state */
+              if (receiverIsContact && _.isEqual(receiverIsContact.state, statics.model('state', 'pending')._id)) {
+
+                receiver.contacts[senderIsContact.index].state = statics.model('state', 'disabled')._id;
+                sender.contacts[receiverIsContact.index].state = statics.model('state', 'disabled')._id;
+
+                receiver.save(function (err) {
+                  if (err) {
+                    next(err);
+                  } else {
+
+                    sender.save(function (err) {
+                      if (err) {
+                        next(err);
+                      } else {
+
+                        debug('The contact request between %s and %s has been deleted!', receiver.user, sender.user);
+                        res.send('The contact request between ' + receiver.user + ' and ' + sender.user + ' has been deleted!');
+
+                      }
+                    });
+                  }
+                });
+              } else {
+                debug('User %s and %s are no contacts with each other!', receiver.user, sender.user);
+                res.sendStatus(400);
+              }
             }
           } else {
             debug('No contacts list found for user with id %s', req.session.user._id);
