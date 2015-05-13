@@ -6,7 +6,8 @@ var bcrypt = require('bcrypt'),
     _ = require('underscore'),
     debug = require('debug')('app:api:users');
 
-var statics = component('statics');
+var relations = component('relations'),
+    statics = component('statics');
 
 module.exports = function (router, mongoose) {
 
@@ -291,63 +292,47 @@ module.exports = function (router, mongoose) {
    */
   router.get('/disable', function (req, res, next) { /** TODO: Check asynchronous method */
 
-    User.findById(req.session.user._id, function (err, user) {
+    var user = req.session.user._id,
+        userContact,
+        index;
 
-      if (err) {
-        next(err);
+    relations.contact(user, function(relation) {
 
-      } else if (user) {
+      userContact = relation.contact; /** The user contact model */
 
-        Contact.
+      if (userContact) {
 
-        findOne().
-        where('user', user._id). /** Find user collaborators list*/
+        userContact.contacts.forEach(function(contact) { 
 
-        exec(function (err, userContact) {
+          contact.state = statics.model('state', 'disabled')._id;  /** Set the user contact as disabled */
 
-          if (err) {
+          relations.contact(contact.user, function(relation) {      
+
+            index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
+
+            contact = relation.contact;
+
+            contact.contacts[index].state = statics.model('state', 'disabled')._id; /** Set itself as disabled in the contact contacts list */
+
+            contact.save(function(err) {
+              if (err) {
+                debug(err);
+              }
+            });
+          });          
+        });
+
+        userContact.save(function(err) {
+          if (err) { 
             next(err);
           } else {
 
-            userContact.contacts.forEach(function(contact){ /** For each user contact */
-
-              if(_.isEqual(contact.state, statics.model('state', 'active')._id)){ /** Check if it's an active contact */
-
-                Contact.
-
-                findOne(). 
-                where('user', contact.user). /** Find contact collaborators list*/
-
-                exec(function (err, contact) {
-
-                  if (err) {
-                    next(err);
-
-                  } else if (contact) {
-
-                    for (var i = 0; i < contact.contacts.length; i++) { /** Look itself in contact's collaborators list */
-                      if (JSON.stringify(contact.contacts[i].user) === JSON.stringify(user._id)) { 
-                        contact.contacts[i].state = statics.model('state', 'disabled')._id; /** And set itself disabled */
-                        break;
-                      }
-                    }
-
-                    contact.save(function(err){
-                      if (err) {debug(err); }
-                    });
-                  }
-                });
-
-                contact.state = statics.model('state', 'disabled')._id;  /** Finally set the user's contact as disabled */
-              }
-            });
-
-            userContact.save(function(err){
-
+            User.findById(user, function(err, user){
               if (err) { 
                 next(err);
               } else {
-                user.state = statics.model('state', 'disabled')._id;
+
+                user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
 
                 user.save(function(err){
 
@@ -364,6 +349,7 @@ module.exports = function (router, mongoose) {
           }
         });
       } else {
+        debug('No contacts list for user %s was found', user);
         res.sendStatus(404);
       }
     });
