@@ -282,7 +282,7 @@ module.exports = function (router, mongoose) {
         }
       }); 
     } else {
-      res.status(403).send('The new password should be different');
+      res.status(400).send('The new password should be different');
     }
 
   });
@@ -323,7 +323,7 @@ module.exports = function (router, mongoose) {
         });
 
         userContact.save(function(err) {
-          if (err) { 
+          if (err) {  
             next(err);
           } else {
 

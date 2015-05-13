@@ -65,6 +65,7 @@ module.exports = function (router, mongoose) {
           }
         });
       } else {
+        debug('No profile found for user %s', req.session.user._id);
         res.sendStatus(404);
       }
     });
@@ -78,7 +79,7 @@ module.exports = function (router, mongoose) {
 
     var profile, /* This is the target schema */
         saved = 0;
-
+    debug(req.files);
     /**
      * Create the document with the saved File ids
      */
@@ -88,7 +89,7 @@ module.exports = function (router, mongoose) {
         if (err) {
           next(err);
         } else {
-          res.sendStatus(204);
+          res.send(saved + ' pictures saved');
         }
       });
     }

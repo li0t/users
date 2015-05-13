@@ -23,7 +23,6 @@ var logger = require('morgan');
 var io = require('socket.io')(http);
 var sockets = require('./sockets');
 
-
 /**** Components ****/
 var multiParser = component('multiparse');
 var schemas = component('schemas');

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>emeeter</title>
+    <style>
+    </style>
+    <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
+  </head>
+  <body>
+
+    <h1 id="top">emeeter</h1>
+
+    <ul>
+      <li><a href="#">/#</a></li>
+      <li><a href="#users">/users</a></li>
+      <li><a href="#groups">/groups</a></li>
+    </ul>
+
+    <div id="sections">
+
+      <div id="users">
+        <p>users</p>
+        <input type="button" id="listUsers" value="list"/>
+        <div id="signing"> 
+          <form id="newUserForm">
+            <p>create user</p>
+            <input type="text" name="email" placeholder="email"/><br>
+            <input type="text" name="password" placeholder="password"/><br>
+            <input type="button" id="newUser" value="submit"/>
+          </form>
+        </div>
+        <div id="changingPasswor">
+          <form id="changePasswordForm">
+            <p>change password</p>
+            <input type="text" name="oldPassword" placeholder="old password"/><br>
+            <input type="text" name="newPassword" placeholder="new password"/><br>
+            <input type="button" id="changePassword" value="change password"/>
+          </form>
+        </div>
+        <div id="updatingProfile">
+          <form id="updateProfileForm">
+            <p>update profile</p>
+            <input type="text" name="name" placeholder="name"/><br>
+            <input type="text" name="birthdate" placeholder="birthdate"/><br>
+            <input type="text" name="location" placeholder="location"/><br>
+            <select>
+              <option name="gender" value="" selected>gender</option>
+              <option name="gender" value="5542539742a7313b59a037d3">male</option>
+              <option name="gender" value="5542539742a7313b59a037d4">female</option>
+            </select><br>
+            <input type="button" id="updateProfile" value="update profile"/>
+          </form>
+        </div>
+        <div id="uploadingProfilePictures">
+          <form id="uploadProfilePicturesForm" enctype="multipart/form-data">
+            <p>upload profile pictures</p>
+            <input type="file"/><br>
+            <input type="file"/><br>
+            <input type="button" id="uploadProfilePictures" value="upload profile pictures"/>
+          </form>
+        </div>
+        <div id="logingin">
+          <form id="loginForm">
+            <p>login</p>
+            <input type="text" name="email" placeholder="email"/><br>
+            <input type="text" name="password" placeholder="password"/><br>
+            <input type="button" id="login" value="login"/>
+            <input type="button" id="logout" value="logout"/>
+          </form>
+        </div>
+        <h4>output</h4>
+        <textarea id="usersOutput" rows="8" cols="8"></textarea><br>
+        <input type="button" id="clearUsersOutput" value="clear"/>
+      </div>
+
+      <div id="groups">
+        <p>groups</p>
+        <a href="#top">top</a></div>
+    </div>
+
+    <script>
+      page.base('/');
+      page('/:section', section);
+      page();
+      function section(ctx, next) {
+        console.log('path: ', ctx.path);
+        console.log('querystring: ', ctx.querystring);
+        console.log('hash: ', ctx.hash);
+        console.log(' ');
+      }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+
+      /** 
+       * Get users list.
+       */
+      $('#listUsers').on('click', function(){
+        $.get('api/users' ,function(data){
+          $('#usersOutput').val(JSON.stringify(data));
+        });
+      });
+
+      /** 
+       * Create a new user
+       */
+      $("#newUser").on('click', function() {
+        $.post("api/users/create", $("#newUserForm").serialize())
+          .done(function(data) {
+          $('#usersOutput').val(data);
+        }).fail(function(data) {
+          alert(data.status + '  (' + data.statusText +')');
+        });
+      });
+
+      /** 
+       * Change password
+       */
+      $("#changePassword").on('click', function() {
+        $.post("api/users/changePassword", $("#changePasswordForm").serialize())
+          .done(function(data) {
+          $('#usersOutput').val('Password changed');
+        }).fail(function(data) {
+          alert(data.status + '  (' + data.statusText +')\n' + data.responseText);
+        });
+      });
+
+      /** 
+       * Login user
+       */
+      $("#login").on('click', function() {
+        $.post("api/users/login", $("#loginForm").serialize())
+          .done(function(data) {
+          $('#usersOutput').val('Logged in');
+        }).fail(function(data) {
+          alert(data.status + '  (' + data.statusText +')');
+        });
+      });
+
+      /** 
+       * Update profile
+       */
+      $("#updateProfile").on('click', function() {
+        $.post("api/profiles/", $("#updateProfileForm").serialize())
+          .done(function(data) {
+          $('#usersOutput').val('Profile updated');
+        }).fail(function(data) {
+          alert(data.status + '  (' + data.statusText +')');
+        });
+      });
+
+      /** 
+       * Upload profiles pictures
+       */
+      $("#uploadProfilePictures").on('click', function() {
+        var formData = new FormData($("#uploadProfilePicturesForm")[0]);
+        $.post("api/profiles/pictures", formData
+          .done(function(data) {
+          $('#usersOutput').val(data);
+        }).fail(function(data) {
+          alert(JSON.stringify(data));
+        });
+      });
+
+      /** 
+       * Logout
+       */
+      $('#logout').on('click', function(){
+        $.get('api/users/logout' ,function(data){
+          $('#usersOutput').val('Logged out');
+        });
+      });
+
+      /** 
+       * Clear users output
+       */
+      $('#clearUsersOutput').on('click', function(){
+        $('#usersOutput').val('');
+      });
+    </script>
+  </body>
+</html>
