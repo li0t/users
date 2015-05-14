@@ -19,97 +19,109 @@
     <div id="sections">
 
       <div id="users">
-        <h4>users</h4>
-        <a href="#top">top</a></div>
-      <input type="button" id="listUsers" value="list"/>
-      <div id="signing"> 
-        <form id="newUserForm">
-          <p>create user</p>
-          <input type="text" name="email" placeholder="email"/><br>
-          <input type="text" name="password" placeholder="password"/><br>
-          <input type="button" id="newUser" value="submit"/>
-        </form>
+        <h3>users</h3>
+        <div id="signing"> 
+          <form id="newUserForm">
+            <h4>create user</h4>
+            <input type="text" name="email" placeholder="email"/><br>
+            <input type="text" name="password" placeholder="password"/><br>
+            <input type="button" id="newUser" value="submit"/>
+          </form>
+        </div>
+        <div id="changingPasswor">
+          <form id="changePasswordForm">
+            <h4>change password</h4>
+            <input type="text" name="oldPassword" placeholder="old password"/><br>
+            <input type="text" name="newPassword" placeholder="new password"/><br>
+            <input type="button" id="changePassword" value="change password"/>
+          </form>
+        </div>
+        <div id="updatingProfile">
+          <form id="updateProfileForm">
+            <h4>update profile</h4>
+            <input type="text" name="name" placeholder="name"/><br>
+            <input type="text" name="birthdate" placeholder="birthdate"/><br>
+            <input type="text" name="location" placeholder="location"/><br>
+            <select>
+              <option name="gender" value="" selected>gender</option>
+              <option name="gender" value="5542539742a7313b59a037d3">male</option>
+              <option name="gender" value="5542539742a7313b59a037d4">female</option>
+            </select><br>
+            <input type="button" id="updateProfile" value="update profile"/>
+          </form>
+        </div>
+        <div id="uploadingProfilePictures">
+          <form id="uploadProfilePicturesForm" enctype="multipart/form-data">
+            <h4>upload profile pictures</h4>
+            <input type="file" id="profilePictures" multiple/><br>
+            <input type="submit" value="upload profile pictures"/>
+          </form>
+        </div>
+        <div id="recoveringPassword">
+          <form id="recoverPasswordForm">
+            <h4>recover password</h4>
+            <input type="text" name="email" placeholder="email"/><br>
+            <input type="button" id="recoverPassword" value="recover password"/>
+          </form>
+        </div>
+        <div id="resetingPassword">
+          <form id="resetPasswordForm">
+            <h4>reset password</h4>
+            <input type="text" name="password" placeholder="new password"/><br>
+            <input type="button" id="resetPassword" value="reset password"/>
+          </form>
+        </div>
+        <div id="invitedSigningin">
+          <form id="invitedSigninForm">
+            <h4>invited signin</h4>
+            <input type="text" name="password" placeholder="select password"/><br>
+            <input type="button" id="invitedSignin" value="activate account"/>
+          </form>
+        </div>
+        <div id="logingin">
+          <form id="loginForm">
+            <h4>login</h4>
+            <input type="text" name="email" id="userEmail" placeholder="email"/><br>
+            <input type="text" name="password" placeholder="password"/><br>
+            <input type="button" id="login" value="login"/>
+            <input type="button" id="logout" value="logout"/>
+          </form>
+        </div>
+        <div>
+          <br>
+          <input type="button" id="listUsers" value="list users"/>
+          <h4>output</h4>
+          <textarea id="usersOutput" rows="8" cols="8"></textarea><br>
+          <input type="button" id="clearUsersOutput" value="clear"/><br>
+          <a href="#top">top</a>
+        </div>
       </div>
-      <div id="changingPasswor">
-        <form id="changePasswordForm">
-          <p>change password</p>
-          <input type="text" name="oldPassword" placeholder="old password"/><br>
-          <input type="text" name="newPassword" placeholder="new password"/><br>
-          <input type="button" id="changePassword" value="change password"/>
-        </form>
+      <div id="groups">
+        <h3>groups</h3>
+        <div id="listGroups">
+        </div>
+        <br>
+        <div id="thisGroup">
+        </div>
+        <div id="addGroupMembers">
+        </div>
+        <div id="creatingGroup">
+          <form id="createGroupForm">
+            <h4>create group</h4>
+            <input type="text" name="name" placeholder="group name"/><br>
+            <div  id="newGroupMembers">
+            </div>
+            <input type="button" id="createGroup" value="create"/>
+          </form>
+        </div>
+        <div>
+          <h4>output</h4>
+          <textarea id="groupsOutput" rows="8" cols="8"></textarea><br>
+          <input type="button" id="clearGroupsOutput" value="clear"/><br>
+          <a href="#top">top</a>
+        </div>
       </div>
-      <div id="updatingProfile">
-        <form id="updateProfileForm">
-          <p>update profile</p>
-          <input type="text" name="name" placeholder="name"/><br>
-          <input type="text" name="birthdate" placeholder="birthdate"/><br>
-          <input type="text" name="location" placeholder="location"/><br>
-          <select>
-            <option name="gender" value="" selected>gender</option>
-            <option name="gender" value="5542539742a7313b59a037d3">male</option>
-            <option name="gender" value="5542539742a7313b59a037d4">female</option>
-          </select><br>
-          <input type="button" id="updateProfile" value="update profile"/>
-        </form>
-      </div>
-      <div id="uploadingProfilePictures">
-        <form id="uploadProfilePicturesForm" enctype="multipart/form-data">
-          <p>upload profile pictures</p>
-          <input type="file" id="profilePictures" multiple/><br>
-          <input type="submit" value="upload profile pictures"/>
-        </form>
-      </div>
-      <div id="recoveringPassword">
-        <form id="recoverPasswordForm">
-          <p>recover password</p>
-          <input type="text" name="email" placeholder="email"/><br>
-          <input type="button" id="recoverPassword" value="recover password"/>
-        </form>
-      </div>
-      <div id="resetingPassword">
-        <form id="resetPasswordForm">
-          <p>reset password</p>
-          <input type="text" name="password" placeholder="new password"/><br>
-          <input type="button" id="resetPassword" value="reset password"/>
-        </form>
-      </div>
-      <div id="invitedSigningin">
-        <form id="invitedSigninForm">
-          <p>invited signin</p>
-          <input type="text" name="password" placeholder="select password"/><br>
-          <input type="button" id="invitedSignin" value="activate account"/>
-        </form>
-      </div>
-      <div id="logingin">
-        <form id="loginForm">
-          <p>login</p>
-          <input type="text" name="email" placeholder="email"/><br>
-          <input type="text" name="password" placeholder="password"/><br>
-          <input type="button" id="login" value="login"/>
-          <input type="button" id="logout" value="logout"/>
-        </form>
-      </div>
-      <h4>output</h4>
-      <textarea id="usersOutput" rows="8" cols="8"></textarea><br>
-      <input type="button" id="clearUsersOutput" value="clear"/>
-    </div>
 
-    <div id="groups">
-      <h4>groups</h4>
-      <a href="#top">top</a>
-      <input type="button" id="listGroups" value="list"/>
-      <div id="creatingGroup">
-        <form id="createGroupForm">
-          <p>create group</p>
-          <input type="text" name="name" placeholder="group name"/><br>
-          <div  id="newGroupMembers">
-          </div>
-          <input type="button" id="createGroup" value="create"/>
-        </form>
-      </div>
-      <h4>output</h4>
-      <textarea id="groupsOutput" rows="8" cols="8"></textarea><br>
-      <input type="button" id="clearGroupsOutput" value="clear"/>
     </div>
 
     <script>
@@ -127,32 +139,111 @@
     <script>
 
       $(document).ready(function() {
-        
-        var contacts = [];
-        
+
+        var contacts = [],
+            groups,
+            user = {};
+
+
+
+        function displayGroup() {
+
+          $('#thisGroup').empty();
+
+          $("input[type='radio'][name=group]").click(function() {
+
+            $('#thisGroup').empty().append('<p>members</p>');;
+
+            var group = this.value,
+                members;
+            $.
+            get('api/groups/' + group + '/members').
+
+            done(function(data) {
+
+              $('#thisGroup').append('<form id="thisGroupForm"></form>');
+
+              data.forEach(function(member){
+                
+                if (member.email === user.email) {
+                  
+                  member.email += ' (me)';
+                  
+                }
+                
+                $('#thisGroupForm').
+                append('<input type="checkbox" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
+
+              });
+            }).
+
+            fail(function(data) {
+              alert(data.status + '  (' + data.statusText +')');
+            });
+          });
+        }
+
         function loadAvailableGroupMembers() {
 
+          $('#newGroupMembers').empty();
+
           if (contacts.length) {
-            $('#newGroupMembers').empty().append('<p>select members</p>');  
+
+            $('#newGroupMembers').
+            append('<p>select new group members</p>');  
 
             /** Load available members of a group */
             contacts.forEach(function(contact) {
 
-              $('#newGroupMembers')
-                .append('<input type="checkbox" name="members" value="' + contact._id+ '"/>' + contact.email + '<br>');  
+              $('#newGroupMembers').
+              append('<input type="checkbox" name="members" value="' + contact._id+ '"/>' + contact.email + '<br>');  
 
             });
           }
         };
-        
+
+        function loadSessionUserGroups() {
+
+          $.
+          get('api/groups/me').
+
+          done(function(data) {
+
+            groups = data;
+
+            $('#listGroups').empty();
+
+            if (groups.length) {
+
+              $('#listGroups').
+              append('<h4>your groups</h4>');
+
+              groups.forEach(function(group) {
+
+                $('#listGroups').
+                append('<input type="radio" ' +
+                       'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
+
+              });
+            } 
+            displayGroup();
+          });
+        };
+
+        loadSessionUserGroups();
         loadAvailableGroupMembers();
-        
+
+
         /** 
          * Get users list.
          */
-        $('#listUsers').on('click', function(){
+        $('#listUsers').
+        on('click', function() {
 
-          $.get('api/users' ,function(data){
+          $.
+          get('api/users').
+
+          done(function(data) {
             $('#usersOutput').val(JSON.stringify(data));
           });
 
@@ -163,10 +254,14 @@
          */
         $("#newUser").on('click', function() {
 
-          $.post("api/users/create", $("#newUserForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/users/create", $("#newUserForm").serialize()).
+
+          done(function(data) {
             $('#usersOutput').val(data);
-          }).fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')');
           });
 
@@ -177,10 +272,14 @@
          */
         $("#changePassword").on('click', function() {
 
-          $.post("api/users/changePassword", $("#changePasswordForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/users/changePassword", $("#changePasswordForm").serialize()).
+
+          done(function(data) {
             $('#usersOutput').val('Password changed');
-          }).fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')\n' + data.responseText);
           });
 
@@ -191,10 +290,14 @@
          */
         $("#invitedSignin").on('click', function() {
 
-          $.post("api/users/invited/signin", $("#invitedSigninForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/users/invited/signin", $("#invitedSigninForm").serialize()).
+
+          done(function(data) {
             $('#usersOutput').val('Account activated, welcome to emeeter');
-          }).fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')\n' + data.responseText);
           });
 
@@ -205,22 +308,30 @@
          */
         $("#login").on('click', function() {
 
-          $.post("api/users/login", $("#loginForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/users/login", $("#loginForm").serialize()).
 
-            /** Load user contacts */
-            $.get('api/contacts' ,function(data) {
+          done(function(data) {
+
+            user.email = $("#userEmail").val();
+
+            $. /* Load user contacts */
+            get('api/contacts').
+
+            done(function(data) {
 
               contacts = data;
-              
+
+              loadSessionUserGroups();
               loadAvailableGroupMembers();
 
             });
 
             $('#usersOutput').val('Logged in');
 
-          })
-            .fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')');
           });
 
@@ -231,10 +342,14 @@
          */
         $("#recoverPassword").on('click', function() {
 
-          $.post("api/users/recover", $("#recoverPasswordForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/users/recover", $("#recoverPasswordForm").serialize()).
+
+          done(function(data) {
             $('#usersOutput').val(data);
-          }).fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')');
           });
 
@@ -245,10 +360,14 @@
          */
         $("#resetPassword").on('click', function() {
 
-          $.post("api/users/resetPassword", $("#resetPasswordForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/users/resetPassword", $("#resetPasswordForm").serialize()).
+
+          done(function(data) {
             $('#usersOutput').val(data);
-          }).fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')');
           });
 
@@ -259,10 +378,14 @@
          */
         $("#updateProfile").on('click', function() {
 
-          $.post("api/profiles/", $("#updateProfileForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/profiles/", $("#updateProfileForm").serialize()).
+
+          done(function(data) {
             $('#usersOutput').val('Profile updated');
-          }).fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')');
           });
 
@@ -290,9 +413,11 @@
             data: formData,
             processData: false,
             contentType: false,
+
             success: function(data) {
               $('#usersOutput').val(data);
             },
+
             error: function(data) {
               alert(data);
             }
@@ -305,7 +430,21 @@
          */
         $('#logout').on('click', function(){
 
-          $.get('api/users/logout' ,function(data){
+          $.
+          get('api/users/logout').
+
+          done(function(data) {
+            
+            user = {};
+  
+            $('#newGroupMembers').empty();
+            
+            $('#listGroups').empty();
+            
+            if($('#thisGroup')) { 
+              $('#thisGroup').empty();
+            }
+            
             $('#usersOutput').val('Logged out');
           });
 
@@ -314,33 +453,25 @@
         /** 
          * Clear users output
          */
-        $('#clearUsersOutput').on('click', function(){
+        $('#clearUsersOutput').on('click', function() {
 
           $('#usersOutput').val('');
 
         });
 
         /** 
-         * Get groups session user is part of
-         */
-        $('#listGroups').on('click', function(){
-
-          $.get('api/groups/me' ,function(data){
-            $('#groupsOutput').val(JSON.stringify(data));
-          });
-
-        });
-
-
-        /** 
          * Create group
          */
         $("#createGroup").on('click', function() {
 
-          $.post("api/groups/create", $("#createGroupForm").serialize())
-            .done(function(data) {
+          $.
+          post("api/groups/create", $("#createGroupForm").serialize()).
+
+          done(function(data) {
             $('#groupsOutput').val('group ' + data + ' created');
-          }).fail(function(data) {
+          }).
+
+          fail(function(data) {
             alert(data.status + '  (' + data.statusText +')');
           });
 

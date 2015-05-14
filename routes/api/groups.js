@@ -170,7 +170,7 @@ module.exports = function (router, mongoose) {
   /**
    * Remove member from group
    */
-  router.post('/:groupId/removeMembers', function(req, res, next) {
+  router.post('/:groupId/removeMembers', function(req, res, next) { /** TODO: check entries of a deleted */
 
     var toRemove, removed = 0,
         lostAdmin = false,
@@ -242,12 +242,12 @@ module.exports = function (router, mongoose) {
 
               res.sendStatus(410);
 
-              Group.remove({_id : group._id}, function(err){
-                if(err) { 
+              /** Group.remove({_id : group._id}, function(err) {
+                if (err) { 
                   debug(err);
                 }
 
-              });
+              }); */
 
             }
           } else {
