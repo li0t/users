@@ -311,11 +311,12 @@ module.exports = function (router, mongoose) {
         toCheck = 0,
         toPopulate = 0,
         populated = 0,
+        contacts = [],
 
-        send = function (found) {
+        send = function () {
 
           if (checked === toCheck && populated === toPopulate) {
-            res.send(found);
+            res.send(contacts);
           }
         };
 
@@ -341,22 +342,24 @@ module.exports = function (router, mongoose) {
 
             toPopulate += 1;
 
-            contact.deepPopulate('user.profile', function(err) {
+            contact.deepPopulate('user.profile', function(err, contact) {
 
               if (err) {
                 debug(err);
 
               } else {
+                
                 populated += 1;
+                contacts.push(contact.user);
 
                 if (populated === toPopulate) {
-                  send(found.contacts);
+                  send();
                 }
               }
             }); 
 
           } else if (checked === toCheck) {
-            send(found.contacts);
+            send();
           }
         });
 
