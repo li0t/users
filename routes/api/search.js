@@ -5,7 +5,7 @@ var //bcrypt = require('bcrypt'),
 //_ = require('underscore'),
 debug = require('debug')('app:api:search');
 
-module.exports = function (router, mongoose) {
+module.exports = function (router, mongoose) { /** TODO: Validate if user is active*/
 
   var User = mongoose.model('user')/*,
       Contact = mongoose.model('contact')*/;

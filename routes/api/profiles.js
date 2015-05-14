@@ -20,16 +20,16 @@ module.exports = function (router, mongoose) {
     var genders = statics.models.gender,
         _gender,
         gender = null;
-    
+
     for (_gender in genders) { /** Search the gender id and check that exists */
-      
+
       if (genders.hasOwnProperty(_gender)) {
-        
+
         if (JSON.stringify(genders[_gender]._id) === JSON.stringify(req.body.gender)) {
-          
+
           gender = req.body.gender;
           break;
-          
+
         }
       }
     }
@@ -79,7 +79,9 @@ module.exports = function (router, mongoose) {
 
     var profile, /* This is the target schema */
         saved = 0;
-    debug(req.files);
+
+    debug('req.files: %s',req.files);
+
     /**
      * Create the document with the saved File ids
      */

@@ -162,7 +162,15 @@ module.exports = function (router, mongoose) {
    */
   router.post('/recover', function (req, res/*, next*/) {
 
-    res.redirect('/api/mandrill/recover/'+req.body.email);
+    var email = req.body.email;
+
+    if (email) {
+
+      res.redirect('/api/mandrill/recover/' + email);
+
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 
@@ -444,20 +452,21 @@ module.exports = function (router, mongoose) {
    */
   router.post('/invited/signin',  function(req, res , next) {
 
-    var token = req.session.token;
+    var token = req.session.token,
+        password = req.body.password;
 
     if (token.user && token.sender) {
+      
+      if (password) {
+        
+        User.findById(token.user, function(err, user) {
 
-      User.findById(token.user, function(err, user) {
+          if (err) {
+            next(err);
 
-        if (err) {
-          next(err);
+          } else if (user) {
 
-        } else if (user) {
-
-          if(req.body.password){
-
-            user.password = req.body.password;
+            user.password = password;
 
             user.state = statics.model('state', 'active')._id;
 
@@ -476,13 +485,14 @@ module.exports = function (router, mongoose) {
 
               }
             });
+
           } else {
-            res.sendStatus(400);
+            res.sendStatus(404);
           }
-        } else {
-          res.sendStatus(404);
-        }
-      });
+        });
+      } else {
+        res.sendStatus(400);
+      }
     } else {
       res.sendStatus(403);
     }
