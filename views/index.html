@@ -140,41 +140,57 @@
 
       $(document).ready(function() {
 
-        var contacts = [],
+        var contacts,
             groups,
-            user = {};
+            user,
+            group,
+            admin,
+            members;
 
-
-
-        function displayGroup() {
-
-          $('#thisGroup').empty();
+        function displayGroups() {
 
           $("input[type='radio'][name=group]").click(function() {
 
             $('#thisGroup').empty().append('<p>members</p>');;
 
-            var group = this.value,
-                members;
+            group = this.value;
+
+
             $.
             get('api/groups/' + group + '/members').
 
             done(function(data) {
 
+              members = data;
+
               $('#thisGroup').append('<form id="thisGroupForm"></form>');
 
               data.forEach(function(member){
-                
-                if (member.email === user.email) {
-                  
-                  member.email += ' (me)';
-                  
+
+                if (member._id === admin[group]) {
+
+                  member.email += ' (admin)';
+
                 }
-                
+
+                if (member.email === user.email) {
+
+                  member.email += ' (me)';
+
+                }
+
                 $('#thisGroupForm').
                 append('<input type="checkbox" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
 
               });
+
+              if (user._id === admin[group]) { 
+
+                $('#thisGroupForm').
+                append('<input type="button" id="removeGroupMembers" value="remove members"/>');
+
+              }
+
             }).
 
             fail(function(data) {
@@ -183,11 +199,9 @@
           });
         }
 
-        function loadAvailableGroupMembers() {
+        function loadContacts() {
 
-          $('#newGroupMembers').empty();
-
-          if (contacts.length) {
+          if (contacts && contacts.length) {
 
             $('#newGroupMembers').
             append('<p>select new group members</p>');  
@@ -202,36 +216,57 @@
           }
         };
 
-        function loadSessionUserGroups() {
+        function loadSession() {
 
-          $.
-          get('api/groups/me').
+          $('#thisGroup').empty();
+          $('#listGroups').empty();
+          $('#newGroupMembers').empty();
+
+          $./* Load session user */
+          get('api/users/session').
 
           done(function(data) {
 
-            groups = data;
+            user = data;
+                  
+            $. /* Load session user contacts */
+            get('api/contacts').
 
-            $('#listGroups').empty();
+            done(function(data) {
 
-            if (groups.length) {
+              contacts = data;
 
-              $('#listGroups').
-              append('<h4>your groups</h4>');
+              $./* Load session user groups */
+              get('api/groups/me').
 
-              groups.forEach(function(group) {
+              done(function(data) {
 
-                $('#listGroups').
-                append('<input type="radio" ' +
-                       'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
+                admin = {};
+                groups = data;
 
+                if (groups.length) {
+
+                  $('#listGroups').
+                  append('<h4>your groups</h4>');
+
+                  groups.forEach(function(group) {
+
+                    $('#listGroups').
+                    append('<input type="radio" ' +
+                           'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
+
+                    admin[group._id] = group.admin;
+
+                  });
+                } 
+                displayGroups();
+                loadContacts();
               });
-            } 
-            displayGroup();
+            });
           });
         };
 
-        loadSessionUserGroups();
-        loadAvailableGroupMembers();
+        loadSession();
 
 
         /** 
@@ -313,20 +348,7 @@
 
           done(function(data) {
 
-            user.email = $("#userEmail").val();
-
-            $. /* Load user contacts */
-            get('api/contacts').
-
-            done(function(data) {
-
-              contacts = data;
-
-              loadSessionUserGroups();
-              loadAvailableGroupMembers();
-
-            });
-
+            loadSession();
             $('#usersOutput').val('Logged in');
 
           }).
@@ -434,17 +456,17 @@
           get('api/users/logout').
 
           done(function(data) {
-            
+
             user = {};
-  
+
             $('#newGroupMembers').empty();
-            
+
             $('#listGroups').empty();
-            
+
             if($('#thisGroup')) { 
               $('#thisGroup').empty();
             }
-            
+
             $('#usersOutput').val('Logged out');
           });
 
@@ -474,6 +496,27 @@
           fail(function(data) {
             alert(data.status + '  (' + data.statusText +')');
           });
+
+        });
+
+        /** 
+         * Remove group members
+         */
+        $("#removeGroupMembers").click(function() {
+
+          /*$.
+          post("api/groups/removeMembers", $("#thisGroupForm").serialize()).
+
+          done(function(data) {
+            $('#groupsOutput').val(data);
+          }).
+
+          fail(function(data) {
+            alert(data.status + '  (' + data.statusText +')');
+          });*/
+          console.log('yes');
+          console.log($("#thisGroupForm").serialize());
+          alert($("#thisGroupForm").serialize());
 
         });
 
