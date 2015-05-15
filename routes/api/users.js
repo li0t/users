@@ -456,9 +456,9 @@ module.exports = function (router, mongoose) {
         password = req.body.password;
 
     if (token.user && token.sender) {
-      
+
       if (password) {
-        
+
         User.findById(token.user, function(err, user) {
 
           if (err) {
@@ -552,14 +552,46 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Get a user and renders it's profile
+   * Get the session user
+   */
+  router.get('/session', function (req, res, next) {
+
+    User.
+
+    findById(req.session.user._id).
+    deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
+
+    exec(function (err, user) {
+
+      if (err) {
+
+        if(err.name && err.name === 'CastError') {
+
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
+      } else if (user) {
+
+        res.send(user);
+
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
+  /**
+   * Get a user and populate it's profile
    */
   router.get('/:id', function (req, res, next) {
 
     User.
 
     findById(req.params.id).
-    deepPopulate('state profile.gender profile.contacts profile.pictures'). /* Retrieves data from linked schemas */
+    deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
 
     exec(function (err, user) {
 
