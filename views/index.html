@@ -1,135 +1,141 @@
-  
-  <body>
 
-    <h1 id="top">emeeter</h1>
+<body>
 
-    <ul>
-      <li><a href="#">/#</a></li>
-      <li><a href="#users">/users</a></li>
-      <li><a href="#groups">/groups</a></li>
-    </ul>
+  <h1 id="top">emeeter</h1>
 
-    <div id="sections">
+  <ul>
+    <li><a href="#">/#</a></li>
+    <li><a href="#users">/users</a></li>
+    <li><a href="#groups">/groups</a></li>
+  </ul>
 
-      <div id="users">
-        <h3>users</h3>
-        <div id="signing"> 
-          <form id="newUserForm">
-            <h4>create user</h4>
-            <input type="text" name="email" placeholder="email"/><br>
-            <input type="text" name="password" placeholder="password"/><br>
-            <input type="button" id="newUser" value="submit"/>
-          </form>
-        </div>
-        <div id="changingPasswor">
-          <form id="changePasswordForm">
-            <h4>change password</h4>
-            <input type="text" name="oldPassword" placeholder="old password"/><br>
-            <input type="text" name="newPassword" placeholder="new password"/><br>
-            <input type="button" id="changePassword" value="change password"/>
-          </form>
-        </div>
-        <div id="updatingProfile">
-          <form id="updateProfileForm">
-            <h4>update profile</h4>
-            <input type="text" name="name" placeholder="name"/><br>
-            <input type="text" name="birthdate" placeholder="birthdate"/><br>
-            <input type="text" name="location" placeholder="location"/><br>
-            <select>
-              <option name="gender" value="" selected>gender</option>
-              <option name="gender" value="5542539742a7313b59a037d3">male</option>
-              <option name="gender" value="5542539742a7313b59a037d4">female</option>
-            </select><br>
-            <input type="button" id="updateProfile" value="update profile"/>
-          </form>
-        </div>
-        <div id="uploadingProfilePictures">
-          <form id="uploadProfilePicturesForm" enctype="multipart/form-data">
-            <h4>upload profile pictures</h4>
-            <input type="file" id="profilePictures" multiple/><br>
-            <input type="submit" value="upload profile pictures"/>
-          </form>
-        </div>
-        <div id="recoveringPassword">
-          <form id="recoverPasswordForm">
-            <h4>recover password</h4>
-            <input type="text" name="email" placeholder="email"/><br>
-            <input type="button" id="recoverPassword" value="recover password"/>
-          </form>
-        </div>
-        <div id="resetingPassword">
-          <form id="resetPasswordForm">
-            <h4>reset password</h4>
-            <input type="text" name="password" placeholder="new password"/><br>
-            <input type="button" id="resetPassword" value="reset password"/>
-          </form>
-        </div>
-        <div id="invitedSigningin">
-          <form id="invitedSigninForm">
-            <h4>invited signin</h4>
-            <input type="text" name="password" placeholder="select password"/><br>
-            <input type="button" id="invitedSignin" value="activate account"/>
-          </form>
-        </div>
-        <div id="logingin">
-          <form id="loginForm">
-            <h4>login</h4>
-            <input type="text" name="email" id="userEmail" placeholder="email"/><br>
-            <input type="text" name="password" placeholder="password"/><br>
-            <input type="button" id="login" value="login"/>
-            <input type="button" id="logout" value="logout"/>
-          </form>
-        </div>
-        <div>
-          <br>
-          <input type="button" id="listUsers" value="list users"/>
-          <h4>output</h4>
-          <textarea id="usersOutput" rows="8" cols="8"></textarea><br>
-          <input type="button" id="clearUsersOutput" value="clear"/><br>
-          <a href="#top">top</a>
-        </div>
+  <div id="sections">
+
+    <div id="users">
+      <h3>users</h3>
+
+      <form id="searchUserForm">
+        <h4>search a user</h4>
+        <input type="text" name="email" placeholder="email"/><br>
+        <input type="button" id="searchUser" value="search"/>
+      </form>
+      <div id="signing"> 
+        <form id="newUserForm">
+          <h4>create user</h4>
+          <input type="text" name="email" placeholder="email"/><br>
+          <input type="text" name="password" placeholder="password"/><br>
+          <input type="button" id="newUser" value="submit"/>
+        </form>
       </div>
-      
-      <div id="groups">
-        <h3>groups</h3>
-        <div id="listGroups">
-        </div>
+      <div id="changingPasswor">
+        <form id="changePasswordForm">
+          <h4>change password</h4>
+          <input type="text" name="oldPassword" placeholder="old password"/><br>
+          <input type="text" name="newPassword" placeholder="new password"/><br>
+          <input type="button" id="changePassword" value="change password"/>
+        </form>
+      </div>
+      <div id="updatingProfile">
+        <form id="updateProfileForm">
+          <h4>update profile</h4>
+          <input type="text" name="name" placeholder="name"/><br>
+          <input type="text" name="birthdate" placeholder="birthdate"/><br>
+          <input type="text" name="location" placeholder="location"/><br>
+          <select>
+            <option name="gender" value="" selected>gender</option>
+            <option name="gender" value="5542539742a7313b59a037d3">male</option>
+            <option name="gender" value="5542539742a7313b59a037d4">female</option>
+          </select><br>
+          <input type="button" id="updateProfile" value="update profile"/>
+        </form>
+      </div>
+      <div id="uploadingProfilePictures">
+        <form id="uploadProfilePicturesForm" enctype="multipart/form-data">
+          <h4>upload profile pictures</h4>
+          <input type="file" id="profilePictures" multiple/><br>
+          <input type="submit" value="upload profile pictures"/>
+        </form>
+      </div>
+      <div id="recoveringPassword">
+        <form id="recoverPasswordForm">
+          <h4>recover password</h4>
+          <input type="text" name="email" placeholder="email"/><br>
+          <input type="button" id="recoverPassword" value="recover password"/>
+        </form>
+      </div>
+      <div id="resetingPassword">
+        <form id="resetPasswordForm">
+          <h4>reset password</h4>
+          <input type="text" name="password" placeholder="new password"/><br>
+          <input type="button" id="resetPassword" value="reset password"/>
+        </form>
+      </div>
+      <div id="invitedSigningin">
+        <form id="invitedSigninForm">
+          <h4>invited signin</h4>
+          <input type="text" name="password" placeholder="select password"/><br>
+          <input type="button" id="invitedSignin" value="activate account"/>
+        </form>
+      </div>
+      <div id="logingin">
+        <form id="loginForm">
+          <h4>login</h4>
+          <input type="text" name="email" id="userEmail" placeholder="email"/><br>
+          <input type="password" name="password" placeholder="password"/><br>
+          <input type="button" id="login" value="login"/>
+          <input type="button" id="logout" value="logout"/>
+        </form>
+      </div>
+      <div>
         <br>
-        <div id="thisGroup">
-        </div>
-        <div id="addGroupMembers">
-        </div>
-        <div id="creatingGroup">
-          <form id="createGroupForm">
-            <h4>create group</h4>
-            <input type="text" name="name" placeholder="group name"/><br>
-            <div  id="newGroupMembers">
-            </div>
-            <input type="button" id="createGroup" value="create"/>
-          </form>
-        </div>
-        <div>
-          <h4>output</h4>
-          <textarea id="groupsOutput" rows="8" cols="8"></textarea><br>
-          <input type="button" id="clearGroupsOutput" value="clear"/><br>
-          <a href="#top">top</a>
-        </div>
+        <input type="button" id="listUsers" value="list users"/>
+        <h4>output</h4>
+        <textarea id="usersOutput" rows="8" cols="8"></textarea><br>
+        <input type="button" id="clearUsersOutput" value="clear"/><br>
+        <a href="#top">top</a>
       </div>
-
     </div>
-    
-    <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
-    <script>
-      page.base('/');
-      page('/:section', section);
-      page();
-      function section(ctx, next) {
-        console.log('path: ', ctx.path);
-        console.log('querystring: ', ctx.querystring);
-        console.log('hash: ', ctx.hash);
-        console.log(' ');
-      }
-    </script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    
-  </body>
+
+    <div id="groups">
+      <h3>groups</h3>
+      <div id="listGroups">
+      </div>
+      <br>
+      <div id="thisGroup">
+      </div>
+      <div id="addGroupMembers">
+      </div>
+      <div id="creatingGroup">
+        <form id="createGroupForm">
+          <h4>create group</h4>
+          <input type="text" name="name" placeholder="group name"/><br>
+          <div  id="newGroupMembers">
+          </div>
+          <input type="button" id="createGroup" value="create"/>
+        </form>
+      </div>
+      <div>
+        <h4>output</h4>
+        <textarea id="groupsOutput" rows="8" cols="8"></textarea><br>
+        <input type="button" id="clearGroupsOutput" value="clear"/><br>
+        <a href="#top">top</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
+  <script>
+    page.base('/');
+    page('/:section', section);
+    page();
+    function section(ctx, next) {
+      console.log('path: ', ctx.path);
+      console.log('querystring: ', ctx.querystring);
+      console.log('hash: ', ctx.hash);
+      console.log(' ');
+    }
+  </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+</body>

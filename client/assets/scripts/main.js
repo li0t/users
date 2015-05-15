@@ -236,6 +236,43 @@ $(document).ready(function() {
   });
 
   /** 
+   * Search a user
+   */
+  $("#searchUser").on('click', function() {
+    
+    console.log($("#searchUserForm"));
+
+    $.
+    post("api/search/email", $("#searchUserForm").serialize()).
+
+    done(function(data) {
+      $('#usersOutput').val(data);
+    }).
+
+    fail(function(data) {
+
+      if (data.status === 404) {
+
+        $('#usersOutput').val(data.statusText);
+
+        if (confirm("User (email) was not found, would you like send an emeeter invite?") === true) {
+          $('#usersOutput').val("You pressed OK!");
+          /** redirect */
+        } else {
+          $('#usersOutput').val("You pressed Cancel!");
+        }
+
+      } else {
+
+        alert(data.status + '  (' + data.statusText +')');
+
+      }
+
+    });
+
+  });
+
+  /** 
    * Create a new user
    */
   $("#newUser").on('click', function() {

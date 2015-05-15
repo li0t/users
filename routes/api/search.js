@@ -12,30 +12,39 @@ module.exports = function (router, mongoose) { /** TODO: Validate if user is act
 
   router.post('/email', function(req, res, next){
 
-    User.findOne().
+    var email = req.body.email;
 
-    where('email', req.body.email).
+    if (email) {
 
-    exec(function(err, user) {
+      User.findOne().
 
-      if (err) {
+      where('email', email).
 
-        if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
-          res.sendStatus(400);
+      exec(function(err, user) {
+
+        if (err) {
+
+          if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
+
+        } else if (user) {
+
+          res.send(user._id);
+
         } else {
-          next(err);
+          debug("User %s was not found",  req.body.email);
+          res.sendStatus(404); 
         }
-
-      } else if (user) {
-
-        res.send(user._id);
-
-      } else {
-        debug("User %s was not found and an invitation email it's beign sent",  req.body.email);
-        res.redirect('/api/users/createAndInvite/' + req.body.email); 
-      }
-    });
-
+      });
+    } else {
+      
+      res.sendStatus(400);
+      
+    }
   });
+
 
 };
