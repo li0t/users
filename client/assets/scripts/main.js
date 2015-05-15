@@ -15,9 +15,13 @@ $(document).ready(function() {
 
   function displayGroups() {
 
+    var email, isMemeber, i, $this;
+
     $("input[type='radio'][name=group]").click(function() {
 
       $('#thisGroup').empty().append('<p>members</p>');
+
+      $this = $(this);
 
       group = this.value;
 
@@ -33,27 +37,106 @@ $(document).ready(function() {
 
         data.forEach(function(member){
 
-          if (member._id === admin[group]) {
-
-            member.email += ' (admin)';
-
-          }
+          email = member.email;
 
           if (member.email === user.email) {
 
-            member.email += ' (me)';
+            email += ' (me)';
 
           }
 
+          if (member._id === admin[group]) {
+
+            email += ' (admin)';
+
+          } 
+
           $('#thisGroupForm').
-          append('<input type="checkbox" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
+          append('<input type="checkbox" name="members" value="' + member._id+ '"/>' + email + '<br>');
 
         });
 
         if (user._id === admin[group]) { 
 
-          $('#thisGroupForm').
+          $('#thisGroup').
           append('<input type="button" id="removeGroupMembers" value="remove members"/>');
+
+          /** 
+           *Remove group members 
+           */
+          $("#removeGroupMembers").click(function() {
+
+            $.
+            post("api/groups/" + group + "/removeMembers", $("#thisGroupForm").serialize()).
+
+            done(function(data) {
+
+              $('#thisGroup').empty();
+              $this.click();
+              $('#groupsOutput').val(data);
+
+            }).
+
+            fail(function(data) {
+              alert(data.status + '  (' + data.statusText +')');
+            });
+
+          });
+
+        }
+
+        if (contacts.length) {
+
+          $('#thisGroup').append('<form id="groupNewMembersForm"></form>');
+
+          /** Load contacts */
+          contacts.forEach(function(contact) {
+
+            isMemeber = false;
+
+            for (i = 0; i < members.length; i++) {
+              if (members[i]._id === contact._id) {
+                isMemeber = true;
+                break;
+              }
+            }
+
+            if (!isMemeber) {
+              $('#groupNewMembersForm').
+              append('<input type="checkbox" name="members" value="' + contact._id+ '"/>' + contact.email + '<br>');  
+            }
+          });
+
+
+          if (document.getElementById('groupNewMembersForm').hasChildNodes()) {
+
+            $("<p>add new members</p>").insertBefore("#groupNewMembersForm");
+
+            $('#thisGroup').
+            append('<input type="button" id="addGroupMembers" value="add members"/>');
+          }
+
+          /** 
+           * Add group members 
+           */
+          $("#addGroupMembers").click(function() {
+
+            $.
+            post("api/groups/" + group + "/addMembers", $("#groupNewMembersForm").serialize()).
+
+            done(function(data) {
+
+              $('#thisGroup').empty();
+              $this.click();
+              $('#groupsOutput').val(data);
+
+            }).
+
+            fail(function(data) {
+              alert(data.status + '  (' + data.statusText +')');
+            });
+
+          });
 
         }
 
@@ -67,7 +150,7 @@ $(document).ready(function() {
 
   function loadContacts() {
 
-    if (contacts && contacts.length) {
+    if (contacts.length) {
 
       $('#newGroupMembers').
       append('<p>select new group members</p>');  
@@ -127,6 +210,7 @@ $(document).ready(function() {
           } 
           displayGroups();
           loadContacts();
+          alert('Welcome ' + user.email);
         });
       });
     });
@@ -137,8 +221,8 @@ $(document).ready(function() {
 
 
   /** 
-         * Get users list.
-         */
+   * Get users list.
+   */
   $('#listUsers').
   on('click', function() {
 
@@ -152,8 +236,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Create a new user
-         */
+   * Create a new user
+   */
   $("#newUser").on('click', function() {
 
     $.
@@ -170,8 +254,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Change password
-         */
+   * Change password
+   */
   $("#changePassword").on('click', function() {
 
     $.
@@ -188,8 +272,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Invited signin
-         */
+   * Invited signin
+   */
   $("#invitedSignin").on('click', function() {
 
     $.
@@ -206,8 +290,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Login user
-         */
+   * Login user
+   */
   $("#login").on('click', function() {
 
     $.
@@ -227,8 +311,8 @@ $(document).ready(function() {
   });
 
   /**
-         * Recover password
-         */
+   * Recover password
+   */
   $("#recoverPassword").on('click', function() {
 
     $.
@@ -245,8 +329,8 @@ $(document).ready(function() {
   });
 
   /**
-         * Reset password
-         */
+   * Reset password
+   */
   $("#resetPassword").on('click', function() {
 
     $.
@@ -263,8 +347,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Update profile
-         */
+   * Update profile
+   */
   $("#updateProfile").on('click', function() {
 
     $.
@@ -281,8 +365,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Upload profiles pictures
-         */
+   * Upload profiles pictures
+   */
   $("#uploadProfilePicturesForm").on('submit', function(e) {
 
     e.preventDefault();
@@ -315,8 +399,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Logout
-         */
+   * Logout
+   */
   $('#logout').on('click', function(){
 
     $.
@@ -334,14 +418,16 @@ $(document).ready(function() {
         $('#thisGroup').empty();
       }
 
+      $('#groupsOutput').val('');
+
       $('#usersOutput').val('Logged out');
     });
 
   });
 
   /** 
-         * Clear users output
-         */
+   * Clear users output
+   */
   $('#clearUsersOutput').on('click', function() {
 
     $('#usersOutput').val('');
@@ -349,8 +435,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Create group
-         */
+   * Create group
+   */
   $("#createGroup").on('click', function() {
 
     $.
@@ -367,29 +453,8 @@ $(document).ready(function() {
   });
 
   /** 
-         * Remove group members
-         */
-  $("#removeGroupMembers").click(function() {
-
-    /*$.
-          post("api/groups/removeMembers", $("#thisGroupForm").serialize()).
-
-          done(function(data) {
-            $('#groupsOutput').val(data);
-          }).
-
-          fail(function(data) {
-            alert(data.status + '  (' + data.statusText +')');
-          });*/
-    console.log('yes');
-    console.log($("#thisGroupForm").serialize());
-    alert($("#thisGroupForm").serialize());
-
-  });
-
-  /** 
-         * Clear groups output
-         */
+   * Clear groups output
+   */
   $('#clearGroupsOutput').on('click', function(){
 
     $('#groupsOutput').val('');
