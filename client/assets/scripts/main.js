@@ -15,7 +15,7 @@ $(document).ready(function() {
 
   function displayGroups() {
 
-    var email, isMemeber, i, $this;
+    var email, isMemeber, i, $this, newAdmin;
 
     $("input[type='radio'][name=group]").click(function() {
 
@@ -35,7 +35,7 @@ $(document).ready(function() {
 
         $('#thisGroup').append('<form id="thisGroupForm"></form>');
 
-        data.forEach(function(member){
+        members.forEach(function(member) {
 
           email = member.email;
 
@@ -58,12 +58,13 @@ $(document).ready(function() {
 
         if (user._id === admin[group]) { 
 
+
+          /** 
+           * Remove group members 
+           */
           $('#thisGroup').
           append('<input type="button" id="removeGroupMembers" value="remove members"/>');
 
-          /** 
-           *Remove group members 
-           */
           $("#removeGroupMembers").click(function() {
 
             $.
@@ -71,7 +72,47 @@ $(document).ready(function() {
 
             done(function(data) {
 
-              $('#thisGroup').empty();
+              $this.click();
+              $('#groupsOutput').val(data);
+
+            }).
+
+            fail(function(data) {
+              alert(data.status + '  (' + data.statusText +')');
+            });
+
+          });
+
+          /** 
+           * Change group administrator
+           */
+
+          $('#thisGroup').append('<form id="thisGroupNewAdminForm"></form>');
+
+          members.forEach(function(member) {
+
+            if (member._id !== admin[group]) {
+
+              $('#thisGroupNewAdminForm').
+              append('<input type="radio" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
+
+            } 
+
+          });
+
+          $('#thisGroup').
+          append('<input type="button" id="changeGroupAdmin" value="change admin"/>');
+
+          $("#changeGroupAdmin").click(function() {
+
+            newAdmin = $('#thisGroupNewAdminForm').find('input[name="members"]:checked').val();
+
+            $.
+            get("api/groups/" + group + "/changeAdmin/" + newAdmin).
+
+            done(function(data) {
+
+              admin[group] = newAdmin;
               $this.click();
               $('#groupsOutput').val(data);
 
@@ -239,14 +280,52 @@ $(document).ready(function() {
    * Search a user
    */
   $("#searchUser").on('click', function() {
-    
-    console.log($("#searchUserForm"));
+
+    var email = $('#searchUserForm').find('input[name="email"]').val(),
+        isContact = false, i;
 
     $.
     post("api/search/email", $("#searchUserForm").serialize()).
 
     done(function(data) {
-      $('#usersOutput').val(data);
+
+      if (user._id === data) { 
+
+        $('#usersOutput').val("That's yourself, great!");
+
+      } else {
+
+        for (i = 0; i < contacts.length; i++) { 
+
+          if (contacts[i]._id === data) {
+            
+            isContact = true;
+            $('#usersOutput').val("That's your old friend " + data);
+            break;
+            
+          }
+        }
+        
+        if (!isContact) {
+          
+          if (confirm("User " + email + " was found, would you like send a contact request") === true) {
+
+          $. /* Create a new user and invite it to emeeter */
+          get('api/contacts/add/' + data).
+
+          done(function(data) {
+            $('#usersOutput').val(data);
+          }).
+
+          fail(function(data) {
+            alert(data.status + '  (' + data.statusText +')');
+          });
+        } else {
+          $('#usersOutput').val("User " + data);
+        }
+          
+        }
+      }
     }).
 
     fail(function(data) {
@@ -255,19 +334,26 @@ $(document).ready(function() {
 
         $('#usersOutput').val(data.statusText);
 
-        if (confirm("User (email) was not found, would you like send an emeeter invite?") === true) {
-          $('#usersOutput').val("You pressed OK!");
-          /** redirect */
-        } else {
-          $('#usersOutput').val("You pressed Cancel!");
-        }
+        if (confirm("User " + email + " was not found, would you like send an emeeter invite?") === true) {
 
+          $. /* Create a new user and invite it to emeeter */
+          get('api/users/createAndInvite/' + email).
+
+          done(function(data) {
+            $('#usersOutput').val(data);
+          }).
+
+          fail(function(data) {
+            alert(data.status + '  (' + data.statusText +')');
+          });
+        } else {
+          $('#usersOutput').val("User not found!");
+        }
       } else {
 
         alert(data.status + '  (' + data.statusText +')');
 
       }
-
     });
 
   });
@@ -337,6 +423,7 @@ $(document).ready(function() {
     done(function() {
 
       loadSession();
+      $('#loginForm')[0].reset();
       $('#usersOutput').val('Logged in');
 
     }).
