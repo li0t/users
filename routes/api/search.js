@@ -1,9 +1,12 @@
 /* jshint node: true */
+/* global component */
 'use strict';
 
 var //bcrypt = require('bcrypt'),
 //_ = require('underscore'),
 debug = require('debug')('app:api:search');
+
+var statics = component('statics');
 
 module.exports = function (router, mongoose) { /** TODO: Validate if user is active*/
 
@@ -19,6 +22,8 @@ module.exports = function (router, mongoose) { /** TODO: Validate if user is act
       User.findOne().
 
       where('email', email).
+      
+      where('state', statics.model('state', 'active')._id).
 
       exec(function(err, user) {
 
