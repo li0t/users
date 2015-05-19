@@ -386,14 +386,33 @@ module.exports = function (router, mongoose) {
         save(function(err, user) {
 
           if (err) {
-            /* Check for duplicated entry */
+            /** The user is already in the platform */
             if (err.code && err.code === 11000) {
-            } else if(err.name && err.name === 'ValidationError'){
+              
+              User.   
+              findOne().
+              where('email', email).
+              exec(function(err, user) {
+                if (err) {
+                  next(err);
+                } else if (user){
+                  /** Send contact request */
+                  res.redirect('/api/contacts/add/' + user._id);
+                }
+              });
+            } else if (err.name && err.name === 'ValidationError') {
               res.sendStatus(400);
             } else {
               next(err);
             }
 
+            Profile. /** Remove unnecessary new profile */
+            remove({ _id: profile._id  }).
+            exec(function(err) {
+              if (err) {
+                debug(err);
+              }
+            });
           } else {
 
             new Contact({user: user._id}).
@@ -403,8 +422,8 @@ module.exports = function (router, mongoose) {
               if (err) {
                 next(err);
               } else {
-
-                res.redirect('/api/mandrill/invite/'+user._id);
+                /** Send invite to the platform */
+                res.redirect('/api/mandrill/invite/'+ user._id);
 
               }
             });
@@ -421,9 +440,9 @@ module.exports = function (router, mongoose) {
   /**
    * Invited user Token validation
    */
-  router.get('/invited/signin/:token', function(req, res , next){
+  router.get('/invited/signin/:token', function(req, res , next) {
 
-    Token.findById(req.params.token, function(err, token){
+    Token.findById(req.params.token, function(err, token) {
 
       if (err) {
 
@@ -470,9 +489,9 @@ module.exports = function (router, mongoose) {
 
             user.state = statics.model('state', 'active')._id;
 
-            user.save(function(err){
+            user.save(function(err) {
 
-              if(err){
+              if (err) {
                 next(err);
 
               } else {
@@ -597,7 +616,7 @@ module.exports = function (router, mongoose) {
 
       if (err) {
 
-        if(err.name && err.name === 'CastError') {
+        if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
