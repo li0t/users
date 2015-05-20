@@ -2,7 +2,7 @@
 
 <head>
   <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
-  <link href="../client/assets/styles/jquery.tagit.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" type="text/css" href="../client/assets/styles/jquery.tagit.css" >
 </head>
 
 <body>
@@ -129,8 +129,19 @@
     </div>
     <div id="entries">
       <h3>entries</h3>
-      <form id="newEntryForm">
-      </form>
+      <div id="listEntries">
+      </div>
+      <br>
+      <div id="thisEntry">
+      </div>
+      <div id="creatingEntry">
+        <form id="newEntryForm">
+        </form>
+      </div>
+      <h4>output</h4>
+      <textarea id="entriesOutput" rows="8" cols="8"></textarea><br>
+      <input type="button" id="clearEntriesOutput" value="clear"/><br>
+      <a href="#top">top</a>
     </div>
 
   </div>

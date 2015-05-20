@@ -65,7 +65,7 @@ module.exports = function (router, mongoose) {
           if (err) {
             debug('Error! : %s', err);
           } else if (found) {
-            debug('Tag found : %s' , found);
+            debug('Tag found : %s' , found._name);
             onTagReady(found);
           } else {
             debug('Creating new Tag : %s', tag);
