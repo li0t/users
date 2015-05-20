@@ -189,7 +189,7 @@ module.exports = function (router, mongoose) {
 
         group = membership.group; /** The group model */
 
-        if(group) { 
+        if (group) { 
 
           remover = membership.isMember(remover);
 
@@ -208,7 +208,7 @@ module.exports = function (router, mongoose) {
                   debug('User %s removed from group %s' , member, group._id);
                   group.members.splice(toRemove.index, 1); /** Remove user from members array */
 
-                  if (membership.isAdmin(toRemove)) {
+                  if (membership.isAdmin(toRemove.member)) {
                     lostAdmin = true;
                   }
 
@@ -223,6 +223,7 @@ module.exports = function (router, mongoose) {
             if (group.members.length > 0) {
 
               if (lostAdmin) {
+                debug('The group %s, has a new admin with id %s' , group._id, group.members[0]);
                 group.admin = group.members[0];
               }
 
