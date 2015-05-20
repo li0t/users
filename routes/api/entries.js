@@ -18,10 +18,10 @@ module.exports = function (router, mongoose) {
   /**
    * Create a new entry
    */
-  router.post('/create/:groupId?', function (req, res, next) {
+  router.post('/create', function (req, res, next) {
 
     var entry, /* This is the target schema */
-        group = req.params.groupId || null,
+        group = req.body.group || null,
         tagsSaved = 0;
 
     /**
