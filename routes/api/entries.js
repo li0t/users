@@ -65,7 +65,7 @@ module.exports = function (router, mongoose) {
           if (err) {
             debug('Error! : %s', err);
           } else if (found) {
-            debug('Tag found : %s' , found._name);
+            debug('Tag found : %s' , found.name);
             onTagReady(found);
           } else {
             debug('Creating new Tag : %s', tag);
@@ -147,7 +147,8 @@ module.exports = function (router, mongoose) {
         if (err) {
           next(err);
         } else {
-          res.status(201).send(entry._id);
+          debug('%s pictures saved to entry %s', picturesSaved, entry._id);
+          res.send(picturesSaved + ' pictures save to entry ' + entry._id);
         }
       });
     }

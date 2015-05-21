@@ -80,8 +80,6 @@ module.exports = function (router, mongoose) {
     var profile, /* This is the target schema */
         saved = 0;
 
-    debug('req.files: %s',req.files);
-
     /**
      * Create the document with the saved File ids
      */

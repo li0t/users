@@ -30,7 +30,7 @@ module.exports = {
       method: ['GET', 'POST', 'PUT'],
       route: [
         '/api/answers*', '/api/attachments*', '/api/comments*',
-        '/api/files*', '/api/patients*', '/api/sics*'
+        /*'/api/files*',*/ '/api/patients*', '/api/sics*'
       ],
       allows: 'user workplace'
     }

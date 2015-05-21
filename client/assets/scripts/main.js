@@ -12,8 +12,54 @@ $(document).ready(function() {
       members, 
       tags, 
       tagsNames, 
-      entries, 
-      entry;
+      entries;
+
+  function loadUser(){ 
+
+    $. /* Load session user */
+    get('api/users/session').
+
+    done(function(data) {
+
+      user = data;
+
+      console.log(JSON.stringify(user));
+
+      $('#thisUser').append('<h4>' + user.email + '</h4>');
+
+      if (user.profile.name) {
+        $('#thisUser').append('<p> name: ' + user.profile.name + '</p>');
+      }
+
+      if (user.profile.gender) {
+        $('#thisUser').append('<p> gender: ' + user.profile.gender.name + '</p>');
+      }
+
+      if (user.profile.birthdate) {
+        $('#thisUser').append('<p> birthdate: ' + user.profile.birthdate + '</p>');
+      }
+
+      if (user.profile.location) {
+        $('#thisUser').append('<p> location: ' + user.profile.location + '</p>');
+      }
+
+      if (user.profile.pictures && user.profile.pictures.length) {
+
+        $('#thisUser').append('<ul id="thisUserPictures"></ul>');
+
+        user.profile.pictures.forEach(function(pic) {
+
+          $('#thisUserPictures').
+          append('<li><img src="api/files/' + pic._id +'"  alt="' + pic._filename + '" width="200" height="200"></li>');
+
+        });
+      }
+
+      alert('Welcome ' + user.email);
+
+    });
+
+  }
 
   function loadTags() {
 
@@ -24,7 +70,7 @@ $(document).ready(function() {
       tags = data;
       tagsNames = [];
 
-      data.forEach(function(tag){ 
+      tags.forEach(function(tag) { 
 
         tagsNames.push(tag.name);
 
@@ -34,6 +80,8 @@ $(document).ready(function() {
   }
 
   function loadContacts() {
+
+    $('#newGroupMembers').empty(); 
 
     $. /* Load session user contacts */
     get('api/contacts').
@@ -61,9 +109,17 @@ $(document).ready(function() {
 
   function loadGroups() {
 
-    var email, isMemeber, i, $this, newAdmin;
+    var email, 
+        input, 
+        isMemeber,
+        i, $this,
+        newAdmin;
 
-    $./* Load session user groups */
+    $('#thisGroup').empty();
+    $('#listGroups').empty();
+    $('#newEntryForm').empty();
+
+    $. /* Load session user groups */
     get('api/groups/me').
 
     done(function(data) {
@@ -76,8 +132,11 @@ $(document).ready(function() {
         $('#listGroups').
         append('<h4>your groups</h4>');
 
-        $('<p>...will you choose a group?</p><br>').
-        insertBefore("#newEntryForm");
+        $('#groupsEntries').
+        append('<h4>groups entries</h4>');
+
+        /** In case the entries does not belong to a group */
+        $("#newEntryForm").prepend('<input type="radio" name="group" value=""/>none<br>');
 
         groups.forEach(function(group) {    
 
@@ -86,197 +145,301 @@ $(document).ready(function() {
           append('<input type="radio" ' +
                  'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
 
+          $('#groupsEntries').
+          append('<input type="radio" ' +
+                 'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
+
           /** Available groups to create entries in*/
-          $('<input type="radio" name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>').
-          insertBefore("#newEntryForm");
+          $("#newEntryForm").prepend('<input type="radio" name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
 
           /** Store de group admin */
           admin[group._id] = group.admin;
 
         });
-      } 
+
+        $("#newEntryForm").
+        prepend('<h4>create an entry</h4>' +
+                '<p>...will you choose a group?</p>');
+
+        $('#listGroups').find("input[type='radio'][name=group]").click(function() {
+
+          $('#thisGroup').empty().append('<p>members</p>');
+
+          $this = $(this);
+
+          group = this.value;
+
+          $.
+          get('api/groups/' + group + '/members').
+
+          done(function(data) {
+
+            members = data;
+
+            $('#thisGroup').append('<form id="thisGroupForm"></form>');
+
+            members.forEach(function(member) {
+
+              email = member.email;
+
+              if (member._id === admin[group]) {
+
+                email += ' (admin)';
+
+              } 
+
+              if (member.email === user.email) {
+
+                input = '<input type="checkbox" name="members" value="' + member._id+ '" disabled/>' + email + ' (me) <br>';
+
+              } else {
+
+                input = '<input type="checkbox" name="members" value="' + member._id+ '"/>' + email + '<br>';
+
+              }
+
+              $('#thisGroupForm').append(input);
+
+            });
+
+            if (user._id === admin[group]) { 
+
+              /** 
+               * Remove group members 
+               */
+              $('#thisGroup').
+              append('<input type="button" id="removeGroupMembers" value="remove members"/>');
+
+              $("#removeGroupMembers").click(function() {
+
+                $.
+                post("api/groups/" + group + "/removeMembers", $("#thisGroupForm").serialize()).
+
+                done(function(data) {
+
+                  $this.click();
+                  $('#groupsOutput').val(data);
+
+                }).
+
+                fail(function(data) {
+
+                  alert(data.status + '  (' + data.statusText +')');
+
+                });
+              });
+
+              /** 
+               * Change group administrator
+               */
+              $('#thisGroup').append('<br><form id="thisGroupNewAdminForm"></form>');
+
+              members.forEach(function(member) {
+
+                if (member._id !== admin[group]) {
+
+                  $('#thisGroupNewAdminForm').
+                  append('<input type="radio" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
+
+                } 
+              });
+
+              $('#thisGroup').
+              append('<input type="button" id="changeGroupAdmin" value="change admin"/>');
+
+              $("#changeGroupAdmin").click(function() {
+
+                newAdmin = $('#thisGroupNewAdminForm').find('input[name="members"]:checked').val();
+
+                $.
+                get("api/groups/" + group + "/changeAdmin/" + newAdmin).
+
+                done(function(data) {
+
+                  admin[group] = newAdmin;
+                  $this.click();
+                  $('#groupsOutput').val(data);
+
+                }).
+
+                fail(function(data) {
+                  alert(data.status + '  (' + data.statusText +')');
+                });
+              });
+            }
+
+            if (contacts.length) {
+
+              $('#thisGroup').append('<form id="groupNewMembersForm"></form>');
+
+              /** Load contacts */
+              contacts.forEach(function(contact) {
+
+                isMemeber = false;
+
+                for (i = 0; i < members.length; i++) {
+                  if (members[i]._id === contact._id) {
+                    isMemeber = true;
+                    break;
+                  }
+                }
+
+                if (!isMemeber) {
+                  $('#groupNewMembersForm').
+                  append('<input type="checkbox" name="members" value="' + contact._id+ '"/>' + contact.email + '<br>');  
+                }
+              });
+
+              if (document.getElementById('groupNewMembersForm').hasChildNodes()) {
+
+                $("<p>add new members</p>").insertBefore("#groupNewMembersForm");
+
+                $('#thisGroup').
+                append('<input type="button" id="addGroupMembers" value="add members"/><br>');
+              }
+
+              /** 
+               * Add group members 
+               */
+              $("#addGroupMembers").click(function() {
+
+                $.
+                post("api/groups/" + group + "/addMembers", $("#groupNewMembersForm").serialize()).
+
+                done(function(data) {
+
+                  $('#thisGroup').empty();
+                  $this.click();
+                  $('#groupsOutput').val(data);
+
+                }).
+
+                fail(function(data) {
+                  alert(data.status + '  (' + data.statusText +')');
+                });
+              });
+
+              /** 
+               * Leave group
+               */
+              $('#thisGroup').append('<input type="button"  id="leaveGroup" value="leave group"/>');
+
+              $("#leaveGroup").click(function() {
+
+                $.
+                post("api/groups/" + group + "/removeMembers", "members=" + user._id).
+
+                done(function(data) {
+
+                  loadGroups();
+                  $('#groupsOutput').val(data);
+
+                }).
+
+                fail(function(data) {
+                  alert(data.status + '  (' + data.statusText +')');
+                });
+              });
+            }
+          }).
+
+          fail(function(data) {
+            alert(data.status + '  (' + data.statusText +')');
+          });
+        });
+      } else {
+        $('#listGroups').
+        append('<h4>no groups</h4>');
+      }
+      loadEntries();
     });
 
-    $('#listGroups').find("input[type='radio'][name=group]").click(function() {
+  }
 
-      $('#thisGroup').empty().append('<p>members</p>');
+  function loadEntry($this, id) {
 
-      $this = $(this);
+    $.
+    get('api/entries/' + id).
 
-      group = this.value;
-      
-      $.
-      get('api/groups/' + group + '/members').
+    done(function(entry) {
 
-      done(function(data) {
+      $('#thisEntry').
+      empty().
+      append('<h4>entry</h4>' +
+             '<p>' + entry.title + '</p>'+
+             '<p>' +entry.content + '</p>'); 
 
-        members = data;
+      if (entry.pictures.length) {
 
-        $('#thisGroup').append('<form id="thisGroupForm"></form>');
+        $('#thisEntry').append('<ul id="thisEntryPictures"></ul>');
 
-        members.forEach(function(member) {
+        entry.pictures.forEach(function(pic) {
 
-          email = member.email;
-
-          if (member.email === user.email) {
-
-            email += ' (me)';
-
-          }
-
-          if (member._id === admin[group]) {
-
-            email += ' (admin)';
-
-          } 
-
-          $('#thisGroupForm').
-          append('<input type="checkbox" name="members" value="' + member._id+ '"/>' + email + '<br>');
+          $('#thisEntryPictures').
+          append('<li><img src="api/files/' + pic._id +'"  alt="' + pic._filename + '" width="200" height="200"></li>');
 
         });
+      }
 
-        if (user._id === admin[group]) { 
+      $('#thisEntry').
+      append('<p>upload pictures to this entry</p>' +
+             '<form id="entryPicturesForm" enctype="multipart/form-data">' +
+             '<input type="file" id="entryPictures" multiple/><br>' +
+             '<input type="submit" value="upload"/>' +
+             '</form>'
+            );
 
-          /** 
-           * Remove group members 
-           */
-          $('#thisGroup').
-          append('<input type="button" id="removeGroupMembers" value="remove members"/>');
+      /** 
+       * Upload entry pictures
+       */
+      $("#entryPicturesForm").on('submit', function(e) {
 
-          $("#removeGroupMembers").click(function() {
+        e.preventDefault();
 
-            $.
-            post("api/groups/" + group + "/removeMembers", $("#thisGroupForm").serialize()).
+        var formData = new FormData(),
+            files = $("#entryPictures")[0].files,
+            file, i;
 
-            done(function(data) {
-
-              $this.click();
-              $('#groupsOutput').val(data);
-
-            }).
-
-            fail(function(data) {
-
-              alert(data.status + '  (' + data.statusText +')');
-
-            });
-          });
-
-          /** 
-           * Change group administrator
-           */
-          $('#thisGroup').append('<form id="thisGroupNewAdminForm"></form>');
-
-          members.forEach(function(member) {
-
-            if (member._id !== admin[group]) {
-
-              $('#thisGroupNewAdminForm').
-              append('<input type="radio" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
-
-            } 
-          });
-
-          $('#thisGroup').
-          append('<input type="button" id="changeGroupAdmin" value="change admin"/>');
-
-          $("#changeGroupAdmin").click(function() {
-
-            newAdmin = $('#thisGroupNewAdminForm').find('input[name="members"]:checked').val();
-
-            $.
-            get("api/groups/" + group + "/changeAdmin/" + newAdmin).
-
-            done(function(data) {
-
-              admin[group] = newAdmin;
-              $this.click();
-              $('#groupsOutput').val(data);
-
-            }).
-
-            fail(function(data) {
-              alert(data.status + '  (' + data.statusText +')');
-            });
-          });
+        for (i = 0; i < files.length; i++) {
+          file = files[i];
+          formData.append('pictures[]', file, file.name);
         }
 
-        if (contacts.length) {
+        $.ajax({
+          url: 'api/entries/' + entry._id +'/pictures',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
 
-          $('#thisGroup').append('<form id="groupNewMembersForm"></form>');
+          success: function(data) {
+            $this.click();
+            $('#entriesOutput').val(data);
+          },
 
-          /** Load contacts */
-          contacts.forEach(function(contact) {
-
-            isMemeber = false;
-
-            for (i = 0; i < members.length; i++) {
-              if (members[i]._id === contact._id) {
-                isMemeber = true;
-                break;
-              }
-            }
-
-            if (!isMemeber) {
-              $('#groupNewMembersForm').
-              append('<input type="checkbox" name="members" value="' + contact._id+ '"/>' + contact.email + '<br>');  
-            }
-          });
-
-          if (document.getElementById('groupNewMembersForm').hasChildNodes()) {
-
-            $("<p>add new members</p>").insertBefore("#groupNewMembersForm");
-
-            $('#thisGroup').
-            append('<input type="button" id="addGroupMembers" value="add members"/>');
+          error: function(data) {
+            alert(data);
           }
-
-          /** 
-           * Add group members 
-           */
-          $("#addGroupMembers").click(function() {
-
-            $.
-            post("api/groups/" + group + "/addMembers", $("#groupNewMembersForm").serialize()).
-
-            done(function(data) {
-
-              $('#thisGroup').empty();
-              $this.click();
-              $('#groupsOutput').val(data);
-
-            }).
-
-            fail(function(data) {
-              alert(data.status + '  (' + data.statusText +')');
-            });
-          });
-        }
-      }).
-
-      fail(function(data) {
-        alert(data.status + '  (' + data.statusText +')');
+        });
       });
+    }).
+
+    fail(function(data) { 
+      alert(data.status + '  (' + data.statusText +')');
     });
 
   }
 
   function loadEntries() {
 
-    var $this;
+    $('#listEntries').empty();
 
     $.
     get('api/entries/user/' + user._id).
 
     done(function(data) {
 
-      entries = [];
-
-      data.forEach(function(entry) {
-
-        entries[entry._id] = entry;
-
-      });
+      entries = data;
 
       /** Load session user entries */
       if (entries.length) {
@@ -284,79 +447,66 @@ $(document).ready(function() {
         $('#listEntries').
         append('<h4>your entries</h4>');
 
-        entries.forEach(function(entry) {    
+        entries.forEach(function(entry) {
 
           $('#listEntries').
           append('<input type="radio" ' +
                  'name="entry" value="' + entry._id+ '"/>' + entry.title + '<br>');
 
         });
-
       }
-      console.log('oink');
+
       $('#listEntries').find("input[type='radio'][name=entry]").click(function() {
 
-        $this = $(this);
+        loadEntry($(this), this.value);
 
-        entry = entries[this.value];
+      });
 
-        $('#thisEntry').
-        empty().
-        append('<p>' + entry.title + '</p><br>'+
-               '<p>' +entry.content + '</p><br>' + 
-               '<form id="entryPicturesForm" enctype="multipart/form-data">' +
-               '<p>upload pictures</p>' +
-               '<input type="file" id="entryPictures" multiple/><br>' +
-               '<input type="submit" value="upload"/>' +
-               '</form>'
-              );
+      $('#groupsEntries').find("input[type='radio'][name=group]").click(function() {
 
-        /** 
-         * Upload entry pictures
-         */
-        $("#entryPicturesForm").on('submit', function(e) {
+        $('#listGroupEntries').empty();
 
-          e.preventDefault();
+        $.
+        get('api/entries/group/' + this.value).
 
-          var formData = new FormData(),
-              files = $("#entryPictures")[0].files,
-              file, i;
+        done(function(entries) {
 
-          for (i = 0; i < files.length; i++) {
-            file = files[i];
-            formData.append('pictures[]', file, file.name);
+          if (entries.length) {
+
+            $('#listGroupEntries').
+            append('<h4>group entries</h4>');
+
+            entries.forEach(function(entry) {
+
+              $('#listGroupEntries').
+              append('<input type="radio" ' +
+                     'name="entry" value="' + entry._id+ '"/>' + entry.title + '<br>');
+
+            });
+
+            $('#listGroupEntries').find("input[type='radio'][name=entry]").click(function() {
+
+              loadEntry($(this), this.value);
+
+            });
+          } else {
+            $('#listGroupEntries').
+            append('<h4>no entries</h4>');
           }
+        }).
 
-          $.ajax({
-            url: 'api/entries/' + entry._id +'/pictures',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-
-            success: function(data) {
-              $('#entriesOutput').val(data);
-            },
-
-            error: function(data) {
-              alert(data);
-            }
-          });
+        fail(function(data) {
+          alert(data.status + '  (' + data.statusText +')');
         });
       });
 
-      /** In case the entries does not belong to a group */
-      $("#newEntryForm").append('<input type="radio" name="group" value=""/>none<br>');
-
       /** Re-create entry form */
       $('#newEntryForm').
-      append('<h4>create an entry</h4><br>' +
-             '<input type="text" name="title" placeholder="title..."/><br>' +
+      append('<input type="text" name="title" placeholder="title..."/><br>' +
              '<textarea rows="8" cols="8" name="content" placeholder="content..."></textarea><br>' +
              '<ul id="entryTags" name="tags"></ul>  ' +
              '<input type="button" id="createEntry" value="send"/><br>'
             );
-
 
       $("#entryTags").tagit({
         availableTags: tagsNames,
@@ -370,45 +520,28 @@ $(document).ready(function() {
 
         done(function(data) {
 
+          loadEntries();
           $('#newEntryForm')[0].reset();
           $('#entriesOutput').val('Created new entry : ' + data);
 
         }).
 
         fail(function(data) {
+
           alert(data.status + '  (' + data.statusText +')');
+
         });
-
-        console.log('entry: ' + $("#newEntryForm").serialize());
-
       });
-
     });
 
   }
 
   function loadSession() {
 
-    $('#thisGroup').empty();
-    $('#listGroups').empty();
-    $('#newEntryForm').empty();
-    $('#newGroupMembers').empty(); 
-
-
-    $. /* Load session user */
-    get('api/users/session').
-
-    done(function(data) {
-
-      user = data;
-
-      loadTags();
-      loadContacts();
-      loadGroups();
-      loadEntries();
-      alert('Welcome ' + user.email);
-
-    });
+    loadUser();
+    loadTags();
+    loadContacts();
+    loadGroups();
 
   }
 
@@ -633,7 +766,12 @@ $(document).ready(function() {
     post("api/profiles/", $("#updateProfileForm").serialize()).
 
     done(function() {
+
+      $('#thisUser').empty();
+      loadUser();
+
       $('#usersOutput').val('Profile updated');
+
     }).
 
     fail(function(data) {
@@ -679,7 +817,7 @@ $(document).ready(function() {
   /** 
    * Logout
    */
-  $('#logout').on('click', function(){
+  $('#logout').on('click', function() {
 
     $.
     get('api/users/logout').
@@ -688,19 +826,25 @@ $(document).ready(function() {
 
       user = {};
 
-      $('#newGroupMembers').empty();
+      $('#thisUser').empty();
+      $('#thisEntry').empty();
 
-      $('#listGroups').empty();
-
-      $('#newEntryForm').empty();
-
-      if($('#thisGroup')) { 
+      if ($('#thisGroup')) { 
         $('#thisGroup').empty();
       }
 
-      $('#groupsOutput').val('');
+      $('#groupsEntries').empty();
+      $('#listGroups').empty();
+      $('#listGroupEntries').empty();
+      $('#listEntries').empty();
 
+      $('#newEntryForm').empty();
+      $('#newGroupMembers').empty();
+
+      $('#groupsOutput').val('');
+      $('#entriesOutput').val('');
       $('#usersOutput').val('Logged out');
+
     });
 
   });
@@ -735,9 +879,18 @@ $(document).ready(function() {
   /** 
    * Clear groups output
    */
-  $('#clearGroupsOutput').on('click', function(){
+  $('#clearGroupsOutput').on('click', function() {
 
     $('#groupsOutput').val('');
+
+  });
+
+  /** 
+   * Clear entries output
+   */
+  $('#clearEntriesOutput').on('click', function() {
+
+    $('#entriesOutput').val('');
 
   });
 

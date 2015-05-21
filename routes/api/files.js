@@ -16,7 +16,7 @@ module.exports = function (router, mongoose) {
   /**
    * Obtain a file.
    */
-  router.get('/:id/:name', function (req, res, next) {
+  router.get('/:id/:name?', function (req, res, next) {
 
     /* Get the file from GridFS */
     gridfs.get(req.params.id, function (err, fsfile, stream) {
