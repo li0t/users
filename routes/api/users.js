@@ -388,7 +388,7 @@ module.exports = function (router, mongoose) {
           if (err) {
             /** The user is already in the platform */
             if (err.code && err.code === 11000) {
-              
+
               User.   
               findOne().
               where('email', email).
@@ -592,7 +592,7 @@ module.exports = function (router, mongoose) {
         }
 
       } else if (user) {
-
+        debug(user);
         res.send(user);
 
       } else {

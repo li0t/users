@@ -16,6 +16,8 @@ $(document).ready(function() {
 
   function loadUser(){ 
 
+    $('#thisUser').empty();
+
     $. /* Load session user */
     get('api/users/session').
 
@@ -55,8 +57,8 @@ $(document).ready(function() {
         });
       }
 
-      alert('Welcome ' + user.email);
-
+      loadContacts();
+      loadGroups();
     });
 
   }
@@ -64,7 +66,7 @@ $(document).ready(function() {
   function loadTags() {
 
     $. /* Load platform tags */
-    get('/api/tags').
+    get('api/tags').
     done(function(data) {
 
       tags = data;
@@ -117,6 +119,7 @@ $(document).ready(function() {
 
     $('#thisGroup').empty();
     $('#listGroups').empty();
+    $('#groupsEntries').empty();
     $('#newEntryForm').empty();
 
     $. /* Load session user groups */
@@ -432,7 +435,10 @@ $(document).ready(function() {
 
   function loadEntries() {
 
+
+    $('#thisEntry').empty();
     $('#listEntries').empty();
+    $('#listGroupEntries').empty();
 
     $.
     get('api/entries/user/' + user._id).
@@ -540,8 +546,6 @@ $(document).ready(function() {
 
     loadUser();
     loadTags();
-    loadContacts();
-    loadGroups();
 
   }
 
@@ -804,6 +808,7 @@ $(document).ready(function() {
       contentType: false,
 
       success: function(data) {
+        loadUser();
         $('#usersOutput').val(data);
       },
 
