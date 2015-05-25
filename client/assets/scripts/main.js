@@ -25,8 +25,6 @@ $(document).ready(function() {
 
       user = data;
 
-      console.log(JSON.stringify(user));
-
       $('#thisUser').append('<h4>' + user.email + '</h4>');
 
       if (user.profile.name) {
@@ -47,7 +45,7 @@ $(document).ready(function() {
 
       if (user.profile.pictures && user.profile.pictures.length) {
 
-        $('#thisUser').append('<ul id="thisUserPictures"></ul>');
+        $('#thisUser').append('<p>pictures: </p><ul id="thisUserPictures"></ul>');
 
         user.profile.pictures.forEach(function(pic) {
 
@@ -57,8 +55,14 @@ $(document).ready(function() {
         });
       }
 
-      loadContacts();
-      loadGroups();
+      if (!contacts || !contacts.length) {
+        loadContacts();
+      }
+
+      if (!groups || !groups.length) {
+        loadGroups();
+      }
+
     });
 
   }
@@ -694,6 +698,7 @@ $(document).ready(function() {
     post("api/users/invited/signin", $("#invitedSigninForm").serialize()).
 
     done(function() {
+      loadSession();
       $('#usersOutput').val('Account activated, welcome to emeeter');
     }).
 

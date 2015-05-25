@@ -77,7 +77,7 @@ module.exports = function (Schema) {
     populate :{
       
       'profile' : {
-        select : 'name birthdate gender location'
+        select : 'name birthdate gender location pictures'
       }
 
     }

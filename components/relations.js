@@ -46,7 +46,7 @@ function contact(userId, cb) { /** Returns a relation object with the contact mo
                 }
               }
             } else {
-              debug('Contact list %s has no contacts', relation.contact._id);
+              debug('User %s has no contacts', relation.contact.user);
             }
           } else {
             debug('Error! No contact list found');
