@@ -94,11 +94,20 @@ module.exports = function (router, mongoose) {
 
       save(function (err, data) {
         if (err) {
-          next(err);
+
+          if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) { 
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
+
         } else {
+
           entry = data;
+
           if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
             saveTags();
+
           } else { /* If not, just save the entry */
             saveEntry();
           }

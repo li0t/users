@@ -3,6 +3,40 @@
 <head>
   <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
   <link rel="stylesheet" type="text/css" href="../client/assets/styles/jquery.tagit.css" >
+  <style>
+    form {
+      width:250px;
+      border:1px solid black;
+    }
+
+
+    ul li
+    {
+      margin: 2px;
+      padding: 0;
+      display: inline;
+      list-style-type: none;
+    }
+
+    img
+    {
+      max-width: 200px;
+      max-height: 200px;
+    }
+
+    input[type=text],
+    input[type=button],
+    input[type=password],
+    input[type=file],
+    textarea, select {
+      width : 150px;
+      margin: 0;
+
+      -webkit-box-sizing: border-box; /* For legacy WebKit based browsers */
+      -moz-box-sizing: border-box; /* For legacy (Firefox <29) Gecko based browsers */
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 
 <body>
@@ -19,30 +53,9 @@
   <div id="sections">
 
     <div id="users">
-      <div id="thisUser">
+      <div id="thisUser" class="output" >
       </div>
-      <h3>users</h3>
-      <form id="searchUserForm">
-        <h4>search a user</h4>
-        <input type="text" name="email" placeholder="exact email"/><br>
-        <input type="button" id="searchUser" value="search"/>
-      </form>
-      <div id="signing"> 
-        <form id="newUserForm">
-          <h4>create user</h4>
-          <input type="text" name="email" placeholder="email"/><br>
-          <input type="text" name="password" placeholder="password"/><br>
-          <input type="button" id="newUser" value="submit"/>
-        </form>
-      </div>
-      <div id="changingPasswor">
-        <form id="changePasswordForm">
-          <h4>change password</h4>
-          <input type="text" name="oldPassword" placeholder="old password"/><br>
-          <input type="text" name="newPassword" placeholder="new password"/><br>
-          <input type="button" id="changePassword" value="change password"/>
-        </form>
-      </div>
+
       <div id="updatingProfile">
         <form id="updateProfileForm">
           <h4>update profile</h4>
@@ -64,6 +77,14 @@
           <input type="submit" value="upload profile pictures"/>
         </form>
       </div>
+      <div id="changingPassword">
+        <form id="changePasswordForm">
+          <h4>change password</h4>
+          <input type="text" name="oldPassword" placeholder="old password"/><br>
+          <input type="text" name="newPassword" placeholder="new password"/><br>
+          <input type="button" id="changePassword" value="change password"/>
+        </form>
+      </div>
       <div id="recoveringPassword">
         <form id="recoverPasswordForm">
           <h4>recover password</h4>
@@ -78,13 +99,6 @@
           <input type="button" id="resetPassword" value="reset password"/>
         </form>
       </div>
-      <div id="invitedSigningin">
-        <form id="invitedSigninForm">
-          <h4>invited signin</h4>
-          <input type="text" name="password" placeholder="select password"/><br>
-          <input type="button" id="invitedSignin" value="activate account"/>
-        </form>
-      </div>
       <div id="logingin">
         <form id="loginForm">
           <h4>login</h4>
@@ -94,14 +108,35 @@
           <input type="button" id="logout" value="logout"/>
         </form>
       </div>
-      <div>
-        <br>
-        <input type="button" id="listUsers" value="list users"/>
+      <h3>users</h3>
+      <form id="searchUserForm" >
+        <h4>search a user</h4>
+        <input type="text" name="email" placeholder="exact email"/><br>
+        <input type="button" id="searchUser" value="search"/>
+      </form>
+      <div id="signing"> 
+        <form id="newUserForm">
+          <h4>create user</h4>
+          <input type="text" name="email" placeholder="email"/><br>
+          <input type="text" name="password" placeholder="password"/><br>
+          <input type="button" id="newUser" value="submit"/>
+        </form>
+      </div>
+      <div id="invitedSigningin">
+        <form id="invitedSigninForm">
+          <h4>invited signin</h4>
+          <input type="text" name="password" placeholder="select password"/><br>
+          <input type="button" id="invitedSignin" value="activate account"/>
+        </form>
+      </div>
+      <br>
+      <input type="button" id="listUsers" value="list users"/>
+      <div class="output" >
         <h4>output</h4>
         <textarea id="usersOutput" rows="8" cols="8"></textarea><br>
         <input type="button" id="clearUsersOutput" value="clear"/><br>
-        <a href="#top">top</a>
       </div>
+      <a href="#top">top</a>
     </div>
 
     <div id="groups">
@@ -109,7 +144,7 @@
       <div id="listGroups">
       </div>
       <br>
-      <div id="thisGroup">
+      <div id="thisGroup" class="output" >
       </div>
       <div id="addGroupMembers">
       </div>
@@ -122,7 +157,7 @@
           <input type="button" id="createGroup" value="create"/>
         </form>
       </div>
-      <div>
+      <div class="output" >
         <h4>output</h4>
         <textarea id="groupsOutput" rows="8" cols="8"></textarea><br>
         <input type="button" id="clearGroupsOutput" value="clear"/><br>
@@ -138,14 +173,14 @@
       <div id="listEntries">
       </div>
       <br>
-      <div id="thisEntry">
+      <div id="thisEntry" class="output" >
       </div>
       <div id="creatingEntry">
         <form id="newEntryForm">
         </form>
       </div>
       <h4>output</h4>
-      <textarea id="entriesOutput" rows="8" cols="8"></textarea><br>
+      <textarea id="entriesOutput" rows="8" cols="8" class="output" ></textarea><br>
       <input type="button" id="clearEntriesOutput" value="clear"/><br>
       <a href="#top">top</a>
     </div>

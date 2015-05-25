@@ -45,12 +45,13 @@ $(document).ready(function() {
 
       if (user.profile.pictures && user.profile.pictures.length) {
 
-        $('#thisUser').append('<p>pictures: </p><ul id="thisUserPictures"></ul>');
+        $('#thisUser').append('<p>pictures: </p><ul id="thisUserPictures" ></ul>');
 
         user.profile.pictures.forEach(function(pic) {
 
           $('#thisUserPictures').
-          append('<li><img src="api/files/' + pic._id +'"  alt="' + pic._filename + '" width="200" height="200"></li>');
+          append('<li><img src="api/files/' + pic._id +'"  alt="' +
+                 pic._filename + '"></li>');
 
         });
       }
@@ -211,72 +212,79 @@ $(document).ready(function() {
 
             if (user._id === admin[group]) { 
 
-              /** 
+              if (members.length > 1) {
+
+                /** 
                * Remove group members 
                */
-              $('#thisGroup').
-              append('<input type="button" id="removeGroupMembers" value="remove members"/>');
+                $('#thisGroupForm').
+                append('<input type="button" id="removeGroupMembers" value="remove members"/>');
 
-              $("#removeGroupMembers").click(function() {
+                $("#removeGroupMembers").click(function() {
 
-                $.
-                post("api/groups/" + group + "/removeMembers", $("#thisGroupForm").serialize()).
+                  $.
+                  post("api/groups/" + group + "/removeMembers", $("#thisGroupForm").serialize()).
 
-                done(function(data) {
+                  done(function(data) {
 
-                  $this.click();
-                  $('#groupsOutput').val(data);
+                    $this.click();
+                    $('#groupsOutput').val(data);
 
-                }).
+                  }).
 
-                fail(function(data) {
+                  fail(function(data) {
 
-                  alert(data.status + '  (' + data.statusText +')');
+                    alert(data.status + '  (' + data.statusText +')');
 
+                  });
                 });
-              });
 
-              /** 
+                /** 
                * Change group administrator
                */
-              $('#thisGroup').append('<br><form id="thisGroupNewAdminForm"></form>');
+                $('#thisGroup').append('<br><form id="thisGroupNewAdminForm"></form>');
 
-              members.forEach(function(member) {
+                members.forEach(function(member) {
 
-                if (member._id !== admin[group]) {
+                  if (member._id !== admin[group]) {
 
-                  $('#thisGroupNewAdminForm').
-                  append('<input type="radio" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
+                    $('#thisGroupNewAdminForm').
+                    append('<input type="radio" name="members" value="' + member._id+ '"/>' + member.email + '<br>');
 
-                } 
-              });
-
-              $('#thisGroup').
-              append('<input type="button" id="changeGroupAdmin" value="change admin"/>');
-
-              $("#changeGroupAdmin").click(function() {
-
-                newAdmin = $('#thisGroupNewAdminForm').find('input[name="members"]:checked').val();
-
-                $.
-                get("api/groups/" + group + "/changeAdmin/" + newAdmin).
-
-                done(function(data) {
-
-                  admin[group] = newAdmin;
-                  $this.click();
-                  $('#groupsOutput').val(data);
-
-                }).
-
-                fail(function(data) {
-                  alert(data.status + '  (' + data.statusText +')');
+                  } 
                 });
-              });
+
+                $('#thisGroupNewAdminForm').
+                append('<input type="button" id="changeGroupAdmin" value="change admin"/>');
+
+                $("#changeGroupAdmin").click(function() {
+
+                  newAdmin = $('#thisGroupNewAdminForm').find('input[name="members"]:checked').val();
+
+                  $.
+                  get("api/groups/" + group + "/changeAdmin/" + newAdmin).
+
+                  done(function(data) {
+
+                    admin[group] = newAdmin;
+                    $this.click();
+                    $('#groupsOutput').val(data);
+
+                  }).
+
+                  fail(function(data) {
+                    alert(data.status + '  (' + data.statusText +')');
+
+                  });
+                });
+              }
             }
 
             if (contacts.length) {
 
+              /** 
+               * Add group members 
+               */
               $('#thisGroup').append('<form id="groupNewMembersForm"></form>');
 
               /** Load contacts */
@@ -301,53 +309,52 @@ $(document).ready(function() {
 
                 $("<p>add new members</p>").insertBefore("#groupNewMembersForm");
 
-                $('#thisGroup').
+                $('#groupNewMembersForm').
                 append('<input type="button" id="addGroupMembers" value="add members"/><br>');
-              }
 
-              /** 
-               * Add group members 
-               */
-              $("#addGroupMembers").click(function() {
 
-                $.
-                post("api/groups/" + group + "/addMembers", $("#groupNewMembersForm").serialize()).
+                $("#addGroupMembers").click(function() {
 
-                done(function(data) {
+                  $.
+                  post("api/groups/" + group + "/addMembers", $("#groupNewMembersForm").serialize()).
 
-                  $('#thisGroup').empty();
-                  $this.click();
-                  $('#groupsOutput').val(data);
+                  done(function(data) {
 
-                }).
+                    $('#thisGroup').empty();
+                    $this.click();
+                    $('#groupsOutput').val(data);
 
-                fail(function(data) {
-                  alert(data.status + '  (' + data.statusText +')');
+                  }).
+
+                  fail(function(data) {
+                    alert(data.status + '  (' + data.statusText +')');
+                  });
                 });
-              });
+              }
+            }
 
-              /** 
+            /** 
                * Leave group
                */
-              $('#thisGroup').append('<input type="button"  id="leaveGroup" value="leave group"/>');
+            $('#thisGroup').append('<input type="button"  id="leaveGroup" value="leave group"/>');
 
-              $("#leaveGroup").click(function() {
+            $("#leaveGroup").click(function() {
 
-                $.
-                post("api/groups/" + group + "/removeMembers", "members=" + user._id).
+              $.
+              post("api/groups/" + group + "/removeMembers", "members=" + user._id).
 
-                done(function(data) {
+              done(function(data) {
 
-                  loadGroups();
-                  $('#groupsOutput').val(data);
+                loadGroups();
+                $('#groupsOutput').val(data);
 
-                }).
+              }).
 
-                fail(function(data) {
-                  alert(data.status + '  (' + data.statusText +')');
-                });
+              fail(function(data) {
+                alert(data.status + '  (' + data.statusText +')');
               });
-            }
+            });
+
           }).
 
           fail(function(data) {
@@ -355,10 +362,14 @@ $(document).ready(function() {
           });
         });
       } else {
+
         $('#listGroups').
         append('<h4>no groups</h4>');
+
       }
+
       loadEntries();
+
     });
 
   }
@@ -378,12 +389,13 @@ $(document).ready(function() {
 
       if (entry.pictures.length) {
 
-        $('#thisEntry').append('<ul id="thisEntryPictures"></ul>');
+        $('#thisEntry').append('<ul id="thisEntryPictures" class="pictures" ></ul>');
 
         entry.pictures.forEach(function(pic) {
 
           $('#thisEntryPictures').
-          append('<li><img src="api/files/' + pic._id +'"  alt="' + pic._filename + '" width="200" height="200"></li>');
+          append('<li><img src="api/files/' + pic._id +'"  alt="' +
+                 pic._filename + '"></li>');
 
         });
       }
@@ -877,6 +889,7 @@ $(document).ready(function() {
     post("api/groups/create", $("#createGroupForm").serialize()).
 
     done(function(data) {
+      loadGroups();
       $('#groupsOutput').val('group ' + data + ' created');
     }).
 

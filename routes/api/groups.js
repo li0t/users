@@ -44,7 +44,12 @@ module.exports = function (router, mongoose) {
       save(function(err, profile) {
 
         if (err) {
-          next(err);
+
+          if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) { 
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
 
         } else {
 
@@ -85,7 +90,9 @@ module.exports = function (router, mongoose) {
 
             });
           } else {
+            
             saveGroup();
+            
           }
         }
       });
@@ -331,11 +338,13 @@ module.exports = function (router, mongoose) {
     exec(function(err, group) {
 
       if (err) {
+
         if (err.name && err.name === 'CastError') { 
           res.sendStatus(400);
         } else {
           next(err);
         }
+
       } else if (group) {
 
         res.send(group.members);
