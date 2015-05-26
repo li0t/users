@@ -486,17 +486,27 @@ $(document).ready(function() {
 
       $('#groupsEntries').find("input[type='radio'][name=group]").click(function() {
 
+        group = this.value;
+
         $('#listGroupEntries').empty();
 
         $.
-        get('api/entries/group/' + this.value).
+        get('api/entries/group/' + group).
 
         done(function(entries) {
 
           if (entries.length) {
 
-            $('#listGroupEntries').
-            append('<h4>group entries</h4>');
+            for (var i = 0; i < groups.length; i++) {
+
+
+              if (groups[i]._id === group) {
+
+                $('#listGroupEntries').
+                append('<h4>' + groups[i].profile.name  + ' entries</h4>');
+                break;
+              }
+            }
 
             entries.forEach(function(entry) {
 

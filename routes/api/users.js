@@ -262,35 +262,40 @@ module.exports = function (router, mongoose) {
     var oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;
 
-    if (newPassword && (newPassword !== oldPassword)) {
+    if (newPassword) {
 
-      User.
+      if (newPassword !== oldPassword) {
 
-      findById(req.session.user._id).
+        User.
 
-      exec(function (err, user) {
+        findById(req.session.user._id).
 
-        if (err) {
-          next(err);
+        exec(function (err, user) {
 
-        } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
+          if (err) {
+            next(err);
 
-          user.password = newPassword;
+          } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
 
-          user.save(function (err, user) {
+            user.password = newPassword;
 
-            req.session.user = user;
-            res.send(user._id);
+            user.save(function (err, user) {
 
-          });
-        } else {
-          setTimeout(function () {
-            res.sendStatus(401);
-          }, 1000);
-        }
-      }); 
+              req.session.user = user;
+              res.send(user._id);
+
+            });
+          } else {
+            setTimeout(function () {
+              res.sendStatus(401);
+            }, 1000);
+          }
+        }); 
+      } else {
+        res.status(400).send('The new password should be different');
+      }
     } else {
-      res.status(400).send('The new password should be different');
+      res.sendStatus(400);
     }
 
   });
