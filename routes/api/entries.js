@@ -202,8 +202,6 @@ module.exports = function (router, mongoose) {
     Entry.
     findOne().
     where('_id', req.params.id).
-    where('user', req.session.user._id).
-
     exec(function (err, data) {
       if (err) {
 
@@ -214,13 +212,22 @@ module.exports = function (router, mongoose) {
         }
 
       } else if (data) {
+
         entry = data;
-        if (req.files && req.files.length) { /* If there are any files, save them */
-          savePictures();
-        } else { /* If not, just save the document */
-          saveEntry();
+
+        if (JSON.stringify(entry.user) === JSON.stringify(req.session.user._id)) {
+
+          if (req.files && req.files.length) { /* If there are any files, save them */
+            savePictures();
+          } else { /* If not, just save the document */
+            saveEntry();
+          }
+          
+        } else {
+          res.sendStatus(403);
         }
       } else {
+        debug('Entry %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });

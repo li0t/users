@@ -4,16 +4,24 @@
   <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
   <link rel="stylesheet" type="text/css" href="../client/assets/styles/jquery.tagit.css" >
   <style>
+
     form {
       width:250px;
       border:1px solid black;
     }
 
+    .this {
+      width:500px;
+      height: 300px;
+      border:1px solid black;
+      overflow-x: auto;
+    }
 
     ul li
     {
       margin: 2px;
       padding: 0;
+      white-space: nowrap;
       display: inline;
       list-style-type: none;
     }
@@ -53,9 +61,19 @@
   <div id="sections">
 
     <div id="users">
-      <div id="thisUser" class="output" >
+      <h3>users</h3>
+      <div id="thisUser" class="this" >
       </div>
-
+      <br>
+      <div id="logingin">
+        <form id="loginForm">
+          <h4>login</h4>
+          <input type="text" name="email" id="userEmail" placeholder="email"/><br>
+          <input type="password" name="password" placeholder="password"/><br>
+          <input type="button" id="login" value="login"/>
+          <input type="button" id="logout" value="logout"/>
+        </form>
+      </div>
       <div id="updatingProfile">
         <form id="updateProfileForm">
           <h4>update profile</h4>
@@ -99,16 +117,6 @@
           <input type="button" id="resetPassword" value="reset password"/>
         </form>
       </div>
-      <div id="logingin">
-        <form id="loginForm">
-          <h4>login</h4>
-          <input type="text" name="email" id="userEmail" placeholder="email"/><br>
-          <input type="password" name="password" placeholder="password"/><br>
-          <input type="button" id="login" value="login"/>
-          <input type="button" id="logout" value="logout"/>
-        </form>
-      </div>
-      <h3>users</h3>
       <form id="searchUserForm" >
         <h4>search a user</h4>
         <input type="text" name="email" placeholder="exact email"/><br>
@@ -144,7 +152,7 @@
       <div id="listGroups">
       </div>
       <br>
-      <div id="thisGroup" class="output" >
+      <div id="thisGroup" class="this" >
       </div>
       <div id="addGroupMembers">
       </div>
@@ -164,6 +172,7 @@
         <a href="#top">top</a>
       </div>
     </div>
+
     <div id="entries">
       <h3>entries</h3>
       <div id="groupsEntries">
@@ -173,7 +182,7 @@
       <div id="listEntries">
       </div>
       <br>
-      <div id="thisEntry" class="output" >
+      <div id="thisEntry" class="this" >
       </div>
       <div id="creatingEntry">
         <form id="newEntryForm">

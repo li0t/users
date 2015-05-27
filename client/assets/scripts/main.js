@@ -45,7 +45,7 @@ $(document).ready(function() {
 
       if (user.profile.pictures && user.profile.pictures.length) {
 
-        $('#thisUser').append('<p>pictures: </p><ul id="thisUserPictures" ></ul>');
+        $('#thisUser').append('<ul id="thisUserPictures" ></ul>');
 
         user.profile.pictures.forEach(function(pic) {
 
@@ -56,13 +56,10 @@ $(document).ready(function() {
         });
       }
 
-      if (!contacts || !contacts.length) {
-        loadContacts();
-      }
+      loadContacts();
 
-      if (!groups || !groups.length) {
-        loadGroups();
-      }
+      loadGroups();
+
 
     });
 
@@ -140,12 +137,6 @@ $(document).ready(function() {
         $('#listGroups').
         append('<h4>your groups</h4>');
 
-        $('#groupsEntries').
-        append('<h4>groups entries</h4>');
-
-        /** In case the entries does not belong to a group */
-        $("#newEntryForm").prepend('<input type="radio" name="group" value=""/>none<br>');
-
         groups.forEach(function(group) {    
 
           /** Groups list of session user */ 
@@ -153,25 +144,36 @@ $(document).ready(function() {
           append('<input type="radio" ' +
                  'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
 
-          $('#groupsEntries').
-          append('<input type="radio" ' +
-                 'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
-
-          /** Available groups to create entries in*/
-          $("#newEntryForm").prepend('<input type="radio" name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
-
           /** Store de group admin */
           admin[group._id] = group.admin;
 
         });
 
-        $("#newEntryForm").
-        prepend('<h4>create an entry</h4>' +
-                '<p>...will you choose a group?</p>');
-
         $('#listGroups').find("input[type='radio'][name=group]").click(function() {
 
-          $('#thisGroup').empty().append('<p>members</p>');
+          /** 
+           * Leave group
+           */
+          $('#thisGroup').empty().append('<input type="button"  id="leaveGroup" value="leave group"/><br>');
+
+          $("#leaveGroup").click(function() {
+
+            $.
+            post("api/groups/" + group + "/removeMembers", "members=" + user._id).
+
+            done(function(data) {
+
+              loadGroups();
+              $('#groupsOutput').val(data);
+
+            }).
+
+            fail(function(data) {
+              alert(data.status + '  (' + data.statusText +')');
+            });
+          });
+
+          $('#thisGroup').append('<p>members</p>');
 
           $this = $(this);
 
@@ -240,8 +242,8 @@ $(document).ready(function() {
                 });
 
                 /** 
-               * Change group administrator
-               */
+                 * Change group administrator
+                 */
                 $('#thisGroup').append('<br><form id="thisGroupNewAdminForm"></form>');
 
                 members.forEach(function(member) {
@@ -307,11 +309,8 @@ $(document).ready(function() {
 
               if (document.getElementById('groupNewMembersForm').hasChildNodes()) {
 
-                $("<p>add new members</p>").insertBefore("#groupNewMembersForm");
-
                 $('#groupNewMembersForm').
                 append('<input type="button" id="addGroupMembers" value="add members"/><br>');
-
 
                 $("#addGroupMembers").click(function() {
 
@@ -332,28 +331,6 @@ $(document).ready(function() {
                 });
               }
             }
-
-            /** 
-               * Leave group
-               */
-            $('#thisGroup').append('<input type="button"  id="leaveGroup" value="leave group"/>');
-
-            $("#leaveGroup").click(function() {
-
-              $.
-              post("api/groups/" + group + "/removeMembers", "members=" + user._id).
-
-              done(function(data) {
-
-                loadGroups();
-                $('#groupsOutput').val(data);
-
-              }).
-
-              fail(function(data) {
-                alert(data.status + '  (' + data.statusText +')');
-              });
-            });
 
           }).
 
@@ -389,7 +366,7 @@ $(document).ready(function() {
 
       if (entry.pictures.length) {
 
-        $('#thisEntry').append('<ul id="thisEntryPictures" class="pictures" ></ul>');
+        $('#thisEntry').append('<ul id="thisEntryPictures" ></ul>');
 
         entry.pictures.forEach(function(pic) {
 
@@ -400,8 +377,20 @@ $(document).ready(function() {
         });
       }
 
+      if (entry.tags.length) {
+
+        $('#thisEntry').append('tags: <ul></ul>');
+
+        entry.tags.forEach(function(tag) {
+
+          $('#thisEntry').
+          append('<li><p>' + tag + '</p></li>');
+
+        });
+      }
+
       $('#thisEntry').
-      append('<p>upload pictures to this entry</p>' +
+      append('<p>upload pictures to ' + entry.title + '</p>' +
              '<form id="entryPicturesForm" enctype="multipart/form-data">' +
              '<input type="file" id="entryPictures" multiple/><br>' +
              '<input type="submit" value="upload"/>' +
@@ -437,7 +426,7 @@ $(document).ready(function() {
           },
 
           error: function(data) {
-            alert(data);
+            alert(data.status + '  (' + data.statusText +')');
           }
         });
       });
@@ -451,10 +440,63 @@ $(document).ready(function() {
 
   function loadEntries() {
 
-
     $('#thisEntry').empty();
-    $('#listEntries').empty();
     $('#listGroupEntries').empty();
+
+    /** Re-create entry form */
+    $('#newEntryForm').
+    empty().
+    append('<h4>create an entry</h4>'+
+           '<p>...will you choose a group?</p>');
+
+    $('#groupsEntries').
+    empty().
+    append('<h4>groups entries</h4>');
+
+    groups.forEach(function(group) {
+
+      $('#groupsEntries').
+      append('<input type="radio" ' +
+             'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
+
+      /** Available groups to create entries in*/
+      $("#newEntryForm").append('<input type="radio" name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
+
+    });
+
+    /** In case the entries does not belong to a group */
+    $("#newEntryForm").append('<input type="radio" name="group" value=""/>none<br>');
+
+    $('#newEntryForm').
+    append('<input type="text" name="title" placeholder="title..."/><br>' +
+           '<textarea rows="8" cols="8" name="content" placeholder="content..."></textarea><br>' +
+           '<ul id="entryTags" name="tags"></ul>  ' +
+           '<input type="button" id="createEntry" value="send"/><br>'
+          );
+
+    $("#entryTags").tagit({
+      availableTags: tagsNames,
+      placeholderText: 'add new tag here...'
+    });
+
+    $('#createEntry').click(function() {
+
+      $.
+      post("api/entries/create", $("#newEntryForm").serialize()).
+
+      done(function(data) {
+
+        loadEntries();
+        $('#entriesOutput').val('Created new entry : ' + data);
+
+      }).
+
+      fail(function(data) {
+
+        alert(data.status + '  (' + data.statusText +')');
+
+      });
+    });
 
     $.
     get('api/entries/user/' + user._id).
@@ -467,6 +509,7 @@ $(document).ready(function() {
       if (entries.length) {
 
         $('#listEntries').
+        empty().
         append('<h4>your entries</h4>');
 
         entries.forEach(function(entry) {
@@ -483,86 +526,52 @@ $(document).ready(function() {
         loadEntry($(this), this.value);
 
       });
+    });
 
-      $('#groupsEntries').find("input[type='radio'][name=group]").click(function() {
+    $('#groupsEntries').find("input[type='radio'][name=group]").click(function() {
 
-        group = this.value;
+      group = this.value;
 
-        $('#listGroupEntries').empty();
+      $('#listGroupEntries').empty();
 
-        $.
-        get('api/entries/group/' + group).
+      $.
+      get('api/entries/group/' + group).
 
-        done(function(entries) {
+      done(function(entries) {
 
-          if (entries.length) {
+        if (entries.length) {
 
-            for (var i = 0; i < groups.length; i++) {
+          for (var i = 0; i < groups.length; i++) {
 
-
-              if (groups[i]._id === group) {
-
-                $('#listGroupEntries').
-                append('<h4>' + groups[i].profile.name  + ' entries</h4>');
-                break;
-              }
-            }
-
-            entries.forEach(function(entry) {
+            if (groups[i]._id === group) {
 
               $('#listGroupEntries').
-              append('<input type="radio" ' +
-                     'name="entry" value="' + entry._id+ '"/>' + entry.title + '<br>');
-
-            });
-
-            $('#listGroupEntries').find("input[type='radio'][name=entry]").click(function() {
-
-              loadEntry($(this), this.value);
-
-            });
-          } else {
-            $('#listGroupEntries').
-            append('<h4>no entries</h4>');
+              append('<h4>' + groups[i].profile.name  + ' entries</h4>');
+              break;
+            }
           }
-        }).
 
-        fail(function(data) {
-          alert(data.status + '  (' + data.statusText +')');
-        });
-      });
+          entries.forEach(function(entry) {
 
-      /** Re-create entry form */
-      $('#newEntryForm').
-      append('<input type="text" name="title" placeholder="title..."/><br>' +
-             '<textarea rows="8" cols="8" name="content" placeholder="content..."></textarea><br>' +
-             '<ul id="entryTags" name="tags"></ul>  ' +
-             '<input type="button" id="createEntry" value="send"/><br>'
-            );
+            $('#listGroupEntries').
+            append('<input type="radio" ' +
+                   'name="entry" value="' + entry._id+ '"/>' + entry.title + '<br>');
 
-      $("#entryTags").tagit({
-        availableTags: tagsNames,
-        placeholderText: 'add new tag here...'
-      });
+          });
 
-      $('#createEntry').click(function() {
+          $('#listGroupEntries').find("input[type='radio'][name=entry]").click(function() {
 
-        $.
-        post("api/entries/create", $("#newEntryForm").serialize()).
+            loadEntry($(this), this.value);
 
-        done(function(data) {
+          });
+        } else {
+          $('#listGroupEntries').
+          append('<h4>no entries</h4>');
+        }
+      }).
 
-          loadEntries();
-          $('#newEntryForm')[0].reset();
-          $('#entriesOutput').val('Created new entry : ' + data);
-
-        }).
-
-        fail(function(data) {
-
-          alert(data.status + '  (' + data.statusText +')');
-
-        });
+      fail(function(data) {
+        alert(data.status + '  (' + data.statusText +')');
       });
     });
 
@@ -673,6 +682,8 @@ $(document).ready(function() {
       }
     });
 
+    $('#searchUserForm')[0].reset();
+
   });
 
   /** 
@@ -691,6 +702,8 @@ $(document).ready(function() {
       alert(data.status + '  (' + data.statusText +')');
     });
 
+    $('#newUserForm')[0].reset();
+
   });
 
   /** 
@@ -708,6 +721,8 @@ $(document).ready(function() {
     fail(function(data) {
       alert(data.status + '  (' + data.statusText +')\n' + data.responseText);
     });
+
+    $('#changePasswordForm')[0].reset();
 
   });
 
@@ -728,6 +743,9 @@ $(document).ready(function() {
       alert(data.status + '  (' + data.statusText +')\n' + data.responseText);
     });
 
+    $('#invitedSigninForm')[0].reset();
+
+
   });
 
   /** 
@@ -742,6 +760,8 @@ $(document).ready(function() {
 
       loadSession();
       $('#loginForm')[0].reset();
+      $('#groupsOutput').val('');
+      $('#entriesOutput').val('');
       $('#usersOutput').val('Logged in');
 
     }).
@@ -768,6 +788,8 @@ $(document).ready(function() {
       alert(data.status + '  (' + data.statusText +')');
     });
 
+    $('#recoverPasswordForm')[0].reset();
+
   });
 
   /**
@@ -785,6 +807,8 @@ $(document).ready(function() {
     fail(function(data) {
       alert(data.status + '  (' + data.statusText +')');
     });
+
+    $('#resetPasswordForm')[0].reset();
 
   });
 
@@ -808,6 +832,9 @@ $(document).ready(function() {
     fail(function(data) {
       alert(data.status + '  (' + data.statusText +')');
     });
+
+    $('#updateProfileForm')[0].reset();
+
 
   });
 
@@ -840,9 +867,11 @@ $(document).ready(function() {
       },
 
       error: function(data) {
-        alert(data);
+        alert(data.status + '  (' + data.statusText +')');
       }
     });
+
+    $('#uploadProfilePicturesForm')[0].reset();
 
   });
 
@@ -882,15 +911,6 @@ $(document).ready(function() {
   });
 
   /** 
-   * Clear users output
-   */
-  $('#clearUsersOutput').on('click', function() {
-
-    $('#usersOutput').val('');
-
-  });
-
-  /** 
    * Create group
    */
   $("#createGroup").on('click', function() {
@@ -906,6 +926,17 @@ $(document).ready(function() {
     fail(function(data) {
       alert(data.status + '  (' + data.statusText +')');
     });
+
+    $('#createGroupForm')[0].reset();
+
+  });
+
+  /** 
+   * Clear users output
+   */
+  $('#clearUsersOutput').on('click', function() {
+
+    $('#usersOutput').val('');
 
   });
 
