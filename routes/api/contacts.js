@@ -291,8 +291,8 @@ module.exports = function (router, mongoose) {
                         exec(function(err, removed) { 
                           if(err) {
                             debug(err);
-                          } else {
-                            debug('%s removed with user %s and sender %s', removed, receiver.user, sender.user);
+                          } else if (removed) {
+                            debug('contact request token with user %s and sender %s has been removed', receiver.user, sender.user);
                           }
                         });
 
@@ -303,8 +303,8 @@ module.exports = function (router, mongoose) {
                         exec(function(err, removed) { 
                           if(err) {
                             debug(err);
-                          } else {
-                            debug('%s removed with user %s and sender %s', removed, sender.user, receiver.user);
+                          } else if (removed) {
+                            debug('contact request token with user %s and sender %s has been removed', receiver.user, sender.user);
                           }
                         });
                       }

@@ -148,7 +148,7 @@ module.exports = function (router, mongoose) {
             } else {
 
               message = {
-                "html": "<a href='http://" + url + "/api/users/" + user._id + "'>Go to emeeter</a>",
+                "html": "<a href='http://" + url + "/'>Go to emeeter</a>",
                 "text": "Someone wants to contact you",
                 "subject": "Someone wants to contact you",
                 "from_email": senderEmail,

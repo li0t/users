@@ -597,7 +597,7 @@ module.exports = function (router, mongoose) {
         }
 
       } else if (user) {
-        debug(user);
+        
         res.send(user);
 
       } else {
