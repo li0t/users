@@ -129,9 +129,14 @@ module.exports = function (router, mongoose) {
 
             res.status(409).send("Looks like you havent confirmed your email yet.");
 
-          } else {
+          } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
 
             res.status(409).send("Looks like you have disabled your account.");
+            
+          } else {
+            
+            res.status(409).send("There is an internal problem, contact the administrator");
+            
           }
         } else {
           setTimeout(function () {
@@ -555,9 +560,9 @@ module.exports = function (router, mongoose) {
             next(err);
 
           } else {
-
+            
             req.session.user = user;
-            res.send(user._id);
+            res.redirect('http://' + req.headers.host + '/');
 
             Token.remove({
               user: user._id
@@ -597,7 +602,7 @@ module.exports = function (router, mongoose) {
         }
 
       } else if (user) {
-        
+
         res.send(user);
 
       } else {

@@ -11,7 +11,8 @@ var relations = component('relations'),
 module.exports = function (router, mongoose) {
 
   var Contact = mongoose.model('contact'),
-      Token = mongoose.model('token');
+      Token = mongoose.model('token'),
+      User = mongoose.model('user');
 
   /** 
    * Add contact
@@ -59,22 +60,27 @@ module.exports = function (router, mongoose) {
                       next(err);
                     } else {
 
-                      Token.
-                      findOne().
-                      where('user', receiver.user).
-                      exec(function(err, token) {
+                      User.
+                      findById(receiver.user).
+                      exec(function(err, user) {
+
                         if (err) {
                           next(err);
 
-                        } else if (token) { /** The user is not part of emeeter and the invitation email is already been sent */
+                        } else { 
 
-                          res.send('Great! You have invited a collaborator to emeeter'); 
+                          /** The user was not part of the emeeter platform, and is in a pending state */
+                          if (_.isEqual(user.state, statics.model('state', 'pending')._id)) { 
 
-                        } else { /** The user is part of emeeter and a contact request email is going to be sent */
+                            res.send('Great! You have invited a collaborator to emeeter'); 
 
-                          res.redirect('/api/mandrill/addContact/' + receiver.user);
 
-                        }                   
+                          } else { /** The user is part of emeeter and a contact request email is going to be sent */
+
+                            res.redirect('/api/mandrill/addContact/' + receiver.user);
+
+                          }  
+                        }
                       });
                     }
                   });
@@ -381,7 +387,7 @@ module.exports = function (router, mongoose) {
                 debug(err);
 
               } else if (token) {
-                
+
                 contact = contact.user.toObject();
                 contact.token = token._id;
                 contacts.push(contact);

@@ -11,9 +11,46 @@ $(document).ready(function() {
       group,
       admin,
       members, 
-      tags, 
+      tags,
+      statics,
       tagsNames, 
       entries;
+
+  function loadStatics() {
+
+    $. /* Load platform tags */
+    get('api/statics/?statics=gender&statics=state&statics=priority').
+    done(function(data) {
+
+      statics = data;
+
+      statics.gender.forEach(function(gender){
+
+        $('#genders').append('<option value="' + gender._id + '">' + gender.slug + '</option>');
+
+      });
+    });
+
+  }
+
+
+  function loadTags() {
+
+    $. /* Load platform tags */
+    get('api/tags').
+    done(function(data) {
+
+      tags = data;
+      tagsNames = [];
+
+      tags.forEach(function(tag) { 
+
+        tagsNames.push(tag.name);
+
+      });
+    });
+
+  }
 
   function loadUser(){ 
 
@@ -62,24 +99,6 @@ $(document).ready(function() {
       loadGroups();
 
 
-    });
-
-  }
-
-  function loadTags() {
-
-    $. /* Load platform tags */
-    get('api/tags').
-    done(function(data) {
-
-      tags = data;
-      tagsNames = [];
-
-      tags.forEach(function(tag) { 
-
-        tagsNames.push(tag.name);
-
-      });
     });
 
   }
@@ -567,6 +586,7 @@ $(document).ready(function() {
   function loadEntries() {
 
     $('#thisEntry').empty();
+    $('#listEntries').empty();
     $('#listGroupEntries').empty();
 
     /** Re-create entry form */
@@ -707,6 +727,7 @@ $(document).ready(function() {
 
     loadUser();
     loadTags();
+    loadStatics();
 
   }
 
@@ -825,7 +846,13 @@ $(document).ready(function() {
     }).
 
     fail(function(data) {
-      alert(data.status + '  (' + data.statusText +')');
+
+      if (data.status === 409) {
+        alert('That user already exists!');
+      } else {
+        alert(data.status + '  (' + data.statusText +')');
+      }
+
     });
 
     $('#newUserForm')[0].reset();
@@ -893,7 +920,13 @@ $(document).ready(function() {
     }).
 
     fail(function(data) {
-      alert(data.status + '  (' + data.statusText +')');
+
+      if (data.status === 409) {
+        alert(data.responseText);
+      } else {
+        alert(data.status + '  (' + data.statusText +')');
+      }
+
     });
 
   });
@@ -942,7 +975,7 @@ $(document).ready(function() {
    * Update profile
    */
   $("#updateProfile").on('click', function() {
-
+    console.log($("#updateProfileForm").serialize());
     $.
     post("api/profiles/", $("#updateProfileForm").serialize()).
 

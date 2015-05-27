@@ -1,0 +1,27 @@
+{
+    "_id" : ObjectId("5542539742a7313b59a037d9"),
+    "slug" : "pending",
+    "name" : "Pending",
+    "__v" : 0
+}
+
+{
+    "_id" : ObjectId("5542539742a7313b59a037da"),
+    "slug" : "active",
+    "name" : "Active",
+    "__v" : 0
+}
+
+{
+    "_id" : ObjectId("5542539742a7313b59a037db"),
+    "slug" : "disabled",
+    "name" : "Disabled",
+    "__v" : 0
+}
+
+{
+    "_id" : ObjectId("5542539742a7313b59a037dc"),
+    "slug" : "completed",
+    "name" : "Completed",
+    "__v" : 0
+}

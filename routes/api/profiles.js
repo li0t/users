@@ -20,7 +20,7 @@ module.exports = function (router, mongoose) {
     var genders = statics.models.gender,
         _gender,
         gender = null;
-
+    
     for (_gender in genders) { /** Search the gender id and check that exists */
 
       if (genders.hasOwnProperty(_gender)) {
