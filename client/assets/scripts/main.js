@@ -5,6 +5,7 @@
 $(document).ready(function() {
 
   var contacts,
+      pending,
       groups,
       user,
       group,
@@ -85,6 +86,8 @@ $(document).ready(function() {
 
   function loadContacts() {
 
+    var i, contact, token;
+
     $('#newGroupMembers').empty(); 
 
     $. /* Load session user contacts */
@@ -96,17 +99,140 @@ $(document).ready(function() {
 
       if (contacts.length) {
 
+        $('#thisUser').append('<form id="contactsForm"></form>');
+
+        $('#contactsForm').
+        append('<p>contacts</p>');  
+
         $('#newGroupMembers').
         append('<p>select new group members</p>');  
 
         /** Load available members of a group */
         contacts.forEach(function(contact) {
 
+          $("#contactsForm").
+          append('<input type="radio" name="contact" value="' + contact._id+ '"/>' + contact.email + '<br>');
+
           $('#newGroupMembers').
           append('<input type="checkbox" name="members" value="' + contact._id+ '"/>' + contact.email + '<br>');  
 
         });
+
+        $('#contactsForm').
+        append('<input type="button" id="deleteContact" value="delete contact"/><br>');  
+
+        $('#deleteContact').click(function() {
+
+          var contact = $('#contactsForm').find('input[name="contact"]:checked').val();
+
+          $.
+          get("api/contacts/delete/" + contact).
+
+          done(function(data) {
+
+            loadUser();
+            $('#usersOutput').val(data);
+
+          }).
+
+          fail(function(data) {
+
+            alert(data.status + '  (' + data.statusText +')');
+
+          });
+        });
       }
+    });
+
+
+    $. /** Get pending contact requests of session user */
+    get('/api/contacts/pending').
+
+    done(function(data) {
+
+      pending = data;
+
+      if (pending.length) {
+
+        $('#thisUser').append('<form id="pendingContactsForm"></form>');
+
+        $('#pendingContactsForm').
+        append('<p>contacts requests</p>');  
+
+        pending.forEach(function(pending){
+
+          $("#pendingContactsForm").
+          append('<input type="radio" name="contact" value="' + pending._id+ '"/>' + pending.email + '<br>');
+
+        });
+
+        $('#pendingContactsForm').
+        append('<input type="button" id="rejectContact" value="reject"/><br>'); 
+
+        $('#pendingContactsForm').
+        append('<input type="button" id="confirmContact" value="confirm"/><br>');  
+
+        /** Confirm contact request */
+        $('#confirmContact').click(function() {
+
+          contact = $('#pendingContactsForm').find('input[name="contact"]:checked').val();
+
+          for (i = 0; i < pending.length; i++) {
+
+            if (pending[i]._id === contact) {
+
+              token = pending[i].token;
+              break;
+
+            }
+          }
+
+          $.
+          get("api/contacts/confirm/" + token).
+
+          done(function(data) {
+
+            loadUser();
+            $('#usersOutput').val(data);
+
+          }).
+
+          fail(function(data) {
+
+            alert(data.status + '  (' + data.statusText +')');
+
+          });
+        });
+
+        /** Reject contact request */
+        $('#rejectContact').click(function() {
+
+          contact = $('#pendingContactsForm').find('input[name="contact"]:checked').val();
+
+          $.
+          get("api/contacts/delete/" + contact).
+
+          done(function(data) {
+
+            loadUser();
+            $('#usersOutput').val(data);
+
+          }).
+
+          fail(function(data) {
+
+            alert(data.status + '  (' + data.statusText +')');
+
+          });
+        });
+
+      } 
+    }).
+
+    fail(function(data) {
+
+      alert(data.status + '  (' + data.statusText +')');
+
     });
 
   }

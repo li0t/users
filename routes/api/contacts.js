@@ -256,6 +256,7 @@ module.exports = function (router, mongoose) {
                   });
                 }
               });
+
             } else {
 
               senderIsContact = receiverRelation.isContact(sender.user, true);
@@ -280,6 +281,32 @@ module.exports = function (router, mongoose) {
                         debug('The contact request between %s and %s has been deleted!', receiver.user, sender.user);
                         res.send('The contact request between ' + receiver.user + ' and ' + sender.user + ' has been deleted!');
 
+                        /** 
+                         * Remove contact request token
+                         */
+                        Token.
+                        remove({
+                          user: receiver.user,
+                          sender: sender.user }).
+                        exec(function(err, removed) { 
+                          if(err) {
+                            debug(err);
+                          } else {
+                            debug('%s removed with user %s and sender %s', removed, receiver.user, sender.user);
+                          }
+                        });
+
+                        Token.
+                        remove({
+                          user: sender.user,
+                          sender: receiver.user }).
+                        exec(function(err, removed) { 
+                          if(err) {
+                            debug(err);
+                          } else {
+                            debug('%s removed with user %s and sender %s', removed, sender.user, receiver.user);
+                          }
+                        });
                       }
                     });
                   }
@@ -303,19 +330,18 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Get contacts of session user
+   * Get pending contact requests of session user
    */ 
-  router.get('/', function(req, res, next) {
+  router.get('/pending', function(req, res, next) {
 
-    var checked = 0,
+    var sessionUser = req.session.user._id,
+        checked = 0,
         toCheck = 0,
-        toPopulate = 0,
-        populated = 0,
         contacts = [],
 
         send = function () {
 
-          if (checked === toCheck && populated === toPopulate) {
+          if (checked === toCheck) {
             res.send(contacts);
           }
         };
@@ -324,12 +350,15 @@ module.exports = function (router, mongoose) {
 
     findOne().
 
-    where('user', req.session.user._id).
+    where('user', sessionUser).
+
+    deepPopulate('contacts.user').
 
     exec(function(err, found) {
 
       if (err) {
         next(err);
+
       } else if (found.contacts.length) {
 
         toCheck = found.contacts.length;
@@ -338,24 +367,33 @@ module.exports = function (router, mongoose) {
 
           checked += 1;
 
-          if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
+          if (_.isEqual(contact.state, statics.model('state', 'pending')._id)) {
 
-            toPopulate += 1;
+            checked -= 1;
 
-            contact.deepPopulate('user.profile', function(err, contact) {
+            Token.
+            findOne().
+            where('user', sessionUser).
+            where('sender', contact.user._id).
+            exec(function(err, token) {
 
               if (err) {
                 debug(err);
 
-              } else {
+              } else if (token) {
                 
-                populated += 1;
-                contacts.push(contact.user);
+                contact = contact.user.toObject();
+                contact.token = token._id;
+                contacts.push(contact);
 
-                if (populated === toPopulate) {
-                  send();
-                }
               }
+
+              checked += 1;
+
+              if (checked === toCheck) {
+                send();
+              }
+
             }); 
 
           } else if (checked === toCheck) {
@@ -368,6 +406,42 @@ module.exports = function (router, mongoose) {
       }
     });
 
+  });
+
+  /**
+   * Get contacts of session user
+   */ 
+  router.get('/', function(req, res, next) {
+
+    var contacts = [];
+
+    Contact.
+
+    findOne().
+
+    where('user', req.session.user._id).
+
+    deepPopulate('contacts.user').
+
+    exec(function(err, found) {
+
+      if (err) {
+        next(err);
+
+      } else {
+
+        found.contacts.forEach(function(contact) {
+
+          if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
+
+            contacts.push(contact.user);
+
+          }
+        });
+
+        res.send(contacts);
+      }
+    });
   });
 
 };
