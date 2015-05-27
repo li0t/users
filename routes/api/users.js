@@ -228,11 +228,11 @@ module.exports = function (router, mongoose) {
 
               } else {
 
+                delete req.session.token; 
+
                 req.session.user = user;
 
                 res.send('Password reset successful');
-
-                delete req.session.token; /** IMPORTANT! Token seems to survive this action */
 
                 Token.remove({_id : token._id}, function(err) {
                   if (err) {

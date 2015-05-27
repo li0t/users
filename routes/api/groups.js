@@ -90,9 +90,9 @@ module.exports = function (router, mongoose) {
 
             });
           } else {
-            
+
             saveGroup();
-            
+
           }
         }
       });
@@ -234,21 +234,9 @@ module.exports = function (router, mongoose) {
                 group.admin = group.members[0];
               }
 
-              group.save(function(err) {
-                if (err) {
-                  next(err);
-
-                } else {
-
-                  debug('%s of %s members removed from group %s' , removed, members.length, group._id);
-                  res.send(removed + ' of ' + members.length + ' members removed from group ' + group._id);
-
-                }
-              });
-
             } else {
 
-              res.sendStatus(410);
+              debug('The group %s, has no members left' , group._id);
 
               /** Group.remove({_id : group._id}, function(err) {
                 if (err) { 
@@ -258,6 +246,19 @@ module.exports = function (router, mongoose) {
               }); */
 
             }
+
+            group.save(function(err) {
+              if (err) {
+                next(err);
+
+              } else {
+
+                debug('%s of %s members removed from group %s' , removed, members.length, group._id);
+                res.send(removed + ' of ' + members.length + ' members removed from group ' + group._id);
+
+              }
+            });
+
           } else {
             debug('User %s was not found in group %s' , req.session.user._id, group._id);
             res.sendStatus(403);
