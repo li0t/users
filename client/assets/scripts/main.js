@@ -14,7 +14,8 @@ $(document).ready(function() {
       tags,
       statics,
       tagsNames, 
-      entries;
+      entries,
+      tasks;
 
   function loadStatics() {
 
@@ -267,7 +268,7 @@ $(document).ready(function() {
     $('#thisGroup').empty();
     $('#listGroups').empty();
     $('#groupsEntries').empty();
-    $('#newEntryForm').empty();
+
 
     $. /* Load session user groups */
     get('api/groups/me').
@@ -496,6 +497,178 @@ $(document).ready(function() {
 
   }
 
+  function loadTask($this, id) {
+
+    $.
+    get('api/tasks/' + id).
+
+    done(function(task) {
+
+      console.log(task);
+
+    }).
+
+    fail(function(data) { 
+      alert(data.status + '  (' + data.statusText +')');
+    });
+
+  }
+
+  function loadTasks() {
+
+    $('#thisTask').empty();
+    $('#listTasks').empty();
+    $('#listGroupTasks').empty();
+
+    /** Re-create entry form */
+    $('#newTaskForm').
+    empty().
+    append('<h4>create a Task</h4>'+
+           '<select name="group"></select>' +
+           '<select name="priority"></select>');
+
+    $('#groupsTasks').
+    empty().
+    append('<h4>groups tasks</h4>');
+
+    $("#newTaskForm").find("select[name=group]").append('<option value="">group</option>');
+
+    groups.forEach(function(group) {
+
+      $('#groupsTasks').
+      append('<input type="radio" ' +
+             'name="group" value="' + group._id+ '"/>' + group.profile.name + '<br>');
+
+      /** Available groups to create tasks in*/
+      $("#newTaskForm").find("select[name=group]").append('<option value="' + group._id + '">' + group.profile.name + '</option>');
+
+    });
+
+    $("#newTaskForm").find("select[name=priority]").append('<option value="">priority</option>');
+
+    statics.priority.forEach(function(priority) {
+
+      /** Available priorities*/
+      $("#newTaskForm").find("select[name=priority]").append('<option value="' + priority._id + '">' + priority.slug + '</option>');
+
+    });
+
+    $('#newTaskForm').
+    append('<input type="text" name="objective" placeholder="objective..."/><br>' +
+           '<input type="text" name="dateTime" id="taskDateTime" placeholder="date time"/>' +
+           '<input type="button" id="createTask" value="send"/><br>'
+          );
+
+    $('#taskDateTime').datepicker();
+
+    $('#createTask').click(function() {
+
+      $.
+      post("api/tasks/create", $("#newTaskForm").serialize()).
+
+      done(function(data) {
+
+        loadTasks();
+        $('#tasksOutput').val('Created new entry : ' + data);
+
+      }).
+
+      fail(function(data) {
+
+        alert(data.status + '  (' + data.statusText +')');
+
+      });
+
+      $("#newTaskForm")[0].reset();
+    });
+
+    $.get('/api/tasks/me').
+
+    done(function(data) { 
+
+      tasks = data;
+
+      /** Load session user tasks */
+      if (tasks.length) {
+
+        $('#listTasks').
+        empty().
+        append('<h4>your tasks</h4>');
+
+        tasks.forEach(function(task) {
+
+          $('#listTasks').
+          append('<input type="radio" ' +
+                 'name="task" value="' + task._id+ '"/>' + task.objective + ' (' + task.priority.slug + ') (' + task.state.slug + ')<br>');
+
+        });
+
+        $('#listTasks').find("input[type='radio'][name=task]").click(function() {
+
+          loadTask($(this), this.value);
+
+        });
+      }
+
+      $('#groupTasks').find("input[type='radio'][name=group]").click(function() {
+
+        group = this.value;
+
+        $('#listGroupTasks').empty();
+
+        $.
+        get('api/tasks/group/' + group).
+
+        done(function(entries) {
+
+          if (entries.length) {
+
+            for (var i = 0; i < groups.length; i++) {
+
+              if (groups[i]._id === group) {
+
+                $('#listGroupTasks').
+                append('<h4>' + groups[i].profile.name  + ' tasks</h4>');
+                break;
+              }
+            }
+
+            entries.forEach(function(entry) {
+
+              $('#listGroupTasks').
+              append('<input type="radio" ' +
+                     'name="entry" value="' + entry._id+ '"/>' + entry.title + '<br>');
+
+            });
+
+            $('#listGroupTasks').find("input[type='radio'][name=entry]").click(function() {
+
+              loadTask($(this), this.value);
+
+            });
+          } else {
+            $('#listGroupTasks').
+            append('<h4>no entries</h4>');
+          }
+        }).
+
+        fail(function(data) {
+
+          alert(data.status + '  (' + data.statusText +')');
+
+        });
+
+      });
+    }).
+
+    fail(function(data) { 
+
+      alert(data.status + '  (' + data.statusText +')');
+
+    });
+
+  }
+
   function loadEntry($this, id) {
 
     $.
@@ -672,6 +845,11 @@ $(document).ready(function() {
         loadEntry($(this), this.value);
 
       });
+
+      if (groups.length) {
+        loadTasks();
+      }
+
     });
 
     $('#groupsEntries').find("input[type='radio'][name=group]").click(function() {
@@ -1114,6 +1292,15 @@ $(document).ready(function() {
   $('#clearEntriesOutput').on('click', function() {
 
     $('#entriesOutput').val('');
+
+  });
+
+  /** 
+   * Clear entries output
+   */
+  $('#clearTasksOutput').on('click', function() {
+
+    $('#tasksOutput').val('');
 
   });
 

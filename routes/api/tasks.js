@@ -301,48 +301,6 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Get task collaborators
-   */
-  router.get('/:taskId/collaborators', function(req, res, next) {
-
-    var user = req.session.user._id; 
-
-    Task.
-
-    findById(req.params.taskId).
-
-    deepPopulate('collaborators.profile').
-
-    exec(function(err, task) {
-
-      if (err) {
-        if (err.name && (err.name === 'CastError')) {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
-      } else if (task) {
-
-        relations.membership(task.group, function(taskGroup) {
-
-          if (taskGroup.isMember(user)) {
-
-            res.send(task.collaborators);
-
-          } else {
-            debug('User %s is not allowed to get information about task %s', user, task._id);
-            res.sendStatus(403);
-          }
-        });
-      } else {
-        debug('Task %s was not found' , req.params.taskId);
-        res.sendStatus(404);
-      }
-    });
-
-  });
-
-  /**
    * Add notes to a task
    */
   router.post('/:taskId/addNotes', function(req, res, next) {
@@ -713,7 +671,53 @@ module.exports = function (router, mongoose) {
         res.sendStatus(404);
       }
     });
-    
+
+  });
+
+  /**
+   * Get a task
+   **/
+  router.get('/:id', function(req, res, next) {
+
+    var task = req.params.taskId,
+        user = req.session.user._id;
+
+    relations.collaboration(task, function(collaboration) {
+
+      task = collaboration.task; /** The task model */
+
+      /** Check if task exists and is available for changes */
+      if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+
+        relations.membership(task.group, function(taskGroup) {
+
+          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+            task.
+
+            populate('collaborators entries').
+
+            exec(function(err, task) {
+
+              if (err) {
+                next(err);
+              } else {
+                res.send(task);
+              }
+
+            });
+
+          } else {
+            debug('User %s is not allowed to modify task %s', user, task._id);
+            res.sendStatus(403);
+          } 
+        });
+      } else {
+        debug('Task %s was not found' , req.params.taskId);
+        res.sendStatus(404);
+      }
+    });
+
   });
 
 };

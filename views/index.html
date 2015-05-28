@@ -56,6 +56,8 @@
     <li><a href="#users">/users</a></li>
     <li><a href="#groups">/groups</a></li>
     <li><a href="#entries">/entries</a></li>
+    <li><a href="#tasks">/tasks</a></li>
+
   </ul>
 
   <div id="sections">
@@ -192,6 +194,25 @@
       <a href="#top">top</a>
     </div>
 
+    <div id="tasks">
+      <h3>tasks</h3>
+      <div id="groupsTasks">
+      </div>
+      <div id="listGroupTasks">
+      </div>
+      <div id="listTasks">
+      </div>
+      <br>
+      <div id="thisTask" class="this" >
+      </div>
+      <div id="creatingTask">
+        <form id="newTaskForm">
+        </form>
+      </div>
+      <h4>output</h4>
+      <textarea id="tasksOutput" rows="8" cols="8" class="output" ></textarea><br>
+      <input type="button" id="clearTasksOutput" value="clear"/><br>
+    </div>
   </div>
 
   <script src="https://cdn.rawgit.com/visionmedia/page.js/master/page.js"></script>
