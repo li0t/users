@@ -50,7 +50,7 @@ module.exports = function (Schema) {
       type: Schema.Types.ObjectId,
       //  ref: ''
     }],*/
-    
+
     dateTime : Date,
 
     notes: [String]
@@ -68,25 +68,28 @@ module.exports = function (Schema) {
   });
 
   /** Check the date time is set in the future */
-  TaskSchema.path('dateTime').validate(function(dateTime, cb){
-    if (dateTime <= new Date()) {
-      cb(false);
-    }
+  TaskSchema.path('dateTime').validate(function(dateTime, cb) {
+    
+    if (dateTime && dateTime <= new Date()) {
+        cb(false);
+      }
+    
     cb(true);
+    
   }, 'The task date time must be in the future!');
 
   /** Lets populate reach any level */
   TaskSchema.plugin(deepPopulate, {
     populate :{
-      
+
       'group' : {
         select: 'name location pictures'
       },
-      
+
       'entries.user' : {
         select: 'email'
       },
-      
+
       'collaborators' : {
         select : 'email'
       }
