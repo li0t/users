@@ -18,11 +18,12 @@ module.exports = function (router, mongoose) {
   router.post('/create', function(req, res, next) {
 
     var group = req.body.group,
+        dateTime = req.body.dateTime || null,
         creator = req.session.user._id,
         priorities = statics.models.priority,
         _priority,
         priority = null;
-
+    debug(dateTime);
     relations.membership(group, function(membership) {
 
       group = membership.group; /** The group model */
@@ -52,7 +53,7 @@ module.exports = function (router, mongoose) {
               state: statics.model('state', 'pending')._id,
               objective: req.body.objective,
               priority: req.body.priority,
-              dateTime: req.body.dateTime,
+              dateTime: dateTime,
               notes: req.body.notes,
             }).
 
@@ -82,7 +83,7 @@ module.exports = function (router, mongoose) {
         }
       } else {
         debug('Group %s not found', req.body.group);
-        res.sendStatus(404);
+        res.status(404).send('group not found');
       }
     });
 
@@ -97,7 +98,35 @@ module.exports = function (router, mongoose) {
 
     find().
 
+    where('creator', req.session.user._id).
+
+    populate('group collaborators entries priority state').
+
+    sort('-created').
+
+    exec(function(err, tasks) {
+
+      if (err) { 
+        next(err);
+      } else {
+        res.send(tasks);
+      }
+    });
+
+  });
+
+  /**
+   * Get tasks where session user is collaborator
+   */
+  router.get('/collaborator', function(req, res, next) {
+
+    Task.
+
+    find().
+
     where('collaborators', req.session.user._id).
+
+    populate('group collaborators entries priority state').
 
     sort('-created').
 
@@ -679,7 +708,7 @@ module.exports = function (router, mongoose) {
    **/
   router.get('/:id', function(req, res, next) {
 
-    var task = req.params.taskId,
+    var task = req.params.id,
         user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -693,11 +722,7 @@ module.exports = function (router, mongoose) {
 
           if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-            task.
-
-            populate('collaborators entries').
-
-            exec(function(err, task) {
+            task.deepPopulate('group collaborators entries priority state', function(err, task) {
 
               if (err) {
                 next(err);
