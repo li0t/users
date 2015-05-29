@@ -10,10 +10,6 @@
   {
     "slug": "disabled",
     "name": "Disabled"
-  },
-  {
-    "slug": "completed",
-    "name": "Completed"
   }
 
 ]

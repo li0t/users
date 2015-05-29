@@ -514,6 +514,10 @@ $(document).ready(function() {
     var i;
     var isCollaborator;
     var collaborators;
+    var $button;
+    var $that;
+    var url;
+    var oldState;
 
     $. /** Get the task document */
     get('api/tasks/' + id).
@@ -527,20 +531,278 @@ $(document).ready(function() {
 
       done(function(members) {
 
-        $('#thisTask').
-        empty().
+        $('#thisTask').empty().append('<form id="thisTaskForm"></form>');
+
+        $('#thisTaskForm').
         append('<h4>task</h4>' +
-          '<p>state: ' + task.state.slug + '</p>' +
-          '<p>objective: ' + task.objective + '</p>' +
-          '<p>priority: ' + task.priority.slug + '</p>');
+          'state: <br><select id="taskState" name="" ><option value="' + task.state._id + '">' + task.state.slug + '</option></select>' +
+          '<input type="button" name="editTask" id="editTaskState" value="edit"/><br>' +
+          '<br>priority: <br><select id="taskPriority" ><option value = "' + task.priority._id + '" > ' + task.priority.slug + ' </option></select>' +
+          '<input type="button" name="editTask" id="editTaskPriority" value="edit"/><br>' +
+          '<br>objective: <br><p id="taskObjective" >' + task.objective + '</p>' +
+          '<input type="button" name="editTask" id="editTaskObjective" value="edit"/><br>');
+
+        /** Add listeners to edit task buttons */
+        $('#thisTaskForm').find("input[name=editTask]").click(function() {
+
+          $button = $(this);
+
+          if ($button.val() === 'edit') {
+
+            if (this.id === 'editTaskState') {
+
+              $that = $('#taskState');
+
+              oldState = $that.find(":selected").text();
+
+              $that.empty().append('<option value="">select</option>');
+
+              if (oldState === 'completed') {
+
+                statics.state.forEach(function(state) {
+
+                  if (state.slug === 'pending' || state.slug === 'completed') {
+
+                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
+
+                  }
+                });
+
+              } else if (oldState === 'disabled') {
+
+                statics.state.forEach(function(state) {
+
+                  if (state.slug === 'pending' || state.slug === 'disabled') {
+
+                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
+
+                  }
+                });
+
+              } else if (oldState === 'pending') {
+
+                statics.state.forEach(function(state) {
+
+                  if (state.slug === 'completed' || state.slug === 'pending' || state.slug === 'disabled') {
+
+                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
+
+                  }
+                });
+
+              } else if (oldState === 'active') {
+
+                statics.state.forEach(function(state) {
+
+                  if (state.slug === 'completed' || state.slug === 'pending' || state.slug === 'disabled') {
+
+                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
+
+                  }
+                });
+              }
+
+              $button.val('send');
+
+            } else if (this.id === 'editTaskPriority') {
+
+              $that = $('#taskPriority');
+
+              $that.empty().append('<option value="">select</option>');
+
+              statics.priority.forEach(function(priority) {
+
+                $that.append('<option value="' + priority._id + '">' + priority.slug + '</option>');
+
+              });
+
+              $button.val('send');
+
+            } else if (this.id === 'editTaskObjective') {
+
+              $that = $('#taskObjective');
+
+              $that.replaceWith('<textarea rows="4" cols="8" id="taskObjective" name="objective" placeholder="' + task.objective + '"></textarea>');
+
+              $button.val('send');
+
+            }
+
+            /**
+             * Edit task fields
+             */
+          } else if ($button.val() === 'send') {
+
+            /** Edit task state */
+            if (this.id === 'editTaskState') {
+
+              $that = $('#taskState').find(":selected");
+
+              if ($that.text() === 'completed') {
+
+                if (oldState !== "completed") {
+
+                  $.ajax({
+
+                    url: 'api/tasks/' + task._id + '/complete',
+                    type: 'PUT',
+
+                    success: function(data) {
+
+                      $('#thisTask').empty();
+                      $this.click();
+                      $('#tasksOutput').val(data);
+                      loadTasks();
+
+                    },
+
+                    error: function(data) {
+
+                      alert(data.status + '  (' + data.statusText + ')');
+
+                    }
+                  });
+
+                } else {
+
+                  statics.state.forEach(function(state) {
+
+                    if (state.slug === 'completed') {
+
+                      $that.empty().append('<option value="' + state._id + '">' + state.slug + '</option>');
+
+                    }
+                  });
+
+                  $button.val('edit');
+
+                }
+
+              } else if ($that.text() === 'pending') {
+
+                if (oldState !== "pending") {
+
+                  $.ajax({
+
+                    url: 'api/tasks/' + task._id + '/pending',
+                    type: 'PUT',
+
+                    success: function(data) {
+
+                      $('#thisTask').empty();
+                      $this.click();
+                      $('#tasksOutput').val(data);
+                      loadTasks();
+
+                    },
+
+                    error: function(data) {
+
+                      alert(data.status + '  (' + data.statusText + ')');
+
+                    }
+                  });
+
+                } else {
+
+                  statics.state.forEach(function(state) {
+
+                    if (state.slug === 'pending') {
+
+                      $that.empty().append('<option value="' + state._id + '">' + state.slug + '</option>');
+
+                    }
+                  });
+
+                  $button.val('edit');
+
+                }
+
+              } else if ($that.text() === 'disabled') {
+
+                if (oldState !== "disabled") {
+
+                  $.ajax({
+
+                    url: 'api/tasks/' + task._id + '/disable',
+                    type: 'PUT',
+
+                    success: function(data) {
+
+                      $('#thisTask').empty();
+                      $this.click();
+                      $('#tasksOutput').val(data);
+                      loadTasks();
+
+                    },
+
+                    error: function(data) {
+
+                      alert(data.status + '  (' + data.statusText + ')');
+
+                    }
+                  });
+
+                } else {
+
+                  statics.state.forEach(function(state) {
+
+                    if (state.slug === 'disabled') {
+
+                      $that.empty().append('<option value="' + state._id + '">' + state.slug + '</option>');
+
+                    }
+                  });
+
+                  $button.val('edit');
+
+                }
+
+              } else {
+
+                alert('Select a new state!');
+
+              }
+
+              /** Edit task priority */
+            } else if (this.id === 'editTaskPriority') {
+
+              $that = $('#taskPriority');
+
+              /** Edit task objective */
+            } else if (this.id === 'editTaskObjective') {
+
+              $that = $('#taskObjective');
+
+              $.
+              post("api/tasks/" + task._id + "/objective", $("#thisTaskForm").serialize()).
+
+              done(function(data) {
+
+                $('#thisTask').empty();
+                $this.click();
+                $('#tasksOutput').val(data);
+                loadTasks();
+
+              }).
+
+              fail(function(data) {
+
+                alert(data.status + '  (' + data.statusText + ')');
+
+              });
+
+            }
+          }
+        });
 
         if (task.dateTime) {
 
-          $('#thisTask').append('<p>datetime: ' + task.dateTime + '</p>');
+          $('#thisTaskForm').append('<p>datetime: ' + task.dateTime + '</p>');
 
         } else {
 
-          $('#thisTask').append('<p>datetime: not set</p>');
+          $('#thisTaskForm').append('<p>datetime: not set</p>');
 
         }
 
@@ -660,6 +922,20 @@ $(document).ready(function() {
           append('<input type="button" id="removeEntries" value="remove entries"/><br>');
 
         }
+
+        /** Prevent changes for completed or disabled tasks */
+        if (task.slug === 'completed' || task.slug === 'disabled') {
+
+          $('#editTaskPriority').prop('disabled', true);
+          $('#editTaskObjective').prop('disabled', true);
+          $('#editTaskDateTime').prop('disabled', true);
+          $('#addTaskCollaborators').prop('disabled', true);
+          $('#removeTaskCollaborators').prop('disabled', true);
+          $('#addEntries').prop('disabled', true);
+          $('#removeEntries').prop('disabled', true);
+
+        }
+
       }).
 
       fail(function(data) {
@@ -862,7 +1138,7 @@ $(document).ready(function() {
             } else {
 
               $('#listGroupTasks').
-              append('<h4>no entries</h4>');
+              append('<h4>no tasks</h4>');
 
             }
           }).
