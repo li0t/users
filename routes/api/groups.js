@@ -206,217 +206,254 @@ module.exports = function(router, mongoose) {
    */
   router.post('/:groupId/removeMembers', function(req, res, next) {
 
-    var toRemove, removed = 0,
-      lostAdmin = false,
-      remover = req.session.user._id,
-      group = req.params.groupId,
-      now = new Date(),
-      members = req.body.members;
+      var toRemove, removed = 0;
+      var lostAdmin = false;
+      var i;
+      var remover = req.session.user._id;
+      var group = req.params.groupId;
+      var now = new Date();
+      var members = req.body.members;
 
-    if (members && members.length) {
+      if (members && members.length) {
 
-      /** Prevent a mistype error */
-      if (typeof members === 'string') {
-        members = [members];
-      }
+        /** Prevent a mistype error */
+        if (typeof members === 'string') {
+          members = [members];
+        }
 
-      relations.membership(group, function(membership) {
+        relations.membership(group, function(membership) {
 
-        group = membership.group; /** The group model */
+            group = membership.group; /** The group model */
 
-        if (group) {
+            if (group) {
 
-          remover = membership.isMember(remover);
+              remover = membership.isMember(remover);
 
-          if (remover) { /** Check if remover is part of group */
+              if (remover) { /** Check if remover is part of group */
 
-            members.forEach(function(member) {
+                members.forEach(function(member) {
 
-              toRemove = membership.isMember(member);
+                  toRemove = membership.isMember(member);
 
-              if (toRemove) { /** Check if user to remove is member of group */
+                  if (toRemove) { /** Check if user to remove is member of group */
 
-                /** Check if remover has enough privileges */
-                if (membership.isAdmin(remover.member) || JSON.stringify(member) === JSON.stringify(remover.member)) {
+                    /** Check if remover has enough privileges */
+                    if (membership.isAdmin(remover.member) || JSON.stringify(member) === JSON.stringify(remover.member)) {
 
-                  removed += 1;
-                  debug('User %s removed from group %s', member, group._id);
-                  group.members[toRemove.index].left.push(now); /** Set member left time */
-                  debug(group.members[toRemove.index]);
-                  if (membership.isAdmin(toRemove.member)) {
-                    lostAdmin = true;
+                      removed += 1;
+                      debug('User %s removed from group %s', member, group._id);
+                      member = group.members[toRemove.index];
+                      member.left.push(now); /** Set member left time */
+
+                      if (membership.isAdmin(member.user)) {
+                        lostAdmin = member.user;
+                      }
+
+                    } else {
+                      debug('User %s does not have enough privileges in group %s', remover.member, group._id);
+                    }
+                  } else {
+                    debug('No user with id %s found in group %s', member, req.params.groupId);
                   }
+                });
+
+                if (lostAdmin) {
+
+                  while (lostAdmin) {
+
+                    for (i = 0; i < group.members.length; i++) {
+
+                      if (JSON.stringify(group.members[i].user) !== lostAdmin) {
+
+                      group.admin = group.members[i].user;
+                      debug('The group %s, has a new admin with id %s', group._id, group.admin);
+                      lostAdmin = false;
+                      break;
+
+                    }
+                  }
+                }
+              }
+
+              group.save(function(err) {
+                if (err) {
+                  next(err);
 
                 } else {
-                  debug('User %s does not have enough privileges in group %s', remover.member, group._id);
+
+                  debug('%s of %s members removed from group %s', removed, members.length, group._id);
+                  res.send(removed + ' of ' + members.length + ' members removed from group ' + group._id);
+
                 }
-              } else {
-                debug('No user with id %s found in group %s', member, req.params.groupId);
-              }
-            });
+              });
 
-
-            if (lostAdmin) {
-              debug('The group %s, has a new admin with id %s', group._id, group.members[0]);
-              group.admin = group.members[0];
+            } else {
+              debug('User %s was not found in group %s', req.session.user._id, group._id);
+              res.sendStatus(403);
             }
-
-            group.save(function(err) {
-              if (err) {
-                next(err);
-
-              } else {
-
-                debug('%s of %s members removed from group %s', removed, members.length, group._id);
-                res.send(removed + ' of ' + members.length + ' members removed from group ' + group._id);
-
-              }
-            });
-
           } else {
-            debug('User %s was not found in group %s', req.session.user._id, group._id);
-            res.sendStatus(403);
+            debug('No group found with id %s', req.params.groupId);
+            res.sendStatus(404);
           }
-        } else {
-          debug('No group found with id %s', req.params.groupId);
-          res.sendStatus(404);
-        }
-      });
+        });
     } else {
       res.sendStatus(400);
     }
 
   });
 
-  /**
-   * Change group admin
-   */
-  router.get('/:groupId/changeAdmin/:id', function(req, res, next) {
+/**);
+ * Change group admin
+ */
+router.get('/:groupId/changeAdmin/:id', function(req, res, next) {
 
-    var group = req.params.groupId,
-      sessionUser = req.session.user._id,
-      user = req.params.id;
+  var group = req.params.groupId,
+    sessionUser = req.session.user._id,
+    user = req.params.id;
 
-    relations.membership(group, function(membership) {
+  relations.membership(group, function(membership) {
 
-      group = membership.group;
+    group = membership.group;
 
-      if (group) {
+    if (group) {
 
-        if (membership.isAdmin(sessionUser)) { /** Check if logged user is the group admin */
+      if (membership.isAdmin(sessionUser)) { /** Check if logged user is the group admin */
 
-          if (membership.isMember(user)) {
+        if (membership.isMember(user)) {
 
-            group.admin = user;
+          group.admin = user;
 
-            group.save(function(err) {
+          group.save(function(err) {
 
-              if (err) {
-                next(err);
-              } else {
+            if (err) {
+              next(err);
+            } else {
 
-                debug('The group %s, has a new admin with id %s', group._id, user);
-                res.send('The group ' + group._id + ' has a new admin with id ' + user);
+              debug('The group %s, has a new admin with id %s', group._id, user);
+              res.send('The group ' + group._id + ' has a new admin with id ' + user);
 
-              }
-            });
-          } else {
-            debug('No user with id %s found in group %s', req.params.id, req.params.groupId);
-            res.sendStatus(400);
-          }
+            }
+          });
         } else {
-          res.sendStatus(403);
+          debug('No user with id %s found in group %s', req.params.id, req.params.groupId);
+          res.sendStatus(400);
         }
       } else {
-        debug('No group found with id %s', req.params.groupId);
-        res.sendStatus(404);
+        res.sendStatus(403);
       }
-    });
-
+    } else {
+      debug('No group found with id %s', req.params.groupId);
+      res.sendStatus(404);
+    }
   });
 
-  /**
-   * Get group members
-   */
-  router.get('/:groupId/members', function(req, res, next) {
+});
 
-    var members = [];
+/**
+ * Get group members
+ */
+router.get('/:groupId/members', function(req, res, next) {
 
-    Group.
+  var members = [];
 
-    findOne().
+  Group.
 
-    where('_id', req.params.groupId).
+  findOne().
 
-    where('members', req.session.user._id).
+  where('_id', req.params.groupId).
 
-    deepPopulate('members.profile').
+  where('members.user', req.session.user._id).
 
-    exec(function(err, group) {
+  deepPopulate('members.user').
 
-      if (err) {
+  exec(function(err, group) {
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
+    if (err) {
+
+      if (err.name && err.name === 'CastError') {
+        res.sendStatus(400);
+      } else {
+        next(err);
+      }
+
+    } else if (group) {
+
+      group.members.forEach(function(member) {
+
+        if (!member.left.length) { /* Check if user left in some point */
+
+          members.push(member);
+
+        } else if (member.joined.length > member.left.length) {
+
+          members.push(member);
+
         }
 
-      } else if (group) {
+      });
 
-        group.members.forEach(function(member) {
+      res.send(members);
 
-          if (!member.left.length) { /* Check if user left in some point */
+    } else {
+      res.sendStatus(404);
+    }
+  });
 
-            members.push(member);
+});
 
-          } else if (member.joined.length > member.left.length) {
+/**
+ * Get user groups
+ */
+router.get('/me', function(req, res, next) {
 
-            members.push(member);
+  var user = req.session.user._id;
+  var groups = [];
+  var toCheck = 0;
+  var checked = 0;
 
+  Group.
+
+  find().
+
+  where('members.user', user).
+
+  sort('created').
+
+  select('id admin profile members created').
+
+  populate('profile').
+
+  exec(function(err, found) {
+
+    if (err) {
+      next(err);
+
+    } else if (found.length) {
+
+      toCheck = found.length;
+
+      found.forEach(function(group) {
+
+        relations.membership(group._id, function(relation) {
+
+          if (relation.isMember(user)) {
+            groups.push(group);
+          }
+
+          checked += 1;
+
+          if (checked === toCheck) {
+            res.send(groups);
           }
 
         });
+      });
 
-        return members;
-
-      } else {
-        res.sendStatus(404);
-      }
-    });
-
+    } else {
+      res.sendStatus(404);
+    }
   });
 
-  /**
-   * Get user groups
-   */
-  router.get('/me', function(req, res, next) {
-
-    Group.
-
-    find().
-
-    where('members', req.session.user._id).
-
-    sort('created').
-
-    select('id admin profile members created').
-
-    populate('profile').
-
-    exec(function(err, groups) {
-
-      if (err) {
-        next(err);
-      } else if (groups) {
-
-        res.send(groups);
-
-      } else {
-        res.sendStatus(404);
-      }
-    });
-
-  });
+});
 
 };

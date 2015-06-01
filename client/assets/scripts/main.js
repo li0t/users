@@ -326,6 +326,8 @@ $(document).ready(function() {
             $('#thisGroup').append('<form id="thisGroupForm"></form>');
 
             members.forEach(function(member) {
+              
+              member = member.user;
 
               email = member.email;
 
@@ -385,6 +387,8 @@ $(document).ready(function() {
 
                 members.forEach(function(member) {
 
+                  member = member.user;
+
                   if (member._id !== admin[group]) {
 
                     $('#thisGroupNewAdminForm').
@@ -438,7 +442,7 @@ $(document).ready(function() {
 
                   for (i = 0; i < members.length; i++) {
 
-                    if (members[i]._id === contact._id) {
+                    if (members[i].user._id === contact._id) {
 
                       isMemeber = true;
                       break;

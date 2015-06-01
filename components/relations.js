@@ -118,9 +118,9 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
 
           for (i = 0; i < relation.group.members.length; i++) {
 
-            if (JSON.stringify(relation.group.members[i]) === JSON.stringify(id)) {
+            if (JSON.stringify(relation.group.members[i].user) === JSON.stringify(id)) {
 
-              if (!member.left.length) {
+              if (!relation.group.members[i].left.length) {
 
                 member = {
                   member: relation.group.members[i].user,
@@ -128,7 +128,7 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
                 };
                 break;
 
-              } else if (member.joined.length > member.left.length) {
+              } else if (relation.group.members[i].joined.length > relation.group.members[i].left.length) {
 
                 member = {
                   member: relation.group.members[i].user,
@@ -154,7 +154,7 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
 
           for (i = 0; i < relation.group.members.length; i++) {
 
-            if (JSON.stringify(relation.group.members[i]) === JSON.stringify(id)) {
+            if (JSON.stringify(relation.group.members[i].user) === JSON.stringify(id)) {
 
               member = {
                 member: relation.group.members[i],
@@ -168,6 +168,7 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
           debug('Error! No group found');
         }
 
+        return member;
       }
 
     };

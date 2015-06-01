@@ -210,54 +210,55 @@ module.exports = function(router, mongoose) {
         /** Check if task exists and is available for changes */
         if (task) {
 
-          if  (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+          if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
 
-          relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(taskGroup) {
 
-            if (taskGroup.isMember(inviter)) {
+              if (taskGroup.isMember(inviter)) {
 
-              collaborators.forEach(function(collaborator) {
+                collaborators.forEach(function(collaborator) {
 
-                if (taskGroup.isMember(collaborator)) {
+                  if (taskGroup.isMember(collaborator)) {
 
-                  if (!relation.isCollaborator(collaborator)) {
+                    if (!relation.isCollaborator(collaborator)) {
 
-                    debug('New collaborator %s added to task %s', collaborator, task._id);
-                    task.collaborators.push(collaborator);
-                    saved += 1;
+                      debug('New collaborator %s added to task %s', collaborator, task._id);
+                      task.collaborators.push(collaborator);
+                      saved += 1;
 
+                    } else {
+                      debug('User %s is already collaborating in task %s', collaborator, task._id);
+                    }
                   } else {
-                    debug('User %s is already collaborating in task %s', collaborator, task._id);
+                    debug('Users %s and %s are not in the same group', inviter, collaborator);
                   }
-                } else {
-                  debug('Users %s and %s are not in the same group', inviter, collaborator);
-                }
-              });
+                });
 
-              task.save(function(err) {
-                if (err) {
-                  next(err);
-                } else {
+                task.save(function(err) {
+                  if (err) {
+                    next(err);
+                  } else {
 
-                  debug('%s of %s new collaborators added to task %s', saved, collaborators.length, task._id);
-                  res.send(saved + ' of ' + collaborators.length + ' new collaborators added to task ' + task._id);
+                    debug('%s of %s new collaborators added to task %s', saved, collaborators.length, task._id);
+                    res.send(saved + ' of ' + collaborators.length + ' new collaborators added to task ' + task._id);
 
-                }
-              });
-            } else {
-              debug('User is not part of task group %s', inviter, task.group);
-              res.sendStatus(403);
-            }
-          });
+                  }
+                });
+              } else {
+                debug('User is not part of task group %s', inviter, task.group);
+                res.sendStatus(403);
+              }
+            });
+          } else {
+            debug('Task %s is not active', task._id);
+            res.sendStatus(403);
+          }
+
         } else {
-          debug('Task %s was not found', req.params.taskId);
+
           res.sendStatus(404);
         }
       });
-    } else {
-      debug('Task %s is not active', user);
-      res.sendStatus(403);
-    }
     } else {
       res.sendStatus(400);
     }
@@ -291,50 +292,50 @@ module.exports = function(router, mongoose) {
 
           if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
 
-          relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(taskGroup) {
 
-            if (taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
+              if (taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
 
-              collaborators.forEach(function(_collaborator) {
+                collaborators.forEach(function(_collaborator) {
 
-                collaborator = relation.isCollaborator(_collaborator);
+                  collaborator = relation.isCollaborator(_collaborator);
 
-                if (collaborator) { /** Check if user is part of the task collaborators array */
+                  if (collaborator) { /** Check if user is part of the task collaborators array */
 
-                  removed += 1;
-                  debug('Collaborator %s removed from task %s', _collaborator, task._id);
-                  task.collaborators.splice(collaborator.index, 1); /** Remove user from collaborators array */
+                    removed += 1;
+                    debug('Collaborator %s removed from task %s', _collaborator, task._id);
+                    task.collaborators.splice(collaborator.index, 1); /** Remove user from collaborators array */
 
-                } else {
-                  debug('User %s is not collaborator of task %s', _collaborator, task._id);
-                }
-              });
+                  } else {
+                    debug('User %s is not collaborator of task %s', _collaborator, task._id);
+                  }
+                });
 
-              task.save(function(err) {
-                if (err) {
-                  next(err);
+                task.save(function(err) {
+                  if (err) {
+                    next(err);
 
-                } else {
+                  } else {
 
-                  debug('%s of %s collaborators removed from task %s', removed, collaborators.length, task._id);
-                  res.send(removed + ' of ' + collaborators.length + ' collaborators removed from task ' + task._id);
+                    debug('%s of %s collaborators removed from task %s', removed, collaborators.length, task._id);
+                    res.send(removed + ' of ' + collaborators.length + ' collaborators removed from task ' + task._id);
 
-                }
-              });
-            } else {
-              debug('User %s is not part of task %s group', remover, task.group);
-              res.sendStatus(403);
-            }
-          });
+                  }
+                });
+              } else {
+                debug('User %s is not part of task %s group', remover, task.group);
+                res.sendStatus(403);
+              }
+            });
+          } else {
+            debug('Task %s is not active', task._id);
+            res.sendStatus(404);
+          }
         } else {
           debug('Task %s was not found', req.params.taskId);
-          res.sendStatus(404);
+          res.sendStatus(403);
         }
       });
-    } else {
-      debug('Task %s is not active', user);
-      res.sendStatus(403);
-    }
     } else {
       res.sendStatus(400);
     }
@@ -367,46 +368,46 @@ module.exports = function(router, mongoose) {
 
           if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
 
-          relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+              if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              notes.forEach(function(note) {
+                notes.forEach(function(note) {
 
-                if (note) {
+                  if (note) {
 
-                  saved += 1;
-                  debug('Note -> %s added to task %s', note, task._id);
-                  task.notes.push(note);
+                    saved += 1;
+                    debug('Note -> %s added to task %s', note, task._id);
+                    task.notes.push(note);
 
-                }
+                  }
 
-              });
+                });
 
-              task.save(function(err) {
-                if (err) {
-                  next(err);
-                } else {
+                task.save(function(err) {
+                  if (err) {
+                    next(err);
+                  } else {
 
-                  debug('%s of %s new notes added to task %s', saved, notes.length, task._id);
-                  res.send(saved + ' of ' + notes.length + ' new notes added to task ' + task._id);
+                    debug('%s of %s new notes added to task %s', saved, notes.length, task._id);
+                    res.send(saved + ' of ' + notes.length + ' new notes added to task ' + task._id);
 
-                }
-              });
-            } else {
-              debug('User %s is not allowed to modify task %s', user, task._id);
-              res.sendStatus(403);
-            }
-          });
+                  }
+                });
+              } else {
+                debug('User %s is not allowed to modify task %s', user, task._id);
+                res.sendStatus(403);
+              }
+            });
+          } else {
+            debug('Task %s is not active', task._id);
+            res.sendStatus(403);
+          }
         } else {
           debug('Task %s was not found', req.params.taskId);
           res.sendStatus(404);
         }
       });
-    } else {
-      debug('Task %s is not active', user);
-      res.sendStatus(403);
-    }
     } else {
       res.sendStatus(400);
     }
@@ -440,55 +441,48 @@ module.exports = function(router, mongoose) {
 
           if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
 
-          relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+              if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              notes.forEach(function(note) {
+                notes.forEach(function(note) {
 
-                if (note) {
+                  if (note) {
 
-                  index = -1;
+                    index = -1;
 
-                  for (i = 0; i < task.notes.length; i++) {
+                    for (i = 0; i < task.notes.length; i++) {
 
-                    if (task.notes[i] === note) {
-                      index = i;
-                      break;
+                      if (task.notes[i] === note) {
+                        index = i;
+                        break;
+                      }
                     }
+
+                    if (index > -1) {
+
+                      removed += 1;
+                      debug('Note -> %s removed from task %s', note, task._id);
+                      task.notes.splice(index, 1);
+
+                    } else {
+                      debug('Note -> %s was not found in task %s', note, task._id);
+                    }
+
+                    debug('%s of %s notes removed from task %s', removed, notes.length, task._id);
+                    res.send(removed + ' of ' + notes.length + ' notes removed from task ' + task._id);
+
                   }
-
-                  if (index > -1) {
-
-                    removed += 1;
-                    debug('Note -> %s removed from task %s', note, task._id);
-                    task.notes.splice(index, 1);
-
-                  } else {
-                    debug('Note -> %s was not found in task %s', note, task._id);
-                  }
-                }
-              });
-
-              task.save(function(err) {
-                if (err) {
-                  next(err);
-                } else {
-
-                  debug('%s of %s notes removed from task %s', removed, notes.length, task._id);
-                  res.send(removed + ' of ' + notes.length + ' notes removed from task ' + task._id);
-
-                }
-              });
-            } else {
-              debug('User %s is not allowed to modify task %s', user, task._id);
-              res.sendStatus(403);
-            }
-          });
-        } else {
-          debug('Task %s is not active', user);
-          res.sendStatus(403);
-        }
+                });
+              } else {
+                debug('User %s is not allowed to modify task %s', user, task._id);
+                res.sendStatus(403);
+              }
+            });
+          } else {
+            debug('Task %s is not active', task._id);
+            res.sendStatus(403);
+          }
         } else {
           debug('Task %s was not found', req.params.taskId);
           res.sendStatus(404);
