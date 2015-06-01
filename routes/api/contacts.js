@@ -2,60 +2,60 @@
 /* global component */
 'use strict';
 
-var  _ = require('underscore'),
-    debug = require('debug')('app:api:contacts');
+var _ = require('underscore'),
+  debug = require('debug')('app:api:contacts');
 
 var relations = component('relations'),
-    statics = component('statics');
+  statics = component('statics');
 
-module.exports = function (router, mongoose) {
+module.exports = function(router, mongoose) {
 
   var Contact = mongoose.model('contact'),
-      Token = mongoose.model('token'),
-      User = mongoose.model('user');
+    Token = mongoose.model('token'),
+    User = mongoose.model('user');
 
-  /** 
+  /**
    * Add contact
    */
-  router.get('/add/:id', function (req, res, next) {
+  router.get('/add/:id', function(req, res, next) {
 
-    var sender = null,
-        receiver = null,
-        senderIsContact,
-        receiverIsContact;
+    var sender = null;
+    var receiver = null;
+    var senderIsContact;
+    var receiverIsContact;
 
-    relations.contact(req.params.id, function(receiverRelation) { 
+    relations.contact(req.params.id, function(receiverRelation) {
 
       receiver = receiverRelation.contact; /** The contact model of the receiver user */
 
-      if (receiver) { 
+      if (receiver) {
 
-        relations.contact(req.session.user._id, function(senderRelation) { 
+        relations.contact(req.session.user._id, function(senderRelation) {
 
           sender = senderRelation.contact; /** The contact model of the sender user */
 
-          if (sender) { 
+          if (sender) {
 
             receiverIsContact = senderRelation.isContact(receiver.user, true);
 
             if (!receiverIsContact) { /** Check if the users are contacts already */
 
-              sender.contacts.push({ 
+              sender.contacts.push({
                 user: receiver.user,
-                state: statics.model('state', 'pending')._id  
+                state: statics.model('state', 'pending')._id
               });
               /** Push each other id's and set te the contact as pending*/
-              receiver.contacts.push({ 
+              receiver.contacts.push({
                 user: sender.user,
-                state: statics.model('state', 'pending')._id  
+                state: statics.model('state', 'pending')._id
               });
 
-              sender.save(function (err) {
+              sender.save(function(err) {
                 if (err) {
                   next(err);
                 } else {
 
-                  receiver.save(function (err) { 
+                  receiver.save(function(err) {
                     if (err) {
                       next(err);
                     } else {
@@ -67,19 +67,19 @@ module.exports = function (router, mongoose) {
                         if (err) {
                           next(err);
 
-                        } else { 
+                        } else {
 
                           /** The user was not part of the emeeter platform, and is in a pending state */
-                          if (_.isEqual(user.state, statics.model('state', 'pending')._id)) { 
+                          if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
 
-                            res.send('Great! You have invited a collaborator to emeeter'); 
+                            res.send('Great! You have invited a collaborator to emeeter');
 
 
                           } else { /** The user is part of emeeter and a contact request email is going to be sent */
 
                             res.redirect('/api/mandrill/addContact/' + receiver.user);
 
-                          }  
+                          }
                         }
                       });
                     }
@@ -92,7 +92,7 @@ module.exports = function (router, mongoose) {
 
             } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'pending')._id)) { /** The contact state is Pending */
 
-              res.send('Waiting for confirmation!'); 
+              res.send('Waiting for confirmation!');
 
             } else { /** The users were contacts, but in some point one of them disabled the relation */
 
@@ -129,21 +129,21 @@ module.exports = function (router, mongoose) {
       }
     });
 
-  }); 
+  });
 
-  /** 
+  /**
    *  Confirm request
    */
-  router.get('/confirm/:token', function (req, res, next) {
+  router.get('/confirm/:token', function(req, res, next) {
 
-    var sender = null,
-        receiver = null,
-        senderIsContact,
-        receiverIsContact;
+    var sender = null;
+    var receiver = null;
+    var senderIsContact;
+    var receiverIsContact;
 
-    Token.findById(req.params.token, function(err,token){
+    Token.findById(req.params.token, function(err, token) {
 
-      if (err) { 
+      if (err) {
 
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
@@ -159,7 +159,7 @@ module.exports = function (router, mongoose) {
 
           if (receiver) {
 
-            relations.contact(token.sender, function(senderRelation) { 
+            relations.contact(token.sender, function(senderRelation) {
 
               sender = senderRelation.contact;
 
@@ -168,17 +168,17 @@ module.exports = function (router, mongoose) {
                 senderIsContact = receiverRelation.isContact(sender.user, true);
                 receiverIsContact = senderRelation.isContact(receiver.user, true);
 
-                if (senderIsContact && receiverIsContact) { 
+                if (senderIsContact && receiverIsContact) {
 
                   receiver.contacts[senderIsContact.index].state = statics.model('state', 'active')._id;
                   sender.contacts[receiverIsContact.index].state = statics.model('state', 'active')._id;
 
-                  receiver.save(function (err) {
+                  receiver.save(function(err) {
                     if (err) {
                       next(err);
                     } else {
 
-                      sender.save(function (err) {
+                      sender.save(function(err) {
                         if (err) {
                           next(err);
                         } else {
@@ -186,8 +186,10 @@ module.exports = function (router, mongoose) {
                           debug('User %s and %s are now contacts!', receiver.user, sender.user);
                           res.send('User ' + receiver.user + ' and ' + sender.user + ' are now contacts!');
 
-                          Token.remove({ _id: token._id}, function(err) { 
-                            if(err) { 
+                          Token.remove({
+                            _id: token._id
+                          }, function(err) {
+                            if (err) {
                               debug(err);
                             }
                           });
@@ -218,12 +220,12 @@ module.exports = function (router, mongoose) {
   /**
    * Delete a contact
    */
-  router.get('/delete/:id', function (req, res, next) { /** TODO: Delete contact request tokens */
+  router.get('/delete/:id', function(req, res, next) { /** TODO: Delete contact request tokens */
 
-    var sender = null,
-        receiver = null,
-        senderIsContact,
-        receiverIsContact;
+    var sender = null;
+    var receiver = null;
+    var senderIsContact;
+    var receiverIsContact;
 
     relations.contact(req.params.id, function(receiverRelation) {
 
@@ -231,7 +233,7 @@ module.exports = function (router, mongoose) {
 
       if (receiver) {
 
-        relations.contact(req.session.user._id, function(senderRelation) { 
+        relations.contact(req.session.user._id, function(senderRelation) {
 
           sender = senderRelation.contact;
 
@@ -245,12 +247,12 @@ module.exports = function (router, mongoose) {
               receiver.contacts[senderIsContact.index].state = statics.model('state', 'disabled')._id;
               sender.contacts[receiverIsContact.index].state = statics.model('state', 'disabled')._id;
 
-              receiver.save(function (err) {
+              receiver.save(function(err) {
                 if (err) {
                   next(err);
                 } else {
 
-                  sender.save(function (err) {
+                  sender.save(function(err) {
                     if (err) {
                       next(err);
                     } else {
@@ -274,12 +276,12 @@ module.exports = function (router, mongoose) {
                 receiver.contacts[senderIsContact.index].state = statics.model('state', 'disabled')._id;
                 sender.contacts[receiverIsContact.index].state = statics.model('state', 'disabled')._id;
 
-                receiver.save(function (err) {
+                receiver.save(function(err) {
                   if (err) {
                     next(err);
                   } else {
 
-                    sender.save(function (err) {
+                    sender.save(function(err) {
                       if (err) {
                         next(err);
                       } else {
@@ -287,15 +289,16 @@ module.exports = function (router, mongoose) {
                         debug('The contact request between %s and %s has been deleted!', receiver.user, sender.user);
                         res.send('The contact request between ' + receiver.user + ' and ' + sender.user + ' has been deleted!');
 
-                        /** 
+                        /**
                          * Remove contact request token
                          */
                         Token.
                         remove({
                           user: receiver.user,
-                          sender: sender.user }).
-                        exec(function(err, removed) { 
-                          if(err) {
+                          sender: sender.user
+                        }).
+                        exec(function(err, removed) {
+                          if (err) {
                             debug(err);
                           } else if (removed) {
                             debug('contact request token with user %s and sender %s has been removed', receiver.user, sender.user);
@@ -305,9 +308,10 @@ module.exports = function (router, mongoose) {
                         Token.
                         remove({
                           user: sender.user,
-                          sender: receiver.user }).
-                        exec(function(err, removed) { 
-                          if(err) {
+                          sender: receiver.user
+                        }).
+                        exec(function(err, removed) {
+                          if (err) {
                             debug(err);
                           } else if (removed) {
                             debug('contact request token with user %s and sender %s has been removed', receiver.user, sender.user);
@@ -337,20 +341,20 @@ module.exports = function (router, mongoose) {
 
   /**
    * Get pending contact requests of session user
-   */ 
+   */
   router.get('/pending', function(req, res, next) {
 
-    var sessionUser = req.session.user._id,
-        checked = 0,
-        toCheck = 0,
-        contacts = [],
+    var sessionUser = req.session.user._id;
+    var checked = 0;
+    var toCheck = 0;
+    var contacts = [];
 
-        send = function () {
+    function send() {
 
-          if (checked === toCheck) {
-            res.send(contacts);
-          }
-        };
+      if (checked === toCheck) {
+        res.send(contacts);
+      }
+    }
 
     Contact.
 
@@ -400,7 +404,7 @@ module.exports = function (router, mongoose) {
                 send();
               }
 
-            }); 
+            });
 
           } else if (checked === toCheck) {
             send();
@@ -416,7 +420,7 @@ module.exports = function (router, mongoose) {
 
   /**
    * Get contacts of session user
-   */ 
+   */
   router.get('/', function(req, res, next) {
 
     var contacts = [];
@@ -448,6 +452,7 @@ module.exports = function (router, mongoose) {
         res.send(contacts);
       }
     });
+
   });
 
 };

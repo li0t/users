@@ -2,54 +2,54 @@
 /* global component */
 'use strict';
 
-var //bcrypt = require('bcrypt'),
-//_ = require('underscore'),
-debug = require('debug')('app:api:search');
+var bcrypt = require('bcrypt');
+var _ = require('underscore');
+var debug = require('debug')('app:api:search');
 
 var statics = component('statics');
 
-module.exports = function (router, mongoose) { /** TODO: Validate if user is active*/
+module.exports = function(router, mongoose) { /** TODO: Validate if user is active*/
 
-  var User = mongoose.model('user')/*,
-      Contact = mongoose.model('contact')*/;
+  var User = mongoose.model('user');
+  var Contact = mongoose.model('contact');
 
-  router.post('/email', function(req, res, next){
+    router.post('/email', function(req, res, next) {
 
-    var email = req.body.email;
+      var email = req.body.email;
 
-    if (email) {
+      if (email) {
 
-      User.findOne().
+        User.findOne().
 
-      where('email', email).
-      
-      where('state', statics.model('state', 'active')._id).
+        where('email', email).
 
-      exec(function(err, user) {
+        where('state', statics.model('state', 'active')._id).
 
-        if (err) {
+        exec(function(err, user) {
 
-          if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
-            res.sendStatus(400);
+          if (err) {
+
+            if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
+              res.sendStatus(400);
+            } else {
+              next(err);
+            }
+
+          } else if (user) {
+
+            res.send(user._id);
+
           } else {
-            next(err);
+            debug("User %s was not found", req.body.email);
+            res.sendStatus(404);
           }
+        });
+      } else {
 
-        } else if (user) {
+        res.sendStatus(400);
 
-          res.send(user._id);
-
-        } else {
-          debug("User %s was not found",  req.body.email);
-          res.sendStatus(404); 
-        }
-      });
-    } else {
-      
-      res.sendStatus(400);
-      
-    }
-  });
+      }
+    });
 
 
 };

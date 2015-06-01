@@ -1,18 +1,18 @@
 /* jslint node: true */
 'use strict';
 
-var Mandrill = require('mandrill-api/mandrill').Mandrill,
-    debug = require('debug')('app:api:mandrill'),
-    apiKey = 'DhTgCrDsRExbzSfSU-3dLw',
-    url = 'localhost:3030',
-    api = false,
-    sender = "emeeter",
-    senderEmail = "infoemeeter@gmail.com";
+var Mandrill = require('mandrill-api/mandrill').Mandrill;
+var debug = require('debug')('app:api:mandrill');
+var apiKey = 'DhTgCrDsRExbzSfSU-3dLw';
+var url = 'localhost:3030';
+var api = false;
+var sender = "emeeter";
+var senderEmail = "infoemeeter@gmail.com";
 
-module.exports = function (router, mongoose) {
+module.exports = function(router, mongoose) {
 
-  var User = mongoose.model('user'),
-      Token = mongoose.model('token');
+  var User = mongoose.model('user');
+  var Token = mongoose.model('token');
 
   (function connectToMandrill() {
     try {
@@ -23,20 +23,20 @@ module.exports = function (router, mongoose) {
     }
   })();
 
-  /** 
-   * List all users in this mandrill account 
+  /**
+   * List all users in this mandrill account
    */
-  router.get('/users', function (req, res/*, next*/) {
+  router.get('/users', function(req, res /*, next*/ ) {
 
     if (api) {
 
       api.users.info({
 
-      }, function (users) {
+      }, function(users) {
         debug(users);
 
-      }, function (err) {
-        debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+      }, function(err) {
+        debug('A mandrill error occurred %s : %s', +err.nam, err.message);
         res.sendStatus(500);
       });
 
@@ -47,28 +47,34 @@ module.exports = function (router, mongoose) {
 
   });
 
-  /**  
-   * Send confirmation email 
+  /**
+   * Send confirmation email
    */
-  router.get('/signin/:id', function (req, res, next) {
+  router.get('/signin/:id', function(req, res, next) {
 
     if (api) {
 
       var message = null;
 
-      User.findById(req.params.id, function (err, user) {
+      User.findById(req.params.id, function(err, user) {
 
         if (err) {
           next(err);
         } else if (user) {
 
-          Token.remove({ user: user._id }, function (err) { /* Remove any previous tokens assigned to the user */
-            if (err){ debug(err); }
+          Token.remove({
+            user: user._id
+          }, function(err) { /* Remove any previous tokens assigned to the user */
+            if (err) {
+              debug(err);
+            }
           });
 
-          new Token({ user: user._id }). /* Assign a new Token to the user */
+          new Token({
+            user: user._id
+          }). /* Assign a new Token to the user */
 
-          save(function (err, token) {
+          save(function(err, token) {
 
             if (err) {
               next(err);
@@ -97,12 +103,12 @@ module.exports = function (router, mongoose) {
               api.messages.send({ /* Send a confirmation email to the user */
                 "message": message
 
-              }, function (result) {
+              }, function(result) {
                 debug(result);
                 res.send("You've been sent a confirmation email.");
 
-              }, function (err) {
-                debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+              }, function(err) {
+                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
                 res.sendStatus(500);
               });
             }
@@ -110,7 +116,7 @@ module.exports = function (router, mongoose) {
           });
 
         } else {
-          debug('No user found with id %s ', + req.params.id);
+          debug('No user found with id %s ', +req.params.id);
           res.sendStatus(404);
         }
       });
@@ -126,13 +132,13 @@ module.exports = function (router, mongoose) {
   /**
    * Send a contact request
    */
-  router.get('/addContact/:id', function (req, res, next) {
+  router.get('/addContact/:id', function(req, res, next) {
 
     if (api) {
 
       var message = null;
 
-      User.findById(req.params.id, function (err, user) {
+      User.findById(req.params.id, function(err, user) {
         if (err) {
           next(err);
         } else if (user) {
@@ -140,9 +146,9 @@ module.exports = function (router, mongoose) {
           new Token({ /** Create token to allow contact confirmation */
             user: user._id,
             sender: req.session.user._id
-          }). 
+          }).
 
-          save(function(err){
+          save(function(err) {
             if (err) {
               next(err);
             } else {
@@ -169,18 +175,18 @@ module.exports = function (router, mongoose) {
               api.messages.send({ /* Send a confirmation email to the user */
                 "message": message
 
-              }, function (result) {
+              }, function(result) {
                 debug(result);
                 res.send("You have sent a contact request! Good!");
 
-              }, function (err) {
-                debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+              }, function(err) {
+                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
                 res.sendStatus(500);
               });
             }
           });
         } else {
-          debug('No user found with id %s ', + req.params.id);
+          debug('No user found with id %s ', +req.params.id);
           res.sendStatus(404);
         }
       });
@@ -194,30 +200,30 @@ module.exports = function (router, mongoose) {
   /**
    * Send an invite
    */
-  router.get('/invite/:id', function (req, res, next) {
+  router.get('/invite/:id', function(req, res, next) {
 
     if (api) {
 
       var message = null;
 
-      User.findById(req.params.id, function (err, user) {
+      User.findById(req.params.id, function(err, user) {
         if (err) {
           next(err);
         } else if (user) {
 
           new Token({
-            user : user._id,
-            sender : req.session.user._id
+            user: user._id,
+            sender: req.session.user._id
           }).
 
-          save(function(err, token){
+          save(function(err, token) {
 
             if (err) {
               next(err);
             } else {
 
               message = {
-                "html": "<a href='http://" + url + "/api/users/invited/signin/"+token._id+"'/>Go to emeeter</a>",
+                "html": "<a href='http://" + url + "/api/users/invited/signin/" + token._id + "'/>Go to emeeter</a>",
                 "text": "Have you tried emeeter? Check it now!",
                 "subject": "emeeter invitation",
                 "from_email": senderEmail,
@@ -238,19 +244,19 @@ module.exports = function (router, mongoose) {
               api.messages.send({ /* Send a invite email*/
                 "message": message
 
-              }, function (result) {
+              }, function(result) {
                 debug(result);
-                res.redirect('/api/contacts/add/'+user._id);
+                res.redirect('/api/contacts/add/' + user._id);
 
-              }, function (err) {
-                debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+              }, function(err) {
+                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
                 res.sendStatus(500);
               });
             }
           });
 
         } else {
-          debug('No user found with id %s ', + req.params.id);
+          debug('No user found with id %s ', +req.params.id);
           res.sendStatus(404);
         }
       });
@@ -265,7 +271,7 @@ module.exports = function (router, mongoose) {
   /**
    * Provide a reset password link
    */
-  router.get('/recover/:email', function(req, res, next){
+  router.get('/recover/:email', function(req, res, next) {
 
     if (api) {
 
@@ -281,7 +287,9 @@ module.exports = function (router, mongoose) {
           next(err);
         } else if (user) {
 
-          new Token({user : user._id}).
+          new Token({
+            user: user._id
+          }).
 
           save(function(err, token) {
 
@@ -311,12 +319,12 @@ module.exports = function (router, mongoose) {
               api.messages.send({ /* Send a recovery email to the user */
                 "message": message
 
-              }, function (result) {
+              }, function(result) {
                 debug(result);
                 res.send("A recovery email has been sent to " + user.email);
 
-              }, function (err) {
-                debug('A mandrill error occurred %s : %s', + err.nam, err.message);
+              }, function(err) {
+                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
                 res.sendStatus(500);
               });
             }

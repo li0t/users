@@ -2,30 +2,30 @@
 /* global component */
 'use strict';
 
-var bcrypt = require('bcrypt'),
-    _ = require('underscore'),
-    debug = require('debug')('app:api:users');
+var bcrypt = require('bcrypt');
+var _ = require('underscore');
+var debug = require('debug')('app:api:users');
 
-var relations = component('relations'),
-    statics = component('statics');
+var relations = component('relations');
+var statics = component('statics');
 
-module.exports = function (router, mongoose) {
+module.exports = function(router, mongoose) {
 
-  var User = mongoose.model('user'),
-      Profile = mongoose.model('profile'),
-      Contact = mongoose.model('contact'),
-      Token = mongoose.model('token');
+  var User = mongoose.model('user');
+  var Profile = mongoose.model('profile');
+  var Contact = mongoose.model('contact');
+  var Token = mongoose.model('token');
 
-  /** 
+  /**
    * Get users list.
    */
-  router.get('/', function (req, res, next) {
+  router.get('/', function(req, res, next) {
 
     User.find().
 
-    where('state' , statics.model('state', 'active')._id).
+    where('state', statics.model('state', 'active')._id).
 
-    exec(function (err, users) {
+    exec(function(err, users) {
 
       if (err) {
         next(err);
@@ -39,14 +39,14 @@ module.exports = function (router, mongoose) {
 
   });
 
-  /** 
+  /**
    * Create a new user
    */
-  router.post('/create', function (req, res, next) {
+  router.post('/create', function(req, res, next) {
 
     new Profile().
 
-    save(function (err, profile) { /* Create a new Profile that will store the user information */
+    save(function(err, profile) { /* Create a new Profile that will store the user information */
       if (err) {
         next(err);
       } else {
@@ -55,10 +55,10 @@ module.exports = function (router, mongoose) {
           email: req.body.email,
           password: req.body.password,
           profile: profile._id,
-          state: statics.model('state', 'pending')._id 
+          state: statics.model('state', 'pending')._id
         }).
 
-        save(function (err, user) {
+        save(function(err, user) {
           if (err) {
             /* Check for duplicated entry */
             if (err.code && err.code === 11000) {
@@ -74,11 +74,11 @@ module.exports = function (router, mongoose) {
               user: user._id
             }).
 
-            save(function (err) {
+            save(function(err) {
               if (err) {
                 next(err);
               } else {
-                res.redirect('/api/mandrill/signin/' + user._id); 
+                res.redirect('/api/mandrill/signin/' + user._id);
               }
             });
           }
@@ -91,10 +91,10 @@ module.exports = function (router, mongoose) {
   /**
    * Log a user in.
    */
-  router.post('/login', function (req, res, next) {
+  router.post('/login', function(req, res, next) {
 
-    var email = req.body.email,
-        password = req.body.password;
+    var email = req.body.email;
+    var password = req.body.password;
 
     if (email && password) {
 
@@ -108,7 +108,7 @@ module.exports = function (router, mongoose) {
       findOne().
       where('email', email).
 
-      exec(function (err, user) {
+      exec(function(err, user) {
 
         if (err) {
 
@@ -132,14 +132,14 @@ module.exports = function (router, mongoose) {
           } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
 
             res.status(409).send("Looks like you have disabled your account.");
-            
+
           } else {
-            
+
             res.status(409).send("There is an internal problem, contact the administrator");
-            
+
           }
         } else {
-          setTimeout(function () {
+          setTimeout(function() {
             res.sendStatus(401);
           }, 1000);
         }
@@ -154,7 +154,7 @@ module.exports = function (router, mongoose) {
   /**
    * Logs a user out.
    */
-  router.get('/logout', function (req, res/*, next*/) {
+  router.get('/logout', function(req, res /*, next*/ ) {
 
     delete req.session.user;
 
@@ -165,7 +165,7 @@ module.exports = function (router, mongoose) {
   /**
    * Begin password reset.
    */
-  router.post('/recover', function (req, res/*, next*/) {
+  router.post('/recover', function(req, res /*, next*/ ) {
 
     var email = req.body.email;
 
@@ -182,9 +182,9 @@ module.exports = function (router, mongoose) {
   /**
    * Validate token for password reset
    */
-  router.get('/recover/:token', function (req, res, next) {
+  router.get('/recover/:token', function(req, res, next) {
 
-    Token.findById(req.params.token, function(err, token){
+    Token.findById(req.params.token, function(err, token) {
 
       if (err) {
 
@@ -194,7 +194,7 @@ module.exports = function (router, mongoose) {
           next(err);
         }
 
-      } else if (token){
+      } else if (token) {
 
         req.session.token = token;
         res.send('Please choose a new password.');
@@ -211,12 +211,12 @@ module.exports = function (router, mongoose) {
    */
   router.post('/resetPassword', function(req, res, next) {
 
-    var token = req.session.token,
-        password = req.body.password;
+    var token = req.session.token;
+    var password = req.body.password;
 
     if (token) {
 
-      if (password) { 
+      if (password) {
 
         User.findById(token.user, function(err, user) { /** Find user that sent the reset request */
           if (err) {
@@ -233,22 +233,24 @@ module.exports = function (router, mongoose) {
 
               } else {
 
-                delete req.session.token; 
+                delete req.session.token;
 
                 req.session.user = user;
 
                 res.send('Password reset successful');
 
-                Token.remove({_id : token._id}, function(err) {
+                Token.remove({
+                  _id: token._id
+                }, function(err) {
                   if (err) {
-                    debug('Error! ' + err); 
+                    debug('Error! ' + err);
                   }
                 });
               }
             });
           } else {
             debug('No user found for id ' + req.session.token.user);
-            res.sendStatus(404);  
+            res.sendStatus(404);
           }
         });
       } else {
@@ -262,10 +264,10 @@ module.exports = function (router, mongoose) {
   /**
    * Changes user password
    */
-  router.post('/changePassword', function (req, res, next) {
+  router.post('/changePassword', function(req, res, next) {
 
-    var oldPassword = req.body.oldPassword,
-        newPassword = req.body.newPassword;
+    var oldPassword = req.body.oldPassword;
+    var newPassword = req.body.newPassword;
 
     if (newPassword) {
 
@@ -275,7 +277,7 @@ module.exports = function (router, mongoose) {
 
         findById(req.session.user._id).
 
-        exec(function (err, user) {
+        exec(function(err, user) {
 
           if (err) {
             next(err);
@@ -284,18 +286,18 @@ module.exports = function (router, mongoose) {
 
             user.password = newPassword;
 
-            user.save(function (err, user) {
+            user.save(function(err, user) {
 
               req.session.user = user;
               res.send(user._id);
 
             });
           } else {
-            setTimeout(function () {
+            setTimeout(function() {
               res.sendStatus(401);
             }, 1000);
           }
-        }); 
+        });
       } else {
         res.status(400).send('The new password should be different');
       }
@@ -308,11 +310,11 @@ module.exports = function (router, mongoose) {
   /**
    * Disable the user's account
    */
-  router.get('/disable', function (req, res, next) { /** TODO: Check asynchronous method */
+  router.get('/disable', function(req, res, next) { /** TODO: Check asynchronous method */
 
-    var user = req.session.user._id,
-        userContact,
-        index;
+    var user = req.session.user._id;
+    var userContact;
+    var index;
 
     relations.contact(user, function(relation) {
 
@@ -320,11 +322,11 @@ module.exports = function (router, mongoose) {
 
       if (userContact) {
 
-        userContact.contacts.forEach(function(contact) { 
+        userContact.contacts.forEach(function(contact) {
 
-          contact.state = statics.model('state', 'disabled')._id;  /** Set the user contact as disabled */
+          contact.state = statics.model('state', 'disabled')._id; /** Set the user contact as disabled */
 
-          relations.contact(contact.user, function(relation) {      
+          relations.contact(contact.user, function(relation) {
 
             index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
 
@@ -337,24 +339,24 @@ module.exports = function (router, mongoose) {
                 debug(err);
               }
             });
-          });          
+          });
         });
 
         userContact.save(function(err) {
-          if (err) {  
+          if (err) {
             next(err);
           } else {
 
-            User.findById(user, function(err, user){
-              if (err) { 
+            User.findById(user, function(err, user) {
+              if (err) {
                 next(err);
               } else {
 
                 user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
 
-                user.save(function(err){
+                user.save(function(err) {
 
-                  if(err){
+                  if (err) {
                     next(err);
 
                   } else {
@@ -374,10 +376,10 @@ module.exports = function (router, mongoose) {
 
   });
 
-  /** 
+  /**
    * Create a new user and invite it to emeeter
    */
-  router.get('/createAndInvite/:email', function(req, res ,next) {
+  router.get('/createAndInvite/:email', function(req, res, next) {
 
     var email = req.params.email;
 
@@ -387,11 +389,12 @@ module.exports = function (router, mongoose) {
       save(function(err, profile) {
 
         new User({
-          email : email,
-          password: Math.random().toString(36).slice(-8), /** Randomized alphanumeric password */
+          email: email,
+          password: Math.random().toString(36).slice(-8),
+          /** Randomized alphanumeric password */
           profile: profile._id,
           state: statics.model('state', 'pending')._id
-        }). 
+        }).
 
         save(function(err, user) {
 
@@ -399,13 +402,13 @@ module.exports = function (router, mongoose) {
             /** The user is already in the platform */
             if (err.code && err.code === 11000) {
 
-              User.   
+              User.
               findOne().
               where('email', email).
               exec(function(err, user) {
                 if (err) {
                   next(err);
-                } else if (user){
+                } else if (user) {
                   /** Send contact request */
                   res.redirect('/api/contacts/add/' + user._id);
                 }
@@ -417,7 +420,9 @@ module.exports = function (router, mongoose) {
             }
 
             Profile. /** Remove unnecessary new profile */
-            remove({ _id: profile._id  }).
+            remove({
+              _id: profile._id
+            }).
             exec(function(err) {
               if (err) {
                 debug(err);
@@ -425,7 +430,9 @@ module.exports = function (router, mongoose) {
             });
           } else {
 
-            new Contact({user: user._id}).
+            new Contact({
+              user: user._id
+            }).
 
             save(function(err) {
 
@@ -433,7 +440,7 @@ module.exports = function (router, mongoose) {
                 next(err);
               } else {
                 /** Send invite to the platform */
-                res.redirect('/api/mandrill/invite/'+ user._id);
+                res.redirect('/api/mandrill/invite/' + user._id);
 
               }
             });
@@ -450,13 +457,13 @@ module.exports = function (router, mongoose) {
   /**
    * Invited user Token validation
    */
-  router.get('/invited/signin/:token', function(req, res , next) {
+  router.get('/invited/signin/:token', function(req, res, next) {
 
     Token.findById(req.params.token, function(err, token) {
 
       if (err) {
 
-        if(err.name && err.name === 'CastError') {
+        if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
@@ -479,10 +486,10 @@ module.exports = function (router, mongoose) {
   /**
    * Activation of invited user that already validated token
    */
-  router.post('/invited/signin',  function(req, res , next) {
+  router.post('/invited/signin', function(req, res, next) {
 
-    var token = req.session.token,
-        password = req.body.password;
+    var token = req.session.token;
+    var password = req.body.password;
 
     if (token.user && token.sender) {
 
@@ -508,7 +515,7 @@ module.exports = function (router, mongoose) {
 
                 req.session.user = user;
 
-                res.redirect('/api/contacts/confirm/'+token._id);
+                res.redirect('/api/contacts/confirm/' + token._id);
 
                 delete req.session.token;
 
@@ -529,16 +536,16 @@ module.exports = function (router, mongoose) {
   });
 
 
-  /** 
+  /**
    * Validate email of new user
    */
-  router.get('/validate/:token', function (req, res, next) {
+  router.get('/validate/:token', function(req, res, next) {
 
-    Token.findById(req.params.token, function (err, token) {
+    Token.findById(req.params.token, function(err, token) {
 
       if (err) {
 
-        if(err.name && err.name === 'CastError') {
+        if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
@@ -550,23 +557,23 @@ module.exports = function (router, mongoose) {
 
         findOneAndUpdate({
           _id: token.user
-        },{
+        }, {
           state: statics.model('state', 'active')._id
         }).
 
-        exec(function (err, user) {
+        exec(function(err, user) {
 
           if (err) {
             next(err);
 
           } else {
-            
+
             req.session.user = user;
             res.redirect('http://' + req.headers.host + '/');
 
             Token.remove({
               user: user._id
-            }, function (err) {
+            }, function(err) {
               if (err) {
                 debug('Error! : %s', err);
               }
@@ -583,18 +590,18 @@ module.exports = function (router, mongoose) {
   /**
    * Get the session user
    */
-  router.get('/session', function (req, res, next) {
+  router.get('/session', function(req, res, next) {
 
     User.
 
     findById(req.session.user._id).
     deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
 
-    exec(function (err, user) {
+    exec(function(err, user) {
 
       if (err) {
 
-        if(err.name && err.name === 'CastError') {
+        if (err.name && err.name === 'CastError') {
 
           res.sendStatus(400);
         } else {
@@ -615,14 +622,14 @@ module.exports = function (router, mongoose) {
   /**
    * Get a user and populate it's profile
    */
-  router.get('/:id', function (req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     User.
 
     findById(req.params.id).
     deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
 
-    exec(function (err, user) {
+    exec(function(err, user) {
 
       if (err) {
 

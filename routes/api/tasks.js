@@ -2,11 +2,11 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
-  debug = require('debug')('app:api:tasks');
+var _ = require('underscore');
+var debug = require('debug')('app:api:tasks');
 
-var relations = component('relations'),
-  statics = component('statics');
+var relations = component('relations');
+var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
@@ -17,13 +17,13 @@ module.exports = function(router, mongoose) {
    */
   router.post('/create', function(req, res, next) {
 
-    var group = req.body.group,
-      dateTime = req.body.dateTime || null,
-      creator = req.session.user._id,
-      priorities = statics.models.priority,
-      _priority,
-      priority = null;
-    debug(dateTime);
+    var group = req.body.group;
+    var dateTime = req.body.dateTime || null;
+    var creator = req.session.user._id;
+    var priorities = statics.models.priority;
+    var _priority;
+    var priority = null;
+
     relations.membership(group, function(membership) {
 
       group = membership.group; /** The group model */
@@ -146,8 +146,8 @@ module.exports = function(router, mongoose) {
    */
   router.get('/group/:id', function(req, res, next) {
 
-    var user = req.session.user._id,
-      group = req.params.id;
+    var user = req.session.user._id;
+    var group = req.params.id;
 
     relations.membership(group, function(relation) {
 
@@ -191,10 +191,10 @@ module.exports = function(router, mongoose) {
    */
   router.post('/:taskId/addCollaborators', function(req, res, next) {
 
-    var task = req.params.taskId,
-      inviter = req.session.user._id,
-      collaborators = req.body.collaborators,
-      saved = 0;
+    var task = req.params.taskId;
+    var inviter = req.session.user._id;
+    var collaborators = req.body.collaborators;
+    var saved = 0;
 
     if (collaborators && collaborators.length) {
 
@@ -270,11 +270,11 @@ module.exports = function(router, mongoose) {
    */
   router.post('/:taskId/removeCollaborators', function(req, res, next) {
 
-    var removed = 0,
-      remover = req.session.user._id,
-      task = req.params.taskId,
-      collaborators = req.body.collaborators,
-      collaborator;
+    var removed = 0;
+    var remover = req.session.user._id;
+    var task = req.params.taskId;
+    var collaborators = req.body.collaborators;
+    var collaborator;
 
     if (collaborators && collaborators.length) {
 
@@ -347,10 +347,10 @@ module.exports = function(router, mongoose) {
    */
   router.post('/:taskId/addNotes', function(req, res, next) {
 
-    var task = req.params.taskId,
-      user = req.session.user._id,
-      notes = req.body.notes,
-      saved = 0;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
+    var notes = req.body.notes;
+    var saved = 0;
 
     if (notes && notes.length) {
 
@@ -419,11 +419,12 @@ module.exports = function(router, mongoose) {
    */
   router.post('/:taskId/removeNotes', function(req, res, next) {
 
-    var task = req.params.taskId,
-      user = req.session.user._id,
-      notes = req.body.notes,
-      removed = 0,
-      i, index;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
+    var notes = req.body.notes;
+    var removed = 0;
+    var i;
+    var index;
 
     if (notes && notes.length) {
 
@@ -499,8 +500,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:taskId/complete', function(req, res, next) { /** TODO: implement this change as a date field  */
 
-    var task = req.params.taskId,
-      user = req.session.user._id;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -549,8 +550,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:taskId/disable', function(req, res, next) {
 
-    var task = req.params.taskId,
-      user = req.session.user._id;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -599,8 +600,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:taskId/active', function(req, res, next) { /** TODO: remove completed field if necessary */
 
-    var task = req.params.taskId,
-      user = req.session.user._id;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -649,8 +650,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:taskId/dateTime/:dateTime', function(req, res, next) {
 
-    var task = req.params.taskId,
-      user = req.session.user._id;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -705,8 +706,8 @@ module.exports = function(router, mongoose) {
    */
   router.post('/:taskId/objective', function(req, res, next) {
 
-    var task = req.params.taskId,
-      user = req.session.user._id;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -756,8 +757,8 @@ module.exports = function(router, mongoose) {
    */
   router.post('/:taskId/priority', function(req, res, next) {
 
-    var task = req.params.taskId,
-      user = req.session.user._id;
+    var task = req.params.taskId;
+    var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -807,8 +808,8 @@ module.exports = function(router, mongoose) {
    **/
   router.get('/:id', function(req, res, next) {
 
-    var task = req.params.id,
-      user = req.session.user._id;
+    var task = req.params.id;
+    var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
 

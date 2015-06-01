@@ -4,23 +4,23 @@
 
 var debug = require('debug')('app:api:profiles');
 
-var gridfs = component('gridfs'),
-    relations = component('relations'), 
-    statics = component('statics');
+var gridfs = component('gridfs');
+var relations = component('relations');
+var statics = component('statics');
 
-module.exports = function (router, mongoose) {
+module.exports = function(router, mongoose) {
 
   var Profile = mongoose.model('profile');
 
-  /** 
+  /**
    * Update Profile linked to User
    */
-  router.post('/', function (req, res, next) {
+  router.post('/', function(req, res, next) {
 
-    var genders = statics.models.gender,
-        _gender,
-        gender = null;
-    
+    var genders = statics.models.gender;
+    var _gender;
+    var gender = null;
+
     for (_gender in genders) { /** Search the gender id and check that exists */
 
       if (genders.hasOwnProperty(_gender)) {
@@ -34,7 +34,7 @@ module.exports = function (router, mongoose) {
       }
     }
 
-    Profile.findById(req.session.user.profile , function(err, profile) {
+    Profile.findById(req.session.user.profile, function(err, profile) {
 
       if (err) {
         next(err);
@@ -49,13 +49,13 @@ module.exports = function (router, mongoose) {
 
         profile.location = req.body.location || profile.location;
 
-        profile.save(function (err) {
+        profile.save(function(err) {
 
           if (err) {
-            if(err.name && err.name === 'CastError') { 
+            if (err.name && err.name === 'CastError') {
               res.sendStatus(400);
             } else {
-              next(err);  
+              next(err);
             }
 
           } else {
@@ -75,17 +75,17 @@ module.exports = function (router, mongoose) {
   /**
    * Upload a picture
    */
-  router.post('/pictures', function (req, res, next) {
+  router.post('/pictures', function(req, res, next) {
 
-    var profile, /* This is the target schema */
-        saved = 0;
+    var profile; /* This is the target schema */
+    var saved = 0;
 
     /**
      * Create the document with the saved File ids
      */
     function saveProfile() {
 
-      profile.save(function (err) {
+      profile.save(function(err) {
         if (err) {
           next(err);
         } else {
@@ -116,7 +116,7 @@ module.exports = function (router, mongoose) {
         next(err);
       }
 
-      req.files.forEach(function (file) {
+      req.files.forEach(function(file) {
         debug('Saving %s', file.filename);
 
         var writestream = gridfs.save(file.data, {
@@ -130,7 +130,7 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    Profile.findById(req.session.user.profile, function (err, data) {
+    Profile.findById(req.session.user.profile, function(err, data) {
       if (err) {
         next(err);
       } else if (data) {
@@ -150,13 +150,13 @@ module.exports = function (router, mongoose) {
 
   });
 
-  /** 
+  /**
    * Update group profile
    */
-  router.post('/group/:id', function (req, res, next) {
+  router.post('/group/:id', function(req, res, next) {
 
-    var user = req.session.user._id,
-        group = req.params.id;
+    var user = req.session.user._id;
+    var group = req.params.id;
 
     relations.membership(group, function(membership) {
 
@@ -177,7 +177,7 @@ module.exports = function (router, mongoose) {
 
               profile.location = req.body.location || profile.location;
 
-              profile.save(function (err) {
+              profile.save(function(err) {
 
                 if (err) {
                   next(err);
@@ -190,11 +190,11 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
-          debug('User %s is not admin of group %s',user, group._id);
+          debug('User %s is not admin of group %s', user, group._id);
           res.sendStatus(403);
         }
       } else {
-        debug('No group found with id %s' , req.params.id);
+        debug('No group found with id %s', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -204,19 +204,19 @@ module.exports = function (router, mongoose) {
   /**
    * Upload a group picture
    */
-  router.post('/group/:id/pictures', function (req, res, next) {
+  router.post('/group/:id/pictures', function(req, res, next) {
 
-    var user = req.session.user._id,
-        group = req.params.id,
-        profile, /* This is the target schema */
-        saved = 0;
+    var user = req.session.user._id;
+    var group = req.params.id;
+    var profile; /* This is the target schema */
+    var saved = 0;
 
     /**
      * Create the document with the saved File ids
      */
     function saveProfile() {
 
-      profile.save(function (err) {
+      profile.save(function(err) {
         if (err) {
           next(err);
         } else {
@@ -247,7 +247,7 @@ module.exports = function (router, mongoose) {
         next(err);
       }
 
-      req.files.forEach(function (file) {
+      req.files.forEach(function(file) {
         debug('Saving %s', file.filename);
 
         var writestream = gridfs.save(file.data, {
@@ -269,7 +269,7 @@ module.exports = function (router, mongoose) {
 
         if (membership.isAdmin(user)) {
 
-          Profile.findById(group.profile, function (err, data) {
+          Profile.findById(group.profile, function(err, data) {
 
             profile = data;
 
@@ -281,11 +281,11 @@ module.exports = function (router, mongoose) {
             }
           });
         } else {
-          debug('User %s is not admin of group %s',user, group._id);
+          debug('User %s is not admin of group %s', user, group._id);
           res.sendStatus(403);
         }
       } else {
-        debug('No group found with id %s' , req.params.id);
+        debug('No group found with id %s', req.params.id);
         res.sendStatus(404);
       }
     });

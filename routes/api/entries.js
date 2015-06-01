@@ -2,33 +2,33 @@
 /* global component */
 'use strict';
 
-var  _ = require('underscore'),
-    debug = require('debug')('app:api:entries');
+var _ = require('underscore'),
+  debug = require('debug')('app:api:entries');
 
 var relations = component('relations'),
-    statics = component('statics'),
-    gridfs = component('gridfs');
+  statics = component('statics'),
+  gridfs = component('gridfs');
 
-module.exports = function (router, mongoose) {
+module.exports = function(router, mongoose) {
 
-  var Entry = mongoose.model('entry'),
-      Tag = mongoose.model('tag'),
-      Task = mongoose.model('task');
+  var Entry = mongoose.model('entry');
+  var Tag = mongoose.model('tag');
+  var Task = mongoose.model('task');
 
   /**
    * Create a new entry
    */
-  router.post('/create', function (req, res, next) {
+  router.post('/create', function(req, res, next) {
 
-    var entry, /* This is the target schema */
-        group = req.body.group || null,
-        tagsSaved = 0;
+    var entry; /* This is the target schema */
+    var group = req.body.group || null;
+    var tagsSaved = 0;
 
     /**
      * Save the document
      */
     function saveEntry() {
-      entry.save(function (err, entry) {
+      entry.save(function(err, entry) {
         if (err) {
           next(err);
         } else {
@@ -37,9 +37,9 @@ module.exports = function (router, mongoose) {
       });
     }
 
-    /** 
+    /**
      * Lookup for tags provided by the user
-     * If one is not found create a new tag 
+     * If one is not found create a new tag
      */
     function saveTags() {
 
@@ -58,28 +58,28 @@ module.exports = function (router, mongoose) {
       if (typeof req.body.tags === 'string') {
         req.body.tags = [req.body.tags];
       }
-      req.body.tags.forEach(function (tag) {
+      req.body.tags.forEach(function(tag) {
         Tag.findOne()
           .where('name', tag)
-          .exec(function (err, found) {
-          if (err) {
-            debug('Error! : %s', err);
-          } else if (found) {
-            debug('Tag found : %s' , found.name);
-            onTagReady(found);
-          } else {
-            debug('Creating new Tag : %s', tag);
-            new Tag({
-              name: tag
-            }).save(function (err, newTag) {
-              if (err) {
-                debug('Error! : %s', err);
-              } else {
-                onTagReady(newTag);
-              }
-            });
-          }
-        });
+          .exec(function(err, found) {
+            if (err) {
+              debug('Error! : %s', err);
+            } else if (found) {
+              debug('Tag found : %s', found.name);
+              onTagReady(found);
+            } else {
+              debug('Creating new Tag : %s', tag);
+              new Tag({
+                name: tag
+              }).save(function(err, newTag) {
+                if (err) {
+                  debug('Error! : %s', err);
+                } else {
+                  onTagReady(newTag);
+                }
+              });
+            }
+          });
       });
     }
 
@@ -87,15 +87,15 @@ module.exports = function (router, mongoose) {
 
       new Entry({
         user: req.session.user._id,
-        group : group,
+        group: group,
         title: req.body.title,
-        content: req.body.content /* Markdown text */ 
+        content: req.body.content /* Markdown text */
       }).
 
-      save(function (err, data) {
+      save(function(err, data) {
         if (err) {
 
-          if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) { 
+          if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
             res.sendStatus(400);
           } else {
             next(err);
@@ -127,7 +127,7 @@ module.exports = function (router, mongoose) {
             createEntry();
 
           } else {
-            debug('User %s is not part of group %s',req.session.user._id, group);
+            debug('User %s is not part of group %s', req.session.user._id, group);
             res.sendStatus(403);
           }
         } else {
@@ -142,17 +142,17 @@ module.exports = function (router, mongoose) {
 
   /**
    * Upload pictures to an entry
-   */ 
-  router.post('/:id/pictures', function (req, res, next) {
+   */
+  router.post('/:id/pictures', function(req, res, next) {
 
-    var entry, /* This is the target schema */
-        picturesSaved = 0;
+    var entry; /* This is the target schema */
+    var picturesSaved = 0;
 
     /**
      * Save the document
      */
     function saveEntry() {
-      entry.save(function (err, entry) {
+      entry.save(function(err, entry) {
         if (err) {
           next(err);
         } else {
@@ -170,7 +170,7 @@ module.exports = function (router, mongoose) {
       function onclose(fsFile) {
         debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
 
-        entry.pictures.push(fsFile._id); 
+        entry.pictures.push(fsFile._id);
 
         picturesSaved += 1;
 
@@ -186,7 +186,7 @@ module.exports = function (router, mongoose) {
         next(err);
       }
 
-      req.files.forEach(function (file) {
+      req.files.forEach(function(file) {
         debug('Saving %s', file.filename);
 
         var writestream = gridfs.save(file.data, {
@@ -202,7 +202,7 @@ module.exports = function (router, mongoose) {
     Entry.
     findOne().
     where('_id', req.params.id).
-    exec(function (err, data) {
+    exec(function(err, data) {
       if (err) {
 
         if (err.name && err.name === 'CastError') {
@@ -222,7 +222,7 @@ module.exports = function (router, mongoose) {
           } else { /* If not, just save the document */
             saveEntry();
           }
-          
+
         } else {
           res.sendStatus(403);
         }
@@ -237,7 +237,7 @@ module.exports = function (router, mongoose) {
   /**
    * Get an entry
    */
-  router.get('/:id', function (req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     Entry.
 
@@ -245,7 +245,7 @@ module.exports = function (router, mongoose) {
 
     populate('pictures'). /* Retrieves data from linked schemas */
 
-    exec(function (err, entry) {
+    exec(function(err, entry) {
 
       if (err) {
 
@@ -265,7 +265,7 @@ module.exports = function (router, mongoose) {
 
           } else {
             debug('User %s and %s are not contacts with each other', entry.user, req.session.user._id);
-            res.sendStatus(403); 
+            res.sendStatus(403);
           }
         });
       } else {
@@ -278,13 +278,13 @@ module.exports = function (router, mongoose) {
   /**
    * Get entries of an user
    */
-  router.get('/user/:id', function (req, res, next) {
+  router.get('/user/:id', function(req, res, next) {
 
     var user = req.params.id;
 
     relations.contact(user, function(relation) {
 
-      if (relation.contact) { 
+      if (relation.contact) {
 
         if (relation.isContact(req.session.user._id) || user === req.session.user._id) {
 
@@ -298,7 +298,7 @@ module.exports = function (router, mongoose) {
 
           sort('-created').
 
-          exec(function (err, entries) {
+          exec(function(err, entries) {
             if (err) {
               next(err);
 
@@ -310,7 +310,7 @@ module.exports = function (router, mongoose) {
           });
         } else {
           debug('User %s and %s are not contacts with each other', user, req.session.user._id);
-          res.sendStatus(403); 
+          res.sendStatus(403);
         }
       } else {
         debug('User %s was not found', user);
@@ -323,19 +323,21 @@ module.exports = function (router, mongoose) {
   /**
    * Get entries with files of an user
    */
-  router.get('/user/:id/files', function (req, res, next) {
+  router.get('/user/:id/files', function(req, res, next) {
 
     var user = req.params.id;
 
     relations.contact(user, function(relation) {
 
-      if (relation.contact) { 
+      if (relation.contact) {
 
         if (relation.isContact(req.session.user._id) || user === req.session.user._id) {
 
           Entry.
 
-          find( { $where : 'this.pictures.length > 0' } ).
+          find({
+            $where: 'this.pictures.length > 0'
+          }).
 
           where('user', user).
 
@@ -343,7 +345,7 @@ module.exports = function (router, mongoose) {
 
           sort('-created').
 
-          exec(function (err, entries) {
+          exec(function(err, entries) {
             if (err) {
               next(err);
 
@@ -351,11 +353,11 @@ module.exports = function (router, mongoose) {
 
               res.send(entries);
 
-            } 
+            }
           });
         } else {
           debug('User %s and %s are not contacts with each other', user, req.session.user._id);
-          res.sendStatus(403); 
+          res.sendStatus(403);
         }
       } else {
         debug('User %s was not found', user);
@@ -368,10 +370,10 @@ module.exports = function (router, mongoose) {
   /**
    * Get entries of a group
    */
-  router.get('/group/:id', function (req, res, next) {
+  router.get('/group/:id', function(req, res, next) {
 
-    var user = req.session.user._id,
-        group = req.params.id;
+    var user = req.session.user._id;
+    var group = req.params.id;
 
     relations.membership(group, function(relation) {
 
@@ -389,7 +391,7 @@ module.exports = function (router, mongoose) {
 
           sort('-created').
 
-          exec(function (err, entries) {
+          exec(function(err, entries) {
 
             if (err) {
               next(err);
@@ -415,10 +417,10 @@ module.exports = function (router, mongoose) {
   /**
    * Get entries with files of a group
    */
-  router.get('/group/:id/files', function (req, res, next) {
+  router.get('/group/:id/files', function(req, res, next) {
 
-    var user = req.session.user._id,
-        group = req.params.id;
+    var user = req.session.user._id;
+    var group = req.params.id;
 
     relations.membership(group, function(relation) {
 
@@ -428,7 +430,9 @@ module.exports = function (router, mongoose) {
 
           Entry.
 
-          find( { $where : 'this.pictures.length > 0' } ).
+          find({
+            $where: 'this.pictures.length > 0'
+          }).
 
           where('group', group).
 
@@ -436,7 +440,7 @@ module.exports = function (router, mongoose) {
 
           sort('-created').
 
-          exec(function (err, entries) {
+          exec(function(err, entries) {
 
             if (err) {
               next(err);
@@ -445,7 +449,7 @@ module.exports = function (router, mongoose) {
 
               res.send(entries);
 
-            } 
+            }
           });
         } else {
           debug('User %s is not part of group %s', req.session.user._id, group);
@@ -464,28 +468,28 @@ module.exports = function (router, mongoose) {
    */
   router.post('/task/:taskId/add', function(req, res, next) {
 
-    var task = req.params.taskId,
-        user = req.session.user._id,
-        entries = req.body.entries,
-        checked = 0, 
-        saved = 0,
+    var task = req.params.taskId;
+    var user = req.session.user._id;
+    var entries = req.body.entries;
+    var checked = 0;
+    var saved = 0;
 
-        checkAndSave = function() {
+    function checkAndSave() {
 
-          if (checked === entries.length) {
-            task.save(function(err) {
-              if (err) {
-                next(err);
-              } else {
+      if (checked === entries.length) {
+        task.save(function(err) {
+          if (err) {
+            next(err);
+          } else {
 
-                debug('%s of %s new entries added to task %s', saved, entries.length, task._id);
-                res.send(saved + ' of ' + entries.length + ' new entries added to task ' +  task._id);
+            debug('%s of %s new entries added to task %s', saved, entries.length, task._id);
+            res.send(saved + ' of ' + entries.length + ' new entries added to task ' + task._id);
 
-              }
-            });
           }
+        });
+      }
 
-        };
+    }
 
     if (entries && entries.length) {
 
@@ -499,16 +503,16 @@ module.exports = function (router, mongoose) {
         task = collaboration.task; /** The task model */
 
         /** Check if task exists and is available for changes */
-        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) || _.isEqual(task.state, statics.model('state', 'pending')._id))) {
 
           relations.membership(task.group, function(taskGroup) {
 
-            if (taskGroup.isMember(user)) {  /** Check if user is part of task group */
+            if (taskGroup.isMember(user)) { /** Check if user is part of task group */
 
               relations.
               contact(user, function(relation) {
 
-                entries.forEach(function(entry) { 
+                entries.forEach(function(entry) {
 
                   Entry.findById(entry, function(err, _entry) {
 
@@ -519,7 +523,7 @@ module.exports = function (router, mongoose) {
 
                     } else if (_entry) {
                       /** Check if user is contact of entry creator or is itself */
-                      if (relation.isContact(_entry.user) || JSON.stringify(user) === JSON.stringify(_entry.user)) { 
+                      if (relation.isContact(_entry.user) || JSON.stringify(user) === JSON.stringify(_entry.user)) {
 
                         saved += 1;
                         debug('Entry %s saved into task %s', entry, task._id);
@@ -529,7 +533,7 @@ module.exports = function (router, mongoose) {
 
                         checked -= 1; /** Wait for asynchronous method to check this entry */
 
-                        relations.membership(_entry.group, function(entryGroup) { 
+                        relations.membership(_entry.group, function(entryGroup) {
 
                           if (entryGroup.isMember(user)) { /** Check if user is part of entry group */
 
@@ -555,15 +559,15 @@ module.exports = function (router, mongoose) {
                     checkAndSave();
 
                   });
-                });    
+                });
               });
             } else {
               debug('User %s is not allowed to modify task %s', user, task._id);
               res.sendStatus(403);
-            } 
+            }
           });
         } else {
-          debug('Task %s was not found' , req.params.taskId);
+          debug('Task %s was not found', req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -578,11 +582,12 @@ module.exports = function (router, mongoose) {
    */
   router.post('/task/:taskId/remove', function(req, res, next) {
 
-    var remover = req.session.user._id,
-        task = req.params.taskId, 
-        entries = req.body.entries,
-        i, index,
-        removed = 0;
+    var remover = req.session.user._id;
+    var task = req.params.taskId;
+    var entries = req.body.entries;
+    var i;
+    var index;
+    var removed = 0;
 
     if (entries && entries.length) {
 
@@ -596,7 +601,7 @@ module.exports = function (router, mongoose) {
         task = collaboration.task; /** The task model */
 
         /** Check if task exists and is available for changes */
-        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) ||                                                                                          _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) || _.isEqual(task.state, statics.model('state', 'pending')._id))) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -612,7 +617,7 @@ module.exports = function (router, mongoose) {
                     index = i;
                     break;
                   }
-                } 
+                }
 
                 if (index > -1) {
 
@@ -631,17 +636,17 @@ module.exports = function (router, mongoose) {
                 } else {
 
                   debug('%s of %s entries removed from task %s', removed, entries.length, task._id);
-                  res.send(removed + ' of '+ entries.length +' entries removed from task ' +  task._id);
+                  res.send(removed + ' of ' + entries.length + ' entries removed from task ' + task._id);
 
                 }
               });
             } else {
-              debug('User %s is not part of task %s group' , remover, task.group);
+              debug('User %s is not part of task %s group', remover, task.group);
               res.sendStatus(403);
-            } 
+            }
           });
         } else {
-          debug('Task %s was not found' , req.params.taskId);
+          debug('Task %s was not found', req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -652,11 +657,11 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Get task entries 
+   * Get task entries
    */
   router.get('/task/:taskId', function(req, res, next) {
 
-    var user = req.session.user._id; 
+    var user = req.session.user._id;
 
     Task.
 
@@ -684,7 +689,7 @@ module.exports = function (router, mongoose) {
           }
         });
       } else {
-        debug('Task %s was not found' , req.params.taskId);
+        debug('Task %s was not found', req.params.taskId);
         res.sendStatus(404);
       }
     });
