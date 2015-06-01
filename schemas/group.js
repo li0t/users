@@ -20,8 +20,13 @@ module.exports = function (Schema) {
     },
 
     members: [{
-      type: Schema.Types.ObjectId,
-      ref: 'user'
+
+      user: { type: Schema.Types.ObjectId, ref: 'user'},
+
+      joined : [Date],
+
+      left: [Date]
+
     }]
 
   });
