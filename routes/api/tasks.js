@@ -650,62 +650,6 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Set task datetime
-   */
-  router.put('/:taskId/dateTime/:dateTime', function(req, res, next) {
-
-    var task = req.params.taskId;
-    var user = req.session.user._id;
-
-    relations.collaboration(task, function(collaboration) {
-
-      task = collaboration.task; /** The task model */
-
-      /** Check if task exists and is available for changes */
-      if (task) {
-
-        if (!task.completed) {
-
-          relations.membership(task.group, function(taskGroup) {
-
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
-
-              task.dateTime = req.params.dateTime;
-
-              task.save(function(err) {
-
-                if (err) {
-
-                  if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
-                    res.status(400).send(err);
-                  } else {
-                    next(err);
-                  }
-
-                } else {
-                  debug('Task %s dateTime was set to %s', task._id, task.dateTime);
-                  res.send('Task ' + task._id + ' dateTime was set to ' + task.dateTime);
-
-                }
-              });
-            } else {
-              debug('User %s is not allowed to modify task %s', user, task._id);
-              res.sendStatus(403);
-            }
-          });
-        } else {
-          debug('Task %s is completed, no changes allowed', task._id);
-          res.sendStatus(403);
-        }
-      } else {
-        debug('Task %s was not found', req.params.taskId);
-        res.sendStatus(404);
-      }
-    });
-
-  });
-
-  /**
    * Edit task objective
    */
   router.post('/:taskId/objective', function(req, res, next) {
@@ -763,6 +707,9 @@ module.exports = function(router, mongoose) {
 
     var task = req.params.taskId;
     var user = req.session.user._id;
+    var priorities = statics.models.priority;
+    var priority = null;
+    var _priority;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -777,7 +724,23 @@ module.exports = function(router, mongoose) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              task.priority = req.body.priority || task.priority;
+              if (req.body.priority) {
+
+                for (_priority in priorities) { /** Search the priority id and check that exists */
+
+                  if (priorities.hasOwnProperty(_priority)) {
+
+                    if (JSON.stringify(priorities[_priority]._id) === JSON.stringify(req.body.priority)) {
+
+                      priority = req.body.priority;
+                      break;
+
+                    }
+                  }
+                }
+              }
+
+              task.priority = priority || task.priority;
 
               task.save(function(err) {
 
@@ -787,6 +750,62 @@ module.exports = function(router, mongoose) {
                 } else {
                   debug('Task %s priority changed to %s', task._id, task.priority);
                   res.send('Task ' + task._id + ' priority changed to ' + task.priority);
+
+                }
+              });
+            } else {
+              debug('User %s is not allowed to modify task %s', user, task._id);
+              res.sendStatus(403);
+            }
+          });
+        } else {
+          debug('Task %s is completed, no changes allowed', task._id);
+          res.sendStatus(403);
+        }
+      } else {
+        debug('Task %s was not found', req.params.taskId);
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
+  /**
+   * Set task datetime
+   */
+  router.put('/:taskId/dateTime/:dateTime', function(req, res, next) {
+
+    var task = req.params.taskId;
+    var user = req.session.user._id;
+
+    relations.collaboration(task, function(collaboration) {
+
+      task = collaboration.task; /** The task model */
+
+      /** Check if task exists and is available for changes */
+      if (task) {
+
+        if (!task.completed) {
+
+          relations.membership(task.group, function(taskGroup) {
+
+            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+
+              task.dateTime = req.params.dateTime;
+
+              task.save(function(err) {
+
+                if (err) {
+
+                  if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
+                    res.status(400).send(err);
+                  } else {
+                    next(err);
+                  }
+
+                } else {
+                  debug('Task %s dateTime was set to %s', task._id, task.dateTime);
+                  res.send('Task ' + task._id + ' dateTime was set to ' + task.dateTime);
 
                 }
               });
