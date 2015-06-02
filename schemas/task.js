@@ -3,7 +3,7 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
-module.exports = function (Schema) {
+module.exports = function(Schema) {
 
   var TaskSchema = new Schema({
 
@@ -15,14 +15,18 @@ module.exports = function (Schema) {
 
     creator: {
       type: Schema.Types.ObjectId,
-      ref: 'user', 
+      ref: 'user',
       required: true
     },
 
-    state: {
-      type: Schema.Types.ObjectId,
-      ref: 'static.state',
-      required: true
+    completed: {
+      type: Date,
+      default: null
+    },
+
+    deleted: {
+      type: Date,
+      default: null
     },
 
     objective: {
@@ -35,13 +39,13 @@ module.exports = function (Schema) {
       ref: 'user'
     }],
 
-    priority : {
+    priority: {
       type: Schema.Types.ObjectId,
       ref: 'static.priority',
       required: true
     },
 
-    entries: [{ 
+    entries: [{
       type: Schema.Types.ObjectId,
       ref: 'entry'
     }],
@@ -51,7 +55,7 @@ module.exports = function (Schema) {
       //  ref: ''
     }],*/
 
-    dateTime : Date,
+    dateTime: Date,
 
     notes: [String]
 
@@ -63,35 +67,35 @@ module.exports = function (Schema) {
   });
 
   /** Task creation time */
-  TaskSchema.virtual('created').get(function () {
+  TaskSchema.virtual('created').get(function() {
     return this._id.getTimestamp();
   });
 
   /** Check the date time is set in the future */
   TaskSchema.path('dateTime').validate(function(dateTime, cb) {
-    
+
     if (dateTime && dateTime <= new Date()) {
-        cb(false);
-      }
-    
+      cb(false);
+    }
+
     cb(true);
-    
+
   }, 'The task date time must be in the future!');
 
   /** Lets populate reach any level */
   TaskSchema.plugin(deepPopulate, {
-    populate :{
+    populate: {
 
-      'group' : {
+      'group': {
         select: 'name location pictures'
       },
 
-      'entries.user' : {
+      'entries.user': {
         select: 'email'
       },
 
-      'collaborators' : {
-        select : 'email'
+      'collaborators': {
+        select: 'email'
       }
 
     }

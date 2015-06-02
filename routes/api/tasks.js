@@ -50,7 +50,6 @@ module.exports = function(router, mongoose) {
             new Task({
               group: group._id,
               creator: creator,
-              state: statics.model('state', 'active')._id,
               objective: req.body.objective,
               priority: req.body.priority,
               dateTime: dateTime,
@@ -100,7 +99,9 @@ module.exports = function(router, mongoose) {
 
     where('creator', req.session.user._id).
 
-    populate('group collaborators entries priority state').
+    where('deleted', null).
+
+    populate('group collaborators entries priority').
 
     sort('-created').
 
@@ -126,7 +127,9 @@ module.exports = function(router, mongoose) {
 
     where('collaborators', req.session.user._id).
 
-    populate('group collaborators entries priority state').
+    where('deleted', null).
+
+    populate('group collaborators entries priority').
 
     sort('-created').
 
@@ -160,6 +163,8 @@ module.exports = function(router, mongoose) {
           find().
 
           where('group', group).
+
+          where('deleted', null).
 
           sort('-created').
 
@@ -210,7 +215,7 @@ module.exports = function(router, mongoose) {
         /** Check if task exists and is available for changes */
         if (task) {
 
-          if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+          if (!task.completed) {
 
             relations.membership(task.group, function(taskGroup) {
 
@@ -250,12 +255,11 @@ module.exports = function(router, mongoose) {
               }
             });
           } else {
-            debug('Task %s is not active', task._id);
+            debug('Task %s is completed, no changes allowed', task._id);
             res.sendStatus(403);
           }
-
         } else {
-
+          debug('Task %s was not found', req.params.taskId);
           res.sendStatus(404);
         }
       });
@@ -290,7 +294,7 @@ module.exports = function(router, mongoose) {
         /** Check if task exists and is available for changes */
         if (task) {
 
-          if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+          if (!task.completed) {
 
             relations.membership(task.group, function(taskGroup) {
 
@@ -328,7 +332,7 @@ module.exports = function(router, mongoose) {
               }
             });
           } else {
-            debug('Task %s is not active', task._id);
+            debug('Task %s is completed, no changes allowed', task._id);
             res.sendStatus(404);
           }
         } else {
@@ -366,7 +370,7 @@ module.exports = function(router, mongoose) {
         /** Check if task exists and is available for changes */
         if (task) {
 
-          if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+          if (!task.completed) {
 
             relations.membership(task.group, function(taskGroup) {
 
@@ -400,7 +404,7 @@ module.exports = function(router, mongoose) {
               }
             });
           } else {
-            debug('Task %s is not active', task._id);
+            debug('Task %s is completed, no changes allowed', task._id);
             res.sendStatus(403);
           }
         } else {
@@ -440,7 +444,7 @@ module.exports = function(router, mongoose) {
         /** Check if task exists and is available for changes */
         if (task) {
 
-          if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+          if (!task.completed) {
 
             relations.membership(task.group, function(taskGroup) {
 
@@ -481,7 +485,7 @@ module.exports = function(router, mongoose) {
               }
             });
           } else {
-            debug('Task %s is not active', task._id);
+            debug('Task %s is completed, no changes allowed', task._id);
             res.sendStatus(403);
           }
         } else {
@@ -510,13 +514,13 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (task) {
 
-        if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+        if (!task.completed) {
 
           relations.membership(task.group, function(taskGroup) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              task.state = statics.model('state', 'completed')._id;
+              task.completed = new Date();
 
               task.save(function(err) {
                 if (err) {
@@ -534,7 +538,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s is not active', user);
+          debug('Task %s is completed, no changes allowed', task._id);
           res.sendStatus(403);
         }
       } else {
@@ -546,9 +550,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Set task as disabled
+   * Set task as deleted
    */
-  router.put('/:taskId/disable', function(req, res, next) {
+  router.put('/:taskId/delete', function(req, res, next) {
 
     var task = req.params.taskId;
     var user = req.session.user._id;
@@ -560,13 +564,13 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (task) {
 
-        if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+        if (!task.completed) {
 
           relations.membership(task.group, function(taskGroup) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              task.state = statics.model('state', 'disabled')._id;
+              task.deleted = new Date();
 
               task.save(function(err) {
                 if (err) {
@@ -584,7 +588,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s is not active', user);
+          debug('Task %s is completed, no changes allowed', task._id);
           res.sendStatus(403);
         }
       } else {
@@ -596,9 +600,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Set task as active
+   * Re-open task
    */
-  router.put('/:taskId/active', function(req, res, next) { /** TODO: remove completed field if necessary */
+  router.put('/:taskId/re-open', function(req, res, next) { /** TODO: remove completed field if necessary */
 
     var task = req.params.taskId;
     var user = req.session.user._id;
@@ -610,13 +614,13 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (task) {
 
-        if (!_.isEqual(task.state, statics.model('state', 'active')._id)) {
+        if (task.completed) {
 
           relations.membership(task.group, function(taskGroup) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              task.state = statics.model('state', 'active')._id;
+              task.completed = null;
 
               task.save(function(err) {
                 if (err) {
@@ -634,7 +638,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s is active already', user);
+          debug('Task %s is not completed', user);
           res.sendStatus(403);
         }
       } else {
@@ -660,7 +664,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (task) {
 
-        if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+        if (!task.completed) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -690,7 +694,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s is not active', user);
+          debug('Task %s is completed, no changes allowed', task._id);
           res.sendStatus(403);
         }
       } else {
@@ -716,7 +720,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (task) {
 
-        if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+        if (!task.completed) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -741,7 +745,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s is not active', user);
+          debug('Task %s is completed, no changes allowed', task._id);
           res.sendStatus(403);
         }
       } else {
@@ -767,7 +771,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (task) {
 
-        if (_.isEqual(task.state, statics.model('state', 'active')._id)) {
+        if (!task.completed) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -792,7 +796,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s is not active', user);
+          debug('Task %s is completed, no changes allowed', task._id);
           res.sendStatus(403);
         }
       } else {
@@ -822,7 +826,7 @@ module.exports = function(router, mongoose) {
 
           if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-            task.deepPopulate('group collaborators entries priority state', function(err, task) {
+            task.deepPopulate('group collaborators entries priority', function(err, task) {
 
               if (err) {
                 next(err);
@@ -831,7 +835,6 @@ module.exports = function(router, mongoose) {
               }
 
             });
-
           } else {
             debug('User %s is not allowed to modify task %s', user, task._id);
             res.sendStatus(403);
