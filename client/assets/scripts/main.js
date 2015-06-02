@@ -515,12 +515,14 @@ $(document).ready(function() {
 
   function loadTask($this, id) {
 
+    var note;
     var i;
     var isCollaborator;
     var collaborators;
     var $button;
     var $that;
     var url;
+    var index = 0;
 
 
     $. /** Get the task document */
@@ -790,6 +792,86 @@ $(document).ready(function() {
             }
           }
         });
+
+        $('#thisTask').append('<form id="thisTaskNotes" ><p>notes</p></form>');
+
+        /** Load task notes */
+        if (task.notes.length) {
+
+          for (index = 0; index < task.notes.length; index++) {
+
+            $('#thisTaskNotes').
+            append('<p name="note" id="note' + index + '">' + task.notes[index].note + '</p>' +
+              '<input type="button" name="deleteNote" id="' + index + '" value="delete"/>');
+
+          }
+
+          $('#thisTaskNotes').find('input[name=deleteNote]').click(function() {
+
+            note = $('note' + this.id).text();
+
+            $.
+            post('api/tasks/' + task._id + '/removeNotes', "notes=" +  note).
+
+            done(function(data) {
+
+              $('#thisTask').empty();
+              $('#tasksOutput').val(data);
+              loadTasks();
+
+              $('#listTasks').
+              find("input[type='radio'][name=task][value=" + $this.val() + "]").
+              trigger('click');
+
+            }).
+
+            fail(function(data) {
+
+              alert(data.status + '  (' + data.statusText + ')');
+
+            });
+
+          });
+
+        } else {
+
+          $('#thisTaskNotes').append('<p>no notes</p>');
+
+        }
+
+        $('#thisTaskNotes').
+        append('<textarea rows="8" cols="8" id="newNote" placeholder="note..."></textarea>' +
+          '<input type="button" id="addNewNote" value="add new note"/>');
+
+          $('#addNewNote').click(function() {
+
+            note = $('#newNote').val();
+
+            $.
+            post('api/tasks/' + task._id + '/addNotes',  {
+              "notes": note
+            }).
+
+            done(function(data) {
+
+              $('#thisTask').empty();
+              $('#tasksOutput').val(data);
+              loadTasks();
+
+              $('#listTasks').
+              find("input[type='radio'][name=task][value=" + $this.val() + "]").
+              trigger('click');
+
+            }).
+
+            fail(function(data) {
+
+              alert(data.status + '  (' + data.statusText + ')');
+
+            });
+
+
+          });
 
         /** Load task collaborators */
         if (task.collaborators.length) {
