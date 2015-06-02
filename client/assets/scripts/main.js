@@ -545,21 +545,9 @@ $(document).ready(function() {
           '<input type="button" name="editTask" id="editTaskPriority" value="edit" /><br>' +
           '<br><p id="taskObjective" >objective:<br>' + task.objective + '</p>' +
           '<input type="button" name="editTask" id="editTaskObjective" value="edit" /><br>' +
-          '<p id="thisTaskDateTime"></p>');
-
-        if (!task.completed) {
-
-          $('#thisTaskState').text('active');
-          $('#thisTaskForm').append('<input type="button" name="editTask" id="completeTask" value="complete" />');
-          $('#thisTaskForm').append('<input type="button" name="editTask" id="deleteTask" value="delete" />');
-
-        } else {
-
-          $('#thisTaskState').text('completed');
-          $('#thisTaskForm').find("input[name=editTask]").attr('type', 'hidden');
-          $('#thisTaskForm').append('<input type="button" name="editTask" id="reOpenTask" value="re-open" />');
-
-        }
+          '<p id="thisTaskDateTime"></p>' +
+          '<input type="button" name="editTask" id="editTaskDateTime" value="edit" /><br>' +
+          '<input type="button" name="editTask" id="makeTaskDateTimePoll" value="make poll" /><br>');
 
         if (task.dateTime) {
 
@@ -569,7 +557,24 @@ $(document).ready(function() {
 
           $('#thisTaskDateTime').text('datetime not set');
 
+
         }
+
+        if (!task.completed) {
+
+          $('#thisTaskState').text('active');
+          $('#thisTaskForm').append('<br><input type="button" name="editTask" id="completeTask" value="complete" />');
+          $('#thisTaskForm').append('<input type="button" name="editTask" id="deleteTask" value="delete" />');
+
+        } else {
+
+          $('#thisTaskState').text('completed');
+          $('#thisTaskForm').find("input[name=editTask]").attr('type', 'hidden');
+          $('#thisTaskForm').append('<br><input type="button" name="editTask" id="reOpenTask" value="re-open" />');
+
+        }
+
+
 
         /** Add listeners to edit task buttons */
         $('#thisTaskForm').find("input[name=editTask]").click(function() {
@@ -659,6 +664,10 @@ $(document).ready(function() {
                 }
               });
             }
+          } else if (this.id === 'makeTaskDateTimePoll') {
+
+            alert('Create a poll, GREAT!');
+
           } else if ($button.val() === 'edit') {
 
             if (this.id === 'editTaskPriority') {
@@ -684,6 +693,17 @@ $(document).ready(function() {
               $that.
               replaceWith('<textarea rows="4" cols="8" id="taskObjective" name="objective" placeholder="' +
                 task.objective + '"></textarea>');
+
+              $button.val('send');
+
+            } else if (this.id === 'editTaskDateTime') {
+
+              $that = $('#thisTaskDateTime');
+
+              $that.
+              replaceWith('<br><input type="text" name="dateTime" id="thisTaskDateTime" placeholder="date time"/>');
+
+              $('#thisTaskDateTime').datepicker();
 
               $button.val('send');
 
@@ -724,6 +744,30 @@ $(document).ready(function() {
 
               $.
               post("api/tasks/" + task._id + "/objective", $("#thisTaskForm").serialize()).
+
+              done(function(data) {
+
+                $('#thisTask').empty();
+                $('#tasksOutput').val(data);
+                loadTasks();
+
+                $('#listTasks').
+                find("input[type='radio'][name=task][value=" + $this.val() + "]").
+                trigger('click');
+
+              }).
+
+              fail(function(data) {
+
+                alert(data.status + '  (' + data.statusText + ')');
+
+              });
+
+              /** edit task date time */
+            } else if (this.id === 'editTaskDateTime') {
+
+              $.
+              post("api/tasks/" + task._id + "/dateTime", $("#thisTaskForm").serialize()).
 
               done(function(data) {
 
@@ -1123,7 +1167,8 @@ $(document).ready(function() {
 
       $('#thisEntry').
       empty().
-      append('<h4>entry</h4>' +
+      append('<input type="button" id="shareThisEntry" value="share"/>' +
+        '<h4>entry</h4>' +
         '<p>' + entry.title + '</p>' +
         '<p>' + entry.content + '</p>');
 
@@ -1198,6 +1243,12 @@ $(document).ready(function() {
 
           }
         });
+      });
+
+      $('#shareThisEntry').click(function() {
+
+        alert('Wold you like to share entry ' + entry.title);
+
       });
     }).
 

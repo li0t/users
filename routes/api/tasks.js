@@ -773,7 +773,7 @@ module.exports = function(router, mongoose) {
   /**
    * Set task datetime
    */
-  router.put('/:taskId/dateTime/:dateTime', function(req, res, next) {
+  router.post('/:taskId/dateTime', function(req, res, next) {
 
     var task = req.params.taskId;
     var user = req.session.user._id;
@@ -791,7 +791,7 @@ module.exports = function(router, mongoose) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              task.dateTime = req.params.dateTime;
+              task.dateTime = req.body.dateTime;
 
               task.save(function(err) {
 
