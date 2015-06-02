@@ -326,7 +326,7 @@ $(document).ready(function() {
             $('#thisGroup').append('<form id="thisGroupForm"></form>');
 
             members.forEach(function(member) {
-              
+
               member = member.user;
 
               email = member.email;
@@ -521,7 +521,7 @@ $(document).ready(function() {
     var $button;
     var $that;
     var url;
-    var oldState;
+
 
     $. /** Get the task document */
     get('api/tasks/' + id).
@@ -538,81 +538,136 @@ $(document).ready(function() {
         $('#thisTask').empty().append('<form id="thisTaskForm"></form>');
 
         $('#thisTaskForm').
-        append('<h4>task</h4>' +
-          'state: <br><select id="taskState" name="" ><option value="' + task.state._id + '">' + task.state.slug + '</option></select>' +
-          '<input type="button" name="editTask" id="editTaskState" value="edit"/><br>' +
-          '<br>priority: <br><select id="taskPriority" ><option value = "' + task.priority._id + '" > ' + task.priority.slug + ' </option></select>' +
-          '<input type="button" name="editTask" id="editTaskPriority" value="edit"/><br>' +
-          '<br>objective: <br><p id="taskObjective" >' + task.objective + '</p>' +
-          '<input type="button" name="editTask" id="editTaskObjective" value="edit"/><br>');
+        append('<p>group: ' + task.group.profile.name + '</p>' +
+          '<h4>task</h4>' +
+          '<p id="thisTaskState"></p>' +
+          '<p id="taskPriority" >priority: ' + task.priority.slug + ' </p>' +
+          '<input type="button" name="editTask" id="editTaskPriority" value="edit" /><br>' +
+          '<br><p id="taskObjective" >objective:<br>' + task.objective + '</p>' +
+          '<input type="button" name="editTask" id="editTaskObjective" value="edit" /><br>' +
+          '<p id="thisTaskDateTime"></p>');
+
+        if (!task.completed) {
+
+          $('#thisTaskState').text('active');
+          $('#thisTaskForm').append('<input type="button" name="editTask" id="completeTask" value="complete" />');
+          $('#thisTaskForm').append('<input type="button" name="editTask" id="deleteTask" value="delete" />');
+
+        } else {
+
+          $('#thisTaskState').text('completed');
+          $('#thisTaskForm').find("input[name=editTask]").attr('type', 'hidden');
+          $('#thisTaskForm').append('<input type="button" name="editTask" id="reOpenTask" value="re-open" />');
+
+        }
+
+        if (task.dateTime) {
+
+          $('#thisTaskDateTime').text('datetime: ' + task.dateTime);
+
+        } else {
+
+          $('#thisTaskDateTime').text('datetime not set');
+
+        }
 
         /** Add listeners to edit task buttons */
         $('#thisTaskForm').find("input[name=editTask]").click(function() {
 
           $button = $(this);
 
-          if ($button.val() === 'edit') {
+          if (this.id === 'completeTask') {
 
-            if (this.id === 'editTaskState') {
+            if (confirm('Do you really want to set this task as completed?') === true) {
+              $.
+              ajax({
 
-              $that = $('#taskState');
+                url: 'api/tasks/' + task._id + '/complete',
+                type: 'PUT',
 
-              oldState = $that.find(":selected").text();
+                success: function(data) {
+                  $('#thisTask').empty();
+                  $('#tasksOutput').val(data);
+                  loadTasks();
 
-              $that.empty().append('<option value="">select</option>');
+                  $('#listTasks').
+                  find("input[type='radio'][name=task][value=" + $this.val() + "]").
+                  trigger('click');
 
-              if (oldState === 'completed') {
+                },
 
-                statics.state.forEach(function(state) {
+                error: function(data) {
 
-                  if (state.slug === 'pending' || state.slug === 'completed') {
+                  alert(data.status + '  (' + data.statusText + ')');
 
-                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
+                }
+              });
+            }
+          } else if (this.id === 'reOpenTask') {
 
-                  }
-                });
+            $.
+            ajax({
 
-              } else if (oldState === 'disabled') {
+              url: 'api/tasks/' + task._id + '/re-open',
+              type: 'PUT',
 
-                statics.state.forEach(function(state) {
+              success: function(data) {
 
-                  if (state.slug === 'pending' || state.slug === 'disabled') {
+                $('#thisTask').empty();
+                $('#tasksOutput').val(data);
+                loadTasks();
 
-                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
+                $('#listTasks').
+                find("input[type='radio'][name=task][value=" + $this.val() + "]").
+                trigger('click');
 
-                  }
-                });
+              },
 
-              } else if (oldState === 'pending') {
+              error: function(data) {
 
-                statics.state.forEach(function(state) {
+                alert(data.status + '  (' + data.statusText + ')');
 
-                  if (state.slug === 'completed' || state.slug === 'pending' || state.slug === 'disabled') {
-
-                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
-
-                  }
-                });
-
-              } else if (oldState === 'active') {
-
-                statics.state.forEach(function(state) {
-
-                  if (state.slug === 'completed' || state.slug === 'pending' || state.slug === 'disabled') {
-
-                    $that.append('<option value="' + state._id + '">' + state.slug + '</option>');
-
-                  }
-                });
               }
+            });
 
-              $button.val('send');
+          } else if (this.id === 'deleteTask') {
 
-            } else if (this.id === 'editTaskPriority') {
+            if (confirm('Are you sure you want to delete this task?\n(This action cannot be reverted)') === true) {
 
-              $that = $('#taskPriority');
+              $.
+              ajax({
 
-              $that.empty().append('<option value="">select</option>');
+                url: 'api/tasks/' + task._id + '/delete',
+                type: 'PUT',
+
+                success: function(data) {
+
+                  $('#thisTask').empty();
+                  $('#tasksOutput').val(data);
+                  loadTasks();
+
+                  $('#listTasks').
+                  find("input[type='radio'][name=task][value=" + $this.val() + "]").
+                  trigger('click');
+
+                },
+
+                error: function(data) {
+
+                  alert(data.status + '  (' + data.statusText + ')');
+
+                }
+              });
+            }
+          } else if ($button.val() === 'edit') {
+
+            if (this.id === 'editTaskPriority') {
+
+              $('#taskPriority').replaceWith('<select name="priority" ></select>');
+
+              $that = $("#thisTaskForm").find("select[name=priority]");
+
+              $that.append('<option value="">select</option>');
 
               statics.priority.forEach(function(priority) {
 
@@ -626,7 +681,9 @@ $(document).ready(function() {
 
               $that = $('#taskObjective');
 
-              $that.replaceWith('<textarea rows="4" cols="8" id="taskObjective" name="objective" placeholder="' + task.objective + '"></textarea>');
+              $that.
+              replaceWith('<textarea rows="4" cols="8" id="taskObjective" name="objective" placeholder="' +
+                task.objective + '"></textarea>');
 
               $button.val('send');
 
@@ -637,156 +694,21 @@ $(document).ready(function() {
              */
           } else if ($button.val() === 'send') {
 
-            /** Edit task state */
-            if (this.id === 'editTaskState') {
-
-              $that = $('#taskState').find(":selected");
-
-              if ($that.text() === 'completed') {
-
-                if (oldState !== "completed") {
-
-                  $.ajax({
-
-                    url: 'api/tasks/' + task._id + '/complete',
-                    type: 'PUT',
-
-                    success: function(data) {
-
-                      $('#thisTask').empty();
-                      $this.click();
-                      $('#tasksOutput').val(data);
-                      loadTasks();
-
-                    },
-
-                    error: function(data) {
-
-                      alert(data.status + '  (' + data.statusText + ')');
-
-                    }
-                  });
-
-                } else {
-
-                  statics.state.forEach(function(state) {
-
-                    if (state.slug === 'completed') {
-
-                      $that.empty().append('<option value="' + state._id + '">' + state.slug + '</option>');
-
-                    }
-                  });
-
-                  $button.val('edit');
-
-                }
-
-              } else if ($that.text() === 'pending') {
-
-                if (oldState !== "pending") {
-
-                  $.ajax({
-
-                    url: 'api/tasks/' + task._id + '/pending',
-                    type: 'PUT',
-
-                    success: function(data) {
-
-                      $('#thisTask').empty();
-                      $this.click();
-                      $('#tasksOutput').val(data);
-                      loadTasks();
-
-                    },
-
-                    error: function(data) {
-
-                      alert(data.status + '  (' + data.statusText + ')');
-
-                    }
-                  });
-
-                } else {
-
-                  statics.state.forEach(function(state) {
-
-                    if (state.slug === 'pending') {
-
-                      $that.empty().append('<option value="' + state._id + '">' + state.slug + '</option>');
-
-                    }
-                  });
-
-                  $button.val('edit');
-
-                }
-
-              } else if ($that.text() === 'disabled') {
-
-                if (oldState !== "disabled") {
-
-                  $.ajax({
-
-                    url: 'api/tasks/' + task._id + '/disable',
-                    type: 'PUT',
-
-                    success: function(data) {
-
-                      $('#thisTask').empty();
-                      $this.click();
-                      $('#tasksOutput').val(data);
-                      loadTasks();
-
-                    },
-
-                    error: function(data) {
-
-                      alert(data.status + '  (' + data.statusText + ')');
-
-                    }
-                  });
-
-                } else {
-
-                  statics.state.forEach(function(state) {
-
-                    if (state.slug === 'disabled') {
-
-                      $that.empty().append('<option value="' + state._id + '">' + state.slug + '</option>');
-
-                    }
-                  });
-
-                  $button.val('edit');
-
-                }
-
-              } else {
-
-                alert('Select a new state!');
-
-              }
-
-              /** Edit task priority */
-            } else if (this.id === 'editTaskPriority') {
-
-              $that = $('#taskPriority');
-
-              /** Edit task objective */
-            } else if (this.id === 'editTaskObjective') {
-
-              $that = $('#taskObjective');
+            /** Edit task priority */
+            if (this.id === 'editTaskPriority') {
 
               $.
-              post("api/tasks/" + task._id + "/objective", $("#thisTaskForm").serialize()).
+              post('api/tasks/' + task._id + '/priority', $("#thisTaskForm").serialize()).
 
               done(function(data) {
 
                 $('#thisTask').empty();
-                $this.click();
                 $('#tasksOutput').val(data);
                 loadTasks();
+
+                $('#listTasks').
+                find("input[type='radio'][name=task][value=" + $this.val() + "]").
+                trigger('click');
 
               }).
 
@@ -796,19 +718,33 @@ $(document).ready(function() {
 
               });
 
+
+              /** Edit task objective */
+            } else if (this.id === 'editTaskObjective') {
+
+              $.
+              post("api/tasks/" + task._id + "/objective", $("#thisTaskForm").serialize()).
+
+              done(function(data) {
+
+                $('#thisTask').empty();
+                $('#tasksOutput').val(data);
+                loadTasks();
+
+                $('#listTasks').
+                find("input[type='radio'][name=task][value=" + $this.val() + "]").
+                trigger('click');
+
+              }).
+
+              fail(function(data) {
+
+                alert(data.status + '  (' + data.statusText + ')');
+
+              });
             }
           }
         });
-
-        if (task.dateTime) {
-
-          $('#thisTaskForm').append('<p>datetime: ' + task.dateTime + '</p>');
-
-        } else {
-
-          $('#thisTaskForm').append('<p>datetime: not set</p>');
-
-        }
 
         /** Load task collaborators */
         if (task.collaborators.length) {
@@ -839,9 +775,12 @@ $(document).ready(function() {
               done(function(data) {
 
                 $('#thisTask').empty();
-                $this.click();
                 $('#tasksOutput').val(data);
                 loadTasks();
+
+                $('#listTasks').
+                find("input[type='radio'][name=task][value=" + $this.val() + "]").
+                trigger('click');
 
               }).
 
@@ -861,6 +800,8 @@ $(document).ready(function() {
 
         /** Load contacts */
         members.forEach(function(member) {
+
+          member = member.user;
 
           isCollaborator = false;
 
@@ -895,9 +836,12 @@ $(document).ready(function() {
             done(function(data) {
 
               $('#thisTask').empty();
-              $this.click();
               $('#tasksOutput').val(data);
               loadTasks();
+
+              $('#listTasks').
+              find("input[type='radio'][name=task][value=" + $this.val() + "]").
+              trigger('click');
 
             }).
 

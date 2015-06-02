@@ -86,7 +86,7 @@ module.exports = function(Schema) {
   TaskSchema.plugin(deepPopulate, {
     populate: {
 
-      'group': {
+      'group.profile': {
         select: 'name location pictures'
       },
 
