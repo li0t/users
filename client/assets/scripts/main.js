@@ -557,7 +557,6 @@ $(document).ready(function() {
 
           $('#thisTaskDateTime').text('datetime not set');
 
-
         }
 
         if (!task.completed) {
@@ -608,6 +607,7 @@ $(document).ready(function() {
                 }
               });
             }
+
           } else if (this.id === 'reOpenTask') {
 
             $.
@@ -664,6 +664,7 @@ $(document).ready(function() {
                 }
               });
             }
+
           } else if (this.id === 'makeTaskDateTimePoll') {
 
             alert('Create a poll, GREAT!');
@@ -1167,7 +1168,8 @@ $(document).ready(function() {
 
       $('#thisEntry').
       empty().
-      append('<input type="button" id="shareThisEntry" value="share"/>' +
+      append('<form id="shareEntryForm"></form>' +
+        '<input type="button" id="shareThisEntry" value="share"/>' +
         '<h4>entry</h4>' +
         '<p>' + entry.title + '</p>' +
         '<p>' + entry.content + '</p>');
@@ -1247,7 +1249,116 @@ $(document).ready(function() {
 
       $('#shareThisEntry').click(function() {
 
-        alert('Wold you like to share entry ' + entry.title);
+        var i;
+        var isPresent;
+        var task;
+        var form;
+        var loaded = 0;
+        var tasks = [];
+        var groups;
+
+        form = $('#shareEntryForm');
+
+        form.empty();
+
+        function loadShareEntryForm() {
+
+          if (loaded === groups.length) {
+
+            tasks.forEach(function(task) {
+
+              form.append('<input type="radio" name="task" value="' +
+                task._id + '"/>task > group: ' + task.group.profile.name + '/ objective: ' + task.objective + '<br>');
+
+            });
+
+            form.append('<input type="button" value="share"/>');
+
+            form.dialog({
+              title: "share entry",
+              position: "top"
+            });
+
+            form.find('input[type=button]').click(function() {
+
+              task = form.find('input[name="task"]:checked').val();
+
+              $.
+              post('api/entries/task/' + task + '/add', {
+                "entries": entry._id
+              }).
+
+              done(function(data) {
+
+                $('#entriesOutput').val(data);
+
+              }).
+
+              fail(function(data) {
+
+                alert(data.status + '  (' + data.statusText + ')');
+
+              });
+            });
+          }
+        }
+
+        $. /** Get groups session user belongs to */
+        get('api/groups/me').
+
+        done(function(_groups) {
+
+          groups = _groups;
+
+          groups.forEach(function(group) {
+
+            $. /** Get tasks of each group */
+            get('api/tasks/group/' + group._id).
+
+            done(function(found) {
+
+              found.forEach(function(task) {
+
+                isPresent = false;
+
+                for (i = 0; i < task.entries.length; i++) {
+
+                  if (task.entries[i].entry === entry._id) {
+
+                    isPresent = true;
+                    break;
+
+                  }
+                }
+
+                if (isPresent) {
+
+                  found.splice(i, 1);
+
+                }
+              });
+
+              loaded += 1;
+              tasks = tasks.concat(found);
+              loadShareEntryForm();
+
+            }).
+
+            fail(function(data) {
+
+              loaded += 1;
+              console.log(data);
+              loadShareEntryForm();
+
+            });
+          });
+        }).
+
+        fail(function(data) {
+
+          alert(data.status + '  (' + data.statusText + ')');
+
+        });
 
       });
     }).

@@ -466,8 +466,10 @@ module.exports = function(router, mongoose) {
   /**
    * Add entries to a task
    */
-  router.post('/task/:taskId/add', function(req, res, next) {
+  router.post('/task/:taskId/add', function(req, res, next) { /** TODO: prevent duplicated entries */
 
+    var now = new Date();
+    var i;
     var task = req.params.taskId;
     var user = req.session.user._id;
     var entries = req.body.entries;
@@ -477,7 +479,9 @@ module.exports = function(router, mongoose) {
     function checkAndSave() {
 
       if (checked === entries.length) {
+
         task.save(function(err) {
+
           if (err) {
             next(err);
           } else {
@@ -488,7 +492,21 @@ module.exports = function(router, mongoose) {
           }
         });
       }
+    }
 
+    function isPresent(entry) {
+
+      var present = false;
+
+      for (i = 0; i < task.entries.length; i++) {
+
+        if (JSON.stringify(task.entries[i].entry) === JSON.stringify(entry)) {
+
+          present = true;
+          break;
+
+        }
+      }
     }
 
     if (entries && entries.length) {
@@ -503,14 +521,13 @@ module.exports = function(router, mongoose) {
         task = collaboration.task; /** The task model */
 
         /** Check if task exists and is available for changes */
-        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) || _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+        if (task) {
 
           relations.membership(task.group, function(taskGroup) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of task group */
 
-              relations.
-              contact(user, function(relation) {
+              relations.contact(user, function(relation) {
 
                 entries.forEach(function(entry) {
 
@@ -525,9 +542,14 @@ module.exports = function(router, mongoose) {
                       /** Check if user is contact of entry creator or is itself */
                       if (relation.isContact(_entry.user) || JSON.stringify(user) === JSON.stringify(_entry.user)) {
 
-                        saved += 1;
-                        debug('Entry %s saved into task %s', entry, task._id);
-                        task.entries.push(entry);
+                        if (!isPresent(entry)) {
+                          saved += 1;
+                          debug('Entry %s saved into task %s', entry, task._id);
+                          task.entries.push({entry: entry, added: now});
+
+                        } else {
+                          debug('Entry %s is already in task %s entries', entry, task._id);
+                        }
 
                       } else if (_entry.group) {
 
@@ -537,10 +559,15 @@ module.exports = function(router, mongoose) {
 
                           if (entryGroup.isMember(user)) { /** Check if user is part of entry group */
 
-                            saved += 1;
-                            debug('Entry %s saved into task %s', entry, task._id);
-                            task.entries.push(entry);
+                            if (!isPresent(entry)) {
 
+                              saved += 1;
+                              debug('Entry %s saved into task %s', entry, task._id);
+                              task.entries.push({entry: entry, added: now});
+
+                            } else {
+                              debug('Entry %s is already in task %s entries', entry, task._id);
+                            }
                           } else {
                             debug('User %s is not part of the entry group %s', user, _entry.group);
                           }
@@ -601,7 +628,7 @@ module.exports = function(router, mongoose) {
         task = collaboration.task; /** The task model */
 
         /** Check if task exists and is available for changes */
-        if (task && (_.isEqual(task.state, statics.model('state', 'active')._id) || _.isEqual(task.state, statics.model('state', 'pending')._id))) {
+        if (task) {
 
           relations.membership(task.group, function(taskGroup) {
 
@@ -613,7 +640,7 @@ module.exports = function(router, mongoose) {
 
                 for (i = 0; i < task.entries.length; i++) {
 
-                  if (JSON.stringify(task.entries[i]) === JSON.stringify(entry)) {
+                  if (JSON.stringify(task.entries[i].entry) === JSON.stringify(entry)) {
                     index = i;
                     break;
                   }
@@ -667,7 +694,7 @@ module.exports = function(router, mongoose) {
 
     findById(req.params.taskId).
 
-    deepPopulate('entries.user entries.pictures').
+    deepPopulate('group.profile entries.user entries.pictures').
 
     sort('created').
 

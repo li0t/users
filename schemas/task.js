@@ -35,8 +35,16 @@ module.exports = function(Schema) {
     },
 
     collaborators: [{
-      type: Schema.Types.ObjectId,
-      ref: 'user'
+
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+      },
+
+      joined: [Date],
+
+      left: [Date]
+
     }],
 
     priority: {
@@ -46,8 +54,14 @@ module.exports = function(Schema) {
     },
 
     entries: [{
-      type: Schema.Types.ObjectId,
-      ref: 'entry'
+
+      entry: {
+        type: Schema.Types.ObjectId,
+        ref: 'entry'
+      },
+
+      added: Date
+
     }],
 
     /*meetings: [{
@@ -57,7 +71,10 @@ module.exports = function(Schema) {
 
     dateTime: Date,
 
-    notes: [String]
+    notes: [{
+      type: String,
+      added: Date
+    }]
 
   });
 

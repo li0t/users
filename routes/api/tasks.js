@@ -93,6 +93,8 @@ module.exports = function(router, mongoose) {
    */
   router.get('/me', function(req, res, next) {
 
+    var i;
+
     Task.
 
     find().
@@ -109,8 +111,23 @@ module.exports = function(router, mongoose) {
 
       if (err) {
         next(err);
+
       } else {
+
+        tasks.forEach(function(task) {
+
+          for (i = 0; i < task.collaborators.length; i++) {
+
+            if (task.collaborators[i].left.length && (task.collaborators[i].left.length > task.collaborators[i].joined.length)) {
+
+              task.collaborators.splice(i, 1);
+
+            }
+          }
+        });
+
         res.send(tasks);
+
       }
     });
 
@@ -121,11 +138,16 @@ module.exports = function(router, mongoose) {
    */
   router.get('/collaborator', function(req, res, next) {
 
+    var user = req.session.user._id;
+    var tasks = [];
+    var i;
+    var isCollaborator;
+
     Task.
 
     find().
 
-    where('collaborators', req.session.user._id).
+    where('collaborators', user).
 
     where('deleted', null).
 
@@ -133,12 +155,39 @@ module.exports = function(router, mongoose) {
 
     sort('-created').
 
-    exec(function(err, tasks) {
+    exec(function(err, found) {
 
       if (err) {
         next(err);
+
       } else {
+
+        found.forEach(function(task) {
+
+          isCollaborator = false;
+
+          for (i = 0; i < task.collaborators.length; i++) {
+
+            if (JSON.stringify(task.collaborators[i].user) === user) {
+
+              if (!task.collaborators[i].left.length || (task.collaborators[i].left.length < task.collaborators[i].joined.length)) {
+
+                isCollaborator = true;
+                break;
+
+              }
+            }
+          }
+
+          if (isCollaborator) {
+
+            tasks.push(task);
+
+          }
+        });
+
         res.send(tasks);
+
       }
     });
 
@@ -149,6 +198,7 @@ module.exports = function(router, mongoose) {
    */
   router.get('/group/:id', function(req, res, next) {
 
+    var i;
     var user = req.session.user._id;
     var group = req.params.id;
 
@@ -168,12 +218,26 @@ module.exports = function(router, mongoose) {
 
           sort('-created').
 
+          deepPopulate('group.profile entries').
+
           exec(function(err, tasks) {
 
             if (err) {
               next(err);
 
             } else {
+
+              tasks.forEach(function(task) {
+
+                for (i = 0; i < task.collaborators.length; i++) {
+
+                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length > task.collaborators[i].joined.length)) {
+
+                    task.collaborators.splice(i, 1);
+
+                  }
+                }
+              });
 
               res.send(tasks);
 
@@ -200,6 +264,8 @@ module.exports = function(router, mongoose) {
     var inviter = req.session.user._id;
     var collaborators = req.body.collaborators;
     var saved = 0;
+    var now = new Date();
+    var wasCollaborator;
 
     if (collaborators && collaborators.length) {
 
@@ -227,10 +293,24 @@ module.exports = function(router, mongoose) {
 
                     if (!relation.isCollaborator(collaborator)) {
 
-                      debug('New collaborator %s added to task %s', collaborator, task._id);
-                      task.collaborators.push(collaborator);
-                      saved += 1;
+                      wasCollaborator = relation.wasCollaborator(collaborator);
 
+                      if (!wasCollaborator) {
+
+                        debug('New collaborator %s added to task %s', collaborator, task._id);
+                        task.collaborators.push({
+                          user: collaborator,
+                          joined: [now]
+                        });
+                        saved += 1;
+
+                      } else {
+
+                        debug('Collaborator %s re-joined task %s', collaborator, task._id);
+                        task.collaborators[wasCollaborator.index].joined.push(now);
+                        saved += 1;
+
+                      }
                     } else {
                       debug('User %s is already collaborating in task %s', collaborator, task._id);
                     }
@@ -279,6 +359,7 @@ module.exports = function(router, mongoose) {
     var task = req.params.taskId;
     var collaborators = req.body.collaborators;
     var collaborator;
+    var now = new Date();
 
     if (collaborators && collaborators.length) {
 
@@ -308,7 +389,7 @@ module.exports = function(router, mongoose) {
 
                     removed += 1;
                     debug('Collaborator %s removed from task %s', _collaborator, task._id);
-                    task.collaborators.splice(collaborator.index, 1); /** Remove user from collaborators array */
+                    task.collaborators[collaborator.index].left.push(now); /** Remove user from collaborators array */
 
                   } else {
                     debug('User %s is not collaborator of task %s', _collaborator, task._id);
@@ -355,6 +436,7 @@ module.exports = function(router, mongoose) {
     var user = req.session.user._id;
     var notes = req.body.notes;
     var saved = 0;
+    var now = new Date();
 
     if (notes && notes.length) {
 
@@ -382,7 +464,10 @@ module.exports = function(router, mongoose) {
 
                     saved += 1;
                     debug('Note -> %s added to task %s', note, task._id);
-                    task.notes.push(note);
+                    task.notes.push({
+                      note: note,
+                      added: now
+                    });
 
                   }
 
@@ -458,7 +543,7 @@ module.exports = function(router, mongoose) {
 
                     for (i = 0; i < task.notes.length; i++) {
 
-                      if (task.notes[i] === note) {
+                      if (task.notes[i].note === note) {
                         index = i;
                         break;
                       }
@@ -831,6 +916,7 @@ module.exports = function(router, mongoose) {
    **/
   router.get('/:id', function(req, res, next) {
 
+    var i;
     var task = req.params.id;
     var user = req.session.user._id;
 
@@ -850,6 +936,16 @@ module.exports = function(router, mongoose) {
               if (err) {
                 next(err);
               } else {
+
+                for (i = 0; i < task.collaborators.length; i++) {
+
+                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length > task.collaborators[i].joined.length)) {
+
+                    task.collaborators.splice(i, 1);
+
+                  }
+                }
+
                 res.send(task);
               }
 

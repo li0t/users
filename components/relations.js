@@ -123,15 +123,7 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
 
           if (JSON.stringify(relation.group.members[i].user) === JSON.stringify(id)) {
 
-            if (!relation.group.members[i].left.length) {
-
-              member = {
-                member: relation.group.members[i].user,
-                index: i
-              };
-              break;
-
-            } else if (relation.group.members[i].joined.length > relation.group.members[i].left.length) {
+            if (!relation.group.members[i].left.length || relation.group.members[i].joined.length > relation.group.members[i].left.length) {
 
               member = {
                 member: relation.group.members[i].user,
@@ -232,13 +224,41 @@ function collaboration(taskId, cb) {
 
         for (i = 0; i < relation.task.collaborators.length; i++) {
 
-          if (JSON.stringify(relation.task.collaborators[i]) === JSON.stringify(id)) {
+          if (JSON.stringify(relation.task.collaborators[i].user) === JSON.stringify(id)) {
+
+            if (!relation.task.collaborators[i].left.length || relation.task.collaborators[i].left.length < relation.task.collaborators[i].joined.length) {
+
+              collaborator = {
+                collaborator: relation.task.collaborators[i],
+                index: i
+              };
+
+            }
+          }
+        }
+      } else {
+        debug('Error! No task found');
+      }
+
+      return collaborator;
+    },
+
+    wasCollaborator: function(id) {
+
+      var collaborator = null;
+
+      if (relation.task) {
+
+        for (i = 0; i < relation.task.collaborators.length; i++) {
+
+          if (JSON.stringify(relation.task.collaborators[i].user) === JSON.stringify(id)) {
 
             collaborator = {
-              collaborator: relation.task.collaborators[i],
+              user: relation.task.collaborators[i].user,
               index: i
             };
 
+            break;
           }
         }
       } else {
@@ -247,6 +267,7 @@ function collaboration(taskId, cb) {
 
       return collaborator;
     }
+
   };
 
   Task.
