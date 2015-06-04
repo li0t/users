@@ -507,6 +507,8 @@ module.exports = function(router, mongoose) {
 
         }
       }
+
+      return present;
     }
 
     if (entries && entries.length) {
@@ -539,10 +541,12 @@ module.exports = function(router, mongoose) {
                       debug(err);
 
                     } else if (_entry) {
+
                       /** Check if user is contact of entry creator or is itself */
                       if (relation.isContact(_entry.user) || JSON.stringify(user) === JSON.stringify(_entry.user)) {
 
                         if (!isPresent(entry)) {
+
                           saved += 1;
                           debug('Entry %s saved into task %s', entry, task._id);
                           task.entries.push({entry: entry, added: now});

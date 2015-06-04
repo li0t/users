@@ -811,7 +811,7 @@ $(document).ready(function() {
             note = $('#note' + this.id).text();
 
             $.
-            post('api/tasks/' + task._id + '/removeNotes', "notes=" +  note).
+            post('api/tasks/' + task._id + '/removeNotes', "notes=" + note).
 
             done(function(data) {
 
@@ -843,35 +843,35 @@ $(document).ready(function() {
         append('<br><textarea rows="8" cols="8" id="newNote" placeholder="note..."></textarea>' +
           '<input type="button" id="addNewNote" value="add new note"/>');
 
-          $('#addNewNote').click(function() {
+        $('#addNewNote').click(function() {
 
-            note = $('#newNote').val();
+          note = $('#newNote').val();
 
-            $.
-            post('api/tasks/' + task._id + '/addNotes',  {
-              "notes": note
-            }).
+          $.
+          post('api/tasks/' + task._id + '/addNotes', {
+            "notes": note
+          }).
 
-            done(function(data) {
+          done(function(data) {
 
-              $('#thisTask').empty();
-              $('#tasksOutput').val(data);
-              loadTasks();
+            $('#thisTask').empty();
+            $('#tasksOutput').val(data);
+            loadTasks();
 
-              $('#listTasks').
-              find("input[type='radio'][name=task][value=" + $this.val() + "]").
-              trigger('click');
+            $('#listTasks').
+            find("input[type='radio'][name=task][value=" + $this.val() + "]").
+            trigger('click');
 
-            }).
+          }).
 
-            fail(function(data) {
+          fail(function(data) {
 
-              alert(data.status + '  (' + data.statusText + ')');
-
-            });
-
+            alert(data.status + '  (' + data.statusText + ')');
 
           });
+
+
+        });
 
         /** Load task collaborators */
         if (collaborators.length) {
@@ -989,14 +989,51 @@ $(document).ready(function() {
 
           task.entries.forEach(function(entry) {
 
+            entry = entry.entry;
+
             $('#thisTaskEntries').
-            append('<input type="checkbox" ' +
-              'name="entry" value="' + entry._id + '"/>' + entry.title + '<br>');
+            append('<input type="radio" ' +
+              'name="entries" value="' + entry._id + '"/>' + entry.title + '<br>');
 
           });
 
+          $('#thisTaskEntries').find("input[type='radio'][name=entries]").click(function() {
+
+            loadEntry($(this), this.value);
+
+          });
+
+
+
+          /**
+           * Remove task entries
+           */
           $('#thisTaskEntries').
           append('<input type="button" id="removeEntries" value="remove entries"/><br>');
+
+          $('#removeEntries').click(function() {
+
+            $.
+            post("api/entries/task/" + task._id + "/remove", $("#thisTaskEntries").serialize()).
+
+            done(function(data) {
+
+              $('#thisTask').empty();
+              $('#tasksOutput').val(data);
+              loadTasks();
+
+              $('#listTasks').
+              find("input[type='radio'][name=task][value=" + $this.val() + "]").
+              trigger('click');
+
+            }).
+
+            fail(function(data) {
+
+              alert(data.status + '  (' + data.statusText + ')');
+
+            });
+          });
 
         }
 
@@ -1263,11 +1300,19 @@ $(document).ready(function() {
         $('#thisEntry').append('<ul id="thisEntryPictures" ></ul>');
 
         entry.pictures.forEach(function(pic) {
+          
+          if (pic.contentType.substr(0, 5) === 'image') {
 
-          $('#thisEntryPictures').
-          append('<li><img src="api/files/' + pic._id + '"  alt="' +
-            pic._filename + '"></li>');
+            $('#thisEntryPictures').
+            append('<li><img src="api/files/' + pic._id + '"  alt="' +
+              pic._filename + '"></li>');
 
+          } else {
+
+            $('#thisEntryPictures').
+            append('<li><iframe src="api/files/' + pic._id + '" ></iframe></li>');
+
+          }
         });
       }
 
@@ -1331,6 +1376,9 @@ $(document).ready(function() {
         });
       });
 
+      /**
+       * Share this entry
+       */
       $('#shareThisEntry').click(function() {
 
         var i;
@@ -1352,7 +1400,7 @@ $(document).ready(function() {
             tasks.forEach(function(task) {
 
               form.append('<input type="radio" name="task" value="' +
-                task._id + '"/>task > group: ' + task.group.profile.name + '/ objective: ' + task.objective + '<br>');
+                task._id + '"/>task ' + task.objective + ' / group: ' + task.group.profile.name + '<br>');
 
             });
 
@@ -1374,12 +1422,18 @@ $(document).ready(function() {
 
               done(function(data) {
 
+                form.empty().dialog('close');
                 $('#entriesOutput').val(data);
+
+                $('#listTasks').
+                find("input[type='radio'][name=task][value=" + task + "]").
+                trigger('click');
 
               }).
 
               fail(function(data) {
 
+                form.empty().dialog('close');
                 alert(data.status + '  (' + data.statusText + ')');
 
               });

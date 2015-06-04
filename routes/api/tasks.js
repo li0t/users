@@ -938,7 +938,7 @@ module.exports = function(router, mongoose) {
 
           if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-            task.deepPopulate('group.profile collaborators.user entries priority notes', function(err, task) {
+            task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
 
               if (err) {
                 next(err);
