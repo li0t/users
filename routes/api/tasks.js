@@ -147,11 +147,11 @@ module.exports = function(router, mongoose) {
 
     find().
 
-    where('collaborators', user).
+    where('collaborators.user', user).
 
     where('deleted', null).
 
-    populate('group collaborators entries priority').
+    populate('group collaborators.user entries priority').
 
     sort('-created').
 
@@ -168,7 +168,7 @@ module.exports = function(router, mongoose) {
 
           for (i = 0; i < task.collaborators.length; i++) {
 
-            if (JSON.stringify(task.collaborators[i].user) === user) {
+            if (JSON.stringify(task.collaborators[i].user._id) === JSON.stringify(user)) {
 
               if (!task.collaborators[i].left.length || (task.collaborators[i].left.length < task.collaborators[i].joined.length)) {
 
@@ -385,11 +385,11 @@ module.exports = function(router, mongoose) {
 
                   collaborator = relation.isCollaborator(_collaborator);
 
-                  if (collaborator) { /** Check if user is part of the task collaborators array */
+                  if (collaborator) { /** Check if user is a task collaborator */
 
                     removed += 1;
                     debug('Collaborator %s removed from task %s', _collaborator, task._id);
-                    task.collaborators[collaborator.index].left.push(now); /** Remove user from collaborators array */
+                    task.collaborators[collaborator.index].left.push(now); /** Add one left instance for task collaborator */
 
                   } else {
                     debug('User %s is not collaborator of task %s', _collaborator, task._id);
@@ -559,9 +559,16 @@ module.exports = function(router, mongoose) {
                       debug('Note -> %s was not found in task %s', note, task._id);
                     }
 
-                    debug('%s of %s notes removed from task %s', removed, notes.length, task._id);
-                    res.send(removed + ' of ' + notes.length + ' notes removed from task ' + task._id);
+                    task.save(function(err) {
+                      if (err) {
+                        next(err);
+                      } else {
 
+                        debug('%s of %s notes removed from task %s', removed, notes.length, task._id);
+                        res.send(removed + ' of ' + notes.length + ' notes removed from task ' + task._id);
+
+                      }
+                    });
                   }
                 });
               } else {
@@ -931,18 +938,18 @@ module.exports = function(router, mongoose) {
 
           if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-            task.deepPopulate('group.profile collaborators entries priority notes', function(err, task) {
+            task.deepPopulate('group.profile collaborators.user entries priority notes', function(err, task) {
 
               if (err) {
                 next(err);
               } else {
 
                 for (i = 0; i < task.collaborators.length; i++) {
-
-                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length > task.collaborators[i].joined.length)) {
-
+                  /** Check if user is actual collaborator of task */
+                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
+                    /** Remove it from the array and reallocate index */
                     task.collaborators.splice(i, 1);
-
+                    i -= 1;
                   }
                 }
 

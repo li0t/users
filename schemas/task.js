@@ -76,7 +76,7 @@ module.exports = function(Schema) {
       note: String,
 
       added: Date
-      
+
     }]
 
   });
@@ -119,7 +119,7 @@ module.exports = function(Schema) {
       },
 
       'collaborators': {
-        select: 'email'
+        select: 'user joined left'
       }
 
     }

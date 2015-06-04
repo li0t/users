@@ -802,13 +802,13 @@ $(document).ready(function() {
 
             $('#thisTaskNotes').
             append('<p name="note" id="note' + index + '">' + task.notes[index].note + '</p>' +
-              '<input type="button" name="deleteNote" id="' + index + '" value="delete"/>');
+              '<input type="button" name="deleteNote" id="' + index + '" value="delete"/><br>');
 
           }
 
           $('#thisTaskNotes').find('input[name=deleteNote]').click(function() {
 
-            note = $('note' + this.id).text();
+            note = $('#note' + this.id).text();
 
             $.
             post('api/tasks/' + task._id + '/removeNotes', "notes=" +  note).
@@ -840,7 +840,7 @@ $(document).ready(function() {
         }
 
         $('#thisTaskNotes').
-        append('<textarea rows="8" cols="8" id="newNote" placeholder="note..."></textarea>' +
+        append('<br><textarea rows="8" cols="8" id="newNote" placeholder="note..."></textarea>' +
           '<input type="button" id="addNewNote" value="add new note"/>');
 
           $('#addNewNote').click(function() {
@@ -874,11 +874,13 @@ $(document).ready(function() {
           });
 
         /** Load task collaborators */
-        if (task.collaborators.length) {
+        if (collaborators.length) {
 
           $('#thisTask').append('<form id="thisTaskCollaborators" ><p>collaborators</p></form>');
 
-          task.collaborators.forEach(function(collaborator) {
+          collaborators.forEach(function(collaborator) {
+
+            collaborator = collaborator.user;
 
             $('#thisTaskCollaborators').
             append('<input type="checkbox" ' +
@@ -934,7 +936,7 @@ $(document).ready(function() {
 
           for (i = 0; i < collaborators.length; i++) {
 
-            if (collaborators[i]._id === member._id) {
+            if (collaborators[i].user._id === member._id) {
 
               isCollaborator = true;
               break;
@@ -1083,7 +1085,7 @@ $(document).ready(function() {
       });
 
       $('#newTaskForm').
-      append('<input type="text" name="objective" placeholder="objective..."/><br>' +
+      append('<textarea name="objective" placeholder="objective..."/></textarea><br>' +
         '<input type="text" name="dateTime" id="taskDateTime" placeholder="date time"/>' +
         '<input type="button" id="createTask" value="send"/><br>');
 
