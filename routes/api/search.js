@@ -51,5 +51,4 @@ module.exports = function(router, mongoose) { /** TODO: Validate if user is acti
       }
     });
 
-
 };
