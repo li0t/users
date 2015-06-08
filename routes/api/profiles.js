@@ -35,7 +35,6 @@ module.exports = function(router, mongoose) {
     }
 
     Profile.findById(req.session.user.profile, function(err, profile) {
-
       if (err) {
         next(err);
 
@@ -50,14 +49,12 @@ module.exports = function(router, mongoose) {
         profile.location = req.body.location || profile.location;
 
         profile.save(function(err) {
-
           if (err) {
             if (err.name && err.name === 'CastError') {
               res.sendStatus(400);
             } else {
               next(err);
             }
-
           } else {
 
             res.sendStatus(204);
@@ -133,12 +130,14 @@ module.exports = function(router, mongoose) {
     Profile.findById(req.session.user.profile, function(err, data) {
       if (err) {
         next(err);
+
       } else if (data) {
 
         profile = data;
 
         if (req.files && req.files.length) { /* If there are any files, save them */
           savePictures();
+
         } else { /* If not, just save the profile */
           debug('No files saved');
           saveProfile();
@@ -167,10 +166,8 @@ module.exports = function(router, mongoose) {
         if (membership.isAdmin(user)) {
 
           Profile.findById(group.profile, function(err, profile) {
-
             if (err) {
               next(err);
-
             } else {
 
               profile.name = req.body.name || profile.name;
@@ -178,14 +175,13 @@ module.exports = function(router, mongoose) {
               profile.location = req.body.location || profile.location;
 
               profile.save(function(err) {
-
                 if (err) {
                   next(err);
-
                 } else {
-                  res.sendStatus(204);
-                }
 
+                  res.sendStatus(204);
+
+                }
               });
             }
           });

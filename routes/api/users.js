@@ -26,15 +26,13 @@ module.exports = function(router, mongoose) {
     where('state', statics.model('state', 'active')._id).
 
     exec(function(err, users) {
-
       if (err) {
         next(err);
-
       } else {
 
         res.send(users);
-      }
 
+      }
     });
 
   });
@@ -46,7 +44,7 @@ module.exports = function(router, mongoose) {
 
     new Profile().
 
-    save(function(err, profile) { /* Create a new Profile that will store the user information */
+    save(function(err, profile) { /* Create a new Profile Schema that will store the user information */
       if (err) {
         next(err);
       } else {
@@ -70,7 +68,7 @@ module.exports = function(router, mongoose) {
             }
           } else {
 
-            new Contact({ /* Create a new ContactSchema that will store the user contacts */
+            new Contact({ /* Create a new Contact Schema that will store the user contacts */
               user: user._id
             }).
 
@@ -78,7 +76,9 @@ module.exports = function(router, mongoose) {
               if (err) {
                 next(err);
               } else {
+
                 res.redirect('/api/mandrill/signin/' + user._id);
+
               }
             });
           }
@@ -109,9 +109,7 @@ module.exports = function(router, mongoose) {
       where('email', email).
 
       exec(function(err, user) {
-
         if (err) {
-
           if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
             res.sendStatus(400);
           } else {
@@ -127,7 +125,7 @@ module.exports = function(router, mongoose) {
 
           } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
 
-            res.status(409).send("Looks like you havent confirmed your email yet.");
+            res.status(409).send("Looks like you haven't confirmed your email yet.");
 
           } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
 
@@ -135,7 +133,7 @@ module.exports = function(router, mongoose) {
 
           } else {
 
-            res.status(409).send("There is an internal problem, contact the administrator");
+            res.status(500).send("There is an internal problem, contact the administrator");
 
           }
         } else {
@@ -144,7 +142,6 @@ module.exports = function(router, mongoose) {
           }, 1000);
         }
       });
-
     } else {
       res.sendStatus(400);
     }
@@ -239,13 +236,8 @@ module.exports = function(router, mongoose) {
 
                 res.send('Password reset successful');
 
-                Token.remove({
-                  _id: token._id
-                }, function(err) {
-                  if (err) {
-                    debug('Error! ' + err);
-                  }
-                });
+                token.remove();
+
               }
             });
           } else {
@@ -273,12 +265,7 @@ module.exports = function(router, mongoose) {
 
       if (newPassword !== oldPassword) {
 
-        User.
-
-        findById(req.session.user._id).
-
-        exec(function(err, user) {
-
+        User.findById(req.session.user._id, function(err, user) {
           if (err) {
             next(err);
 
@@ -355,13 +342,13 @@ module.exports = function(router, mongoose) {
                 user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
 
                 user.save(function(err) {
-
                   if (err) {
                     next(err);
-
                   } else {
+
                     delete req.session.user;
                     res.sendStatus(204);
+
                   }
                 });
               }
@@ -397,7 +384,6 @@ module.exports = function(router, mongoose) {
         }).
 
         save(function(err, user) {
-
           if (err) {
             /** The user is already in the platform */
             if (err.code && err.code === 11000) {
@@ -419,15 +405,9 @@ module.exports = function(router, mongoose) {
               next(err);
             }
 
-            Profile. /** Remove unnecessary new profile */
-            remove({
-              _id: profile._id
-            }).
-            exec(function(err) {
-              if (err) {
-                debug(err);
-              }
-            });
+            /** Remove unnecessary new profile */
+            profile.remove();
+
           } else {
 
             new Contact({
@@ -435,10 +415,10 @@ module.exports = function(router, mongoose) {
             }).
 
             save(function(err) {
-
               if (err) {
                 next(err);
               } else {
+
                 /** Send invite to the platform */
                 res.redirect('/api/mandrill/invite/' + user._id);
 
@@ -447,7 +427,6 @@ module.exports = function(router, mongoose) {
           }
         });
       });
-
     } else {
       res.sendStatus(400);
     }
@@ -460,9 +439,7 @@ module.exports = function(router, mongoose) {
   router.get('/invited/signin/:token', function(req, res, next) {
 
     Token.findById(req.params.token, function(err, token) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
@@ -496,7 +473,6 @@ module.exports = function(router, mongoose) {
       if (password) {
 
         User.findById(token.user, function(err, user) {
-
           if (err) {
             next(err);
 
@@ -507,10 +483,8 @@ module.exports = function(router, mongoose) {
             user.state = statics.model('state', 'active')._id;
 
             user.save(function(err) {
-
               if (err) {
                 next(err);
-
               } else {
 
                 req.session.user = user;
@@ -521,7 +495,6 @@ module.exports = function(router, mongoose) {
 
               }
             });
-
           } else {
             res.sendStatus(404);
           }
@@ -535,16 +508,13 @@ module.exports = function(router, mongoose) {
 
   });
 
-
   /**
    * Validate email of new user
    */
   router.get('/validate/:token', function(req, res, next) {
 
     Token.findById(req.params.token, function(err, token) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
@@ -562,22 +532,15 @@ module.exports = function(router, mongoose) {
         }).
 
         exec(function(err, user) {
-
           if (err) {
             next(err);
-
           } else {
 
             req.session.user = user;
             res.redirect('http://' + req.headers.host + '/');
 
-            Token.remove({
-              user: user._id
-            }, function(err) {
-              if (err) {
-                debug('Error! : %s', err);
-              }
-            });
+            token.remove();
+
           }
         });
       } else {
@@ -598,11 +561,8 @@ module.exports = function(router, mongoose) {
     deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
 
     exec(function(err, user) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
-
           res.sendStatus(400);
         } else {
           next(err);
@@ -630,9 +590,7 @@ module.exports = function(router, mongoose) {
     deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
 
     exec(function(err, user) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {

@@ -39,7 +39,6 @@ module.exports = function(router, mongoose) {
         debug('A mandrill error occurred %s : %s', +err.nam, err.message);
         res.sendStatus(500);
       });
-
     } else {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
@@ -57,9 +56,9 @@ module.exports = function(router, mongoose) {
       var message = null;
 
       User.findById(req.params.id, function(err, user) {
-
         if (err) {
           next(err);
+
         } else if (user) {
 
           Token.remove({
@@ -75,9 +74,9 @@ module.exports = function(router, mongoose) {
           }). /* Assign a new Token to the user */
 
           save(function(err, token) {
-
             if (err) {
               next(err);
+
             } else {
 
               message = { /* Parameters to inject into Mandrill template */
@@ -112,15 +111,12 @@ module.exports = function(router, mongoose) {
                 res.sendStatus(500);
               });
             }
-
           });
-
         } else {
           debug('No user found with id %s ', +req.params.id);
           res.sendStatus(404);
         }
       });
-
     } else {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
@@ -141,6 +137,7 @@ module.exports = function(router, mongoose) {
       User.findById(req.params.id, function(err, user) {
         if (err) {
           next(err);
+
         } else if (user) {
 
           new Token({ /** Create token to allow contact confirmation */
@@ -209,6 +206,7 @@ module.exports = function(router, mongoose) {
       User.findById(req.params.id, function(err, user) {
         if (err) {
           next(err);
+
         } else if (user) {
 
           new Token({
@@ -217,9 +215,9 @@ module.exports = function(router, mongoose) {
           }).
 
           save(function(err, token) {
-
             if (err) {
               next(err);
+
             } else {
 
               message = {
@@ -254,13 +252,11 @@ module.exports = function(router, mongoose) {
               });
             }
           });
-
         } else {
           debug('No user found with id %s ', +req.params.id);
           res.sendStatus(404);
         }
       });
-
     } else {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
@@ -285,6 +281,7 @@ module.exports = function(router, mongoose) {
       exec(function(err, user) {
         if (err) {
           next(err);
+
         } else if (user) {
 
           new Token({
@@ -292,7 +289,6 @@ module.exports = function(router, mongoose) {
           }).
 
           save(function(err, token) {
-
             if (err) {
               next(err);
             } else {

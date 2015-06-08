@@ -57,15 +57,12 @@ module.exports = function(router, mongoose) {
             }).
 
             save(function(err, task) {
-
               if (err) {
-
                 if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
                   res.status(400).send(err);
                 } else {
                   next(err);
                 }
-
               } else {
 
                 debug('Task %s created', task._id);
@@ -108,10 +105,8 @@ module.exports = function(router, mongoose) {
     sort('-created').
 
     exec(function(err, tasks) {
-
       if (err) {
         next(err);
-
       } else {
 
         tasks.forEach(function(task) {
@@ -156,10 +151,8 @@ module.exports = function(router, mongoose) {
     sort('-created').
 
     exec(function(err, found) {
-
       if (err) {
         next(err);
-
       } else {
 
         found.forEach(function(task) {
@@ -221,10 +214,8 @@ module.exports = function(router, mongoose) {
           deepPopulate('group.profile entries').
 
           exec(function(err, tasks) {
-
             if (err) {
               next(err);
-
             } else {
 
               tasks.forEach(function(task) {
@@ -258,9 +249,9 @@ module.exports = function(router, mongoose) {
   /**
    * Add collaborators to a task
    */
-  router.post('/:taskId/addCollaborators', function(req, res, next) {
+  router.post('/:id/addCollaborators', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var inviter = req.session.user._id;
     var collaborators = req.body.collaborators;
     var saved = 0;
@@ -339,7 +330,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -352,11 +343,11 @@ module.exports = function(router, mongoose) {
   /**
    * Remove collaborators from task
    */
-  router.post('/:taskId/removeCollaborators', function(req, res, next) {
+  router.post('/:id/removeCollaborators', function(req, res, next) {
 
     var removed = 0;
     var remover = req.session.user._id;
-    var task = req.params.taskId;
+    var task = req.params.id;
     var collaborators = req.body.collaborators;
     var collaborator;
     var now = new Date();
@@ -399,7 +390,6 @@ module.exports = function(router, mongoose) {
                 task.save(function(err) {
                   if (err) {
                     next(err);
-
                   } else {
 
                     debug('%s of %s collaborators removed from task %s', removed, collaborators.length, task._id);
@@ -417,7 +407,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(404);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(403);
         }
       });
@@ -430,9 +420,9 @@ module.exports = function(router, mongoose) {
   /**
    * Add notes to a task
    */
-  router.post('/:taskId/addNotes', function(req, res, next) {
+  router.post('/:id/addNotes', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
     var notes = req.body.notes;
     var saved = 0;
@@ -493,7 +483,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -506,9 +496,9 @@ module.exports = function(router, mongoose) {
   /**
    * Remove notes from task
    */
-  router.post('/:taskId/removeNotes', function(req, res, next) {
+  router.post('/:id/removeNotes', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
     var notes = req.body.notes;
     var removed = 0;
@@ -581,7 +571,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -594,9 +584,9 @@ module.exports = function(router, mongoose) {
   /**
    * Set task as completed
    */
-  router.put('/:taskId/complete', function(req, res, next) { /** TODO: implement this change as a date field  */
+  router.put('/:id/complete', function(req, res, next) { /** TODO: implement this change as a date field  */
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -634,7 +624,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -644,9 +634,9 @@ module.exports = function(router, mongoose) {
   /**
    * Set task as deleted
    */
-  router.put('/:taskId/delete', function(req, res, next) {
+  router.put('/:id/delete', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -684,7 +674,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -694,9 +684,9 @@ module.exports = function(router, mongoose) {
   /**
    * Re-open task
    */
-  router.put('/:taskId/re-open', function(req, res, next) { /** TODO: remove completed field if necessary */
+  router.put('/:id/re-open', function(req, res, next) { /** TODO: remove completed field if necessary */
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -734,7 +724,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -744,9 +734,9 @@ module.exports = function(router, mongoose) {
   /**
    * Edit task objective
    */
-  router.post('/:taskId/objective', function(req, res, next) {
+  router.post('/:id/objective', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -765,11 +755,10 @@ module.exports = function(router, mongoose) {
               task.objective = req.body.objective || task.objective;
 
               task.save(function(err) {
-
                 if (err) {
                   next(err);
-
                 } else {
+
                   debug('Task %s objective changed to %s', task._id, task.objective);
                   res.send('Task ' + task._id + ' objective changed to ' + task.objective);
 
@@ -785,7 +774,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -795,9 +784,9 @@ module.exports = function(router, mongoose) {
   /**
    * Edit task priority
    */
-  router.post('/:taskId/priority', function(req, res, next) {
+  router.post('/:id/priority', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
     var priorities = statics.models.priority;
     var priority = null;
@@ -835,11 +824,10 @@ module.exports = function(router, mongoose) {
               task.priority = priority || task.priority;
 
               task.save(function(err) {
-
                 if (err) {
                   next(err);
-
                 } else {
+
                   debug('Task %s priority changed to %s', task._id, task.priority);
                   res.send('Task ' + task._id + ' priority changed to ' + task.priority);
 
@@ -855,7 +843,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -865,9 +853,9 @@ module.exports = function(router, mongoose) {
   /**
    * Set task datetime
    */
-  router.post('/:taskId/dateTime', function(req, res, next) {
+  router.post('/:id/dateTime', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -886,16 +874,14 @@ module.exports = function(router, mongoose) {
               task.dateTime = req.body.dateTime;
 
               task.save(function(err) {
-
                 if (err) {
-
                   if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
                     res.status(400).send(err);
                   } else {
                     next(err);
                   }
-
                 } else {
+
                   debug('Task %s dateTime was set to %s', task._id, task.dateTime);
                   res.send('Task ' + task._id + ' dateTime was set to ' + task.dateTime);
 
@@ -911,7 +897,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -939,13 +925,12 @@ module.exports = function(router, mongoose) {
           if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
             task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
-
               if (err) {
                 next(err);
               } else {
 
                 for (i = 0; i < task.collaborators.length; i++) {
-                  /** Check if user is actual collaborator of task */
+                  /** Check if user is not currently a task collaborator */
                   if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
                     /** Remove it from the array and reallocate index */
                     task.collaborators.splice(i, 1);
@@ -954,8 +939,8 @@ module.exports = function(router, mongoose) {
                 }
 
                 res.send(task);
-              }
 
+              }
             });
           } else {
             debug('User %s is not allowed to modify task %s', user, task._id);
@@ -963,7 +948,7 @@ module.exports = function(router, mongoose) {
           }
         });
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });

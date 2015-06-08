@@ -2,12 +2,12 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
-  debug = require('debug')('app:api:entries');
+var _ = require('underscore');
+var debug = require('debug')('app:api:entries');
 
-var relations = component('relations'),
-  statics = component('statics'),
-  gridfs = component('gridfs');
+var relations = component('relations');
+var statics = component('statics');
+var gridfs = component('gridfs');
 
 module.exports = function(router, mongoose) {
 
@@ -18,7 +18,7 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new entry
    */
-  router.post('/create', function(req, res, next) {
+  router.post('/create', function(req, res, next) { /** TODO: update groups relations and share methods */
 
     var entry; /* This is the target schema */
     var group = req.body.group || null;
@@ -94,13 +94,11 @@ module.exports = function(router, mongoose) {
 
       save(function(err, data) {
         if (err) {
-
           if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
             res.sendStatus(400);
           } else {
             next(err);
           }
-
         } else {
 
           entry = data;
@@ -113,7 +111,6 @@ module.exports = function(router, mongoose) {
           }
         }
       });
-
     }
 
     if (group) {
@@ -199,18 +196,13 @@ module.exports = function(router, mongoose) {
       });
     }
 
-    Entry.
-    findOne().
-    where('_id', req.params.id).
-    exec(function(err, data) {
+    Entry.findById(req.params.id, function(err, data) {
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
-
       } else if (data) {
 
         entry = data;
@@ -243,18 +235,15 @@ module.exports = function(router, mongoose) {
 
     findById(req.params.id).
 
-    populate('pictures'). /* Retrieves data from linked schemas */
+    populate('pictures').
 
     exec(function(err, entry) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
-
       } else if (entry) {
 
         relations.contact(req.session.user._id, function(relation) {
@@ -392,10 +381,8 @@ module.exports = function(router, mongoose) {
           sort('-created').
 
           exec(function(err, entries) {
-
             if (err) {
               next(err);
-
             } else {
 
               res.send(entries);
@@ -441,10 +428,8 @@ module.exports = function(router, mongoose) {
           sort('-created').
 
           exec(function(err, entries) {
-
             if (err) {
               next(err);
-
             } else {
 
               res.send(entries);
@@ -466,11 +451,11 @@ module.exports = function(router, mongoose) {
   /**
    * Add entries to a task
    */
-  router.post('/task/:taskId/add', function(req, res, next) { /** TODO: prevent duplicated entries */
+  router.post('/task/:id/add', function(req, res, next) { /** TODO: prevent duplicated entries */
 
     var now = new Date();
     var i;
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
     var entries = req.body.entries;
     var checked = 0;
@@ -481,7 +466,6 @@ module.exports = function(router, mongoose) {
       if (checked === entries.length) {
 
         task.save(function(err) {
-
           if (err) {
             next(err);
           } else {
@@ -539,7 +523,6 @@ module.exports = function(router, mongoose) {
 
                     if (err) {
                       debug(err);
-
                     } else if (_entry) {
 
                       /** Check if user is contact of entry creator or is itself */
@@ -549,7 +532,10 @@ module.exports = function(router, mongoose) {
 
                           saved += 1;
                           debug('Entry %s saved into task %s', entry, task._id);
-                          task.entries.push({entry: entry, added: now});
+                          task.entries.push({
+                            entry: entry,
+                            added: now
+                          });
 
                         } else {
                           debug('Entry %s is already in task %s entries', entry, task._id);
@@ -567,7 +553,10 @@ module.exports = function(router, mongoose) {
 
                               saved += 1;
                               debug('Entry %s saved into task %s', entry, task._id);
-                              task.entries.push({entry: entry, added: now});
+                              task.entries.push({
+                                entry: entry,
+                                added: now
+                              });
 
                             } else {
                               debug('Entry %s is already in task %s entries', entry, task._id);
@@ -598,7 +587,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -611,10 +600,10 @@ module.exports = function(router, mongoose) {
   /**
    * Remove entries from task
    */
-  router.post('/task/:taskId/remove', function(req, res, next) {
+  router.post('/task/:id/remove', function(req, res, next) {
 
     var remover = req.session.user._id;
-    var task = req.params.taskId;
+    var task = req.params.id;
     var entries = req.body.entries;
     var i;
     var index;
@@ -677,7 +666,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -690,20 +679,19 @@ module.exports = function(router, mongoose) {
   /**
    * Get task entries
    */
-  router.get('/task/:taskId', function(req, res, next) {
+  router.get('/task/:id', function(req, res, next) {
 
     var user = req.session.user._id;
 
     Task.
 
-    findById(req.params.taskId).
+    findById(req.params.id).
 
     deepPopulate('group.profile entries.user entries.pictures').
 
     sort('created').
 
     exec(function(err, task) {
-
       if (err) {
         next(err);
       } else if (task) {
@@ -720,7 +708,7 @@ module.exports = function(router, mongoose) {
           }
         });
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });

@@ -2,17 +2,17 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
-  debug = require('debug')('app:api:contacts');
+var _ = require('underscore');
+var debug = require('debug')('app:api:contacts');
 
-var relations = component('relations'),
-  statics = component('statics');
+var relations = component('relations');
+var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
-  var Contact = mongoose.model('contact'),
-    Token = mongoose.model('token'),
-    User = mongoose.model('user');
+  var Contact = mongoose.model('contact');
+  var Token = mongoose.model('token');
+  var User = mongoose.model('user');
 
   /**
    * Add contact
@@ -63,7 +63,6 @@ module.exports = function(router, mongoose) {
                       User.
                       findById(receiver.user).
                       exec(function(err, user) {
-
                         if (err) {
                           next(err);
 
@@ -73,7 +72,6 @@ module.exports = function(router, mongoose) {
                           if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
 
                             res.send('Great! You have invited a collaborator to emeeter');
-
 
                           } else { /** The user is part of emeeter and a contact request email is going to be sent */
 
@@ -86,6 +84,7 @@ module.exports = function(router, mongoose) {
                   });
                 }
               });
+
             } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'active')._id)) { /** The contact state is Active */
 
               res.send('You are already contacts!');
@@ -142,9 +141,7 @@ module.exports = function(router, mongoose) {
     var receiverIsContact;
 
     Token.findById(req.params.token, function(err, token) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
@@ -186,13 +183,7 @@ module.exports = function(router, mongoose) {
                           debug('User %s and %s are now contacts!', receiver.user, sender.user);
                           res.send('User ' + receiver.user + ' and ' + sender.user + ' are now contacts!');
 
-                          Token.remove({
-                            _id: token._id
-                          }, function(err) {
-                            if (err) {
-                              debug(err);
-                            }
-                          });
+                          token.remove();
                         }
                       });
                     }
@@ -401,13 +392,15 @@ module.exports = function(router, mongoose) {
               checked += 1;
 
               if (checked === toCheck) {
+
                 send();
+
               }
-
             });
-
           } else if (checked === toCheck) {
+
             send();
+
           }
         });
 
@@ -434,7 +427,6 @@ module.exports = function(router, mongoose) {
     deepPopulate('contacts.user').
 
     exec(function(err, found) {
-
       if (err) {
         next(err);
 
@@ -450,6 +442,7 @@ module.exports = function(router, mongoose) {
         });
 
         res.send(contacts);
+
       }
     });
 
