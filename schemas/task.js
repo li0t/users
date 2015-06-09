@@ -105,7 +105,7 @@ module.exports = function(Schema) {
 
   }, 'The task date time must be in the future!');
 
-  /** Check the date time is set in the future */
+  /** Check the set priority is valid */
   TaskSchema.path('priority').validate(function(priority, cb) {
 
     Priority.findById(priority, function(err, found) {

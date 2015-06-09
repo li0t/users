@@ -1,9 +1,12 @@
 /* jshint node: true */
 'use strict';
 
+var mongoose = require('mongoose');
 var deepPopulate = require('mongoose-deep-populate');
 
-module.exports = function (Schema) {
+module.exports = function(Schema) {
+
+  var Gender = mongoose.model('static.gender');
 
   var ProfileSchema = new Schema({
 
@@ -37,13 +40,34 @@ module.exports = function (Schema) {
 
   });
 
+  /** Check the set gender is valid */
+  ProfileSchema.path('gender').validate(function(gender, cb) {
+
+    if (gender) {
+
+      Gender.findById(gender, function(err, found) {
+
+        if (!err && found) {
+          cb(true);
+        } else {
+          cb(false);
+        }
+
+      });
+
+    } else {
+      cb(true);
+    }
+
+  }, 'You must set a valid gender');
+
   /** Show virtuals on JSON conversion */
   ProfileSchema.set('toJSON', {
     virtuals: true
   });
 
   /**  */
-  ProfileSchema.pre('save', function (next) {
+  ProfileSchema.pre('save', function(next) {
     next();
   });
 
