@@ -21,7 +21,6 @@ module.exports = function(router, mongoose) {
   router.post('/create', function(req, res, next) {
 
     var entry; /* This is the target schema */
-    var group = req.body.group || null;
     var tagsSaved = 0;
 
     /**
@@ -83,60 +82,32 @@ module.exports = function(router, mongoose) {
       });
     }
 
-    function createEntry() {
+    new Entry({
+      user: req.session.user._id,
+      title: req.body.title,
+      content: req.body.content /* Markdown text */
+    }).
 
-      new Entry({
-        user: req.session.user._id,
-        group: group,
-        title: req.body.title,
-        content: req.body.content /* Markdown text */
-      }).
-
-      save(function(err, data) {
-        if (err) {
-
-          if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
-            res.sendStatus(400);
-          } else {
-            next(err);
-          }
-
+    save(function(err, data) {
+      if (err) {
+        if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
+          res.sendStatus(400);
         } else {
-
-          entry = data;
-
-          if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
-            saveTags();
-
-          } else { /* If not, just save the entry */
-            saveEntry();
-          }
+          next(err);
         }
-      });
+      } else {
 
-    }
+        entry = data;
 
-    if (group) {
+        if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
+          saveTags();
 
-      relations.membership(group, function(relation) { /** Get the group model */
+        } else { /* If not, just save the entry */
+          saveEntry();
 
-        if (relation.group) {
-
-          if (relation.isMember(req.session.user._id)) {
-
-            createEntry();
-
-          } else {
-            debug('User %s is not part of group %s', req.session.user._id, group);
-            res.sendStatus(403);
-          }
-        } else {
-          res.status(404).send('No group found with id ' + group);
         }
-      });
-    } else {
-      createEntry();
-    }
+      }
+    });
 
   });
 
@@ -237,7 +208,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get an entry
    */
-  router.get('/:id', function(req, res, next) {
+  router.get('/:id', function(req, res, next) { /** TODO: Implement share functionality */
 
     Entry.
 
@@ -370,7 +341,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of a group
    */
-  router.get('/group/:id', function(req, res, next) {
+  router.get('/group/:id', function(req, res, next) { /** TODO: Implement share functionality */
 
     var user = req.session.user._id;
     var group = req.params.id;
@@ -417,7 +388,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries with files of a group
    */
-  router.get('/group/:id/files', function(req, res, next) {
+  router.get('/group/:id/files', function(req, res, next) { /** TODO: Implement share functionality */
 
     var user = req.session.user._id;
     var group = req.params.id;
@@ -466,7 +437,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add entries to a task
    */
-  router.post('/task/:taskId/add', function(req, res, next) { /** TODO: prevent duplicated entries */
+  router.post('/task/:taskId/add', function(req, res, next) { /** TODO: Implement share functionality */
 
     var now = new Date();
     var i;
@@ -549,7 +520,10 @@ module.exports = function(router, mongoose) {
 
                           saved += 1;
                           debug('Entry %s saved into task %s', entry, task._id);
-                          task.entries.push({entry: entry, added: now});
+                          task.entries.push({
+                            entry: entry,
+                            added: now
+                          });
 
                         } else {
                           debug('Entry %s is already in task %s entries', entry, task._id);
@@ -567,7 +541,10 @@ module.exports = function(router, mongoose) {
 
                               saved += 1;
                               debug('Entry %s saved into task %s', entry, task._id);
-                              task.entries.push({entry: entry, added: now});
+                              task.entries.push({
+                                entry: entry,
+                                added: now
+                              });
 
                             } else {
                               debug('Entry %s is already in task %s entries', entry, task._id);
@@ -611,7 +588,7 @@ module.exports = function(router, mongoose) {
   /**
    * Remove entries from task
    */
-  router.post('/task/:taskId/remove', function(req, res, next) {
+  router.post('/task/:taskId/remove', function(req, res, next) { /** TODO: Implement share functionality */
 
     var remover = req.session.user._id;
     var task = req.params.taskId;
@@ -690,7 +667,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get task entries
    */
-  router.get('/task/:taskId', function(req, res, next) {
+  router.get('/task/:taskId', function(req, res, next) { /** TODO: Implement share functionality */
 
     var user = req.session.user._id;
 
@@ -698,7 +675,7 @@ module.exports = function(router, mongoose) {
 
     findById(req.params.taskId).
 
-    deepPopulate('group.profile entries.user entries.pictures').
+    deepPopulate('entries.user entries.pictures').
 
     sort('created').
 
