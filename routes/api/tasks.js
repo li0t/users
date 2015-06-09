@@ -20,9 +20,6 @@ module.exports = function(router, mongoose) {
     var group = req.body.group;
     var dateTime = req.body.dateTime || null;
     var creator = req.session.user._id;
-    var priorities = statics.models.priority;
-    var _priority;
-    var priority = null;
 
     relations.membership(group, function(membership) {
 
@@ -32,50 +29,29 @@ module.exports = function(router, mongoose) {
 
         if (membership.isMember(creator)) {
 
-          for (_priority in priorities) { /** Search the priority id and check that exists */
+          new Task({
+            group: group._id,
+            creator: creator,
+            objective: req.body.objective,
+            priority: req.body.priority,
+            dateTime: dateTime,
+            notes: req.body.notes,
+          }).
 
-            if (priorities.hasOwnProperty(_priority)) {
-
-              if (JSON.stringify(priorities[_priority]._id) === JSON.stringify(req.body.priority)) {
-
-                priority = req.body.priority;
-                break;
-
-              }
-            }
-          }
-
-          if (priority) {
-
-            new Task({
-              group: group._id,
-              creator: creator,
-              objective: req.body.objective,
-              priority: req.body.priority,
-              dateTime: dateTime,
-              notes: req.body.notes,
-            }).
-
-            save(function(err, task) {
-
-              if (err) {
-
-                if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
-                  res.status(400).send(err);
-                } else {
-                  next(err);
-                }
-
+          save(function(err, task) {
+            if (err) {
+              if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
+                res.status(400).send(err);
               } else {
-
-                debug('Task %s created', task._id);
-                res.status(201).send(task._id);
-
+                next(err);
               }
-            });
-          } else {
-            res.status(400).send('You must set a valid priority');
-          }
+            } else {
+
+              debug('Task %s created', task._id);
+              res.status(201).send(task._id);
+
+            }
+          });
         } else {
           debug('User is not part of group %s', creator, group._id);
           res.sendStatus(403);
@@ -799,9 +775,6 @@ module.exports = function(router, mongoose) {
 
     var task = req.params.taskId;
     var user = req.session.user._id;
-    var priorities = statics.models.priority;
-    var priority = null;
-    var _priority;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -816,30 +789,17 @@ module.exports = function(router, mongoose) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              if (req.body.priority) {
-
-                for (_priority in priorities) { /** Search the priority id and check that exists */
-
-                  if (priorities.hasOwnProperty(_priority)) {
-
-                    if (JSON.stringify(priorities[_priority]._id) === JSON.stringify(req.body.priority)) {
-
-                      priority = req.body.priority;
-                      break;
-
-                    }
-                  }
-                }
-              }
-
-              task.priority = priority || task.priority;
+              task.priority = req.body.priority || task.priority;
 
               task.save(function(err) {
-
                 if (err) {
-                  next(err);
-
+                  if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
+                    res.status(400).send(err);
+                  } else {
+                    next(err);
+                  }
                 } else {
+
                   debug('Task %s priority changed to %s', task._id, task.priority);
                   res.send('Task ' + task._id + ' priority changed to ' + task.priority);
 
