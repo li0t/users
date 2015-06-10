@@ -13,11 +13,6 @@ module.exports = function (Schema) {
       required: true
     },
 
-    group : {
-      type: Schema.Types.ObjectId,
-      ref: 'group'
-    },
-
     title: {
       type: String,
       required: true

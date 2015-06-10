@@ -17,23 +17,6 @@ module.exports = function(router, mongoose) {
    */
   router.post('/', function(req, res, next) {
 
-    var genders = statics.models.gender;
-    var _gender;
-    var gender = null;
-
-    for (_gender in genders) { /** Search the gender id and check that exists */
-
-      if (genders.hasOwnProperty(_gender)) {
-
-        if (JSON.stringify(genders[_gender]._id) === JSON.stringify(req.body.gender)) {
-
-          gender = req.body.gender;
-          break;
-
-        }
-      }
-    }
-
     Profile.findById(req.session.user.profile, function(err, profile) {
       if (err) {
         next(err);
@@ -44,13 +27,13 @@ module.exports = function(router, mongoose) {
 
         profile.birthdate = req.body.birthdate || profile.birthdate;
 
-        profile.gender = gender || profile.gender;
+        profile.gender = req.body.gender || profile.gender;
 
         profile.location = req.body.location || profile.location;
 
         profile.save(function(err) {
           if (err) {
-            if (err.name && err.name === 'CastError') {
+            if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
               res.sendStatus(400);
             } else {
               next(err);

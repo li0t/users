@@ -21,7 +21,6 @@ module.exports = function(router, mongoose) {
   router.post('/create', function(req, res, next) { /** TODO: update groups relations and share methods */
 
     var entry; /* This is the target schema */
-    var group = req.body.group || null;
     var tagsSaved = 0;
 
     /**
@@ -32,6 +31,7 @@ module.exports = function(router, mongoose) {
         if (err) {
           next(err);
         } else {
+
           res.status(201).send(entry._id);
         }
       });
@@ -45,12 +45,14 @@ module.exports = function(router, mongoose) {
 
       /* Check if all tags were found and/or created */
       function onTagReady(tag) {
+
         entry.tags.push(tag.name);
 
         tagsSaved += 1;
 
         if (tagsSaved === req.body.tags.length) {
           saveEntry();
+
         }
       }
 
@@ -58,82 +60,63 @@ module.exports = function(router, mongoose) {
       if (typeof req.body.tags === 'string') {
         req.body.tags = [req.body.tags];
       }
+
       req.body.tags.forEach(function(tag) {
-        Tag.findOne()
-          .where('name', tag)
-          .exec(function(err, found) {
-            if (err) {
-              debug('Error! : %s', err);
-            } else if (found) {
-              debug('Tag found : %s', found.name);
-              onTagReady(found);
-            } else {
-              debug('Creating new Tag : %s', tag);
-              new Tag({
-                name: tag
-              }).save(function(err, newTag) {
-                if (err) {
-                  debug('Error! : %s', err);
-                } else {
-                  onTagReady(newTag);
-                }
-              });
-            }
-          });
-      });
-    }
 
-    function createEntry() {
+        Tag.
+        findOne().
+        where('name', tag).
+        exec(function(err, found) {
+          if (err) {
+            debug('Error! : %s', err);
 
-      new Entry({
-        user: req.session.user._id,
-        group: group,
-        title: req.body.title,
-        content: req.body.content /* Markdown text */
-      }).
-
-      save(function(err, data) {
-        if (err) {
-          if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
-            res.sendStatus(400);
-          } else {
-            next(err);
-          }
-        } else {
-
-          entry = data;
-
-          if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
-            saveTags();
-
-          } else { /* If not, just save the entry */
-            saveEntry();
-          }
-        }
-      });
-    }
-
-    if (group) {
-
-      relations.membership(group, function(relation) { /** Get the group model */
-
-        if (relation.group) {
-
-          if (relation.isMember(req.session.user._id)) {
-
-            createEntry();
+          } else if (found) {
+            debug('Tag found : %s', found.name);
+            onTagReady(found);
 
           } else {
-            debug('User %s is not part of group %s', req.session.user._id, group);
-            res.sendStatus(403);
+            debug('Creating new Tag : %s', tag);
+            new Tag({
+              name: tag
+            }).save(function(err, newTag) {
+              if (err) {
+                debug('Error! : %s', err);
+              } else {
+
+                onTagReady(newTag);
+              }
+            });
           }
-        } else {
-          res.status(404).send('No group found with id ' + group);
-        }
+        });
       });
-    } else {
-      createEntry();
     }
+
+    new Entry({
+      user: req.session.user._id,
+      title: req.body.title,
+      content: req.body.content /* Markdown text */
+    }).
+
+    save(function(err, data) {
+      if (err) {
+        if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+      } else {
+
+        entry = data;
+
+        if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
+          saveTags();
+
+        } else { /* If not, just save the entry */
+          saveEntry();
+
+        }
+      }
+    });
 
   });
 
@@ -229,7 +212,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get an entry
    */
-  router.get('/:id', function(req, res, next) {
+  router.get('/:id', function(req, res, next) { /** TODO: Implement share functionality */
 
     Entry.
 
@@ -359,7 +342,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of a group
    */
-  router.get('/group/:id', function(req, res, next) {
+  router.get('/group/:id', function(req, res, next) { /** TODO: Implement share functionality */
 
     var user = req.session.user._id;
     var group = req.params.id;
@@ -404,7 +387,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries with files of a group
    */
-  router.get('/group/:id/files', function(req, res, next) {
+  router.get('/group/:id/files', function(req, res, next) { /** TODO: Implement share functionality */
 
     var user = req.session.user._id;
     var group = req.params.id;
@@ -451,7 +434,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add entries to a task
    */
-  router.post('/task/:id/add', function(req, res, next) { /** TODO: prevent duplicated entries */
+  router.post('/task/:id/add', function(req, res, next) { /** TODO: Implement share functionality */
 
     var now = new Date();
     var i;
@@ -600,7 +583,8 @@ module.exports = function(router, mongoose) {
   /**
    * Remove entries from task
    */
-  router.post('/task/:id/remove', function(req, res, next) {
+
+  router.post('/task/:id/remove', function(req, res, next) { /** TODO: Implement share functionality */
 
     var remover = req.session.user._id;
     var task = req.params.id;
@@ -679,7 +663,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get task entries
    */
-  router.get('/task/:id', function(req, res, next) {
+  router.get('/task/:id', function(req, res, next) { /** TODO: Implement share functionality */
 
     var user = req.session.user._id;
 
@@ -687,7 +671,7 @@ module.exports = function(router, mongoose) {
 
     findById(req.params.id).
 
-    deepPopulate('group.profile entries.user entries.pictures').
+    deepPopulate('entries.user entries.pictures').
 
     sort('created').
 
