@@ -1,0 +1,58 @@
+div.container
+  div.row
+    div.col-sm-8.col-sm-offset-2
+      div.page-header
+        h1 Cambiar clave
+
+      div.panel.panel-default
+        div.panel-heading
+          h3.panel-title
+            i.fa.fa-mr.fa-asterisk
+            |Crear nueva clave
+
+        form(
+          ng-submit='form.$valid && submit()',
+          name='form',
+          role='form',
+          novalidate)
+
+          div.panel-body
+            div.form-group
+              div.input-group
+                span.input-group-addon
+                  i.fa.fa-fw.fa-asterisk
+
+                input.form-control(
+                  placeholder='Ingresa tu nueva clave',
+                  ng-disabled='validating',
+                  ng-model='form.password',
+                  ng-minlength='4',
+                  type='password',
+                  required)
+
+            div.input-group
+              span.input-group-addon
+                i.fa.fa-fw.fa-asterisk
+
+              input.form-control(
+                ng-disabled='form.password.length < 4 || validating',
+                placeholder='Confirma tu nueva clave',
+                ng-model='form.vpassword',
+                ng-minlength='4',
+                type='password',
+                required)
+
+          div.panel-footer.text-right
+            div.row
+              div.col-sm-5
+                a.btn.btn-lg.btn-lg.btn-block.btn-default(ng-href='/') 
+                  i.fa.fa-fw.fa-mr.fa-chevron-left
+                  |Cancelar
+
+              div.col-sm-7
+                button.btn.btn-lg.btn-lg.btn-block.btn-default(
+                  ng-disabled='form.$invalid || validating || form.password !== form.vpassword',
+                  type='submit')
+
+                  |Cambiar clave
+                  i.fa.fa-ml.fa-check

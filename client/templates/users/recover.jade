@@ -1,34 +1,41 @@
-div.row
-  div.col-md-4.col-md-offset-4
-    div.panel.panel-default
-      div.panel-heading
-        h3.panel-title
-          i.fa.fa-question-circle
-          |  Recover password
+div.container
+  div.row
+    div.col-sm-8.col-sm-offset-2
+      div.page-header
+        h1 Recuperar cuenta
 
-      form(
-        name='form'
-        role='form'
-        ng-submit='form.$valid && submit()'
-        novalidate)
+      div.panel.panel-default
+        div.panel-heading
+          h3.panel-title
+            i.fa.fa-mr.fa-fw.fa-user
+            |Datos de la cuenta
 
-        div.panel-body
-          div.input-group
-            span.input-group-addon
-              i.fa.fa-at.fa-fw
+        form(
+          name='form'
+          role='form'
+          ng-submit='form.$valid && submit()'
+          novalidate)
 
-            input.form-control(
-              placeholder='Type your email',
-              ng-model='form.email',
-              type='email',
-              required)
+          div.panel-body
+            div.input-group
+              span.input-group-addon
+                i.fa.fa-at.fa-fw
 
-        div.panel-footer.text-right
-          a.btn.btn-link.pull-left(ng-href='/users/signin') I have my password
+              input.form-control(
+                placeholder='Ingrese su email',
+                ng-model='form.email',
+                type='email',
+                required)
 
-          button.btn.btn-primary(
-            ng-disabled='form.$invalid || submitting',
-            type='submit')
+          div.panel-footer
+            div.btn-group-grid
+              a.btn.btn-lg.btn-default(ng-href='/')
+                i.fa.fa-mr.fa-fw.fa-chevron-left
+                |Ya tengo mi clave
 
-            i.fai(class='fa {{ submitting && "fa-circle-o-notch fa-spin" || "fa-send" }}')
-            |  Recover password
+              button.btn.btn-lg.btn-main.btn-default(
+                ng-disabled='form.$invalid || submitting',
+                type='submit')
+
+                |Enviar
+                i.fa.fa-ml.fa-fw(class='fa-{{ submitting && "circle-o-notch fa-spin" || "send" }}')
