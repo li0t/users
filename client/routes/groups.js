@@ -29,7 +29,7 @@
       }).
 
       when('/groups/:id', {
-        controller: 'Groups:Details',
+        controller: 'Groups:Profile',
         templateUrl: '/templates/groups/details.html',
       });
     }
