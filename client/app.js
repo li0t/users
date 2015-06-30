@@ -1,3 +1,5 @@
+ /* global angular */
+
 (function (ng) {
   'use strict';
 

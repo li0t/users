@@ -18,13 +18,18 @@
         templateUrl: '/templates/groups/create.html'
       }).
 
+      when('/groups/:id/members', {
+        controller: 'Groups:Members:Index',
+        templateUrl: '/templates/groups/members/index.html'
+      }).
+
       when('/groups/:id/members/add/:user', {
-        controller: 'Groups:AddMember',
+        controller: 'Groups:Members:Add',
         templateUrl: '/templates/groups/members/add.html'
       }).
 
       when('/groups/:id/members/remove/:user', {
-        controller: 'Groups:RemoveMember',
+        controller: 'Groups:Members:Remove',
         templateUrl: '/templates/groups/members/remove.html'
       }).
 

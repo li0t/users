@@ -1,23 +1,5 @@
-#### PROJECT SPECIFIC ####
-
-# Bower components directory
-client/assets/components/
-
-# Compiled views
-client/assets/templates/
-
-# Compiled styles
-client/assets/styles/
-
-# Compiled scripts
-client/assets/scripts/
-
-
-#### NPM SPECIFIC ####
-dev.config.json
-
-
-#### NODEJS SPECIFIC ####
+# misc
+.DS_Store
 
 # Logs
 logs
@@ -37,65 +19,28 @@ coverage
 # Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
-# node-waf configuration
-.lock-wscript
-
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
 # Dependency directory
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
+# Commenting this out is preferred by some people, see
+# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
 node_modules
 
+# Users Environment Variables
+.lock-wscript
 
-#### WINDOWS SPECIFIC ####
+#npm debug
+npm-debug.log
 
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
+# Bower components directory
+client/assets/components
 
-# Folder config file
-Desktop.ini
+# Compiled views
+client/assets/templates
 
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
+# Compiled styles
+client/assets/styles
 
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-
-#### OSX SPECIFIC ####
-
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Icon must end with two \r
-Icon
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# database
-database/
+# Compiled scripts
+client/assets/scripts
