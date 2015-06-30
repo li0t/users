@@ -14,7 +14,13 @@ module.exports = function (router, mongoose) {
             res.send({
                 user: {
                     _id: req.session.user._id,
-                    name: req.session.user.name
+                    email: req.session.user.email,
+                    profile: {
+                      name: req.session.user.profile.name,
+                      gender: req.session.user.profile.gender || req.session.user.profile.gender.name,
+                      location: req.session.user.profile.location,
+                      birthdate: req.session.user.profile.birthdate
+                    }
                 }
             });
         } else {

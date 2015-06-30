@@ -42,7 +42,7 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new user
    */
-  router.post('/create', function(req, res, next) {
+  router.post('/signup', function(req, res, next) {
 
     new Profile().
 
@@ -91,7 +91,7 @@ module.exports = function(router, mongoose) {
   /**
    * Log a user in.
    */
-  router.post('/login', function(req, res, next) {
+  router.post('/signin', function(req, res, next) {
 
     var email = req.body.email;
     var password = req.body.password;
@@ -103,13 +103,14 @@ module.exports = function(router, mongoose) {
       delete req.session.workplace;
 
       /* Find the user by its email address */
-      User.
+      User.findOne().
 
-      findOne().
       where('email', email).
 
-      exec(function(err, user) {
+      deepPopulate('profile.gender').
 
+      exec(function(err, user) {
+debug(user);
         if (err) {
 
           if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
@@ -123,7 +124,7 @@ module.exports = function(router, mongoose) {
           if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
 
             req.session.user = user;
-            res.send(user._id);
+            res.send(user);
 
           } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
 
@@ -154,7 +155,7 @@ module.exports = function(router, mongoose) {
   /**
    * Logs a user out.
    */
-  router.get('/logout', function(req, res /*, next*/ ) {
+  router.get('/signout', function(req, res /*, next*/ ) {
 
     delete req.session.user;
 

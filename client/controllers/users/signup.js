@@ -1,7 +1,7 @@
 (function (ng) {
   'use strict';
 
-  ng.module('App').controller('Users:SignUp', [
+  ng.module('App').controller('Users:Signup', [
     '$scope', '$http', '$location', '$session', 'statics',
 
     function ($scope, $http, $location, $session, statics) {

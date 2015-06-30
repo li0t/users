@@ -33,7 +33,7 @@
         templateUrl: '/templates/groups/members/remove.html'
       }).
 
-      when('/groups/:id', {
+      when('/groups/:id/details', {
         controller: 'Groups:Profile',
         templateUrl: '/templates/groups/details.html',
       });

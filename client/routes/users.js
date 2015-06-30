@@ -8,6 +8,12 @@
 
       $routeProvider.
 
+      when('/users/signin', {
+        controller: 'Users:Signin',
+        templateUrl: '/templates/users/signin.html'
+      }).
+
+
       when('/users/signup', {
         controller: 'Users:Signup',
         templateUrl: '/templates/users/signup.html',
@@ -29,7 +35,7 @@
 
       }).
 
-      when('/users/profile', {
+      when('/users/:id/profile', {
         controller: 'Users:Profile',
         templateUrl: '/templates/users/profile.html'
       }).

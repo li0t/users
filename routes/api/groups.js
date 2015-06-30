@@ -420,7 +420,7 @@ module.exports = function(router, mongoose) {
 
     select('id admin profile members created').
 
-    populate('profile').
+    deepPopulate('profile admin.profile').
 
     exec(function(err, found) {
 
