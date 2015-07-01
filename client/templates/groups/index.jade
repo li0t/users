@@ -40,7 +40,7 @@ div.panel.panel-default
     tbody
       tr(
         ng-repeat='group in groups',
-        ng-init='href = ("/groups/{0}/details" | format : group._id)')
+        ng-init='href = ("/groups/{0}/profile" | format : group._id)')
 
         td
           a(ng-href='{{ href }}')

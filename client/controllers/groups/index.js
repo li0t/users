@@ -7,8 +7,7 @@
     function ($scope, $http, $location, $session) {
       $scope.groups = null;
       $scope.fetching = false;
-
-
+      
       $scope.loadGroups = function () {
 
         $scope.fetching = true;

@@ -11,209 +11,186 @@ var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
-  var User = mongoose.model('user');
-  var Profile = mongoose.model('profile');
-  var Contact = mongoose.model('contact');
-  var Token = mongoose.model('token');
+var User = mongoose.model('user');
+var Profile = mongoose.model('profile');
+var Contact = mongoose.model('contact');
+var Token = mongoose.model('token');
 
-  /**
-   * Get users list.
-   */
-  router.get('/', function(req, res, next) {
+/**
+ * Get users list.
+ */
+router.get('/', function(req, res, next) {
 
-    User.find().
+  User.find().
 
-    where('state', statics.model('state', 'active')._id).
+  where('state', statics.model('state', 'active')._id).
 
-    exec(function(err, users) {
+  exec(function(err, users) {
 
-      if (err) {
-        next(err);
+    if (err) {
+      next(err);
 
-      } else {
+    } else {
 
-        res.send(users);
-      }
-
-    });
+      res.send(users);
+    }
 
   });
 
-  /**
-   * Create a new user
-   */
-  router.post('/signup', function(req, res, next) {
+});
 
-    new Profile().
+/**
+ * Create a new user
+ */
+router.post('/signup', function(req, res, next) {
 
-    save(function(err, profile) { /* Create a new Profile that will store the user information */
-      if (err) {
-        next(err);
-      } else {
+  new Profile().
 
-        new User({
-          email: req.body.email,
-          password: req.body.password,
-          profile: profile._id,
-          state: statics.model('state', 'pending')._id
-        }).
+  save(function(err, profile) { /* Create a new Profile that will store the user information */
+    if (err) {
+      next(err);
+    } else {
 
-        save(function(err, user) {
-          if (err) {
-            /* Check for duplicated entry */
-            if (err.code && err.code === 11000) {
-              res.sendStatus(409);
-            } else if (err.name && err.name === 'ValidationError') {
-              res.sendStatus(400);
-            } else {
-              next(err);
-            }
-          } else {
+      new User({
+        email: req.body.email,
+        password: req.body.password,
+        profile: profile._id,
+        state: statics.model('state', 'pending')._id
+      }).
 
-            new Contact({ /* Create a new ContactSchema that will store the user contacts */
-              user: user._id
-            }).
-
-            save(function(err) {
-              if (err) {
-                next(err);
-              } else {
-                res.redirect('/api/mandrill/signin/' + user._id);
-              }
-            });
-          }
-        });
-      }
-    });
-
-  });
-
-  /**
-   * Log a user in.
-   */
-  router.post('/signin', function(req, res, next) {
-
-    var email = req.body.email;
-    var password = req.body.password;
-
-    if (email && password) {
-
-      /* Logout any previous user */
-      delete req.session.user;
-      delete req.session.workplace;
-
-      /* Find the user by its email address */
-      User.findOne().
-
-      where('email', email).
-
-      deepPopulate('profile.gender').
-
-      exec(function(err, user) {
-debug(user);
+      save(function(err, user) {
         if (err) {
-
-          if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
+          /* Check for duplicated entry */
+          if (err.code && err.code === 11000) {
+            res.sendStatus(409);
+          } else if (err.name && err.name === 'ValidationError') {
             res.sendStatus(400);
           } else {
             next(err);
           }
-
-        } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
-
-          if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
-
-            req.session.user = user;
-            res.send(user);
-
-          } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
-
-            res.status(409).send("Looks like you havent confirmed your email yet.");
-
-          } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
-
-            res.status(409).send("Looks like you have disabled your account.");
-
-          } else {
-
-            res.status(409).send("There is an internal problem, contact the administrator");
-
-          }
         } else {
-          setTimeout(function() {
-            res.sendStatus(401);
-          }, 1000);
+
+          new Contact({ /* Create a new ContactSchema that will store the user contacts */
+            user: user._id
+          }).
+
+          save(function(err) {
+            if (err) {
+              next(err);
+            } else {
+              res.redirect('/api/mandrill/signin/' + user._id);
+            }
+          });
         }
       });
-
-    } else {
-      res.sendStatus(400);
     }
-
   });
 
-  /**
-   * Logs a user out.
-   */
-  router.get('/signout', function(req, res /*, next*/ ) {
+});
 
+/**
+ * Log a user in.
+ */
+router.post('/signin', function(req, res, next) {
+
+  var email = req.body.email;
+  var password = req.body.password;
+
+  if (email && password) {
+
+    /* Logout any previous user */
     delete req.session.user;
+    delete req.session.workplace;
 
-    res.end();
+    /* Find the user by its email address */
+    User.findOne().
 
-  });
+    where('email', email).
 
-  /**
-   * Begin password reset.
-   */
-  router.post('/recover', function(req, res /*, next*/ ) {
+    deepPopulate('profile.gender').
 
-    var email = req.body.email;
-
-    if (email) {
-
-      res.redirect('/api/mandrill/recover/' + email);
-
-    } else {
-      res.sendStatus(400);
-    }
-
-  });
-
-  /**
-   * Validate token for password reset
-   */
-  router.get('/recover/:token', function(req, res, next) {
-
-    Token.findById(req.params.token, function(err, token) {
-
+    exec(function(err, user) {
+      debug(user);
       if (err) {
 
-        if (err.name && err.name === 'CastError') {
+        if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
           res.sendStatus(400);
         } else {
           next(err);
         }
 
-      } else if (token) {
+      } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
 
-        req.session.token = token;
-        res.send('Please choose a new password.');
+        if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
 
+          req.session.user = user;
+          res.send(user);
+
+        } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
+
+          res.status(409).send("Looks like you havent confirmed your email yet.");
+
+        } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
+
+          res.status(409).send("Looks like you have disabled your account.");
+
+        } else {
+
+          res.status(409).send("There is an internal problem, contact the administrator");
+
+        }
       } else {
-        res.status(498).send('This token is not active anymore');
+        setTimeout(function() {
+          res.sendStatus(401);
+        }, 1000);
       }
     });
 
-  });
+  } else {
+    res.sendStatus(400);
+  }
 
-  /**
-   * Reset password of user that already validated token
-   */
-  router.post('/resetPassword', function(req, res, next) {
+});
 
-    var token = req.session.token;
-    var password = req.body.password;
+/**
+ * Logs a user out.
+ */
+router.get('/signout', function(req, res /*, next*/ ) {
+
+  delete req.session.user;
+
+  res.end();
+
+});
+
+/**
+ * Begin password reset.
+ */
+router.post('/recover', function(req, res /*, next*/ ) {
+
+  var email = req.body.email;
+
+  if (email) {
+
+    res.redirect('/api/mandrill/recover/' + email);
+
+  } else {
+    res.sendStatus(400);
+  }
+
+});
+
+/**
+ * Reset password of user that already validated token
+ */
+router.post('/reset/:token', function(req, res, next) {
+
+  var password = req.body.password;
+
+  Token.findById(req.params.token, function(err, token) {
+    if (err) {
+      return next(err);
+    }
 
     if (token) {
 
@@ -258,397 +235,398 @@ debug(user);
         res.status(400).send('You must set a new password');
       }
     } else {
-      res.sendStatus(403);
+      res.sendStatus(498);
     }
   });
+});
 
-  /**
-   * Changes user password
-   */
-  router.post('/changePassword', function(req, res, next) {
+/**
+ * Changes user password
+ */
+router.post('/changePassword', function(req, res, next) {
 
-    var oldPassword = req.body.oldPassword;
-    var newPassword = req.body.newPassword;
+  var oldPassword = req.body.oldPassword;
+  var newPassword = req.body.newPassword;
 
-    if (newPassword) {
+  if (newPassword) {
 
-      if (newPassword !== oldPassword) {
+    if (newPassword !== oldPassword) {
 
-        User.
+      User.
 
-        findById(req.session.user._id).
+      findById(req.session.user._id).
 
-        exec(function(err, user) {
+      exec(function(err, user) {
 
-          if (err) {
-            next(err);
+        if (err) {
+          next(err);
 
-          } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
+        } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
 
-            user.password = newPassword;
+          user.password = newPassword;
 
-            user.save(function(err, user) {
+          user.save(function(err, user) {
 
-              req.session.user = user;
-              res.send(user._id);
+            req.session.user = user;
+            res.send(user._id);
 
-            });
-          } else {
-            setTimeout(function() {
-              res.sendStatus(401);
-            }, 1000);
-          }
-        });
-      } else {
-        res.status(400).send('The new password should be different');
-      }
-    } else {
-      res.sendStatus(400);
-    }
-
-  });
-
-  /**
-   * Disable the user's account
-   */
-  router.get('/disable', function(req, res, next) { /** TODO: Check asynchronous method */
-
-    var user = req.session.user._id;
-    var userContact;
-    var index;
-
-    relations.contact(user, function(relation) {
-
-      userContact = relation.contact; /** The user contact model */
-
-      if (userContact) {
-
-        userContact.contacts.forEach(function(contact) {
-
-          contact.state = statics.model('state', 'disabled')._id; /** Set the user contact as disabled */
-
-          relations.contact(contact.user, function(relation) {
-
-            index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
-
-            contact = relation.contact;
-
-            contact.contacts[index].state = statics.model('state', 'disabled')._id; /** Set itself as disabled in the contact contacts list */
-
-            contact.save(function(err) {
-              if (err) {
-                debug(err);
-              }
-            });
           });
-        });
+        } else {
+          setTimeout(function() {
+            res.sendStatus(401);
+          }, 1000);
+        }
+      });
+    } else {
+      res.status(400).send('The new password should be different');
+    }
+  } else {
+    res.sendStatus(400);
+  }
 
-        userContact.save(function(err) {
-          if (err) {
-            next(err);
-          } else {
+});
 
-            User.findById(user, function(err, user) {
-              if (err) {
-                next(err);
-              } else {
+/**
+ * Disable the user's account
+ */
+router.get('/disable', function(req, res, next) { /** TODO: Check asynchronous method */
 
-                user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
+  var user = req.session.user._id;
+  var userContact;
+  var index;
 
-                user.save(function(err) {
+  relations.contact(user, function(relation) {
 
-                  if (err) {
-                    next(err);
+    userContact = relation.contact; /** The user contact model */
 
-                  } else {
-                    delete req.session.user;
-                    res.sendStatus(204);
-                  }
-                });
-              }
-            });
-          }
-        });
-      } else {
-        debug('No contacts list for user %s was found', user);
-        res.sendStatus(404);
-      }
-    });
+    if (userContact) {
 
-  });
+      userContact.contacts.forEach(function(contact) {
 
-  /**
-   * Create a new user and invite it to emeeter
-   */
-  router.get('/createAndInvite/:email', function(req, res, next) {
+        contact.state = statics.model('state', 'disabled')._id; /** Set the user contact as disabled */
 
-    var email = req.params.email;
+        relations.contact(contact.user, function(relation) {
 
-    if (email) {
+          index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
 
-      new Profile().
-      save(function(err, profile) {
+          contact = relation.contact;
 
-        new User({
-          email: email,
-          password: Math.random().toString(36).slice(-8),
-          /** Randomized alphanumeric password */
-          profile: profile._id,
-          state: statics.model('state', 'pending')._id
-        }).
+          contact.contacts[index].state = statics.model('state', 'disabled')._id; /** Set itself as disabled in the contact contacts list */
 
-        save(function(err, user) {
-
-          if (err) {
-            /** The user is already in the platform */
-            if (err.code && err.code === 11000) {
-
-              User.
-              findOne().
-              where('email', email).
-              exec(function(err, user) {
-                if (err) {
-                  next(err);
-                } else if (user) {
-                  /** Send contact request */
-                  res.redirect('/api/contacts/add/' + user._id);
-                }
-              });
-            } else if (err.name && err.name === 'ValidationError') {
-              res.sendStatus(400);
-            } else {
-              next(err);
+          contact.save(function(err) {
+            if (err) {
+              debug(err);
             }
-
-            Profile. /** Remove unnecessary new profile */
-            remove({
-              _id: profile._id
-            }).
-            exec(function(err) {
-              if (err) {
-                debug(err);
-              }
-            });
-          } else {
-
-            new Contact({
-              user: user._id
-            }).
-
-            save(function(err) {
-
-              if (err) {
-                next(err);
-              } else {
-                /** Send invite to the platform */
-                res.redirect('/api/mandrill/invite/' + user._id);
-
-              }
-            });
-          }
+          });
         });
       });
 
+      userContact.save(function(err) {
+        if (err) {
+          next(err);
+        } else {
+
+          User.findById(user, function(err, user) {
+            if (err) {
+              next(err);
+            } else {
+
+              user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
+
+              user.save(function(err) {
+
+                if (err) {
+                  next(err);
+
+                } else {
+                  delete req.session.user;
+                  res.sendStatus(204);
+                }
+              });
+            }
+          });
+        }
+      });
+    } else {
+      debug('No contacts list for user %s was found', user);
+      res.sendStatus(404);
+    }
+  });
+
+});
+
+/**
+ * Create a new user and invite it to emeeter
+ */
+router.get('/createAndInvite/:email', function(req, res, next) {
+
+  var email = req.params.email;
+
+  if (email) {
+
+    new Profile().
+    save(function(err, profile) {
+
+      new User({
+        email: email,
+        password: Math.random().toString(36).slice(-8),
+        /** Randomized alphanumeric password */
+        profile: profile._id,
+        state: statics.model('state', 'pending')._id
+      }).
+
+      save(function(err, user) {
+
+        if (err) {
+          /** The user is already in the platform */
+          if (err.code && err.code === 11000) {
+
+            User.
+            findOne().
+            where('email', email).
+            exec(function(err, user) {
+              if (err) {
+                next(err);
+              } else if (user) {
+                /** Send contact request */
+                res.redirect('/api/contacts/add/' + user._id);
+              }
+            });
+          } else if (err.name && err.name === 'ValidationError') {
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
+
+          Profile. /** Remove unnecessary new profile */
+          remove({
+            _id: profile._id
+          }).
+          exec(function(err) {
+            if (err) {
+              debug(err);
+            }
+          });
+        } else {
+
+          new Contact({
+            user: user._id
+          }).
+
+          save(function(err) {
+
+            if (err) {
+              next(err);
+            } else {
+              /** Send invite to the platform */
+              res.redirect('/api/mandrill/invite/' + user._id);
+
+            }
+          });
+        }
+      });
+    });
+
+  } else {
+    res.sendStatus(400);
+  }
+
+});
+
+/**
+ * Invited user Token validation
+ */
+router.get('/invited/signin/:token', function(req, res, next) {
+
+  Token.findById(req.params.token, function(err, token) {
+
+    if (err) {
+
+      if (err.name && err.name === 'CastError') {
+        res.sendStatus(400);
+      } else {
+        next(err);
+      }
+
+    } else if (token) {
+
+      req.session.token = token;
+
+      res.send('Thanks for signing up, Please choose a password');
+
+    } else {
+
+      res.status(498).send('This token is not active anymore');
+    }
+  });
+
+});
+
+/**
+ * Activation of invited user that already validated token
+ */
+router.post('/invited/signin', function(req, res, next) {
+
+  var token = req.session.token;
+  var password = req.body.password;
+
+  if (token.user && token.sender) {
+
+    if (password) {
+
+      User.findById(token.user, function(err, user) {
+
+        if (err) {
+          next(err);
+
+        } else if (user) {
+
+          user.password = password;
+
+          user.state = statics.model('state', 'active')._id;
+
+          user.save(function(err) {
+
+            if (err) {
+              next(err);
+
+            } else {
+
+              req.session.user = user;
+
+              res.redirect('/api/contacts/confirm/' + token._id);
+
+              delete req.session.token;
+
+            }
+          });
+
+        } else {
+          res.sendStatus(404);
+        }
+      });
     } else {
       res.sendStatus(400);
     }
+  } else {
+    res.sendStatus(403);
+  }
 
-  });
+});
 
-  /**
-   * Invited user Token validation
-   */
-  router.get('/invited/signin/:token', function(req, res, next) {
 
-    Token.findById(req.params.token, function(err, token) {
+/**
+ * Validate email of new user
+ */
+router.get('/validate/:token', function(req, res, next) {
 
-      if (err) {
+  Token.findById(req.params.token, function(err, token) {
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+    if (err) {
 
-      } else if (token) {
-
-        req.session.token = token;
-
-        res.send('Thanks for signing up, Please choose a password');
-
-      } else {
-
-        res.status(498).send('This token is not active anymore');
-      }
-    });
-
-  });
-
-  /**
-   * Activation of invited user that already validated token
-   */
-  router.post('/invited/signin', function(req, res, next) {
-
-    var token = req.session.token;
-    var password = req.body.password;
-
-    if (token.user && token.sender) {
-
-      if (password) {
-
-        User.findById(token.user, function(err, user) {
-
-          if (err) {
-            next(err);
-
-          } else if (user) {
-
-            user.password = password;
-
-            user.state = statics.model('state', 'active')._id;
-
-            user.save(function(err) {
-
-              if (err) {
-                next(err);
-
-              } else {
-
-                req.session.user = user;
-
-                res.redirect('/api/contacts/confirm/' + token._id);
-
-                delete req.session.token;
-
-              }
-            });
-
-          } else {
-            res.sendStatus(404);
-          }
-        });
-      } else {
+      if (err.name && err.name === 'CastError') {
         res.sendStatus(400);
+      } else {
+        next(err);
       }
+
+    } else if (token) {
+
+      User.
+
+      findOneAndUpdate({
+        _id: token.user
+      }, {
+        state: statics.model('state', 'active')._id
+      }).
+
+      exec(function(err, user) {
+
+        if (err) {
+          next(err);
+
+        } else {
+
+          req.session.user = user;
+          res.redirect('http://' + req.headers.host + '/');
+
+          Token.remove({
+            user: user._id
+          }, function(err) {
+            if (err) {
+              debug('Error! : %s', err);
+            }
+          });
+        }
+      });
     } else {
-      res.sendStatus(403);
+      res.status(498).send('This token is not active anymore');
     }
-
   });
 
+});
 
-  /**
-   * Validate email of new user
-   */
-  router.get('/validate/:token', function(req, res, next) {
+/**
+ * Get the session user
+ */
+router.get('/session', function(req, res, next) {
 
-    Token.findById(req.params.token, function(err, token) {
+  User.
 
-      if (err) {
+  findById(req.session.user._id).
+  deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+  exec(function(err, user) {
 
-      } else if (token) {
+    if (err) {
 
-        User.
+      if (err.name && err.name === 'CastError') {
 
-        findOneAndUpdate({
-          _id: token.user
-        }, {
-          state: statics.model('state', 'active')._id
-        }).
-
-        exec(function(err, user) {
-
-          if (err) {
-            next(err);
-
-          } else {
-
-            req.session.user = user;
-            res.redirect('http://' + req.headers.host + '/');
-
-            Token.remove({
-              user: user._id
-            }, function(err) {
-              if (err) {
-                debug('Error! : %s', err);
-              }
-            });
-          }
-        });
+        res.sendStatus(400);
       } else {
-        res.status(498).send('This token is not active anymore');
+        next(err);
       }
-    });
 
+    } else if (user) {
+
+      res.send(user);
+
+    } else {
+      res.sendStatus(404);
+    }
   });
 
-  /**
-   * Get the session user
-   */
-  router.get('/session', function(req, res, next) {
+});
 
-    User.
+/**
+ * Get a user and populate it's profile
+ */
+router.get('/:id', function(req, res, next) {
 
-    findById(req.session.user._id).
-    deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
+  User.
 
-    exec(function(err, user) {
+  findById(req.params.id).
+  deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
 
-      if (err) {
+  exec(function(err, user) {
 
-        if (err.name && err.name === 'CastError') {
+    if (err) {
 
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
-
-      } else if (user) {
-
-        res.send(user);
-
+      if (err.name && err.name === 'CastError') {
+        res.sendStatus(400);
       } else {
-        res.sendStatus(404);
+        next(err);
       }
-    });
 
+    } else if (user) {
+
+      res.send(user);
+
+    } else {
+      res.sendStatus(404);
+    }
   });
 
-  /**
-   * Get a user and populate it's profile
-   */
-  router.get('/:id', function(req, res, next) {
-
-    User.
-
-    findById(req.params.id).
-    deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
-
-    exec(function(err, user) {
-
-      if (err) {
-
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
-
-      } else if (user) {
-
-        res.send(user);
-
-      } else {
-        res.sendStatus(404);
-      }
-    });
-
-  });
+});
 
 };

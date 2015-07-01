@@ -33,9 +33,9 @@
         templateUrl: '/templates/groups/members/remove.html'
       }).
 
-      when('/groups/:id/details', {
+      when('/groups/:id/profile', {
         controller: 'Groups:Profile',
-        templateUrl: '/templates/groups/details.html',
+        templateUrl: '/templates/groups/profile.html',
       });
     }
 

@@ -40,7 +40,7 @@
         templateUrl: '/templates/users/profile.html'
       }).
 
-      when('/users/reset/:secret', {
+      when('/users/reset/:token', {
         controller: 'Users:Reset',
         templateUrl: '/templates/users/reset.html'
 

@@ -17,7 +17,7 @@ module.exports = function (router, mongoose) {
                     email: req.session.user.email,
                     profile: {
                       name: req.session.user.profile.name,
-                      gender: req.session.user.profile.gender || req.session.user.profile.gender.name,
+                      gender: req.session.user.profile.gender && req.session.user.profile.gender.name,
                       location: req.session.user.profile.location,
                       birthdate: req.session.user.profile.birthdate
                     }
