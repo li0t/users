@@ -6,6 +6,11 @@
 
     function ($scope, $http, $location, $session) {
 
+      if (!$session.get('user')) {
+
+        $location('/');
+        
+      }
     }
   ]);
 

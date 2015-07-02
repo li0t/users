@@ -1,37 +1,47 @@
-(function (ng) {
+(function(ng) {
   'use strict';
 
   ng.module('App').controller('Groups:Profile', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
-    function ($scope, $http, $location, $session, $routeParams) {
-       $scope.fetchingGroup = null;
-       $scope.group = null;
+    function($scope, $http, $location, $session, $routeParams) {
+      $scope.fetchingEntries = null;
+      $scope.fetchingGroup = null;
+      $scope.entriesLimit = 2;
+      $scope.entries = null;
+      $scope.group = null;
 
+      $scope.fetchGroup = function() {
+        $scope.fetchingGroup = true;
 
+        $http.get('/api/groups/' + $routeParams.id +'/profile').
 
-       $scope.fetchGroup = function () {
-         $scope.fetchingGroup = true;
+        success(function(data) {
+          $scope.group = data;
+          $session.set('group', data);
+        }).
 
-         $http.get('/api/group/' + $routeParams.id).
+        finally(function() {
+          $scope.fetchingGroup = false;
+        });
+      };
 
-         success(function(data){
-           $scope.group = data;
-           $session.set('group', data);
-         }).
+      $scope.fetchEntries = function() {
+        $scope.fetchingEntries = true;
 
-         finally(function(){
-           $scope.fetchingGroup = false;
-         });
-       };
+        $http.get('/api/entries/group/' + $routeParams.id).
 
+        success(function(data) {
+          $scope.entries = data;
+        }).
 
+        finally(function() {
+          $scope.fetchingEntries = false;
+        });
+      };
 
-
-
-       $scope.fetchGroup();
-
-
+      $scope.fetchGroup();
+      $scope.fetchEntries();
 
     }
   ]);

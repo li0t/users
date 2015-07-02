@@ -21,7 +21,7 @@
 
         }).success(function (user) {
           $session.login(user);
-          $location.path('/dashboard');
+          $location.path('/welcome');
           $session.flash('success', 'Account created! Welcome ' + user.name + '!');
 
         }).error(function (data, status) {

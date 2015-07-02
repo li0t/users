@@ -1,0 +1,50 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-users
+      | Grupos
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups')
+      i.fa.fa-mr.fa-users
+      | Volver a Grupos
+          
+  div.panel-body.text-center(ng-show='fetchingGroup && !group')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Recopilando Información
+      
+  div.panel-body.text-center(ng-show='!fetchingGroup && group')
+    h3 {{group.profile.name}}   
+      
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/members')
+      i.fa.fa-mr.fa-users
+      | Miembros
+      
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/tasks')
+      i.fa.fa-mr.fa-tasks
+      | Tareas  
+      
+  div.panel-body.text-center(ng-show='fetchingEntries && !entries')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Buscando Entradas
+  
+  div.panel-body.text-center(ng-show='!fetchingEntries && entries && entries.length')
+    a(ng-href="/group/{{session.group._id}}/entries")
+    h4
+      i.fa.fa-mr.fa-th-large
+      | Últimas Entradas
+      
+  div.panel-body.text-center(ng-show='!fetchingEntries && entries && !entries.length')
+    a(ng-href="/group/{{session.group._id}}/entries")
+    h4 
+      i.fa.fa-mr.fa-th-large
+      | No hay Entradas  
+      
+  div.panel-body(ng-show='!fetchingEntries && entries')
+    div.row
+      div.col-sm-4(ng-repeat='entry in entries | limitTo:entriesLimit ', ng-init='href = ("/groups/" + session.group._id + "/entries/{0}/detail" | format : entry._id)')
+        div.btn.btn-default.btn-block
+          a(ng-href='{{ href }}')
+            h3 {{ entry.title }}

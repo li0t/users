@@ -18,8 +18,18 @@
         templateUrl: '/templates/groups/create.html'
       }).
 
+      when('/groups/:id/tasks', {
+        controller: 'Groups:Tasks',
+        templateUrl: '/templates/groups/tasks/index.html'
+      }).
+
+      when('/groups/:id/tasks/:task/detail', {
+        controller: 'Groups:Tasks:Detail',
+        templateUrl: '/templates/groups/tasks/detail.html'
+      }).
+
       when('/groups/:id/members', {
-        controller: 'Groups:Members:Index',
+        controller: 'Groups:Members',
         templateUrl: '/templates/groups/members/index.html'
       }).
 
@@ -36,6 +46,11 @@
       when('/groups/:id/profile', {
         controller: 'Groups:Profile',
         templateUrl: '/templates/groups/profile.html',
+      }).
+
+      when('/groups/:id/entries/:entry/detail', {
+        controller: 'Groups:Entries',
+        templateUrl: '/templates/groups/entries/detail.html',
       });
     }
 

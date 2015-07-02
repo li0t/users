@@ -304,7 +304,7 @@ module.exports = function(router, mongoose) {
   /**);
    * Change group admin
    */
-  router.get('/:groupId/changeAdmin/:id', function(req, res, next) {
+  router.put('/:groupId/changeAdmin/:id', function(req, res, next) {
 
     var group = req.params.groupId;
     var sessionUser = req.session.user._id;
@@ -448,6 +448,40 @@ module.exports = function(router, mongoose) {
           });
         });
 
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
+  /**
+   * Get a group
+   */
+  router.get('/:id/profile', function(req, res, next) {
+
+    var group = req.params.id;
+    var user = req.session.user._id;
+
+    relations.membership(group, function(relation) {
+
+      if (relation.group) {
+
+        group = relation.group;
+
+        if (relation.isMember(user)) {
+
+          group.deepPopulate('profile admin.profile', function(err, group) {
+            if (err) {
+              return next(err);
+            }
+
+            res.send(group);
+
+          });
+        } else {
+          res.sendStatus(403);
+        }
       } else {
         res.sendStatus(404);
       }

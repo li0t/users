@@ -16,6 +16,11 @@
       when('/entries/create', {
         controller: 'Entries:Create',
         templateUrl: '/templates/entries/create.html'
+      }).
+
+      when('/entries/:id/detail', {
+        controller: 'Entries:Detail',
+        templateUrl: '/templates/entries/detail.html'
       });
     }
 

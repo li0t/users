@@ -9,6 +9,7 @@
      'angularFileUpload',
 
      /** Modules */
+     'Moment',
      'Session',
      'Formatter'
    ]);

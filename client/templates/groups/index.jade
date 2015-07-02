@@ -1,8 +1,13 @@
 div.panel.panel-default
   div.panel-heading
     h3.panel-title
-      i.fa.fa-mr.fa-cubes
+      i.fa.fa-mr.fa-users
       | Grupos
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
+      i.fa.fa-mr.fa-user
+      | Volver     
 
   div.panel-body
     a.btn.btn-block.btn-lg.btn-default(ng-href='/users/create')

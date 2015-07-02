@@ -1,10 +1,10 @@
 (function (ng) {
   'use strict';
 
-  ng.module('App').controller('Group:Members:Index', [
-    '$scope', '$http', '$location', '$session',
+  ng.module('App').controller('Groups:Members', [
+    '$scope', '$http', '$location', '$session', '$routeParams',
 
-    function ($scope, $http, $location, $session) {
+    function ($scope, $http, $location, $session, $routeParams) {
 
       $scope.fetchingMembers = null;
       $scope.members = null;

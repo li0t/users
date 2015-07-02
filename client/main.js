@@ -25,7 +25,7 @@
       $http.get('/api/session').success(function (data) {
         /* Session exists */
         $session.login(data.user);
-        $location.path('/dashboard');
+        $location.path('/welcome');
 
       }).error(function () {
         /* No session */

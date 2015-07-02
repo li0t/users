@@ -5,7 +5,7 @@ CACHE:
 # Templates
 /templates/pages/notfound
 /templates/pages/home
-/templates/pages/dashboard
+/templates/pages/welcome
 /templates/pages/help
 /templates/users/signup
 /templates/users/recover
@@ -43,7 +43,7 @@ CACHE:
 /components/angular/angular.min.js
 
 FALLBACK:
-# This will enable imagename4.png to be as a replacement for 
+# This will enable imagename4.png to be as a replacement for
 # all resources under the images dir when there is no network connectivity.
 /images/ /images/disconnected.png
 

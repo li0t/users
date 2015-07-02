@@ -239,35 +239,59 @@ module.exports = function(router, mongoose) {
    */
   router.get('/:id', function(req, res, next) {
 
+    var user = req.session.user._id;
+    var entry;
+
+    function checkByContact() {
+
+      relations.contact(user, function(relation) {
+
+        if (relation.isContact(entry.user) || JSON.stringify(entry.user) === JSON.stringify(user)) {
+
+          res.send(entry);
+
+        } else {
+
+          debug('User %s and %s are not contacts with each other', entry.user, user);
+          res.sendStatus(403);
+        }
+      });
+
+    }
+
     Entry.
 
     findById(req.params.id).
 
     populate('pictures'). /* Retrieves data from linked schemas */
 
-    exec(function(err, entry) {
-
+    exec(function(err, found) {
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
 
-      } else if (entry) {
+      } else if (found) {
+        entry = found;
 
-        relations.contact(req.session.user._id, function(relation) {
+        if (entry.group) {
 
-          if (relation.isContact(entry.user) || JSON.stringify(entry.user) === JSON.stringify(req.session.user._id)) {
+          relations.membership(entry.group, function(relation) {
 
-            res.send(entry);
+            if (relation.isMember(user)) {
+              res.send(entry);
 
-          } else {
-            debug('User %s and %s are not contacts with each other', entry.user, req.session.user._id);
-            res.sendStatus(403);
-          }
-        });
+            } else {
+              checkByContact();
+
+            }
+          });
+        } else {
+          checkByContact();
+
+        }
       } else {
         res.sendStatus(404);
       }

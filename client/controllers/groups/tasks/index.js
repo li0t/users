@@ -1,15 +1,15 @@
 (function(ng) {
   'use strict';
 
-  ng.module('App').controller('Users:Recover', [
-    '$scope', '$http', '$location', '$session',
+  ng.module('App').controller('Groups:Tasks', [
+    '$scope', '$http', '$location', '$session', '$routeParams',
 
-    function($scope, $http, $location, $session) {
-      
+    function($scope, $http, $location, $session, $routeParams) {
+
       $scope.fetchingTasks = null;
       $scope.tasks = null;
 
-      $scope.fetchTasks = function() {
+      $scope.fetch = function() {
         $scope.fetchingTasks = true;
 
         $http.get('/api/tasks/group/' + $routeParams.id).
@@ -23,7 +23,7 @@
         });
       };
 
-      $scope.fetchTasks();
+      $scope.fetch();
     }
   ]);
 
