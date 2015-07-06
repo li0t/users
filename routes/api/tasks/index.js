@@ -198,9 +198,9 @@ module.exports = function(router, mongoose) {
   /**
    * Set task as completed
    */
-  router.put('/:taskId/complete', function(req, res, next) { /** TODO: implement this change as a date field  */
+  router.put('/:id/complete', function(req, res, next) { /** TODO: implement this change as a date field  */
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -238,7 +238,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -248,9 +248,9 @@ module.exports = function(router, mongoose) {
   /**
    * Set task as deleted
    */
-  router.put('/:taskId/delete', function(req, res, next) {
+  router.put('/:id/delete', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -288,7 +288,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -298,9 +298,9 @@ module.exports = function(router, mongoose) {
   /**
    * Re-open task
    */
-  router.put('/:taskId/re-open', function(req, res, next) { /** TODO: remove completed field if necessary */
+  router.put('/:id/re-open', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -338,7 +338,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -348,9 +348,9 @@ module.exports = function(router, mongoose) {
   /**
    * Edit task objective
    */
-  router.post('/:taskId/objective', function(req, res, next) {
+  router.post('/:id/objective', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -389,7 +389,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -399,9 +399,9 @@ module.exports = function(router, mongoose) {
   /**
    * Edit task priority
    */
-  router.post('/:taskId/priority', function(req, res, next) {
+  router.post('/:id/priority', function(req, res, next) { /** TODO: move static validation to schema */
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
     var priorities = statics.models.priority;
     var priority = null;
@@ -459,7 +459,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -469,9 +469,9 @@ module.exports = function(router, mongoose) {
   /**
    * Set task datetime
    */
-  router.post('/:taskId/dateTime', function(req, res, next) {
+  router.post('/:id/date-time', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
 
     relations.collaboration(task, function(collaboration) {
@@ -515,7 +515,7 @@ module.exports = function(router, mongoose) {
           res.sendStatus(403);
         }
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
@@ -567,7 +567,7 @@ module.exports = function(router, mongoose) {
           }
         });
       } else {
-        debug('Task %s was not found', req.params.taskId);
+        debug('Task %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });

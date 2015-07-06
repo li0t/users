@@ -15,9 +15,9 @@ module.exports = function(router, mongoose) {
   /**
    * Add notes to a task
    */
-  router.post('/:taskId/addNotes', function(req, res, next) {
+  router.post('/:id/add', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
     var notes = req.body.notes;
     var saved = 0;
@@ -78,7 +78,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -91,9 +91,9 @@ module.exports = function(router, mongoose) {
   /**
    * Remove notes from task
    */
-  router.post('/:taskId/removeNotes', function(req, res, next) {
+  router.post('/:id/remove', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var user = req.session.user._id;
     var notes = req.body.notes;
     var removed = 0;
@@ -166,7 +166,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });

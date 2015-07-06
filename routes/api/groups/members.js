@@ -17,7 +17,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get group members
    */
-  router.get('/:groupId/members', function(req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     var members = [];
 
@@ -25,7 +25,7 @@ module.exports = function(router, mongoose) {
 
     findOne().
 
-    where('_id', req.params.groupId).
+    where('_id', req.params.id).
 
     where('members.user', req.session.user._id).
 
@@ -69,10 +69,10 @@ module.exports = function(router, mongoose) {
   /**
    * Add member to a group
    */
-  router.post('/:groupId/addMembers', function(req, res, next) {
+  router.post('/:id/add', function(req, res, next) {
 
     var adder = req.session.user._id;
-    var group = req.params.groupId;
+    var group = req.params.id;
     var members = req.body.members;
     var now = new Date();
     var wasMember;
@@ -144,7 +144,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('No group found with id %s', req.params.groupId);
+          debug('No group found with id %s', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -157,13 +157,13 @@ module.exports = function(router, mongoose) {
   /**
    * Remove member from group
    */
-  router.post('/:groupId/removeMembers', function(req, res, next) {
+  router.post('/:id/remove', function(req, res, next) {
 
     var toRemove, removed = 0;
     var lostAdmin = false;
     var i;
     var remover = req.session.user._id;
-    var group = req.params.groupId;
+    var group = req.params.id;
     var now = new Date();
     var members = req.body.members;
 
@@ -206,7 +206,7 @@ module.exports = function(router, mongoose) {
                   debug('User %s does not have enough privileges in group %s', remover.member, group._id);
                 }
               } else {
-                debug('No user with id %s found in group %s', member, req.params.groupId);
+                debug('No user with id %s found in group %s', member, req.params.id);
               }
             });
 
@@ -245,7 +245,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('No group found with id %s', req.params.groupId);
+          debug('No group found with id %s', req.params.id);
           res.sendStatus(404);
         }
       });

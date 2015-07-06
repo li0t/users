@@ -2,12 +2,12 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
-  debug = require('debug')('app:api:entries');
+var _ = require('underscore');
+var debug = require('debug')('app:api:entries');
 
-var relations = component('relations'),
-  statics = component('statics'),
-  gridfs = component('gridfs');
+var relations = component('relations');
+var statics = component('statics');
+var gridfs = component('gridfs');
 
 module.exports = function(router, mongoose) {
 

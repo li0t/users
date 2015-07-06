@@ -3,7 +3,7 @@
 'use strict';
 
 var _ = require('underscore');
-var debug = require('debug')('app:api:tasks:entries');
+var debug = require('debug')('app:api:entries:tasks');
 
 var relations = component('relations');
 var statics = component('statics');
@@ -18,7 +18,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add entries to a task
    */
-  router.post('/task/:id/entries/add', function(req, res, next) { /** TODO: prevent duplicated entries */
+  router.post('/:id/add', function(req, res, next) { /** TODO: prevent duplicated entries */
 
     var now = new Date();
     var i;
@@ -163,7 +163,7 @@ module.exports = function(router, mongoose) {
   /**
    * Remove entries from task
    */
-  router.post('/task/:id/entries/remove', function(req, res, next) {
+  router.post('/:id/remove', function(req, res, next) {
 
     var remover = req.session.user._id;
     var task = req.params.id;
@@ -242,7 +242,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get task entries
    */
-  router.get('/task/:id/entries', function(req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     var user = req.session.user._id;
 

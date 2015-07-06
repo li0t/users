@@ -19,9 +19,9 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new user and invite it to emeeter
    */
-  router.get('/createAndInvite/:email', function(req, res, next) {
+  router.post('/create', function(req, res, next) {
 
-    var email = req.params.email;
+    var email = req.body.email;
 
     if (email) {
 
@@ -97,7 +97,7 @@ module.exports = function(router, mongoose) {
   /**
    * Activation of invited user that already validated token
    */
-  router.post('/invited/signin/:token', function(req, res, next) {
+  router.post('/validate/:token', function(req, res, next) {
 
     var token = req.session.token;
     var password = req.body.password;

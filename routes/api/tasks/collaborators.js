@@ -15,7 +15,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get tasks where session user is collaborator
    */
-  router.get('/collaborator', function(req, res, next) {
+  router.get('/me', function(req, res, next) {
 
     var user = req.session.user._id;
     var tasks = [];
@@ -75,9 +75,9 @@ module.exports = function(router, mongoose) {
   /**
    * Add collaborators to a task
    */
-  router.post('/:taskId/addCollaborators', function(req, res, next) {
+  router.post('/:id/add', function(req, res, next) {
 
-    var task = req.params.taskId;
+    var task = req.params.id;
     var inviter = req.session.user._id;
     var collaborators = req.body.collaborators;
     var saved = 0;
@@ -156,7 +156,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(403);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(404);
         }
       });
@@ -169,11 +169,11 @@ module.exports = function(router, mongoose) {
   /**
    * Remove collaborators from task
    */
-  router.post('/:taskId/removeCollaborators', function(req, res, next) {
+  router.post('/:id/remove', function(req, res, next) {
 
     var removed = 0;
     var remover = req.session.user._id;
-    var task = req.params.taskId;
+    var task = req.params.id;
     var collaborators = req.body.collaborators;
     var collaborator;
     var now = new Date();
@@ -234,7 +234,7 @@ module.exports = function(router, mongoose) {
             res.sendStatus(404);
           }
         } else {
-          debug('Task %s was not found', req.params.taskId);
+          debug('Task %s was not found', req.params.id);
           res.sendStatus(403);
         }
       });

@@ -2,12 +2,12 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
-  debug = require('debug')('app:api:groups:entries');
+var _ = require('underscore');
+var debug = require('debug')('app:api:entries:groups');
 
-var relations = component('relations'),
-  statics = component('statics'),
-  gridfs = component('gridfs');
+var relations = component('relations');
+var statics = component('statics');
+var gridfs = component('gridfs');
 
 module.exports = function(router, mongoose) {
 
@@ -143,7 +143,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of a group
    */
-  router.get('/group/:id/entries', function(req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     var user = req.session.user._id;
     var group = req.params.id;
@@ -190,7 +190,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries with files of a group
    */
-  router.get('/group/:id/entries-with-files', function(req, res, next) {
+  router.get('/:id/with-files', function(req, res, next) {
 
     var user = req.session.user._id;
     var group = req.params.id;

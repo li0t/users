@@ -243,7 +243,7 @@ module.exports = function(router, mongoose) {
   /**
    * Changes user password
    */
-  router.put('/changePassword', function(req, res, next) {
+  router.put('/change-password', function(req, res, next) {
 
     var oldPassword = req.body.oldPassword;
     var newPassword = req.body.newPassword;

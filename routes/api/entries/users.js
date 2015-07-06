@@ -2,12 +2,12 @@
 /* global component */
 'use strict';
 
-var _ = require('underscore'),
-  debug = require('debug')('app:api:users:entries');
+var _ = require('underscore');
+var debug = require('debug')('app:api:entries:users:');
 
-var relations = component('relations'),
-  statics = component('statics'),
-  gridfs = component('gridfs');
+var relations = component('relations');
+var statics = component('statics');
+var gridfs = component('gridfs');
 
 module.exports = function(router, mongoose) {
 
@@ -18,7 +18,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of an user
    */
-  router.get('/user/:id/entries', function(req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     var user = req.params.id;
 
@@ -63,7 +63,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries with files of an user
    */
-  router.get('/user/:id/entries-with-files', function(req, res, next) {
+  router.get('/:id/with-files', function(req, res, next) {
 
     var user = req.params.id;
 

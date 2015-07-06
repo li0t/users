@@ -112,14 +112,14 @@ module.exports = function(router, mongoose) {
 
   });
 
-  /**);
+  /**
    * Change group admin
    */
-  router.put('/:groupId/changeAdmin/:id', function(req, res, next) {
+  router.put('/:id/change-admin', function(req, res, next) {
 
-    var group = req.params.groupId;
+    var group = req.params.id;
     var sessionUser = req.session.user._id;
-    var user = req.params.id;
+    var user = req.body.id;
 
     relations.membership(group, function(membership) {
 
@@ -145,14 +145,14 @@ module.exports = function(router, mongoose) {
               }
             });
           } else {
-            debug('No user with id %s found in group %s', req.params.id, req.params.groupId);
+            debug('No user with id %s found in group %s', req.body.id, req.params.id);
             res.sendStatus(400);
           }
         } else {
           res.sendStatus(403);
         }
       } else {
-        debug('No group found with id %s', req.params.groupId);
+        debug('No group found with id %s', req.params.id);
         res.sendStatus(404);
       }
     });

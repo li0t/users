@@ -29,7 +29,7 @@
       $scope.fetchEntries = function() {
         $scope.fetchingEntries = true;
 
-        $http.get('/api/entries/group/' + $routeParams.id).
+        $http.get('/api/groups/entries/'  + $routeParams.id ).
 
         success(function(data) {
           $scope.entries = data;
