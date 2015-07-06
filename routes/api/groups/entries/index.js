@@ -3,7 +3,7 @@
 'use strict';
 
 var _ = require('underscore'),
-  debug = require('debug')('app:api:entries');
+  debug = require('debug')('app:api:groups:entries');
 
 var relations = component('relations'),
   statics = component('statics'),
@@ -18,7 +18,7 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new entry
    */
-  router.post('/create', function(req, res, next) { /** TODO: always create without group */
+  router.post('/create', function(req, res, next) { /** TODO: always create to group */
 
     var entry; /* This is the target schema */
     var group = req.body.group || null;
@@ -141,93 +141,46 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Upload pictures to an entry
+   * Get entries of a group
    */
-  router.post('/:id/pictures', function(req, res, next) {
+  router.get('/group/:id/entries', function(req, res, next) {
 
-    var entry; /* This is the target schema */
-    var picturesSaved = 0;
+    var user = req.session.user._id;
+    var group = req.params.id;
 
-    /**
-     * Save the document
-     */
-    function saveEntry() {
-      entry.save(function(err, entry) {
-        if (err) {
-          next(err);
+    relations.membership(group, function(relation) {
+
+      if (relation.group) {
+
+        if (relation.isMember(user)) {
+
+          Entry.
+
+          find().
+
+          where('group', group).
+
+          populate('pictures'). /* Retrieves data from linked schemas */
+
+          sort('-created').
+
+          exec(function(err, entries) {
+
+            if (err) {
+              next(err);
+
+            } else {
+
+              res.send(entries);
+
+            }
+          });
         } else {
-          debug('%s pictures saved to entry %s', picturesSaved, entry._id);
-          res.send(picturesSaved + ' pictures save to entry ' + entry._id);
-        }
-      });
-    }
-
-    /**
-     * Save pictures with gridfs and store de ids
-     */
-    function savePictures() {
-
-      function onclose(fsFile) {
-        debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
-
-        entry.pictures.push(fsFile._id);
-
-        picturesSaved += 1;
-
-        /* Check if all pictures were streamed to the database */
-        if (picturesSaved === req.files.length) {
-          debug('All files saved');
-          saveEntry();
-        }
-      }
-
-      function onerror(err) {
-        debug('Error streaming file!');
-        next(err);
-      }
-
-      req.files.forEach(function(file) {
-        debug('Saving %s', file.filename);
-
-        var writestream = gridfs.save(file.data, {
-          content_type: file.mimetype,
-          filename: file.filename,
-          mode: 'w'
-        });
-        writestream.on('close', onclose); /* The stream has finished */
-        writestream.on('error', onerror); /* Oops! */
-      });
-    }
-
-    Entry.
-    findOne().
-    where('_id', req.params.id).
-    exec(function(err, data) {
-      if (err) {
-
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
-
-      } else if (data) {
-
-        entry = data;
-
-        if (JSON.stringify(entry.user) === JSON.stringify(req.session.user._id)) {
-
-          if (req.files && req.files.length) { /* If there are any files, save them */
-            savePictures();
-          } else { /* If not, just save the document */
-            saveEntry();
-          }
-
-        } else {
+          debug('User %s is not part of group %s', req.session.user._id, group);
           res.sendStatus(403);
         }
       } else {
-        debug('Entry %s was not found', req.params.id);
+        debug('Group  %s was not found', group);
         res.sendStatus(404);
       }
     });
@@ -235,64 +188,48 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get an entry
+   * Get entries with files of a group
    */
-  router.get('/:id', function(req, res, next) {
+  router.get('/group/:id/entries-with-files', function(req, res, next) {
 
     var user = req.session.user._id;
-    var entry;
+    var group = req.params.id;
 
-    function checkByContact() {
+    relations.membership(group, function(relation) {
 
-      relations.contact(user, function(relation) {
+      if (relation.group) {
 
-        if (relation.isContact(entry.user) || JSON.stringify(entry.user) === JSON.stringify(user)) {
+        if (relation.isMember(user)) {
 
-          res.send(entry);
+          Entry.
 
-        } else {
+          find({
+            $where: 'this.pictures.length > 0'
+          }).
 
-          debug('User %s and %s are not contacts with each other', entry.user, user);
-          res.sendStatus(403);
-        }
-      });
+          where('group', group).
 
-    }
+          populate('pictures'). /* Retrieves data from linked schemas */
 
-    Entry.
+          sort('-created').
 
-    findById(req.params.id).
+          exec(function(err, entries) {
 
-    populate('pictures'). /* Retrieves data from linked schemas */
-
-    exec(function(err, found) {
-      if (err) {
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
-
-      } else if (found) {
-        entry = found;
-
-        if (entry.group) {
-
-          relations.membership(entry.group, function(relation) {
-
-            if (relation.isMember(user)) {
-              res.send(entry);
+            if (err) {
+              next(err);
 
             } else {
-              checkByContact();
+
+              res.send(entries);
 
             }
           });
         } else {
-          checkByContact();
-
+          debug('User %s is not part of group %s', req.session.user._id, group);
+          res.sendStatus(403);
         }
       } else {
+        debug('Group  %s was not found', group);
         res.sendStatus(404);
       }
     });

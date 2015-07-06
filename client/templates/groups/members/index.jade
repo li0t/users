@@ -22,6 +22,6 @@ div.panel.panel-default
       div.col-sm-4(ng-repeat='member in members', ng-init='href = ("/users/{0}/profile" | format : member._id)')
         div.btn.btn-default.btn-block
           a(ng-href='{{ href }}')
-            h4 {{ member.user.email }}  
+            h4 {{ member.user.profile.name || member.user.email }}  
           
     

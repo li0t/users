@@ -57,7 +57,7 @@ div.panel.panel-default
 
         td
           a(ng-href='{{ href }}')
-            | {{ group.admin.profile.name }}
+            | {{ group.admin.profile.name || group.admin.email }}
 
         td
           a(ng-href='{{ href }}')

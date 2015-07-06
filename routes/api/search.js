@@ -8,7 +8,7 @@ var debug = require('debug')('app:api:search');
 
 var statics = component('statics');
 
-module.exports = function(router, mongoose) { /** TODO: Validate if user is active*/
+module.exports = function(router, mongoose) { 
 
   var User = mongoose.model('user');
   var Contact = mongoose.model('contact');

@@ -4,9 +4,7 @@
 
 //var debug = require('debug')('app:api:tags');
 
-
-
-module.exports = function (router, mongoose) { /** TODO: Validate if user is active*/
+module.exports = function (router, mongoose) { 
 
   var Tag = mongoose.model('tag');
 

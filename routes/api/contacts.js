@@ -220,7 +220,7 @@ module.exports = function(router, mongoose) {
   /**
    * Delete a contact
    */
-  router.get('/delete/:id', function(req, res, next) { /** TODO: Delete contact request tokens */
+  router.get('/delete/:id', function(req, res, next) {
 
     var sender = null;
     var receiver = null;

@@ -17,7 +17,7 @@ module.exports = function(router, mongoose) {
   (function connectToMandrill() {
     try {
       api = new Mandrill(apiKey);
-      debug('Mandrill API initialiced');
+      debug('Mandrill API initialized');
     } catch (err) {
       debug('Error! : %s', err);
     }
