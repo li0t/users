@@ -12,7 +12,7 @@
       $scope.fetchMembers = function() {
         $scope.fetchingMembers = true;
 
-        $http.get('/api/groups/' + $routeParams.id + '/members').
+        $http.get('/api/groups/members/' + $routeParams.id).
 
         success(function(data){
           $scope.members = data;
