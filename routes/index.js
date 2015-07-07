@@ -10,7 +10,7 @@ module.exports = function(router) {
    */
   router.get([
 
-    '/', '/welcome',
+    '/', '/welcome', '/profile',
 
     /* Users */
     '/users', '/users/:id/profile', '/users/signup', '/users/signin', '/users/recover', '/users/reset/:token',
@@ -23,13 +23,13 @@ module.exports = function(router) {
     '/groups/:id/tasks/add', '/groups/:id/tasks/remove/:task',
 
     /* Entries */
-    '/entries', '/entries/add', '/entries/remove',
+    '/entries', '/entries/add', '/entries/remove', '/entries/:id/detail',
 
     /* Tasks */
-    '/tasks', '/tasks/add', '/tasks/remove',
+    '/tasks', '/tasks/add', '/tasks/remove', '/tasks/:id/detail',
 
     /* Contacts */
-    '/contacts', '/contacts/add', '/contacts/remove',
+    '/contacts', '/contacts/add/:id', '/contacts/remove/:id',
 
   ], function(req, res) {
 

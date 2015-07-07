@@ -1,23 +1,28 @@
 div.panel.panel-default
   div.panel-heading
     h3.panel-title
-      i.fa.fa-mr.fa-cubes
-      | Grupos
+      i.fa.fa-mr.fa-th-large
+      | Entradas
       
   div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/agreements/create')
-      i.fa.fa-mr.fa-users
-      | Volver al grupo
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
+      i.fa.fa-mr.fa-user
+      | Volver
           
-  div.panel-body.text-center(ng-show='fetchingGroup && !group')
+  div.panel-body.text-center(ng-show='fetching && !entries')
     h4
       i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
+      | Buscando entradas
       
-  div.panel-body.text-center(ng-show='fetchingEntries && !entries')
+  div.panel-body.text-center(ng-show='!fetching && !entries.length')
     h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Buscando Entradas 
+      i.fa.fa-mr.fa-th-large
+      | No hay Entradas     
+      
+  div.panel-body.text-center(ng-show='!fetching && entries.length')
+    h4
+      i.fa.fa-mr.fa-th-large
+      | Entradas 
 
   div.panel-body(ng-show='!fetchingEntries && entries')
     div.row
@@ -25,4 +30,3 @@ div.panel.panel-default
         div.btn.btn-default.btn-block
           a(ng-href='{{ href }}')
             h3 {{ entry.title }}
-            p {{ agreement.specialty.name }}

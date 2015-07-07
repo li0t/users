@@ -6,15 +6,15 @@ div.panel.panel-default
       
   div.panel-body
     a.btn.btn-block.btn-lg.btn-default(ng-href='/tasks')
-      i.fa.fa-mr.fa-users
+      i.fa.fa-mr.fa-tasks
       | Volver a las tareas 
           
-  div.panel-body.text-center(ng-show='fetchingTask && !task')
+  div.panel-body.text-center(ng-show='fetching && !task')
     h4
       i.fa.fa-mr.fa-circle-o-notch.fa-spin
       | Recopilando Información
       
-  div.panel-body.text-center(ng-show='!fetchingTask && task')
+  div.panel-body.text-center(ng-show='!fetching && task')
     h4 {{ task.completed && "Completada" || "Abierta"}}
     h3 {{ task.objective }}
     

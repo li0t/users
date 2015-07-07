@@ -2,12 +2,12 @@ div.panel.panel-default
   div.panel-heading
     h3.panel-title
       i.fa.fa-mr.fa-th-large
-      | Entradas del grupo
+      | Entradas 
       
   div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
-      i.fa.fa-mr.fa-users
-      | Volver al grupo
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/entries')
+      i.fa.fa-mr.fa-user
+      | Volver 
           
   div.panel-body.text-center(ng-show='fetching && !entry')
     h4
@@ -26,5 +26,5 @@ div.panel.panel-default
         p {{ tag }}
               
     div.row
-      div.col-sm-4(ng-repeat='picture in entry.pictures', ng-show='entry.pictures.length', ng-init='href = ("/api/files/{0}" | format : picture._id)')
+      div.col-sm-4(ng-show='entry.pictures.length', ng-repeat='picture in entry.pictures', ng-show='entry.pictures.length', ng-init='href = ("/api/files/{0}" | format : picture._id)')
         img(src='{{ href }}', style="max-heigth: 200px; max-width:200px;")

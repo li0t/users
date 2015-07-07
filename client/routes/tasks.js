@@ -9,18 +9,18 @@
       $routeProvider.
 
       when('/tasks', {
-        controller: 'Task:Index',
+        controller: 'Tasks:Index',
         templateUrl: '/templates/tasks/index.html'
       }).
 
       when('/tasks/create', {
-        controller: 'Task:Create',
+        controller: 'Tasks:Create',
         templateUrl: '/templates/tasks/create.html'
       }).
 
-      when('/tasks/:id/close', {
-        controller: 'Task:Close',
-        templateUrl: '/templates/tasks/close.html'
+      when('/tasks/:id/detail', {
+        controller: 'Tasks:Detail',
+        templateUrl: '/templates/tasks/detail.html'
       });
 
     }

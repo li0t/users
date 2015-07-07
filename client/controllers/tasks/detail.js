@@ -1,22 +1,26 @@
 (function(ng) {
   'use strict';
 
-  ng.module('App').controller('Groups:Entries', [
+  ng.module('App').controller('Tasks:Detail', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
 
       $scope.fetching = null;
-      $scope.entry = null;
+      $scope.task = null;
 
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/entries/' + $routeParams.entry).
+        $http.get('/api/tasks/' + $routeParams.id).
 
         success(function(data) {
-          $scope.entry = data;
-          console.log(JSON.stringify(data));
+          $scope.task = data;
+        }).
+
+        error(function(data) {
+          $location('/tasks');
+          $session.flash('danger', data);
         }).
 
         finally(function() {
@@ -24,7 +28,12 @@
         });
       };
 
+      $scope.close = function() {
+
+      };
+
       $scope.fetch();
+
     }
   ]);
 
