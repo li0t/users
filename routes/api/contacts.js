@@ -17,7 +17,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add contact
    */
-  router.get('/add/:id', function(req, res, next) {
+  router.post('/:id', function(req, res, next) {
 
     var sender = null;
     var receiver = null;
@@ -88,11 +88,11 @@ module.exports = function(router, mongoose) {
               });
             } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'active')._id)) { /** The contact state is Active */
 
-              res.send('You are already contacts!');
+              res.status(409).send('You are already contacts!');
 
             } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'pending')._id)) { /** The contact state is Pending */
 
-              res.send('Waiting for confirmation!');
+              res.status(409).send('Waiting for confirmation!');
 
             } else { /** The users were contacts, but in some point one of them disabled the relation */
 
@@ -134,7 +134,7 @@ module.exports = function(router, mongoose) {
   /**
    *  Confirm request
    */
-  router.get('/confirm/:token', function(req, res, next) {
+  router.put('/confirm/:token', function(req, res, next) {
 
     var sender = null;
     var receiver = null;
@@ -220,7 +220,7 @@ module.exports = function(router, mongoose) {
   /**
    * Delete a contact
    */
-  router.get('/delete/:id', function(req, res, next) {
+  router.delete('/:id', function(req, res, next) {
 
     var sender = null;
     var receiver = null;
@@ -362,7 +362,7 @@ module.exports = function(router, mongoose) {
 
     where('user', sessionUser).
 
-    deepPopulate('contacts.user').
+    deepPopulate('contacts.user.profile').
 
     exec(function(err, found) {
 
@@ -431,7 +431,7 @@ module.exports = function(router, mongoose) {
 
     where('user', req.session.user._id).
 
-    deepPopulate('contacts.user').
+    deepPopulate('contacts.user.profile').
 
     exec(function(err, found) {
 
