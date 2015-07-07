@@ -1,5 +1,3 @@
-/* global angular */
-
 (function (ng) {
   'use strict';
 
@@ -10,7 +8,7 @@
 
       $scope.signout = function () {
         $http.get('/api/users/signout').success(function () {
-          $session.flash('success', 'See you soon ' + $session.user('name') + '!');
+          $session.flash('success', 'See you soon ' + $session.user('email') + '!');
           $session.logout();
           $location.path('/');
 

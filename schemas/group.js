@@ -54,6 +54,10 @@ module.exports = function (Schema) {
         select : 'email profile'
       },
 
+      'admin.profile' : {
+        select : 'name birthdate gender location'
+      },
+
       'members' : {
         select : 'email profile'
       },

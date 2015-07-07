@@ -1,0 +1,27 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-users
+      | Grupos
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
+      i.fa.fa-mr.fa-users
+      | Volver al grupo
+        
+  div.panel-body.text-center(ng-show='fetchingMembers && !members')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Buscando Miembros  
+      
+  div.panel-body.text-center(ng-show='!fetchingMembers && members')
+    h3 Miembros del grupo 
+  
+  div.panel-body(ng-show='!fetchingMembers && members')
+    div.row
+      div.col-sm-4(ng-repeat='member in members', ng-init='href = ("/users/{0}/profile" | format : member._id)')
+        div.btn.btn-default.btn-block
+          a(ng-href='{{ href }}')
+            h4 {{ member.user.profile.name || member.user.email }}  
+          
+    

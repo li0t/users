@@ -1,0 +1,77 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-user-plus
+      | Contactos
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
+      i.fa.fa-mr.fa-user
+      | Volver
+      
+  div.form-group(ng-show='!fetchingContacts && contacts')
+    div.input-group
+      span.input-group-addon
+        i.fa.fa-at.fa-fw
+
+      input.form-control(
+        placeholder='Busca un Contacto',
+        ng-model='searchContact',
+        ng-change='resetFound()')
+  
+          
+  div.panel-body.text-center(ng-show='fetchingContacts && !contacts && fetchingPending && !pendings')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Buscando Contactos
+    
+  div.panel-body.text-center(ng-show='!fetchingPending && pendings.length')
+    h4
+      i.fa.fa-mr.fa-plus-circle
+      | Solicitudes de contacto
+              
+  div.panel-body(ng-show='!fetchingPending && pendings')
+    div.row
+      div.col-sm-4(ng-repeat='pending in pendings', ng-init='confirm = ("/contacts/confirm/{0}" | format : pending.token); reject = ("/contacts/reject/{0}" | format : pending._id)')
+        p {{ pending.profile.name || pending.email }}
+        div.btn.btn-default.btn-block
+          a(ng-href='{{ confirm }}')
+            p Confirmar
+        div.btn.btn-default.btn-block
+          a(ng-href='{{ reject }}')
+            p Rechazar        
+
+  div.panel-body.text-center(ng-show='!fetchingContacts && contacts')
+    div.row
+      i.fa.fa-mr.fa-circle-thin
+      | {{ contacts.length && "Contactos" || "No hay Contactos" }}
+
+  div.panel-body.text-center(ng-show='!fetchingContacts && contacts')
+    div.row
+      div.col-sm-4(ng-repeat='contact in filteredContacts = (contacts | filter: searchContact)', ng-init='href = ("/users/{0}/detail" | format : contact._id); delete = ("/contacts/delete/{0}" | format : contact._id)')
+        div.btn.btn-default.btn-block
+          a(ng-href='{{ href }}')
+            p {{ contact.profile.name || contact.email }}
+          a(ng-href='{{ delete }}')
+            i.fa.fa-mr.fa-times
+              p Eliminar
+  
+  div.panel-body.text-center(ng-show='!fetchingContacts && searchContact.length && !filteredContacts.length')
+    div.row
+      div.btn.btn-default.btn-block(ng-click='search()')
+        p Buscar en eMeeter
+        
+  div.panel-body.text-center(ng-show='foundUser')
+    div.row
+      div.btn.btn-default.btn-block(ng-click='search()')
+        p {{ foundUser.email }}
+        a(ng-href='/contacts/add/{{foundUser._id}}')
+          i.fa.fa-mr.fa-plus
+            p Agregar
+            
+  div.panel-body.text-center(ng-show='foundPendingUser')
+    div.row
+      div.btn.btn-default.btn-block
+        p {{ foundPendingUser.email }}
+        i.fa.fa-mr.fa-clock-o
+        p Esperando confirmación         

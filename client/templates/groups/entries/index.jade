@@ -1,0 +1,22 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-th-large
+      | Entradas del grupo
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
+      i.fa.fa-mr.fa-users
+      | Volver al grupo
+          
+  div.panel-body.text-center(ng-show='fetchingGroup && !group')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Recopilando Información
+      
+  div.panel-body.text-center(ng-show='fetchingEntries && !entries')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Buscando Entradas
+      
+  

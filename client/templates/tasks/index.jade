@@ -1,0 +1,72 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-tasks
+      | Tareas
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
+      i.fa.fa-mr.fa-user
+      | Volver 
+      
+  div.panel-body.text-center(ng-show='fetchingTasks && !tasks')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Buscando Tareas
+      
+  div.panel-body.text-center(ng-show='!fetchingTasks && tasks && !tasks.length')
+    h4 No hay Tareas     
+            
+  div.table-responsive(ng-show='!fetchingTasks && tasks && tasks.length')
+    table.table.table-hover
+      thead
+        tr
+          th
+            button.btn.btn-block.btn-default
+              i.fa.fa-mr.fa-fw.fa-dashcube
+              | Ojectivo
+
+          th
+            button.btn.btn-block.btn-default
+              i.fa.fa-at.fa-exclamation-circle
+              | Prioridad
+
+          th
+            button.btn.btn-block.btn-default
+              i.fa.fa-mr.fa-fw.fa-calendar
+              | Fecha de Creación
+
+          th
+            button.btn.btn-block.btn-default
+              i.fa.fa-mr.fa-fw.fa-calendar
+              | Fecha de Entrega
+              
+          th
+            button.btn.btn-block.btn-default
+              i.fa.fa-mr.fa-fw.fa-users
+              | Colaboradores    
+          
+      tbody
+        tr(
+          ng-repeat='task in tasks',
+          ng-init='href = ("/tasks/{0}/detail" | format : task._id)')
+
+          td
+            a(ng-href='{{ href }}')
+              | {{ task.objective }}
+
+          td
+            a(ng-href='{{ href }}')
+              | {{ task.priority.name }}
+
+          td
+            a(ng-href='{{ href }}')
+              | {{ task.created }}
+
+          td
+            a(ng-href='{{ href }}')
+              | {{ task.dateTime  || "No definida" }}
+              
+          td
+            a(ng-href='{{ href }}')
+              | {{ task.collaborators.length }}

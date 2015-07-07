@@ -1,9 +1,7 @@
-/* global angular */
-
 (function (ng) {
   'use strict';
 
-  ng.module('App').controller('Users:SignIn', [
+  ng.module('App').controller('Users:Signin', [
     '$scope', '$http', '$location', '$session',
 
     function ($scope, $http, $location, $session) {
@@ -20,15 +18,15 @@
 
         }).success(function (user) {
           $session.login(user);
-          $location.path('/dashboard');
-          $session.flash('success', 'Welcome back ' + user.name + '!');
+          $location.path('/users/' + user._id + '/profile');
+          $session.flash('success', 'Welcome back ' + user.email + '!');
 
         }).error(function () {
           $session.flash('danger', 'Wrong email or password');
 
         }).finally(function () {
           $scope.submitting = false;
-        });
+        }); 
 
       };
     }

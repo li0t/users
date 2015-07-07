@@ -14,10 +14,14 @@
       }).when('/help', {
         controller: 'Pages:Help',
         templateUrl: '/templates/pages/help.html'
+        
+      }).when('/profile', {
+        controller: 'Users:Profile',
+        templateUrl: '/templates/users/profile.html'
 
-      }).when('/dashboard', {
+      }).when('/welcome', {
         controller: 'Pages:Dashboard',
-        templateUrl: '/templates/pages/dashboard.html'
+        templateUrl: '/templates/pages/welcome.html'
 
       });
 

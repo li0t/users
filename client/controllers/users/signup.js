@@ -1,9 +1,7 @@
-/* global angular */
-
 (function (ng) {
   'use strict';
 
-  ng.module('App').controller('Users:SignUp', [
+  ng.module('App').controller('Users:Signup', [
     '$scope', '$http', '$location', '$session', 'statics',
 
     function ($scope, $http, $location, $session, statics) {
@@ -23,7 +21,7 @@
 
         }).success(function (user) {
           $session.login(user);
-          $location.path('/dashboard');
+          $location.path('/welcome');
           $session.flash('success', 'Account created! Welcome ' + user.name + '!');
 
         }).error(function (data, status) {

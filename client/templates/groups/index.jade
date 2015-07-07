@@ -1,0 +1,64 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-users
+      | Grupos
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
+      i.fa.fa-mr.fa-user
+      | Volver     
+
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/users/create')
+      i.fa.fa-mr.fa-plus
+      | Crear grupo
+      
+  div.panel-body.text-center(ng-show='fetching')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Buscando grupos
+          
+  table.table.table-hover(ng-show='!fetching && groups')
+    thead
+      tr
+        th
+          button.btn.btn-block.btn-default
+            i.fa.fa-mr.fa-fw.fa-user
+            | Nombre
+
+        th
+          button.btn.btn-block.btn-default
+            i.fa.fa-at.fa-fw
+            | Cantidad de Miembros
+
+        th
+          button.btn.btn-block.btn-default
+            i.fa.fa-mr.fa-fw.fa-stethoscope
+            | Administrador
+
+        th
+          button.btn.btn-block.btn-default
+            i.fa.fa-mr.fa-fw.fa-calendar
+            | Fecha de Creación
+
+    tbody
+      tr(
+        ng-repeat='group in groups',
+        ng-init='href = ("/groups/{0}/profile" | format : group._id)')
+
+        td
+          a(ng-href='{{ href }}')
+            | {{ group.profile.name }}
+
+        td
+          a(ng-href='{{ href }}')
+            | {{ group.members.length }}
+
+        td
+          a(ng-href='{{ href }}')
+            | {{ group.admin.profile.name || group.admin.email }}
+
+        td
+          a(ng-href='{{ href }}')
+            | {{ group.created }}

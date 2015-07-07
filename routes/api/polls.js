@@ -24,7 +24,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Answer a poll
    */
-  router.post('/:pollId/answer', function(req, res, next) {
+  router.post('/:id/answer', function(req, res, next) {
 
     /** TODO */
 
@@ -42,7 +42,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Add collaborators to a poll
    */
-  router.post('/:pollId/addCollaborators', function(req, res, next) {
+  router.post('/:id/addCollaborators', function(req, res, next) {
 
     /** TODO */
 
@@ -51,7 +51,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Remove collaborators from poll
    */
-  router.post('/:pollId/removeCollaborators', function(req, res, next) {
+  router.post('/:id/removeCollaborators', function(req, res, next) {
 
     /** TODO */
 
@@ -60,7 +60,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Set poll as completed
    */
-  router.get('/:pollId/complete', function(req, res, next) {
+  router.get('/:id/complete', function(req, res, next) {
 
     /** TODO */
 
@@ -69,7 +69,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Delete poll
    */
-  router.get('/:pollId/delete', function(req, res, next) {
+  router.get('/:id/delete', function(req, res, next) {
 
     /** TODO */
 
@@ -78,7 +78,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Re-open poll
    */
-  router.get('/:pollId/reOpen', function(req, res, next) {
+  router.get('/:id/reOpen', function(req, res, next) {
 
     /** TODO */
 
@@ -88,7 +88,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Edit poll basic data
    */
-  router.post('/:pollId', function(req, res, next) {
+  router.post('/:id', function(req, res, next) {
 
     /** TODO */
 
@@ -97,7 +97,7 @@ module.exports = function (router, mongoose) { /** TODO: Implement link to meeti
   /**
    * Get poll
    */
-  router.get('/:pollId', function(req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     /** TODO */
 

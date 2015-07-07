@@ -15,12 +15,12 @@ module.exports = {
     return null;
   },
 
-  paths: [
-    {
+  paths: [ /** TODO: define */
+    /*{
       method: 'DELETE',
       route: '*',
       allows: 'admin'
-    },
+    },*/
     {
       method: ['GET', 'POST', 'PUT'],
       route: '/api/workplaces*',
@@ -33,6 +33,11 @@ module.exports = {
         /*'/api/files*',*/ '/api/patients*', '/api/sics*'
       ],
       allows: 'user workplace'
+    },
+    {
+      method: ['GET', 'POST', 'PUT', 'DELETE'],
+      route: '/api/contacts*',
+      allows: ['user']
     }
   ]
 

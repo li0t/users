@@ -1,0 +1,30 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-th-large
+      | Entradas del grupo
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
+      i.fa.fa-mr.fa-users
+      | Volver al grupo
+          
+  div.panel-body.text-center(ng-show='fetchingEntry && !entry')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Recopilando Información
+      
+  div.panel-body.text-center(ng-show='!fetchingEntry && entry')
+    h3 {{entry.title}}
+    p {{entry.content}}
+    
+    div.row(ng-show='entry.tags.length')
+      p Tags:
+    
+    div.row
+      div.col-sm-4(ng-repeat='tag in entry.tags', ng-show='entry.tags.length')
+        p {{ tag }}
+              
+    div.row
+      div.col-sm-4(ng-repeat='picture in entry.pictures', ng-show='entry.pictures.length', ng-init='href = ("/api/files/{0}" | format : picture._id)')
+        img(src='{{ href }}', style="max-heigth: 200px; max-width:200px;")
