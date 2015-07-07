@@ -1,0 +1,41 @@
+div.panel.panel-default
+  div.panel-heading
+    h3.panel-title
+      i.fa.fa-mr.fa-th-tasks
+      | Tareas 
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/tasks')
+      i.fa.fa-mr.fa-users
+      | Volver a las tareas 
+          
+  div.panel-body.text-center(ng-show='fetchingTask && !task')
+    h4
+      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+      | Recopilando Información
+      
+  div.panel-body.text-center(ng-show='!fetchingTask && task')
+    h4 {{ task.completed && "Completada" || "Abierta"}}
+    h3 {{ task.objective }}
+    
+    div.row(ng-show='!task.collaborators.length')
+      p No hay collaboradores asignados
+    
+    div.row(ng-show='task.collaborators.length')
+      p Collaboradores:
+    
+    div.row(ng-repeat='collaborator in task.collaborators', ng-show='task.collaborators.length')
+      p {{ collaborator.user.email }}
+      
+    div.row(ng-show='!task.notes.length')
+      p No hay notas
+    
+    div.row(ng-show='task.notes.length')
+      p Notas:
+    
+    div.row
+      div.col-sm-4(ng-repeat='note in task.notes', ng-show='task.notes.length')
+        p {{ note.note }}
+              
+      
+  
