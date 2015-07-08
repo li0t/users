@@ -15,7 +15,7 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new task
    */
-  router.post('/create', function(req, res, next) {
+  router.post('/', function(req, res, next) {
 
     var group = req.body.group;
     var dateTime = req.body.dateTime || null;
@@ -158,7 +158,7 @@ module.exports = function(router, mongoose) {
 
           sort('-created').
 
-          deepPopulate('group.profile entries priority').
+          deepPopulate('priority').
 
           exec(function(err, tasks) {
 
@@ -170,11 +170,11 @@ module.exports = function(router, mongoose) {
               tasks.forEach(function(task) {
 
                 for (i = 0; i < task.collaborators.length; i++) {
-
-                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length > task.collaborators[i].joined.length)) {
-
+                  /** Check if user is actual collaborator of task */
+                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
+                    /** Remove it from the array and reallocate index */
                     task.collaborators.splice(i, 1);
-
+                    i -= 1;
                   }
                 }
               });
@@ -248,7 +248,7 @@ module.exports = function(router, mongoose) {
   /**
    * Set task as deleted
    */
-  router.put('/:id/delete', function(req, res, next) {
+  router.delete('/:id', function(req, res, next) {
 
     var task = req.params.id;
     var user = req.session.user._id;

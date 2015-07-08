@@ -8,6 +8,11 @@ div.panel.panel-default
     a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
       i.fa.fa-mr.fa-users
       | Volver al grupo
+  
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/tasks/create')
+      i.fa.fa-mr.fa-plus
+      | Crear Tarea
       
   div.panel-body.text-center(ng-show='fetchingTasks && !tasks')
     h4

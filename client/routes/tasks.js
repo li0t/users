@@ -15,7 +15,16 @@
 
       when('/tasks/create', {
         controller: 'Tasks:Create',
-        templateUrl: '/templates/tasks/create.html'
+        templateUrl: '/templates/tasks/create.html',
+        resolve: {
+          priorities: [
+            '$statics',
+
+            function ($statics) {
+              return $statics.get('priorities');
+            }
+          ]
+        }
       }).
 
       when('/tasks/:id/detail', {

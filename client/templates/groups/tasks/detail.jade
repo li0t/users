@@ -1,7 +1,7 @@
 div.panel.panel-default
   div.panel-heading
     h3.panel-title
-      i.fa.fa-mr.fa-th-tasks
+      i.fa.fa-mr.fa-tasks
       | Tareas del grupo
       
   div.panel-body
@@ -15,16 +15,28 @@ div.panel.panel-default
       | Recopilando Información
       
   div.panel-body.text-center(ng-show='!fetchingTask && task')
-    h4 {{ task.completed && "Completada" || "Abierta"}}
-    h3 {{ task.objective }}
+    div.row
+        button.btn.btn-default.btn-lg(
+          ng-show='task.completed',
+          ng-click='reOpen()')
+          | Abrir
+          
+        button.btn.btn-default.btn-lg(
+          ng-show='!task.completed',
+          ng-click='close()')
+          | Cerrar    
+        
+    div.row
+      h4 {{ task.completed && "Completada" || "Abierta"}}
+      h3 {{ task.objective }}
     
     div.row(ng-show='!task.collaborators.length')
       p No hay collaboradores asignados
     
     div.row(ng-show='task.collaborators.length')
-      p Collaboradores:
+      p Collaboradores:  
     
-    div.row(ng-repeat='collaborator in task.collaborators', ng-show='task.collaborators.length')
+    div.row(ng-repeat='collaborator in task.collaborators')
       p {{ collaborator.user.email }}
       
     div.row(ng-show='!task.notes.length')

@@ -27,10 +27,30 @@
 
       $scope.close = function () {
 
+        $http.put('/api/tasks/' + $routeParams.task + '/complete').
+
+        success(function(data) {
+          $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/detail');
+          $session.flash('success', 'La tarea ha sido completada!');
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error completando la tarea!');
+        }); 
+
       };
 
       $scope.reOpen = function () {
+        $http.put('/api/tasks/' + $routeParams.task + '/re-open').
 
+        success(function(data) {
+          $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/detail');
+          $session.flash('success', 'La tarea ha sido abierta!');
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error abriendo la tarea!');
+        });
       };
 
     }

@@ -26,19 +26,15 @@ div.panel.panel-default
             i.fa.fa-fw.fa-dot-circle-o
 
           select.form-control(
+            ng-options='priority.id as priority.name for priority in statics.priorities',
             ng-model='data.priority',
             required)
-
+            
             option(value='', hidden, disabled, selected) Prioridad
 
-            option(
-              ng-repeat='priority in statics.priorities',
-              label='{{ priority.name }}',
-              ng-value='priority._id')
-       
     div.panel-footer
       div.btn-group.btn-group-grid
-        a.btn.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/tasks')
+        a.btn.btn-lg.btn-default(ng-href='/group/""/tasks')
           i.fa.fa-mr.fa-chevron-left
           | Cancelar
 
