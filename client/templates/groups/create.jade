@@ -1,29 +1,65 @@
 div.panel.panel-default
   div.panel-heading
     h3.panel-title
-      i.fa.fa-mr.fa-th-large
-      | Entradas del grupo
-      
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
       i.fa.fa-mr.fa-users
-      | Volver al grupo
-          
-  div.panel-body.text-center(ng-show='fetching && !entry')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
-      
-  div.panel-body.text-center(ng-show='!fetching && entry')
-    h3 {{entry.title}}
-    p {{entry.content}}
-    
-    div.row(ng-show='entry.tags.length')
-      p Tags:
-    
-    div.row
-      div.col-sm-4(ng-repeat='tag in entry.tags', ng-show='entry.tags.length')
-        p {{ tag }}
-              
-      
-  
+      | Crear grupo
+
+  form(
+    ng-submit='data.members.length && form.$valid && submit()',
+    role='form',
+    name='form')
+
+    div.panel-body
+      div.form-group
+        div.input-group
+          span.input-group-addon
+            i.fa.fa-fw.fa-pencil
+
+          input.form-control(
+            placeholder='Nombre del grupo',
+            ng-model='data.name',
+            required)
+
+      div.form-group(ng-repeat='member in members.list')
+        div.input-group
+          span.input-group-addon
+              i.fa.fa-fw.fa-user
+
+          span.form-control
+            | {{ member.profile.name || member.email }}
+
+          span.input-group-btn
+            button.btn.btn-default(ng-click='members.remove($index)')
+              i.fa.fa-fw.fa-trash
+
+      p.text-center(ng-hide='data.members.length') No has agregado miembros a este grupo.
+
+      div.form-group(ng-hide='members.list === posibleMembers')
+        div.input-group
+          span.input-group-addon
+            i.fa.fa-fw.fa-user
+
+          select.form-control(
+            ng-change='members.add()',
+            ng-model='form.member')
+
+            option(value='') Selecciona un nuevo miembro
+
+            option(
+              ng-repeat='member in posibleMembers',
+              value='{{ $index }}')
+
+              | {{ member.profile.name || member.email }}
+
+    div.panel-footer
+      div.btn-group.btn-group-grid
+        a.btn.btn-lg.btn-default(ng-href='/groups')
+          i.fa.fa-mr.fa-chevron-left
+          | Cancelar
+
+        button.btn.btn-default.btn-lg(
+          ng-disabled='form.$invalid',
+          type='submit')
+
+          | Crear
+          i.fa.fa-ml.fa-chevron-right

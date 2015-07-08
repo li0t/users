@@ -17,7 +17,7 @@ module.exports = function(router, mongoose) {
   /**
    * Create new group
    */
-  router.post('/create', function(req, res, next) {
+  router.post('/', function(req, res, next) {
 
     var creator = req.session.user._id;
     var members = req.body.members;

@@ -16,7 +16,7 @@ module.exports = function(router) {
     '/users', '/users/:id/profile', '/users/signup', '/users/signin', '/users/recover', '/users/reset/:token',
 
     /* Groups */
-    '/groups', '/groups/:id/profile',
+    '/groups', '/groups/create', '/groups/:id/profile',
     '/groups/:id/members', '/groups/:id/members/add', '/groups/:id/members/remove',
     '/groups/:id/entries', '/groups/:id/entries/add', '/groups/:id/entries/:entry/detail',  '/groups/:id/entries/remove/:entry',
     '/groups/:id/tasks', '/groups/:id/tasks/:task/detail',

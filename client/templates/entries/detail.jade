@@ -26,5 +26,5 @@ div.panel.panel-default
         p {{ tag }}
               
     div.row
-      div.col-sm-4(ng-show='entry.pictures.length', ng-repeat='picture in entry.pictures', ng-show='entry.pictures.length', ng-init='href = ("/api/files/{0}" | format : picture._id)')
+      div.col-sm-4(ng-repeat='picture in entry.pictures', ng-show='entry.pictures.length', ng-init='href = ("/api/files/{0}" | format : picture._id)')
         img(src='{{ href }}', style="max-heigth: 200px; max-width:200px;")
