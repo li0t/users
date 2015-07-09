@@ -29,12 +29,12 @@ div.panel.panel-default
 
         th
           button.btn.btn-block.btn-default
-            i.fa.fa-at.fa-fw
+            i.fa.fa-mr.fa-fw.fa-users
             | Cantidad de Miembros
 
         th
           button.btn.btn-block.btn-default
-            i.fa.fa-mr.fa-fw.fa-stethoscope
+            i.fa.fa-mr.fa-fw.fa-eye
             | Administrador
 
         th
@@ -61,4 +61,4 @@ div.panel.panel-default
 
         td
           a(ng-href='{{ href }}')
-            | {{ group.created }}
+            | {{ group.created | toLocal }}

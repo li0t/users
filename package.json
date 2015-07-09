@@ -1,7 +1,7 @@
 {
-  "name": "users",
-  "title": "users",
-  "description": "A users system over the fi-seed structure",
+  "name": "emeeter",
+  "title": "emeeter",
+  "description": "Horizontal team management app.",
   "version": "1.0.0",
   "private": false,
   "license": "MIT",
@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/li0t/users.git"
+    "url": "https://github.com/FinalDevStudio/emeeter.git"
   },
   "scripts": {
     "setup": "npm install && bower install && node install/statics",
@@ -41,6 +41,7 @@
     "mandrill-api": "^1.0.41",
     "marked": "^0.3.2",
     "mmmagic": "^0.3.8",
+    "moment": "^2.10.3",
     "mongoose": "~3.8.x",
     "mongoose-deep-populate": "^1.0.2",
     "morgan": "^1.5.2",

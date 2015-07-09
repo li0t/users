@@ -1,13 +1,13 @@
 {
-  "name": "users",
-  "title": "users",
-  "description": "A users system base on fi-seed structure.",
+  "name": "emeeter",
+  "title": "emeeter",
+  "description": "Horizontal team management app.",
   "version": "1.0.0",
   "license": "MIT",
   "author": "Final Development Studio <sorcery@finaldevstudio.com> (http://finaldevstudio.com)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/li0t/users.git"
+    "url": "https://github.com/FinalDevStudio/emeeter.git"
   },
   "private": false,
   "ignore": [
