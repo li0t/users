@@ -20,9 +20,6 @@ module.exports = function(router, mongoose) {
     var group = req.body.group;
     var dateTime = req.body.dateTime || null;
     var creator = req.session.user._id;
-    var priorities = statics.models.priority;
-    var _priority;
-    var priority = null;
 
     relations.membership(group, function(membership) {
 
@@ -31,21 +28,6 @@ module.exports = function(router, mongoose) {
       if (group) {
 
         if (membership.isMember(creator)) {
-
-          for (_priority in priorities) { /** Search the priority id and check that exists */
-
-            if (priorities.hasOwnProperty(_priority)) {
-
-              if (JSON.stringify(priorities[_priority]._id) === JSON.stringify(req.body.priority)) {
-
-                priority = req.body.priority;
-                break;
-
-              }
-            }
-          }
-
-          if (priority) {
 
             new Task({
               group: group._id,
@@ -73,16 +55,13 @@ module.exports = function(router, mongoose) {
 
               }
             });
-          } else {
-            res.status(400).send('You must set a valid priority');
-          }
         } else {
           debug('User is not part of group %s', creator, group._id);
           res.sendStatus(403);
         }
       } else {
         debug('Group %s not found', req.body.group);
-        res.status(404).send('group not found');
+        res.status(400).send('group not found');
       }
     });
 
@@ -117,11 +96,11 @@ module.exports = function(router, mongoose) {
         tasks.forEach(function(task) {
 
           for (i = 0; i < task.collaborators.length; i++) {
-
-            if (task.collaborators[i].left.length && (task.collaborators[i].left.length > task.collaborators[i].joined.length)) {
-
+            /** Check if user is actual collaborator of task */
+            if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
+              /** Remove it from the array and reallocate index */
               task.collaborators.splice(i, 1);
-
+              i -= 1;
             }
           }
         });
@@ -399,13 +378,10 @@ module.exports = function(router, mongoose) {
   /**
    * Edit task priority
    */
-  router.post('/:id/priority', function(req, res, next) { /** TODO: move static validation to schema */
-
+  router.post('/:id/priority', function(req, res, next) {
+    
     var task = req.params.id;
     var user = req.session.user._id;
-    var priorities = statics.models.priority;
-    var priority = null;
-    var _priority;
 
     relations.collaboration(task, function(collaboration) {
 
@@ -420,23 +396,7 @@ module.exports = function(router, mongoose) {
 
             if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
-              if (req.body.priority) {
-
-                for (_priority in priorities) { /** Search the priority id and check that exists */
-
-                  if (priorities.hasOwnProperty(_priority)) {
-
-                    if (JSON.stringify(priorities[_priority]._id) === JSON.stringify(req.body.priority)) {
-
-                      priority = req.body.priority;
-                      break;
-
-                    }
-                  }
-                }
-              }
-
-              task.priority = priority || task.priority;
+              task.priority = req.body.priority || task.priority;
 
               task.save(function(err) {
 

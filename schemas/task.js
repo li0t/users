@@ -1,7 +1,9 @@
 /* jshint node: true */
+/* global component */
 'use strict';
 
 var deepPopulate = require('mongoose-deep-populate');
+var mongoose = require('mongoose');
 
 module.exports = function(Schema) {
 
@@ -101,6 +103,26 @@ module.exports = function(Schema) {
     cb(true);
 
   }, 'The task date time must be in the future!');
+
+  /** Check the set priority is valid */
+  TaskSchema.path('priority').validate(function(priority, cb) {
+
+    mongoose.model('static.priority').
+
+    findById(priority).
+
+    exec(function(err, found){
+
+      if(!err && found) {
+        cb(true);
+
+      } else {
+        cb(false);
+
+      }
+    });
+
+  }, 'You must set a valid priority!');
 
   /** Lets populate reach any level */
   TaskSchema.plugin(deepPopulate, {
