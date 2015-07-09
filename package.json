@@ -17,10 +17,10 @@
   },
   "scripts": {
     "setup": "npm install && bower install && node install/statics",
-    "postupdate": "bower update --save --force-latest",
-    "prestart": "grunt",
-    "start": "NODE_ENV=production node app",
-    "dev": "NODE_ENV=development DEBUG=app:* node app"
+    "dev": "NODE_PATH=. NODE_ENV=development PORT=3030 DEBUG=app:* node server",
+    "start": "NODE_PATH=. NODE_ENV=production PORT=3030 node server",
+    "reinstall": "rm -Rf node_modules/ client/assets/components/ && npm install && bower install",
+    "prestart": "grunt"
   },
   "dependencies": {
     "bcrypt": "^0.8.3",
