@@ -20,17 +20,6 @@ div.container
             div.form-group
               div.input-group
                 span.input-group-addon
-                  i.fa.fa-user.fa-fw
-
-                input.form-control(
-                  placeholder='Ingresa tu nombre',
-                  ng-model='data.name',
-                  type='text',
-                  required)
-
-            div.form-group
-              div.input-group
-                span.input-group-addon
                   i.fa.fa-at.fa-fw
 
                 input.form-control(
@@ -50,32 +39,6 @@ div.container
                   ng-minlength='4',
                   type='password',
                   required)
-
-            div.checkbox(class='{{ form.specialist && "form-group" || "" }}')
-              label.control-label.input-group
-                input.hidden(
-                  ng-model='form.specialist',
-                  type='checkbox')
-
-                span.input-group-addon
-                  i(class='fa fa-fw fa-{{ form.specialist && "check-square" || "square-o" }}')
-
-                span.form-control Soy médico especialista
-
-            div.input-group(ng-show='form.specialist')
-              span.input-group-addon
-                i.fa.fa-fw.fa-user-md
-
-              select.form-control(
-                ng-disabled='!form.specialist',
-                ng-model='data.specialty')
-
-                option(value='', hidden, disabled, selected) Elije una especialidad
-
-                option(
-                  ng-repeat='specialty in specialties track by specialty.id',
-                  label='{{ specialty.name }}',
-                  ng-value='specialty.id')
 
           div.panel-footer.text-right
             div.btn-group-grid

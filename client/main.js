@@ -1,39 +1,50 @@
- /* global angular */
-
 (function (ng) {
   'use strict';
 
-  ng.module('App').config([
+  ng.module('App').
+
+  config([
     '$routeProvider', '$locationProvider',
 
     function ($routeProvider, $locationProvider) {
       /** Not found route **/
-      $routeProvider.otherwise({
+      $routeProvider.
+
+      otherwise({
         redirectTo: '/notfound'
-      }).when('/notfound', {
+      }).
+
+      when('/notfound', {
         templateUrl: '/templates/notfound.html'
       });
 
       $locationProvider.html5Mode(true);
     }
+  ]).
 
-  ]).run([
-    '$rootScope', '$location', '$session', '$http',
+  run([
+    '$rootScope', '$location', '$session', '$http', '$moment',
 
-    function ($rootScope, $location, $session, $http) {
-      /* Retrieve current session */
-      $http.get('/api/session').success(function (data) {
-        /* Session exists */
-        $session.login(data.user);
-        $location.path('/welcome');
+    function ($rootScope, $location, $session, $http, $moment) {
 
-      }).error(function () {
-        /* No session */
-        $location.path('/');
+      /* Initialize the session */
+      $session.init({
+        url: '/api/session'
+      });
 
+      /* Calculate server time difference */
+      $session.set('timeDiff', 0);
+
+      var start = Date.now();
+
+      $http.get('/api/time').success(function (data) {
+        var now = Date.now(),
+          time = Number(data) + (now - start),
+          diff = now - time;
+
+        $moment.setServerDiff(diff);
       });
     }
-
   ]);
 
 }(angular));

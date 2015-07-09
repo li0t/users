@@ -37,10 +37,10 @@ npm-debug.log
 client/assets/components
 
 # Compiled views
-# client/assets/templates
+client/assets/templates
 
 # Compiled styles
-# client/assets/styles
+client/assets/styles
 
 # Compiled scripts
-# client/assets/scripts
+client/assets/scripts

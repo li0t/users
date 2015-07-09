@@ -12,7 +12,7 @@ module.exports = function(router) {
     '/', '/welcome', '/profile',
 
     /* Users */
-    '/users', '/users/:id/profile', '/users/signup', '/users/signin', '/users/recover', '/users/reset/:token',
+    '/users', '/users/:id/profile', '/users/signup', '/users/signin', '/users/recover', '/users/validate/:token', '/users/reset/:token',
 
     /* Groups */
     '/groups', '/groups/create', '/groups/:id/profile',

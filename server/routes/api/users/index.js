@@ -40,7 +40,7 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new user
    */
-  router.post('/signup', function(req, res, next) {
+  router.post('/', function(req, res, next) {
 
     new Profile().
 
@@ -285,7 +285,7 @@ module.exports = function(router, mongoose) {
   /**
    * Disable the user's account
    */
-  router.delete('/disable', function(req, res, next) {
+  router.delete('/', function(req, res, next) {
 
     var user = req.session.user._id;
     var userContact;
@@ -357,12 +357,10 @@ module.exports = function(router, mongoose) {
   /**
    * Validate email of new user
    */
-  router.get('/validate/:token', function(req, res, next) {
-
+  router.put('/validate/:token', function(req, res, next) {
+    debug('VALIDATING');
     Token.findById(req.params.token, function(err, token) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
@@ -372,7 +370,6 @@ module.exports = function(router, mongoose) {
       } else if (token) {
 
         User.
-
         findOneAndUpdate({
           _id: token.user
         }, {
@@ -380,14 +377,12 @@ module.exports = function(router, mongoose) {
         }).
 
         exec(function(err, user) {
-
           if (err) {
             next(err);
-
           } else {
-
+debug(user);
             req.session.user = user;
-            res.redirect('http://' + req.headers.host + '/');
+            res.send(user);
 
             Token.remove({
               user: user._id

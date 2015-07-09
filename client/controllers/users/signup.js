@@ -2,27 +2,24 @@
   'use strict';
 
   ng.module('App').controller('Users:Signup', [
-    '$scope', '$http', '$location', '$session', 'statics',
+    '$scope', '$http', '$location', '$session',
 
-    function ($scope, $http, $location, $session, statics) {
+    function ($scope, $http, $location, $session) {
 
       $scope.submitting = false;
-      $scope.statics = statics;
 
       $scope.submit = function () {
         $scope.submitting = true;
         $session.flash();
 
         $http.post('/api/users', {
-          name: $scope.form.name,
-          email: $scope.form.email,
-          gender: $scope.form.gender._id,
-          password: $scope.form.password
+          email: $scope.data.email,
+          password: $scope.data.password
 
         }).success(function (user) {
           $session.login(user);
-          $location.path('/welcome');
-          $session.flash('success', 'Account created! Welcome ' + user.name + '!');
+          $location.path('/');
+          $session.flash('success', 'Te ha sido enviado un mail de confirmación');
 
         }).error(function (data, status) {
           if (status === 409) {

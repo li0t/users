@@ -1,6 +1,3 @@
-/* jshint browser: true */
-/* global angular */
-
 (function (ng, window) {
   'use strict';
 

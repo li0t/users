@@ -26,24 +26,26 @@
             }
           ]
         }
-
       }).
 
       when('/users/recover', {
         controller: 'Users:Recover',
         templateUrl: '/templates/users/recover.html'
-
       }).
 
-      when('/users/:id/profile', {
-        controller: 'Users:Profile',
-        templateUrl: '/templates/users/profile.html'
+      when('/users/validate/:token', {
+        controller: 'Users:Validate'
       }).
 
       when('/users/reset/:token', {
         controller: 'Users:Reset',
         templateUrl: '/templates/users/reset.html'
 
+      }).
+
+      when('/users/:id/profile', {
+        controller: 'Users:Profile',
+        templateUrl: '/templates/users/profile.html'
       });
     }
 

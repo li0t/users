@@ -80,7 +80,7 @@ module.exports = function(router, mongoose) {
             } else {
 
               message = { /* Parameters to inject into Mandrill template */
-                "html": "<a href='http://" + url + "/api/users/validate/" + token._id + "'>Please confirm your email</a>",
+                "html": "<a href='http://" + url + "/users/validate/" + token._id + "'>Please confirm your email</a>",
                 "text": "Bievenido a eMeeter",
                 "subject": "Confirm your email",
                 "from_email": senderEmail,
@@ -297,7 +297,7 @@ module.exports = function(router, mongoose) {
             } else {
 
               message = {
-                "html": "<a href='http://" + url + "/api/users/recover/" + token._id + "'>Reset your password</a>",
+                "html": "<a href='http://" + url + "/users/recover/" + token._id + "'>Reset your password</a>",
                 "text": "Reset your password",
                 "subject": "Reset your password",
                 "from_email": senderEmail,
