@@ -85,19 +85,19 @@ module.exports = function(router, mongoose) {
         members = [members];
       }
 
-      relations.membership(group, function(membership) {
+      relations.membership(group, function(err, membership) {
 
-        group = membership.group;
+        if (!err && membership.group) {
 
-        if (group) {
+          group = membership.group;
 
           if (membership.isMember(adder)) { /** Check if adder is member of the group */
 
-            relations.contact(adder, function(relation) {
+            relations.contact(adder, function(err, relation) {
 
               members.forEach(function(member) {
 
-                if (relation.isContact(member)) {
+                if (!err && relation.contact && relation.isContact(member)) {
 
                   if (!membership.isMember(member)) {
 
@@ -174,11 +174,11 @@ module.exports = function(router, mongoose) {
         members = [members];
       }
 
-      relations.membership(group, function(membership) {
+      relations.membership(group, function(err, membership) {
 
-        group = membership.group; /** The group model */
+        if (!err && membership.group) {
 
-        if (group) {
+          group = membership.group; /** The group model */
 
           remover = membership.isMember(remover);
 

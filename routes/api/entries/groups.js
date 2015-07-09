@@ -18,10 +18,10 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new entry
    */
-  router.post('/create', function(req, res, next) { /** TODO: always create to group */
+  router.post('/', function(req, res, next) {
 
     var entry; /* This is the target schema */
-    var group = req.body.group || null;
+    var group = req.body.group;
     var tagsSaved = 0;
 
     /**
@@ -116,11 +116,9 @@ module.exports = function(router, mongoose) {
 
     }
 
-    if (group) {
+      relations.membership(group, function(err, relation) { /** Get the group model */
 
-      relations.membership(group, function(relation) { /** Get the group model */
-
-        if (relation.group) {
+        if (!err && relation.group) {
 
           if (relation.isMember(req.session.user._id)) {
 
@@ -134,9 +132,6 @@ module.exports = function(router, mongoose) {
           res.status(404).send('No group found with id ' + group);
         }
       });
-    } else {
-      createEntry();
-    }
 
   });
 
@@ -148,9 +143,9 @@ module.exports = function(router, mongoose) {
     var user = req.session.user._id;
     var group = req.params.id;
 
-    relations.membership(group, function(relation) {
+    relations.membership(group, function(err, relation) {
 
-      if (relation.group) {
+      if (!err && relation.group) {
 
         if (relation.isMember(user)) {
 
@@ -195,9 +190,9 @@ module.exports = function(router, mongoose) {
     var user = req.session.user._id;
     var group = req.params.id;
 
-    relations.membership(group, function(relation) {
+    relations.membership(group, function(err, relation) {
 
-      if (relation.group) {
+      if (!err && relation.group) {
 
         if (relation.isMember(user)) {
 

@@ -24,17 +24,17 @@ module.exports = function(router, mongoose) {
     var senderIsContact;
     var receiverIsContact;
 
-    relations.contact(req.params.id, function(receiverRelation) {
+    relations.contact(req.params.id, function(err, receiverRelation) {
+
+      if (!err && receiverRelation.contact) {
 
       receiver = receiverRelation.contact; /** The contact model of the receiver user */
 
-      if (receiver) {
+        relations.contact(req.session.user._id, function(err, senderRelation) {
 
-        relations.contact(req.session.user._id, function(senderRelation) {
+          if (!err && senderRelation.contact) {
 
           sender = senderRelation.contact; /** The contact model of the sender user */
-
-          if (sender) {
 
             receiverIsContact = senderRelation.isContact(receiver.user, true);
 
@@ -153,17 +153,17 @@ module.exports = function(router, mongoose) {
 
       } else if (token && token.sender) {
 
-        relations.contact(token.user, function(receiverRelation) {
+        relations.contact(token.user, function(err, receiverRelation) {
+
+          if (!err && receiverRelation.contact) {
 
           receiver = receiverRelation.contact;
 
-          if (receiver) {
+            relations.contact(token.sender, function(err, senderRelation) {
 
-            relations.contact(token.sender, function(senderRelation) {
+              if (!err && senderRelation.contact) {
 
               sender = senderRelation.contact;
-
-              if (sender) {
 
                 senderIsContact = receiverRelation.isContact(sender.user, true);
                 receiverIsContact = senderRelation.isContact(receiver.user, true);
@@ -227,17 +227,17 @@ module.exports = function(router, mongoose) {
     var senderIsContact;
     var receiverIsContact;
 
-    relations.contact(req.params.id, function(receiverRelation) {
+    relations.contact(req.params.id, function(err, receiverRelation) {
 
-      receiver = receiverRelation.contact;
+      if (!err && receiverRelation.contact) {
 
-      if (receiver) {
+        receiver = receiverRelation.contact;
 
-        relations.contact(req.session.user._id, function(senderRelation) {
+        relations.contact(req.session.user._id, function(err, senderRelation) {
 
-          sender = senderRelation.contact;
+          if (!err && senderRelation.contact) {
 
-          if (sender) {
+            sender = senderRelation.contact;
 
             senderIsContact = receiverRelation.isContact(sender.user);
             receiverIsContact = senderRelation.isContact(receiver.user);

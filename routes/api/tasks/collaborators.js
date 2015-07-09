@@ -91,18 +91,18 @@ module.exports = function(router, mongoose) {
         collaborators = [collaborators];
       }
 
-      relations.collaboration(task, function(relation) {
+      relations.collaboration(task, function(err, relation) {
+
+        /** Check if task exists and is available for changes */
+        if (!err && relation.task) {
 
         task = relation.task; /** The task model */
 
-        /** Check if task exists and is available for changes */
-        if (task) {
-
           if (!task.completed) {
 
-            relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(err, taskGroup) {
 
-              if (taskGroup.isMember(inviter)) {
+              if (!err && taskGroup.group && taskGroup.isMember(inviter)) {
 
                 collaborators.forEach(function(collaborator) {
 
@@ -185,18 +185,18 @@ module.exports = function(router, mongoose) {
         collaborators = [collaborators];
       }
 
-      relations.collaboration(task, function(relation) {
+      relations.collaboration(task, function(err, relation) {
+
+        /** Check if task exists and is available for changes */
+        if (!err && relation.task) {
 
         task = relation.task; /** The task model */
 
-        /** Check if task exists and is available for changes */
-        if (task) {
-
           if (!task.completed) {
 
-            relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(err, taskGroup) {
 
-              if (taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
+              if (!err && taskGroup.group && taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
 
                 collaborators.forEach(function(_collaborator) {
 

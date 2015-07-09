@@ -59,84 +59,61 @@ module.exports = function(router, mongoose) {
         req.body.tags = [req.body.tags];
       }
       req.body.tags.forEach(function(tag) {
-        Tag.findOne()
-          .where('name', tag)
-          .exec(function(err, found) {
-            if (err) {
-              debug('Error! : %s', err);
-            } else if (found) {
-              debug('Tag found : %s', found.name);
-              onTagReady(found);
-            } else {
-              debug('Creating new Tag : %s', tag);
-              new Tag({
-                name: tag
-              }).save(function(err, newTag) {
-                if (err) {
-                  debug('Error! : %s', err);
-                } else {
-                  onTagReady(newTag);
-                }
-              });
-            }
-          });
-      });
-    }
 
-    function createEntry() {
+        Tag.findOne().
+        where('name', tag).
+        exec(function(err, found) {
+          if (err) {
+            debug('Error! : %s', err);
 
-      new Entry({
-        user: req.session.user._id,
-        group: group,
-        title: req.body.title,
-        content: req.body.content /* Markdown text */
-      }).
-
-      save(function(err, data) {
-        if (err) {
-
-          if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
-            res.sendStatus(400);
-          } else {
-            next(err);
-          }
-
-        } else {
-
-          entry = data;
-
-          if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
-            saveTags();
-
-          } else { /* If not, just save the entry */
-            saveEntry();
-          }
-        }
-      });
-
-    }
-
-    if (group) {
-
-      relations.membership(group, function(relation) { /** Get the group model */
-
-        if (relation.group) {
-
-          if (relation.isMember(req.session.user._id)) {
-
-            createEntry();
+          } else if (found) {
+            debug('Tag found : %s', found.name);
+            onTagReady(found);
 
           } else {
-            debug('User %s is not part of group %s', req.session.user._id, group);
-            res.sendStatus(403);
+            debug('Creating new Tag : %s', tag);
+            new Tag({
+              name: tag
+            }).
+            save(function(err, newTag) {
+              if (err) {
+                debug('Error! : %s', err);
+              } else {
+                onTagReady(newTag);
+              }
+            });
           }
-        } else {
-          res.status(404).send('No group found with id ' + group);
-        }
+        });
       });
-    } else {
-      createEntry();
     }
+
+    new Entry({
+      user: req.session.user._id,
+      title: req.body.title,
+      content: req.body.content /* Markdown text */
+    }).
+
+    save(function(err, data) {
+      if (err) {
+        if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+      } else {
+
+        entry = data;
+
+        if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
+          saveTags();
+
+        } else { /* If not, just save the entry */
+          saveEntry();
+
+        }
+      }
+    });
+
 
   });
 
@@ -199,9 +176,11 @@ module.exports = function(router, mongoose) {
       });
     }
 
-    Entry.
-    findOne().
+    Entry.findOne().
+
     where('_id', req.params.id).
+    where('user', req.session.user._id).
+
     exec(function(err, data) {
       if (err) {
 
@@ -215,17 +194,12 @@ module.exports = function(router, mongoose) {
 
         entry = data;
 
-        if (JSON.stringify(entry.user) === JSON.stringify(req.session.user._id)) {
-
-          if (req.files && req.files.length) { /* If there are any files, save them */
-            savePictures();
-          } else { /* If not, just save the document */
-            saveEntry();
-          }
-
-        } else {
-          res.sendStatus(403);
+        if (req.files && req.files.length) { /* If there are any files, save them */
+          savePictures();
+        } else { /* If not, just save the document */
+          saveEntry();
         }
+
       } else {
         debug('Entry %s was not found', req.params.id);
         res.sendStatus(404);
@@ -244,9 +218,9 @@ module.exports = function(router, mongoose) {
 
     function checkByContact() {
 
-      relations.contact(user, function(relation) {
+      relations.contact(user, function(err, relation) {
 
-        if (relation.isContact(entry.user) || JSON.stringify(entry.user) === JSON.stringify(user)) {
+        if ((!err && relation.isContact(entry.user)) || JSON.stringify(entry.user) === JSON.stringify(user)) {
 
           res.send(entry);
 
@@ -278,9 +252,9 @@ module.exports = function(router, mongoose) {
 
         if (entry.group) {
 
-          relations.membership(entry.group, function(relation) {
+          relations.membership(entry.group, function(err, relation) {
 
-            if (relation.isMember(user)) {
+            if (!err && relation.group && relation.isMember(user)) {
               res.send(entry);
 
             } else {

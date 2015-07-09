@@ -66,10 +66,9 @@ function contact(userId, cb) { /** Returns a relation object with the contact mo
   exec(function(err, contact) {
 
     if (err) {
-      debug(err);
+      cb(err, null);
 
     } else if (contact) {
-
       relation.contact = contact;
 
     } else {
@@ -77,7 +76,8 @@ function contact(userId, cb) { /** Returns a relation object with the contact mo
     }
 
     if (cb) {
-      cb(relation);
+      cb(null, relation);
+
     } else {
       debug('Error! No callback provided');
     }
@@ -171,10 +171,9 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
   Group.findById(groupId, function(err, group) {
 
     if (err) {
-      debug(err);
+      cb(err, null);
 
     } else if (group) {
-
       relation.group = group;
 
     } else {
@@ -182,7 +181,8 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
     }
 
     if (cb) {
-      cb(relation);
+      cb(null, relation);
+
     } else {
       debug('No callback provided');
     }
@@ -281,10 +281,9 @@ function collaboration(taskId, cb) {
   exec(function(err, task) {
 
     if (err) {
-      debug(err);
+      cb(err, null);
 
     } else if (task) {
-
       relation.task = task;
 
     } else {
@@ -292,7 +291,8 @@ function collaboration(taskId, cb) {
     }
 
     if (cb) {
-      cb(relation);
+      cb(null, relation);
+      
     } else {
       debug('No callback provided');
     }

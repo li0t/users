@@ -70,18 +70,18 @@ module.exports = function(router, mongoose) {
         entries = [entries];
       }
 
-      relations.collaboration(task, function(collaboration) {
+      relations.collaboration(task, function(err, collaboration) {
+
+        /** Check if task exists and is available for changes */
+        if (!err && collaboration.task) {
 
         task = collaboration.task; /** The task model */
 
-        /** Check if task exists and is available for changes */
-        if (task) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-          relations.membership(task.group, function(taskGroup) {
+            if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of task group */
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of task group */
-
-              relations.contact(user, function(relation) {
+              relations.contact(user, function(err, relation) {
 
                 entries.forEach(function(entry) {
 
@@ -95,7 +95,7 @@ module.exports = function(router, mongoose) {
                     } else if (_entry) {
 
                       /** Check if user is contact of entry creator or is itself */
-                      if (relation.isContact(_entry.user) || JSON.stringify(user) === JSON.stringify(_entry.user)) {
+                      if ((!err && relation.isContact(_entry.user)) || JSON.stringify(user) === JSON.stringify(_entry.user)) {
 
                         if (!isPresent(entry)) {
 
@@ -111,9 +111,9 @@ module.exports = function(router, mongoose) {
 
                         checked -= 1; /** Wait for asynchronous method to check this entry */
 
-                        relations.membership(_entry.group, function(entryGroup) {
+                        relations.membership(_entry.group, function(err, entryGroup) {
 
-                          if (entryGroup.isMember(user)) { /** Check if user is part of entry group */
+                          if (!err && entryGroup.group && entryGroup.isMember(user)) { /** Check if user is part of entry group */
 
                             if (!isPresent(entry)) {
 
@@ -179,16 +179,16 @@ module.exports = function(router, mongoose) {
         entries = [entries];
       }
 
-      relations.collaboration(task, function(collaboration) {
+      relations.collaboration(task, function(err, collaboration) {
+
+        /** Check if task exists and is available for changes */
+        if (!err && collaboration.task) {
 
         task = collaboration.task; /** The task model */
 
-        /** Check if task exists and is available for changes */
-        if (task) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-          relations.membership(task.group, function(taskGroup) {
-
-            if (taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
+            if (!err && taskGroup.group && taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
 
               entries.forEach(function(entry) {
 
@@ -260,9 +260,9 @@ module.exports = function(router, mongoose) {
         next(err);
       } else if (task) {
 
-        relations.membership(task.group, function(taskGroup) {
+        relations.membership(task.group, function(err, taskGroup) {
 
-          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+          if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
             res.send(task.entries);
 

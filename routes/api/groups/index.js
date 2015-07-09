@@ -74,13 +74,13 @@ module.exports = function(router, mongoose) {
               members = [members];
             }
 
-            relations.contact(creator, function(relation) {
+            relations.contact(creator, function(err, relation) {
 
               members.forEach(function(member) {
 
                 if (mongoose.Types.ObjectId.isValid(member)) {
 
-                  if (relation.isContact(member)) {
+                  if (!err && relation.contact && relation.isContact(member)) {
 
                     debug('Pushing %s into group members', member);
                     group.members.push({
@@ -121,11 +121,11 @@ module.exports = function(router, mongoose) {
     var sessionUser = req.session.user._id;
     var user = req.body.id;
 
-    relations.membership(group, function(membership) {
+    relations.membership(group, function(err, membership) {
 
-      group = membership.group;
+      if (!err && membership.group) {
 
-      if (group) {
+        group = membership.group;
 
         if (membership.isAdmin(sessionUser)) { /** Check if logged user is the group admin */
 
@@ -192,9 +192,9 @@ module.exports = function(router, mongoose) {
 
         found.forEach(function(group) {
 
-          relations.membership(group._id, function(relation) {
+          relations.membership(group._id, function(err, relation) {
 
-            if (relation.isMember(user)) {
+            if (!err && relation.group && relation.isMember(user)) {
               groups.push(group);
             }
 
@@ -222,9 +222,9 @@ module.exports = function(router, mongoose) {
     var group = req.params.id;
     var user = req.session.user._id;
 
-    relations.membership(group, function(relation) {
+    relations.membership(group, function(err, relation) {
 
-      if (relation.group) {
+      if (!err && relation.group) {
 
         group = relation.group;
 

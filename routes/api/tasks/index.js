@@ -21,11 +21,11 @@ module.exports = function(router, mongoose) {
     var dateTime = req.body.dateTime || null;
     var creator = req.session.user._id;
 
-    relations.membership(group, function(membership) {
+    relations.membership(group, function(err, membership) {
+
+      if (!err && membership.group) {
 
       group = membership.group; /** The group model */
-
-      if (group) {
 
         if (membership.isMember(creator)) {
 
@@ -121,9 +121,9 @@ module.exports = function(router, mongoose) {
     var user = req.session.user._id;
     var group = req.params.id;
 
-    relations.membership(group, function(relation) {
+    relations.membership(group, function(err, relation) {
 
-      if (relation.group) {
+      if (!err && relation.group) {
 
         if (relation.isMember(user)) {
 
@@ -182,18 +182,18 @@ module.exports = function(router, mongoose) {
     var task = req.params.id;
     var user = req.session.user._id;
 
-    relations.collaboration(task, function(collaboration) {
+    relations.collaboration(task, function(err, collaboration) {
+
+      /** Check if task exists and is available for changes */
+      if (!err && collaboration.task) {
 
       task = collaboration.task; /** The task model */
 
-      /** Check if task exists and is available for changes */
-      if (task) {
-
         if (!task.completed) {
 
-          relations.membership(task.group, function(taskGroup) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+            if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
               task.completed = new Date();
 
@@ -232,18 +232,18 @@ module.exports = function(router, mongoose) {
     var task = req.params.id;
     var user = req.session.user._id;
 
-    relations.collaboration(task, function(collaboration) {
+    relations.collaboration(task, function(err, collaboration) {
+
+      /** Check if task exists and is available for changes */
+      if (!err && collaboration.task) {
 
       task = collaboration.task; /** The task model */
 
-      /** Check if task exists and is available for changes */
-      if (task) {
-
         if (!task.completed) {
 
-          relations.membership(task.group, function(taskGroup) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+            if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
               task.deleted = new Date();
 
@@ -282,18 +282,18 @@ module.exports = function(router, mongoose) {
     var task = req.params.id;
     var user = req.session.user._id;
 
-    relations.collaboration(task, function(collaboration) {
+    relations.collaboration(task, function(err, collaboration) {
+
+      /** Check if task exists and is available for changes */
+      if (!err && collaboration.task) {
 
       task = collaboration.task; /** The task model */
 
-      /** Check if task exists and is available for changes */
-      if (task) {
-
         if (task.completed) {
 
-          relations.membership(task.group, function(taskGroup) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+            if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
               task.completed = null;
 
@@ -332,18 +332,18 @@ module.exports = function(router, mongoose) {
     var task = req.params.id;
     var user = req.session.user._id;
 
-    relations.collaboration(task, function(collaboration) {
+    relations.collaboration(task, function(err, collaboration) {
+
+      /** Check if task exists and is available for changes */
+      if (!err && collaboration.task) {
 
       task = collaboration.task; /** The task model */
 
-      /** Check if task exists and is available for changes */
-      if (task) {
-
         if (!task.completed) {
 
-          relations.membership(task.group, function(taskGroup) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+            if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
               task.objective = req.body.objective || task.objective;
 
@@ -379,22 +379,22 @@ module.exports = function(router, mongoose) {
    * Edit task priority
    */
   router.post('/:id/priority', function(req, res, next) {
-    
+
     var task = req.params.id;
     var user = req.session.user._id;
 
-    relations.collaboration(task, function(collaboration) {
+    relations.collaboration(task, function(err, collaboration) {
+
+      /** Check if task exists and is available for changes */
+      if (!err && collaboration.task) {
 
       task = collaboration.task; /** The task model */
 
-      /** Check if task exists and is available for changes */
-      if (task) {
-
         if (!task.completed) {
 
-          relations.membership(task.group, function(taskGroup) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+            if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
               task.priority = req.body.priority || task.priority;
 
@@ -434,18 +434,18 @@ module.exports = function(router, mongoose) {
     var task = req.params.id;
     var user = req.session.user._id;
 
-    relations.collaboration(task, function(collaboration) {
+    relations.collaboration(task, function(err, collaboration) {
+
+      /** Check if task exists and is available for changes */
+      if (!err && collaboration.task) {
 
       task = collaboration.task; /** The task model */
 
-      /** Check if task exists and is available for changes */
-      if (task) {
-
         if (!task.completed) {
 
-          relations.membership(task.group, function(taskGroup) {
+          relations.membership(task.group, function(err, taskGroup) {
 
-            if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+            if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
               task.dateTime = req.body.dateTime;
 
@@ -491,16 +491,16 @@ module.exports = function(router, mongoose) {
     var task = req.params.id;
     var user = req.session.user._id;
 
-    relations.collaboration(task, function(collaboration) {
+    relations.collaboration(task, function(err, collaboration) {
+
+      /** Check if task exists and is available for changes */
+      if (!err && collaboration.task) {
 
       task = collaboration.task; /** The task model */
 
-      /** Check if task exists and is available for changes */
-      if (task) {
+        relations.membership(task.group, function(err, taskGroup) {
 
-        relations.membership(task.group, function(taskGroup) {
-
-          if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+          if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
             task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
 

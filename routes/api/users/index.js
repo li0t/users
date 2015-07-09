@@ -110,9 +110,7 @@ module.exports = function(router, mongoose) {
       deepPopulate('profile.gender').
 
       exec(function(err, user) {
-        debug(user);
         if (err) {
-
           if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
             res.sendStatus(400);
           } else {
@@ -289,35 +287,38 @@ module.exports = function(router, mongoose) {
   /**
    * Disable the user's account
    */
-  router.delete('/disable', function(req, res, next) { /** TODO: Check asynchronous method */
+  router.delete('/disable', function(req, res, next) {
 
     var user = req.session.user._id;
     var userContact;
     var index;
 
-    relations.contact(user, function(relation) {
+    relations.contact(user, function(err, relation) {
 
-      userContact = relation.contact; /** The user contact model */
+      if (!err && relation.contact) {
 
-      if (userContact) {
+        userContact = relation.contact; /** The user contact model */
 
         userContact.contacts.forEach(function(contact) {
 
           contact.state = statics.model('state', 'disabled')._id; /** Set the user contact as disabled */
 
-          relations.contact(contact.user, function(relation) {
+          relations.contact(contact.user, function(err, relation) {
 
-            index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
+            if (!err && relation.contact) {
 
-            contact = relation.contact;
+              index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
 
-            contact.contacts[index].state = statics.model('state', 'disabled')._id; /** Set itself as disabled in the contact contacts list */
+              contact = relation.contact;
 
-            contact.save(function(err) {
-              if (err) {
-                debug(err);
-              }
-            });
+              contact.contacts[index].state = statics.model('state', 'disabled')._id; /** Set itself as disabled in the contact contacts list */
+
+              contact.save(function(err) {
+                if (err) {
+                  debug(err);
+                }
+              });
+            }
           });
         });
 

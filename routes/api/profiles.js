@@ -158,11 +158,11 @@ module.exports = function(router, mongoose) {
     var user = req.session.user._id;
     var group = req.params.id;
 
-    relations.membership(group, function(membership) {
+    relations.membership(group, function(err, membership) {
 
-      group = membership.group;
+      if (!err && membership.group) {
 
-      if (group) {
+        group = membership.group;
 
         if (membership.isAdmin(user)) {
 
@@ -261,11 +261,11 @@ module.exports = function(router, mongoose) {
       });
     }
 
-    relations.membership(group, function(membership) {
+    relations.membership(group, function(err, membership) {
 
-      group = membership.group; /** The group model */
+      if (!err && membership.group) {
 
-      if (group) {
+        group = membership.group; /** The group model */
 
         if (membership.isAdmin(user)) {
 

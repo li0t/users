@@ -30,18 +30,18 @@ module.exports = function(router, mongoose) {
         notes = [notes];
       }
 
-      relations.collaboration(task, function(collaboration) {
+      relations.collaboration(task, function(err, collaboration) {
+
+        /** Check if task exists and is available for changes */
+        if (!err && collaboration.task) {
 
         task = collaboration.task; /** The task model */
 
-        /** Check if task exists and is available for changes */
-        if (task) {
-
           if (!task.completed) {
 
-            relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(err, taskGroup) {
 
-              if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+              if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
                 notes.forEach(function(note) {
 
@@ -107,18 +107,18 @@ module.exports = function(router, mongoose) {
         notes = [notes];
       }
 
-      relations.collaboration(task, function(collaboration) {
+      relations.collaboration(task, function(err, collaboration) {
+
+        /** Check if task exists and is available for changes */
+        if (!err && collaboration.task) {
 
         task = collaboration.task; /** The task model */
 
-        /** Check if task exists and is available for changes */
-        if (task) {
-
           if (!task.completed) {
 
-            relations.membership(task.group, function(taskGroup) {
+            relations.membership(task.group, function(err, taskGroup) {
 
-              if (taskGroup.isMember(user)) { /** Check if user is part of the task group */
+              if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
                 notes.forEach(function(note) {
 

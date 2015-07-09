@@ -22,9 +22,9 @@ module.exports = function(router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(user, function(relation) {
+    relations.contact(user, function(err, relation) {
 
-      if (relation.contact) {
+      if (!err && relation.contact) {
 
         if (relation.isContact(req.session.user._id) || user === req.session.user._id) {
 
@@ -67,9 +67,9 @@ module.exports = function(router, mongoose) {
 
     var user = req.params.id;
 
-    relations.contact(user, function(relation) {
+    relations.contact(user, function(err, relation) {
 
-      if (relation.contact) {
+      if (!err && relation.contact) {
 
         if (relation.isContact(req.session.user._id) || user === req.session.user._id) {
 
