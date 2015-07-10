@@ -358,7 +358,7 @@ module.exports = function(router, mongoose) {
    * Validate email of new user
    */
   router.put('/validate/:token', function(req, res, next) {
-    debug('VALIDATING');
+
     Token.findById(req.params.token, function(err, token) {
       if (err) {
         if (err.name && err.name === 'CastError') {
@@ -380,7 +380,7 @@ module.exports = function(router, mongoose) {
           if (err) {
             next(err);
           } else {
-debug(user);
+
             req.session.user = user;
             res.send(user);
 

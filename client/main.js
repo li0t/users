@@ -35,7 +35,7 @@
       /* Calculate server time difference */
       $session.set('timeDiff', 0);
 
-      var start = Date.now();
+      /*var start = Date.now();
 
       $http.get('/api/time').success(function (data) {
         var now = Date.now(),
@@ -43,7 +43,7 @@
           diff = now - time;
 
         $moment.setServerDiff(diff);
-      });
+      });*/
     }
   ]);
 

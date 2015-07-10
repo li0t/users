@@ -8,8 +8,8 @@
 
       if (!$session.get('user')) {
 
-        $location('/');
-        
+        $location.path('/');
+
       }
     }
   ]);

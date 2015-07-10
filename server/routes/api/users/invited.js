@@ -1,10 +1,7 @@
 'use strict';
 
-var bcrypt = require('bcrypt');
-var _ = require('underscore');
 var debug = require('debug')('app:api:users:invited');
 
-var relations = component('relations');
 var statics = component('statics');
 
 module.exports = function(router, mongoose) {
@@ -17,103 +14,75 @@ module.exports = function(router, mongoose) {
   /**
    * Create a new user and invite it to emeeter
    */
-  router.post('/create', function(req, res, next) {
+  router.post('/', function(req, res, next) {
 
     var email = req.body.email;
 
-    if (email) {
+    new Profile().
+    save(function(err, profile) {
 
-      new Profile().
-      save(function(err, profile) {
+      new User({
+        email: email,
+        /** Randomized alphanumeric password */
+        password: Math.random().toString(36).slice(-8),
+        profile: profile._id,
+        state: statics.model('state', 'pending')._id
+      }).
 
-        new User({
-          email: email,
-          password: Math.random().toString(36).slice(-8),
-          /** Randomized alphanumeric password */
-          profile: profile._id,
-          state: statics.model('state', 'pending')._id
-        }).
+      save(function(err, user) {
 
-        save(function(err, user) {
-
-          if (err) {
-            /** The user is already in the platform */
-            if (err.code && err.code === 11000) {
-
-              User.
-              findOne().
-              where('email', email).
-              exec(function(err, user) {
-                if (err) {
-                  next(err);
-                } else if (user) {
-                  /** Send contact request */
-                  res.redirect('/api/contacts/add/' + user._id);
-                }
-              });
-            } else if (err.name && err.name === 'ValidationError') {
-              res.sendStatus(400);
-            } else {
-              next(err);
-            }
-
-            Profile. /** Remove unnecessary new profile */
-            remove({
-              _id: profile._id
-            }).
-            exec(function(err) {
-              if (err) {
-                debug(err);
-              }
-            });
+        if (err) {
+          /** The user is already in the platform */
+          if (err.code && err.code === 11000) {
+            res.sendStatus(409);
+          } else if (err.name && err.name === 'ValidationError') {
+            res.sendStatus(400);
           } else {
-
-            new Contact({
-              user: user._id
-            }).
-
-            save(function(err) {
-
-              if (err) {
-                next(err);
-              } else {
-                /** Send invite to the platform */
-                res.redirect('/api/mandrill/invite/' + user._id);
-
-              }
-            });
+            next(err);
           }
-        });
-      });
 
-    } else {
-      res.sendStatus(400);
-    }
+          /** Remove unnecessary new profile */
+          Profile.remove({ _id: profile._id }).
+          exec(function(err) { if (err) { debug(err); } });
+
+        } else {
+
+          new Contact({ user: user._id }).
+
+          save(function(err) {
+            if (err) {
+              next(err);
+            } else {
+
+              res.send(user._id);
+            }
+          });
+        }
+      });
+    });
 
   });
 
   /**
    * Activation of invited user that already validated token
    */
-  router.post('/validate/:token', function(req, res, next) {
+  router.put('/validate/:token', function(req, res, next) {
 
-    var token = req.session.token;
     var password = req.body.password;
 
-    Token.findById(req.params.token, function(err, token) {
-      if (err) {
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
-        }
+    if (password) {
 
-      } else if (token && token.user && token.sender) {
+      Token.findById(req.params.token, function(err, token) {
+        if (err) {
+          if (err.name && err.name === 'CastError') {
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
 
-        if (password) {
+        } else if (token && token.user && token.sender) {
 
           User.findById(token.user, function(err, user) {
-
             if (err) {
               next(err);
 
@@ -124,32 +93,26 @@ module.exports = function(router, mongoose) {
               user.state = statics.model('state', 'active')._id;
 
               user.save(function(err) {
-
                 if (err) {
-                  next(err);
-
-                } else {
-
-                  req.session.user = user;
-
-                  res.redirect('/api/contacts/confirm/' + token._id);
-
-                  delete req.session.token;
-
+                  return next(err);
                 }
-              });
 
+                req.session.user = user;
+
+                res.send(token._id);
+
+              });
             } else {
               res.sendStatus(404);
             }
           });
         } else {
-          res.sendStatus(400);
+          res.sendStatus(498);
         }
-      } else {
-        res.sendStatus(498);
-      }
-    });
+      });
+    } else {
+      res.sendStatus(400);
+    }
 
   });
 

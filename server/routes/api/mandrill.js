@@ -199,13 +199,13 @@ module.exports = function(router, mongoose) {
   /**
    * Send an invite
    */
-  router.get('/invite/:id', function(req, res, next) {
+  router.post('/invite', function(req, res, next) {
 
     if (api) {
 
       var message = null;
 
-      User.findById(req.params.id, function(err, user) {
+      User.findById(req.body.id, function(err, user) {
         if (err) {
           next(err);
         } else if (user) {
@@ -222,7 +222,7 @@ module.exports = function(router, mongoose) {
             } else {
 
               message = {
-                "html": "<a href='http://" + url + "/api/users/invited/signin/" + token._id + "'/>Go to emeeter</a>",
+                "html": "<a href='http://" + url + "/users/invited/validate/" + token._id + "'/>Go to emeeter</a>",
                 "text": "Have you tried emeeter? Check it now!",
                 "subject": "emeeter invitation",
                 "from_email": senderEmail,
@@ -245,7 +245,7 @@ module.exports = function(router, mongoose) {
 
               }, function(result) {
                 debug(result);
-                res.redirect('/api/contacts/add/' + user._id);
+                res.send(user._id);
 
               }, function(err) {
                 debug('A mandrill error occurred %s : %s', +err.nam, err.message);

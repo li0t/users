@@ -18,8 +18,13 @@ div.panel.panel-default
     h4
       i.fa.fa-mr.fa-circle-o-notch.fa-spin
       | Buscando grupos
+      
+  div.panel-body.text-center(ng-show='!fetching && groups && !groups.length')
+    h4
+      i.fa.fa-mr.fa-circle-thin
+      | No hay Grupos    
           
-  table.table.table-hover(ng-show='!fetching && groups')
+  table.table.table-hover(ng-show='!fetching && groups && groups.length')
     thead
       tr
         th

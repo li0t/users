@@ -19,7 +19,7 @@
         }).
 
         error(function(data) {
-          $location('/tasks');
+          $location.path('/tasks');
           $session.flash('danger', data);
         }).
 

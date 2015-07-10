@@ -6,18 +6,16 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      console.log('VALIDATING');
-
       $http.put('/api/users/validate/' + $routeParams.token).
 
       success(function(user) {
-        $session.set('user', user);
+        $session.signin(user);
         $location.path('/welcome');
-        $session.flash('success', 'Welcome to emeeter ' + user.email + '!');
+        $session.flash('success', 'Account activated, Welcome to emeeter!');
 
       }).error(function() {
+        $location.path('/');
         $session.flash('danger', 'This token is not valid!');
-
       });
 
     }

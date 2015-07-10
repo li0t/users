@@ -164,8 +164,26 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
       }
 
       return member;
-    }
+    },
 
+    cleanMembers: function() {
+
+      var i;
+
+      if (relation.group) {
+
+        for (i = 0; i < relation.group.members; i++) {
+
+          if (relation.group.members[i].left.length && relation.group.members[i].joined.length < relation.group.members[i].left.length) {
+            
+            relation.group.members.splice(i, 1);
+            i -= 1;
+          }
+        }
+      } else {
+        debug('Error! No group found');
+      }
+    }
   };
 
   Group.findById(groupId, function(err, group) {
@@ -292,7 +310,7 @@ function collaboration(taskId, cb) {
 
     if (cb) {
       cb(null, relation);
-      
+
     } else {
       debug('No callback provided');
     }

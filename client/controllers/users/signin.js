@@ -17,7 +17,7 @@
           password: $scope.form.password
 
         }).success(function (user) {
-          $session.login(user);
+          $session.signin(user);
           $location.path('/users/' + user._id + '/profile');
           $session.flash('success', 'Welcome back ' + user.email + '!');
 
@@ -26,7 +26,7 @@
 
         }).finally(function () {
           $scope.submitting = false;
-        }); 
+        });
 
       };
     }

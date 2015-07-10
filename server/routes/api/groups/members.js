@@ -7,61 +7,43 @@ var relations = component('relations');
 /*var statics = component('statics');*/
 
 
-module.exports = function(router, mongoose) {
-
-  var Group = mongoose.model('group');
-  var Profile = mongoose.model('profile');
+module.exports = function(router /*, mongoose */) {
 
   /**
    * Get group members
    */
   router.get('/:id', function(req, res, next) {
 
-    var members = [];
-
-    Group.
-
-    findOne().
-
-    where('_id', req.params.id).
-
-    where('members.user', req.session.user._id).
-
-    deepPopulate('members.user members.user.profile').
-
-    exec(function(err, group) {
+    relations.membership(req.params.id, function(err, relation) {
 
       if (err) {
+        return next(err);
+      }
 
-        if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
+      if (relation.group) {
+
+        if (relation.isMember(req.session.user._id)) {
+
+          relation.cleanMembers();
+
+          relation.group.deepPopulate('members.user members.user.profile', function(err, group){
+            if (err) {
+              return next(err);
+            }
+
+            res.send(group.members);
+
+          });
         } else {
-          next(err);
+          debug('User %s is not member of group %s',req.session.user._id , req.params.id);
+          res.sendStatus(403);
         }
-
-      } else if (group) {
-
-        group.members.forEach(function(member) {
-
-          if (!member.left.length) { /* Check if user left in some point */
-
-            members.push(member);
-
-          } else if (member.joined.length > member.left.length) {
-
-            members.push(member);
-
-          }
-
-        });
-
-        res.send(members);
-
       } else {
+        debug('Group %s was not found', req.params.id);
         res.sendStatus(404);
       }
     });
-
+    
   });
 
   /**

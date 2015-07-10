@@ -6,7 +6,7 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      $http.post('/api/contacts/' + $routeParams.id).
+      $http.post('/api/contacts', {id: $routeParams.id}).
 
       success(function() {
         $location.path('/contacts');

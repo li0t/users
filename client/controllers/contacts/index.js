@@ -7,6 +7,7 @@
     function($scope, $http, $location, $session) {
       $scope.fetchingContacts = null;
       $scope.fetchingPending = null;
+      $scope.notFoundUser = null;
       $scope.foundUser = null;
       $scope.contacts = null;
       $scope.pendings = null;
@@ -57,16 +58,44 @@
 
           error(function() {
             $session.flash('danger', 'Usuario no encontrado!');
+            $scope.notFoundUser = $scope.searchContact;
           });
         } else {
           $session.flash('success', 'Ese eres tu, genial!');
         }
       };
 
-      $scope.resetFound = function(){
-        if ($scope.foundUser) {
-          $scope.foundUser = null;
-        }
+      $scope.resetFound = function() {
+        $scope.foundUser = null;
+        $scope.notFoundUser = null;
+      };
+
+      $scope.inviteNotFound = function() {
+
+        $http.post('/api/users/invited', { email: $scope.notFoundUser }).
+
+        success(function(user) {
+
+          $http.post('/api/contacts', { id: user }).
+
+          success(function(user) {
+
+            $http.post('/api/mandrill/invite', { id: user }).
+
+            success(function() {
+              $scope.searchContact = null;
+              $scope.notFoundUser = null;
+              $session.flash('success', 'Bien! Has invitado un amigo a emeeter.');
+
+            }).error(function() {
+              $session.flash('danger', 'An error ocurred!');
+            });
+          }).error(function() {
+            $session.flash('danger', 'An error ocurred!');
+          });
+        }).error(function() {
+          $session.flash('danger', 'An error ocurred!');
+        });
       };
 
       $scope.fetchContacts();

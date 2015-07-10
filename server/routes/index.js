@@ -13,6 +13,7 @@ module.exports = function(router) {
 
     /* Users */
     '/users', '/users/:id/profile', '/users/signup', '/users/signin', '/users/recover', '/users/validate/:token', '/users/reset/:token',
+    '/users/invited/validate/:token',
 
     /* Groups */
     '/groups', '/groups/create', '/groups/:id/profile',

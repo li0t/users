@@ -15,14 +15,14 @@ module.exports = function(router, mongoose) {
   /**
    * Add contact
    */
-  router.post('/:id', function(req, res, next) {
+  router.post('/', function(req, res, next) {
 
     var sender = null;
     var receiver = null;
     var senderIsContact;
     var receiverIsContact;
 
-    relations.contact(req.params.id, function(err, receiverRelation) {
+    relations.contact(req.body.id, function(err, receiverRelation) {
 
       if (!err && receiverRelation.contact) {
 
@@ -67,11 +67,10 @@ module.exports = function(router, mongoose) {
 
                         } else {
 
-                          /** The user was not part of the emeeter platform, and is in a pending state */
+                          /** The user is not yet part of the emeeter platform, and is in a pending state */
                           if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
 
-                            res.send('Great! You have invited a collaborator to emeeter');
-
+                            res.send(user._id);
 
                           } else { /** The user is part of emeeter and a contact request email is going to be sent */
 
@@ -140,9 +139,7 @@ module.exports = function(router, mongoose) {
     var receiverIsContact;
 
     Token.findById(req.params.token, function(err, token) {
-
       if (err) {
-
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
@@ -182,7 +179,7 @@ module.exports = function(router, mongoose) {
                         } else {
 
                           debug('User %s and %s are now contacts!', receiver.user, sender.user);
-                          res.send('User ' + receiver.user + ' and ' + sender.user + ' are now contacts!');
+                          res.end();
 
                           Token.remove({
                             _id: token._id

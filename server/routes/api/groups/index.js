@@ -192,8 +192,10 @@ module.exports = function(router, mongoose) {
 
           relations.membership(group._id, function(err, relation) {
 
-            if (!err && relation.group && relation.isMember(user)) {
-              groups.push(group);
+            if (relation.isMember(user)) {
+
+              relation.cleanMembers();
+              groups.push(relation.group);
             }
 
             checked += 1;
@@ -206,7 +208,7 @@ module.exports = function(router, mongoose) {
         });
 
       } else {
-        res.sendStatus(404);
+        res.send(groups);
       }
     });
 
@@ -217,18 +219,17 @@ module.exports = function(router, mongoose) {
    */
   router.get('/:id/profile', function(req, res, next) {
 
-    var group = req.params.id;
     var user = req.session.user._id;
 
-    relations.membership(group, function(err, relation) {
+    relations.membership(req.params.id, function(err, relation) {
 
       if (!err && relation.group) {
 
-        group = relation.group;
-
         if (relation.isMember(user)) {
 
-          group.deepPopulate('profile admin.profile', function(err, group) {
+          relation.cleanMembers();
+
+          relation.group.deepPopulate('profile admin.profile', function(err, group) {
             if (err) {
               return next(err);
             }

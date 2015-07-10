@@ -16,8 +16,7 @@
           email: $scope.data.email,
           password: $scope.data.password
 
-        }).success(function (user) {
-          $session.login(user);
+        }).success(function () {
           $location.path('/');
           $session.flash('success', 'Te ha sido enviado un mail de confirmación');
 

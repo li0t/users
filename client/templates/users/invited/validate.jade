@@ -1,0 +1,33 @@
+div.row
+  div.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4
+    div.panel.panel-default
+      div.panel-heading
+        h3.panel-title
+          i.fa.fa-sign-in
+          |  Sign In
+
+      form(
+        name='form',
+        role='form',
+        ng-submit='form.$valid && submit()',
+        novalidate)
+
+        div.panel-body
+          div.input-group
+            samp.input-group-addon
+                i.fa.fa-fw.fa-asterisk
+
+            input.form-control(
+              placeholder='Elije una contraseña',
+              ng-model='data.password',
+              ng-minlength='4',
+              type='password',
+              required)
+
+        div.panel-footer.text-right
+          button.btn.btn-primary(
+            ng-disabled='form.$invalid || submitting',
+            type='submit')
+
+            i.fa(class='{{ submitting && "fa-circle-o-notch fa-spin" || "fa-sign-in" }}')
+            |  Sign In

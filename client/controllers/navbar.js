@@ -9,7 +9,7 @@
       $scope.signout = function () {
         $http.get('/api/users/signout').success(function () {
           $session.flash('success', 'See you soon ' + $session.user('email') + '!');
-          $session.logout();
+          $session.signout();
           $location.path('/');
 
         }).error(function () {

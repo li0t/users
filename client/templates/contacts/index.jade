@@ -68,6 +68,13 @@ div.panel.panel-default
         a(ng-href='/contacts/add/{{foundUser._id}}')
           i.fa.fa-mr.fa-plus
             p Agregar
+  
+  div.panel-body.text-center(ng-show='notFoundUser')
+    div.row
+      div.btn.btn-default.btn-block(ng-click='inviteNotFound()')
+        p {{ notFoundUser }}
+        i.fa.fa-mr.fa-plus
+        | Invitar a emeeter          
             
   div.panel-body.text-center(ng-show='foundPendingUser')
     div.row
