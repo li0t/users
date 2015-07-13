@@ -10,7 +10,7 @@ var Contact = mongoose.model('contact');
 var Group = mongoose.model('group');
 var Task = mongoose.model('task');
 
-function contact(userId, cb) { /** Returns a relation object with the contact model and a isContact method */
+function contact(id, cb) { /** Returns a relation object with the contact model and a isContact method */
 
   var i;
 
@@ -55,37 +55,30 @@ function contact(userId, cb) { /** Returns a relation object with the contact mo
 
   };
 
-  Contact.
+  Contact.findOne().
 
-  findOne().
-
-  where('user', userId).
+  where('user', id).
 
   exec(function(err, contact) {
+    if (cb) {
 
-    if (err) {
-      cb(err, null);
+      if (err) {
+        return cb(err, null);
+      }
 
-    } else if (contact) {
       relation.contact = contact;
 
-    } else {
-      debug('Contact list for user %s was not found', userId);
-    }
-
-    if (cb) {
       cb(null, relation);
 
     } else {
       debug('Error! No callback provided');
     }
-
   });
 
 }
 
 
-function membership(groupId, cb) { /** Returns a relation object with the group model and a isMember method */
+function membership(id, cb) { /** Returns a relation object with the group model and a isMember method */
 
   var i;
 
@@ -179,24 +172,20 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
           }
         }
       } else {
-        debug('Error! No group found');
+        debug('Error! No gridoup found');
       }
     }
   };
 
-  Group.findById(groupId, function(err, group) {
+  Group.findById(id, function(err, group) {
+    if (cb) {
 
-    if (err) {
-      cb(err, null);
+      if (err) {
+        return cb(err, null);
+      }
 
-    } else if (group) {
       relation.group = group;
 
-    } else {
-      debug('No group found');
-    }
-
-    if (cb) {
       cb(null, relation);
 
     } else {
@@ -206,7 +195,7 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
 
 }
 
-function collaboration(taskId, cb) {
+function collaboration(id, cb) {
 
   var i;
 
@@ -286,27 +275,20 @@ function collaboration(taskId, cb) {
 
   };
 
-  Task.
+  Task.findOne().
 
-  findOne().
-
-  where('_id', taskId).
-
+  where('_id', id).
   where('deleted', null).
 
   exec(function(err, task) {
+    if (cb) {
 
-    if (err) {
-      cb(err, null);
+      if (err) {
+        return cb(err, null);
+      }
 
-    } else if (task) {
       relation.task = task;
 
-    } else {
-      debug('No task found');
-    }
-
-    if (cb) {
       cb(null, relation);
 
     } else {

@@ -194,7 +194,9 @@ module.exports = function(router, mongoose) {
 
             if (relation.isMember(user)) {
 
+              relation.group = group;
               relation.cleanMembers();
+              
               groups.push(relation.group);
             }
 
