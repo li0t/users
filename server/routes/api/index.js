@@ -9,7 +9,7 @@ module.exports = function(router, mongoose) {
 
     /* Check if there's a user in session */
     if (req.session.user) {
-      res.send({
+      return res.send({
         user: {
           _id: req.session.user._id,
           email: req.session.user.email,
@@ -21,9 +21,9 @@ module.exports = function(router, mongoose) {
           }
         }
       });
-    } else {
-      res.end();
     }
+
+    res.end();
 
   });
 

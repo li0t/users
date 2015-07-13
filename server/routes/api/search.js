@@ -24,9 +24,7 @@ module.exports = function(router, mongoose) {
         where('state', statics.model('state', 'active')._id).
 
         exec(function(err, user) {
-
           if (err) {
-
             if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
               res.sendStatus(400);
             } else {
@@ -43,11 +41,9 @@ module.exports = function(router, mongoose) {
           }
         });
       } else {
-
         res.sendStatus(400);
-
       }
-    });
 
+    });
 
 };

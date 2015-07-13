@@ -58,15 +58,13 @@ module.exports = function(router, mongoose) {
       User.findById(req.params.id, function(err, user) {
 
         if (err) {
-          next(err);
-        } else if (user) {
+          return next(err);
+        }
+
+        if (user) {
 
           Token.remove({
             user: user._id
-          }, function(err) { /* Remove any previous tokens assigned to the user */
-            if (err) {
-              debug(err);
-            }
           });
 
           new Token({
@@ -74,52 +72,47 @@ module.exports = function(router, mongoose) {
           }). /* Assign a new Token to the user */
 
           save(function(err, token) {
-
             if (err) {
-              next(err);
-            } else {
-
-              message = { /* Parameters to inject into Mandrill template */
-                "html": "<a href='http://" + url + "/users/validate/" + token._id + "'>Please confirm your email</a>",
-                "text": "Bievenido a eMeeter",
-                "subject": "Confirm your email",
-                "from_email": senderEmail,
-                "from_name": sender,
-                "to": [{
-                  "email": user.email,
-                  "name": user.email,
-                  "type": "to"
-                }],
-                "headers": {
-                  "Reply-To": "noreply@emeeter.com"
-                },
-                "track_opens": true,
-                "track_clicks": true,
-                "important": true
-
-              };
-
-              api.messages.send({ /* Send a confirmation email to the user */
-                "message": message
-
-              }, function(result) {
-                debug(result);
-                res.send("You've been sent a confirmation email.");
-
-              }, function(err) {
-                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-                res.sendStatus(500);
-              });
+              return next(err);
             }
 
-          });
+            message = { /* Parameters to inject into Mandrill template */
+              "html": "<a href='http://" + url + "/users/validate/" + token._id + "'>Please confirm your email</a>",
+              "text": "Bievenido a eMeeter",
+              "subject": "Confirm your email",
+              "from_email": senderEmail,
+              "from_name": sender,
+              "to": [{
+                "email": user.email,
+                "name": user.email,
+                "type": "to"
+              }],
+              "headers": {
+                "Reply-To": "noreply@emeeter.com"
+              },
+              "track_opens": true,
+              "track_clicks": true,
+              "important": true
 
+            };
+
+            api.messages.send({ /* Send a confirmation email to the user */
+              "message": message
+
+            }, function(result) {
+              debug(result);
+              res.send("You've been sent a confirmation email.");
+
+            }, function(err) {
+              debug('A mandrill error occurred %s : %s', +err.nam, err.message);
+              res.sendStatus(500);
+            });
+          });
         } else {
           debug('No user found with id %s ', +req.params.id);
           res.sendStatus(404);
         }
       });
-
     } else {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
@@ -139,8 +132,10 @@ module.exports = function(router, mongoose) {
 
       User.findById(req.body.id, function(err, user) {
         if (err) {
-          next(err);
-        } else if (user) {
+          return next(err);
+        }
+
+        if (user) {
 
           new Token({ /** Create token to allow contact confirmation */
             user: user._id,
@@ -149,40 +144,39 @@ module.exports = function(router, mongoose) {
 
           save(function(err) {
             if (err) {
-              next(err);
-            } else {
-
-              message = {
-                "html": "<a href='http://" + url + "/'>Go to emeeter</a>",
-                "text": "Someone wants to contact you",
-                "subject": "Someone wants to contact you",
-                "from_email": senderEmail,
-                "from_name": sender,
-                "to": [{
-                  "email": user.email,
-                  "name": user.email,
-                  "type": "to"
-                }],
-                "headers": {
-                  "Reply-To": "noreply@emeeter.com"
-                },
-                "track_opens": true,
-                "track_clicks": true,
-                "important": false
-              };
-
-              api.messages.send({ /* Send a confirmation email to the user */
-                "message": message
-
-              }, function(result) {
-                debug(result);
-                res.send("You have sent a contact request! Good!");
-
-              }, function(err) {
-                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-                res.sendStatus(500);
-              });
+              return next(err);
             }
+
+            message = {
+              "html": "<a href='http://" + url + "/'>Go to emeeter</a>",
+              "text": "Someone wants to contact you",
+              "subject": "Someone wants to contact you",
+              "from_email": senderEmail,
+              "from_name": sender,
+              "to": [{
+                "email": user.email,
+                "name": user.email,
+                "type": "to"
+              }],
+              "headers": {
+                "Reply-To": "noreply@emeeter.com"
+              },
+              "track_opens": true,
+              "track_clicks": true,
+              "important": false
+            };
+
+            api.messages.send({ /* Send a confirmation email to the user */
+              "message": message
+
+            }, function(result) {
+              debug(result);
+              res.send("You have sent a contact request! Good!");
+
+            }, function(err) {
+              debug('A mandrill error occurred %s : %s', +err.nam, err.message);
+              res.sendStatus(500);
+            });
           });
         } else {
           debug('No user found with id %s ', +req.params.id);
@@ -207,8 +201,10 @@ module.exports = function(router, mongoose) {
 
       User.findById(req.body.id, function(err, user) {
         if (err) {
-          next(err);
-        } else if (user) {
+          return next(err);
+        }
+
+        if (user) {
 
           new Token({
             user: user._id,
@@ -216,50 +212,46 @@ module.exports = function(router, mongoose) {
           }).
 
           save(function(err, token) {
-
             if (err) {
-              next(err);
-            } else {
-
-              message = {
-                "html": "<a href='http://" + url + "/users/invited/validate/" + token._id + "'/>Go to emeeter</a>",
-                "text": "Have you tried emeeter? Check it now!",
-                "subject": "emeeter invitation",
-                "from_email": senderEmail,
-                "from_name": req.session.user.email,
-                "to": [{
-                  "email": user.email,
-                  "name": user.email,
-                  "type": "to"
-                }],
-                "headers": {
-                  "Reply-To": "noreply@emeeter.com"
-                },
-                "track_opens": true,
-                "track_clicks": true,
-                "important": false
-              };
-
-              api.messages.send({ /* Send a invite email*/
-                "message": message
-
-              }, function(result) {
-                debug(result);
-                res.send(user._id);
-
-              }, function(err) {
-                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-                res.sendStatus(500);
-              });
+              return next(err);
             }
-          });
 
+            message = {
+              "html": "<a href='http://" + url + "/users/invited/validate/" + token._id + "'/>Go to emeeter</a>",
+              "text": "Have you tried emeeter? Check it now!",
+              "subject": "emeeter invitation",
+              "from_email": senderEmail,
+              "from_name": req.session.user.email,
+              "to": [{
+                "email": user.email,
+                "name": user.email,
+                "type": "to"
+              }],
+              "headers": {
+                "Reply-To": "noreply@emeeter.com"
+              },
+              "track_opens": true,
+              "track_clicks": true,
+              "important": false
+            };
+
+            api.messages.send({ /* Send a invite email*/
+              "message": message
+
+            }, function(result) {
+              debug(result);
+              res.send(user._id);
+
+            }, function(err) {
+              debug('A mandrill error occurred %s : %s', +err.nam, err.message);
+              res.sendStatus(500);
+            });
+          });
         } else {
           debug('No user found with id %s ', +req.params.id);
           res.sendStatus(404);
         }
       });
-
     } else {
       debug('A error occurred with the Mandrill client');
       res.sendStatus(500);
@@ -276,57 +268,57 @@ module.exports = function(router, mongoose) {
 
       var message;
 
-      User.
+      User.findOne().
 
-      findOne().
       where('email', req.params.email).
 
       exec(function(err, user) {
         if (err) {
-          next(err);
-        } else if (user) {
+          return next(err);
+        }
+
+        if (user) {
 
           new Token({
             user: user._id
           }).
 
           save(function(err, token) {
-
             if (err) {
-              next(err);
-            } else {
-
-              message = {
-                "html": "<a href='http://" + url + "/users/recover/" + token._id + "'>Reset your password</a>",
-                "text": "Reset your password",
-                "subject": "Reset your password",
-                "from_email": senderEmail,
-                "from_name": sender,
-                "to": [{
-                  "email": user.email,
-                  "name": user.email,
-                  "type": "to"
-                }],
-                "headers": {
-                  "Reply-To": "noreply@emeeter.com"
-                },
-                "track_opens": true,
-                "track_clicks": true,
-                "important": false
-              };
-
-              api.messages.send({ /* Send a recovery email to the user */
-                "message": message
-
-              }, function(result) {
-                debug(result);
-                res.send("A recovery email has been sent to " + user.email);
-
-              }, function(err) {
-                debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-                res.sendStatus(500);
-              });
+              return next(err);
             }
+
+            message = {
+              "html": "<a href='http://" + url + "/users/recover/" + token._id + "'>Reset your password</a>",
+              "text": "Reset your password",
+              "subject": "Reset your password",
+              "from_email": senderEmail,
+              "from_name": sender,
+              "to": [{
+                "email": user.email,
+                "name": user.email,
+                "type": "to"
+              }],
+              "headers": {
+                "Reply-To": "noreply@emeeter.com"
+              },
+              "track_opens": true,
+              "track_clicks": true,
+              "important": false
+            };
+
+            api.messages.send({ /* Send a recovery email to the user */
+              "message": message
+
+            }, function(result) {
+              debug(result);
+              res.send("A recovery email has been sent to " + user.email);
+
+            }, function(err) {
+              debug('A mandrill error occurred %s : %s', +err.nam, err.message);
+              res.sendStatus(500);
+            });
+
           });
         } else {
           debug('No user found for ' + req.params.email);

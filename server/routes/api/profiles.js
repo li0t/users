@@ -4,7 +4,6 @@ var debug = require('debug')('app:api:profiles');
 
 var gridfs = component('gridfs');
 var relations = component('relations');
-var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
@@ -13,49 +12,30 @@ module.exports = function(router, mongoose) {
   /**
    * Update Profile linked to User
    */
-  router.post('/', function(req, res, next) {
-
-    var genders = statics.models.gender;
-    var _gender;
-    var gender = null;
-
-    for (_gender in genders) { /** Search the gender id and check that exists */
-
-      if (genders.hasOwnProperty(_gender)) {
-
-        if (JSON.stringify(genders[_gender]._id) === JSON.stringify(req.body.gender)) {
-
-          gender = req.body.gender;
-          break;
-
-        }
-      }
-    }
+  router.put('/', function(req, res, next) {
 
     Profile.findById(req.session.user.profile, function(err, profile) {
-
       if (err) {
-        next(err);
+        return next(err);
+      }
 
-      } else if (profile) {
+      if (profile) {
 
         profile.name = req.body.name || profile.name;
 
         profile.birthdate = req.body.birthdate || profile.birthdate;
 
-        profile.gender = gender || profile.gender;
+        profile.gender = req.body.gender || profile.gender;
 
         profile.location = req.body.location || profile.location;
 
         profile.save(function(err) {
-
           if (err) {
             if (err.name && err.name === 'CastError') {
               res.sendStatus(400);
             } else {
               next(err);
             }
-
           } else {
 
             res.sendStatus(204);
@@ -130,8 +110,10 @@ module.exports = function(router, mongoose) {
 
     Profile.findById(req.session.user.profile, function(err, data) {
       if (err) {
-        next(err);
-      } else if (data) {
+        return next(err);
+      }
+
+      if (data) {
 
         profile = data;
 
@@ -151,7 +133,7 @@ module.exports = function(router, mongoose) {
   /**
    * Update group profile
    */
-  router.post('/group/:id', function(req, res, next) {
+  router.put('/group/:id', function(req, res, next) {
 
     var user = req.session.user._id;
     var group = req.params.id;
@@ -165,27 +147,22 @@ module.exports = function(router, mongoose) {
         if (membership.isAdmin(user)) {
 
           Profile.findById(group.profile, function(err, profile) {
-
             if (err) {
-              next(err);
-
-            } else {
-
-              profile.name = req.body.name || profile.name;
-
-              profile.location = req.body.location || profile.location;
-
-              profile.save(function(err) {
-
-                if (err) {
-                  next(err);
-
-                } else {
-                  res.sendStatus(204);
-                }
-
-              });
+              return next(err);
             }
+
+            profile.name = req.body.name || profile.name;
+
+            profile.location = req.body.location || profile.location;
+
+            profile.save(function(err) {
+              if (err) {
+                return next(err);
+              }
+
+              res.sendStatus(204);
+
+            });
           });
         } else {
           debug('User %s is not admin of group %s', user, group._id);
@@ -216,10 +193,10 @@ module.exports = function(router, mongoose) {
 
       profile.save(function(err) {
         if (err) {
-          next(err);
-        } else {
-          res.sendStatus(204);
+          return next(err);
         }
+        res.sendStatus(204);
+
       });
     }
 

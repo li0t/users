@@ -7,7 +7,7 @@ var relations = component('relations');
 /*var statics = component('statics');*/
 
 
-module.exports = function(router /*, mongoose */) {
+module.exports = function(router /*, mongoose */ ) {
 
   /**
    * Get group members
@@ -15,7 +15,6 @@ module.exports = function(router /*, mongoose */) {
   router.get('/:id', function(req, res, next) {
 
     relations.membership(req.params.id, function(err, relation) {
-
       if (err) {
         return next(err);
       }
@@ -26,7 +25,7 @@ module.exports = function(router /*, mongoose */) {
 
           relation.cleanMembers();
 
-          relation.group.deepPopulate('members.user members.user.profile', function(err, group){
+          relation.group.deepPopulate('members.user members.user.profile', function(err, group) {
             if (err) {
               return next(err);
             }
@@ -35,7 +34,7 @@ module.exports = function(router /*, mongoose */) {
 
           });
         } else {
-          debug('User %s is not member of group %s',req.session.user._id , req.params.id);
+          debug('User %s is not member of group %s', req.session.user._id, req.params.id);
           res.sendStatus(403);
         }
       } else {
@@ -43,7 +42,7 @@ module.exports = function(router /*, mongoose */) {
         res.sendStatus(404);
       }
     });
-    
+
   });
 
   /**
@@ -109,14 +108,13 @@ module.exports = function(router /*, mongoose */) {
 
               group.save(function(err) {
                 if (err) {
-                  next(err);
-
-                } else {
-
-                  debug('Saved group %s with %s new members', group._id, saved);
-                  res.send('Added ' + saved + ' new members to group ' + group._id);
+                  return next(err);
 
                 }
+
+                debug('Saved group %s with %s new members', group._id, saved);
+                res.send('Added ' + saved + ' new members to group ' + group._id);
+
               });
             });
           } else {
@@ -210,14 +208,13 @@ module.exports = function(router /*, mongoose */) {
 
             group.save(function(err) {
               if (err) {
-                next(err);
+                return next(err);
 
-              } else {
+              }
 
                 debug('%s of %s members removed from group %s', removed, members.length, group._id);
                 res.send(removed + ' of ' + members.length + ' members removed from group ' + group._id);
 
-              }
             });
 
           } else {

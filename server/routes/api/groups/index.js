@@ -167,9 +167,7 @@ module.exports = function(router, mongoose) {
     var toCheck = 0;
     var checked = 0;
 
-    Group.
-
-    find().
+    Group.find().
 
     where('members.user', user).
 
@@ -180,11 +178,11 @@ module.exports = function(router, mongoose) {
     deepPopulate('profile admin.profile').
 
     exec(function(err, found) {
-
       if (err) {
-        next(err);
+        return next(err);
+      }
 
-      } else if (found.length) {
+      if (found.length) {
 
         toCheck = found.length;
 
@@ -196,7 +194,7 @@ module.exports = function(router, mongoose) {
 
               relation.group = group;
               relation.cleanMembers();
-              
+
               groups.push(relation.group);
             }
 

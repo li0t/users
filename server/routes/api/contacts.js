@@ -1,16 +1,15 @@
 'use strict';
 
-var _ = require('underscore'),
-  debug = require('debug')('app:api:contacts');
+var _ = require('underscore');
+var debug = require('debug')('app:api:contacts');
 
-var relations = component('relations'),
-  statics = component('statics');
+var relations = component('relations');
+var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
-  var Contact = mongoose.model('contact'),
-    Token = mongoose.model('token'),
-    User = mongoose.model('user');
+  var Contact = mongoose.model('contact');
+  var Token = mongoose.model('token');
 
   /**
    * Add contact
@@ -50,19 +49,16 @@ module.exports = function(router, mongoose) {
 
               sender.save(function(err) {
                 if (err) {
-                  next(err);
-                } else {
-
-                  receiver.save(function(err) {
-                    if (err) {
-                      next(err);
-                    } else {
-
-                      res.send(receiver.user);
-
-                    }
-                  });
+                  return next(err);
                 }
+
+                receiver.save(function(err) {
+                  if (err) {
+                    return next(err);
+                  }
+                  res.send(receiver.user);
+
+                });
               });
             } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'active')._id)) { /** The contact state is Active */
 
@@ -81,19 +77,17 @@ module.exports = function(router, mongoose) {
 
               sender.save(function(err) {
                 if (err) {
-                  next(err);
-                } else {
-
-                  receiver.save(function(err) {
-                    if (err) {
-                      next(err);
-                    } else {
-
-                      res.send(receiver.user);
-
-                    }
-                  });
+                  return next(err);
                 }
+
+                receiver.save(function(err) {
+                  if (err) {
+                    return next(err);
+                  }
+
+                  res.send(receiver.user);
+
+                });
               });
             }
           } else {
@@ -141,8 +135,8 @@ module.exports = function(router, mongoose) {
 
                 sender = senderRelation.contact;
 
-                senderIsContact = receiverRelation.isContact(sender.user, true);
-                receiverIsContact = senderRelation.isContact(receiver.user, true);
+                senderIsContact = receiverRelation.isContact(sender.user, true); /** True value allows to know if user is contact **/
+                receiverIsContact = senderRelation.isContact(receiver.user, true); /** But in a pending state */
 
                 if (senderIsContact && receiverIsContact) {
 
@@ -151,27 +145,22 @@ module.exports = function(router, mongoose) {
 
                   receiver.save(function(err) {
                     if (err) {
-                      next(err);
-                    } else {
-
-                      sender.save(function(err) {
-                        if (err) {
-                          next(err);
-                        } else {
-
-                          debug('User %s and %s are now contacts!', receiver.user, sender.user);
-                          res.end();
-
-                          Token.remove({
-                            _id: token._id
-                          }, function(err) {
-                            if (err) {
-                              debug(err);
-                            }
-                          });
-                        }
-                      });
+                      return next(err);
                     }
+
+                    sender.save(function(err) {
+                      if (err) {
+                        return next(err);
+                      }
+
+                      debug('User %s and %s are now contacts!', receiver.user, sender.user);
+                      res.end();
+
+                      Token.remove({
+                        _id: token._id
+                      });
+
+                    });
                   });
                 } else {
                   res.sendStatus(400);
@@ -225,20 +214,19 @@ module.exports = function(router, mongoose) {
 
               receiver.save(function(err) {
                 if (err) {
-                  next(err);
-                } else {
-
-                  sender.save(function(err) {
-                    if (err) {
-                      next(err);
-                    } else {
-
-                      debug('User %s and %s are no longer contacts!', receiver.user, sender.user);
-                      res.send('User ' + receiver.user + ' and ' + sender.user + ' are no longer contacts!');
-
-                    }
-                  });
+                  return next(err);
                 }
+
+                sender.save(function(err) {
+                  if (err) {
+                    return next(err);
+                  }
+
+                  debug('User %s and %s are no longer contacts!', receiver.user, sender.user);
+                  res.send('User ' + receiver.user + ' and ' + sender.user + ' are no longer contacts!');
+
+                });
+
               });
 
             } else {
@@ -254,48 +242,31 @@ module.exports = function(router, mongoose) {
 
                 receiver.save(function(err) {
                   if (err) {
-                    next(err);
-                  } else {
-
-                    sender.save(function(err) {
-                      if (err) {
-                        next(err);
-                      } else {
-
-                        debug('The contact request between %s and %s has been deleted!', receiver.user, sender.user);
-                        res.send('The contact request between ' + receiver.user + ' and ' + sender.user + ' has been deleted!');
-
-                        /**
-                         * Remove contact request token
-                         */
-                        Token.
-                        remove({
-                          user: receiver.user,
-                          sender: sender.user
-                        }).
-                        exec(function(err, removed) {
-                          if (err) {
-                            debug(err);
-                          } else if (removed) {
-                            debug('contact request token with user %s and sender %s has been removed', receiver.user, sender.user);
-                          }
-                        });
-
-                        Token.
-                        remove({
-                          user: sender.user,
-                          sender: receiver.user
-                        }).
-                        exec(function(err, removed) {
-                          if (err) {
-                            debug(err);
-                          } else if (removed) {
-                            debug('contact request token with user %s and sender %s has been removed', receiver.user, sender.user);
-                          }
-                        });
-                      }
-                    });
+                    return next(err);
                   }
+
+                  sender.save(function(err) {
+                    if (err) {
+                      return next(err);
+                    }
+
+                    debug('The contact request between %s and %s has been deleted!', receiver.user, sender.user);
+                    res.send('The contact request between ' + receiver.user + ' and ' + sender.user + ' has been deleted!');
+
+                    /**
+                     * Remove contact request token
+                     */
+                    Token.
+                    remove({
+                      user: receiver.user,
+                      sender: sender.user
+                    });
+
+                    Token.remove({
+                      user: sender.user,
+                      sender: receiver.user
+                    });
+                  });
                 });
               } else {
                 debug('User %s and %s are no contacts with each other!', receiver.user, sender.user);
@@ -332,9 +303,7 @@ module.exports = function(router, mongoose) {
       }
     }
 
-    Contact.
-
-    findOne().
+    Contact.findOne().
 
     where('user', sessionUser).
 
@@ -343,9 +312,10 @@ module.exports = function(router, mongoose) {
     exec(function(err, found) {
 
       if (err) {
-        next(err);
+        return next(err);
+      }
 
-      } else if (found.contacts.length) {
+      if (found.contacts.length) {
 
         toCheck = found.contacts.length;
 
@@ -357,16 +327,17 @@ module.exports = function(router, mongoose) {
 
             checked -= 1;
 
-            Token.
-            findOne().
+            Token.findOne().
+
             where('user', sessionUser).
             where('sender', contact.user._id).
-            exec(function(err, token) {
 
+            exec(function(err, token) {
               if (err) {
                 debug(err);
+              }
 
-              } else if (token) {
+              if (token) {
 
                 contact = contact.user.toObject();
                 contact.token = token._id;
@@ -386,7 +357,6 @@ module.exports = function(router, mongoose) {
             send();
           }
         });
-
       } else {
         res.send(found.contacts);
       }
@@ -401,9 +371,7 @@ module.exports = function(router, mongoose) {
 
     var contacts = [];
 
-    Contact.
-
-    findOne().
+    Contact.findOne().
 
     where('user', req.session.user._id).
 
@@ -414,19 +382,19 @@ module.exports = function(router, mongoose) {
       if (err) {
         return next(err);
 
-      } else {
-
-        found.contacts.forEach(function(contact) {
-
-          if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
-
-            contacts.push(contact.user);
-
-          }
-        });
-
-        res.send(contacts);
       }
+
+      found.contacts.forEach(function(contact) {
+
+        if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
+
+          contacts.push(contact.user);
+
+        }
+      });
+
+      res.send(contacts);
+
     });
 
   });

@@ -11,8 +11,8 @@ module.exports = function (router, mongoose) {
    */
   router.get('/', function(req, res, next){
 
-    Tag.
-    find().
+    Tag.find().
+    
     exec(function(err, tags) {
 
       if (err) {

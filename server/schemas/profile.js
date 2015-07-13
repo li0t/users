@@ -1,8 +1,9 @@
 'use strict';
 
 var deepPopulate = require('mongoose-deep-populate');
+var mongoose = require('mongoose');
 
-module.exports = function (Schema) {
+module.exports = function(Schema) {
 
   var ProfileSchema = new Schema({
 
@@ -36,13 +37,38 @@ module.exports = function (Schema) {
 
   });
 
+  /** Check the set priority is valid */
+  ProfileSchema.path('gender').validate(function(gender, cb) {
+
+    if (gender) {
+      
+      mongoose.model('static.gender').
+
+      findById(gender).
+
+      exec(function(err, found) {
+
+        if (!err && found) {
+          cb(true);
+
+        } else {
+          cb(false);
+
+        }
+      });
+    } else {
+      cb(true);
+
+    }
+  }, 'You must set a valid priority!');
+
   /** Show virtuals on JSON conversion */
   ProfileSchema.set('toJSON', {
     virtuals: true
   });
 
   /**  */
-  ProfileSchema.pre('save', function (next) {
+  ProfileSchema.pre('save', function(next) {
     next();
   });
 
