@@ -26,13 +26,13 @@ module.exports = function(router, mongoose) {
 
       if (!err && receiverRelation.contact) {
 
-      receiver = receiverRelation.contact; /** The contact model of the receiver user */
+        receiver = receiverRelation.contact; /** The contact model of the receiver user */
 
         relations.contact(req.session.user._id, function(err, senderRelation) {
 
           if (!err && senderRelation.contact) {
 
-          sender = senderRelation.contact; /** The contact model of the sender user */
+            sender = senderRelation.contact; /** The contact model of the sender user */
 
             receiverIsContact = senderRelation.isContact(receiver.user, true);
 
@@ -58,27 +58,8 @@ module.exports = function(router, mongoose) {
                       next(err);
                     } else {
 
-                      User.
-                      findById(receiver.user).
-                      exec(function(err, user) {
+                      res.send(receiver.user);
 
-                        if (err) {
-                          next(err);
-
-                        } else {
-
-                          /** The user is not yet part of the emeeter platform, and is in a pending state */
-                          if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
-
-                            res.send(user._id);
-
-                          } else { /** The user is part of emeeter and a contact request email is going to be sent */
-
-                            res.redirect('/api/mandrill/addContact/' + receiver.user);
-
-                          }
-                        }
-                      });
                     }
                   });
                 }
@@ -108,7 +89,7 @@ module.exports = function(router, mongoose) {
                       next(err);
                     } else {
 
-                      res.redirect('/api/mandrill/addContact/' + receiver.user);
+                      res.send(receiver.user);
 
                     }
                   });
@@ -152,13 +133,13 @@ module.exports = function(router, mongoose) {
 
           if (!err && receiverRelation.contact) {
 
-          receiver = receiverRelation.contact;
+            receiver = receiverRelation.contact;
 
             relations.contact(token.sender, function(err, senderRelation) {
 
               if (!err && senderRelation.contact) {
 
-              sender = senderRelation.contact;
+                sender = senderRelation.contact;
 
                 senderIsContact = receiverRelation.isContact(sender.user, true);
                 receiverIsContact = senderRelation.isContact(receiver.user, true);

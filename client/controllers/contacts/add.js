@@ -6,13 +6,23 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      $http.post('/api/contacts', {id: $routeParams.id}).
+      $http.post('/api/contacts', { id: $routeParams.id }).
 
-      success(function() {
-        $location.path('/contacts');
-        $session.flash('success', 'Has enviado una solicitud de contacto!');
+      success(function(user) {
+
+        $http.post('/api/mandrill/addContact', { id: user }).
+
+        success(function() {
+          $location.path('/contacts');
+          $session.flash('success', 'Has enviado una solicitud de contacto!');
+        }).
+
+        error(function(data) {
+          $location.path('/contacts');
+          $session.flash('danger', data);
+        });
+
       }).
-
       error(function(data) {
         $location.path('/contacts');
         $session.flash('danger', data);

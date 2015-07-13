@@ -131,13 +131,13 @@ module.exports = function(router, mongoose) {
   /**
    * Send a contact request
    */
-  router.get('/addContact/:id', function(req, res, next) {
+  router.post('/addContact', function(req, res, next) {
 
     if (api) {
 
       var message = null;
 
-      User.findById(req.params.id, function(err, user) {
+      User.findById(req.body.id, function(err, user) {
         if (err) {
           next(err);
         } else if (user) {

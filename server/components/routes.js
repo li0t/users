@@ -1,5 +1,3 @@
-/* jshint node: true */
-/* global panic */
 'use strict';
 
 var debug = require('debug')('app:routes');

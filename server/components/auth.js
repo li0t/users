@@ -1,4 +1,3 @@
-/* jshint node: true */
 'use strict';
 
 var Type = require('type-of-is');
@@ -14,10 +13,10 @@ function authorize(path, req, res, next) {
   }
 
   if (path.allows === 'all') {
-    debug("%s %s : Allows all", req.method, req.path);
+    //debug("%s %s : Allows all", req.method, req.path);
     next();
   } else if (allowed) {
-    debug("%s %s : Authorized (needed [%s], has [%s])", req.method, req.path, path.allows, req.session.authorized);
+    //debug("%s %s : Authorized (needed [%s], has [%s])", req.method, req.path, path.allows, req.session.authorized);
     next();
   } else {
     debug("%s %s : Unauthorized (allows [%s], has [%s])", req.method, req.path, path.allows, req.session.authorized);

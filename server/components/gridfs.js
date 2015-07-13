@@ -1,4 +1,3 @@
-/* jshint node: true */
 'use strict';
 
 var Grid = require('gridfs-stream');
@@ -8,10 +7,10 @@ var gfs;
 
 /**
  * Initializes the GridFS module.
- * 
+ *
  * @param db {Object} The mongo db instance.
  * @param mongo {Object} The mnative ongo driver.
- * 
+ *
  * @return {Void}
  */
 function init(db, mongo) {
@@ -20,10 +19,10 @@ function init(db, mongo) {
 
 /**
  * Save a new file.
- * 
+ *
  * @param data {Buffer} The file's data buffer.
  * @param options {Object} Any valid gridfs-stream options.
- * 
+ *
  * @retun {Stream} The file's read stream.
  */
 function save(data, options) {
@@ -43,10 +42,10 @@ function save(data, options) {
 
 /**
  * Get a file from GridFS.
- * 
+ *
  * @param filter {String} Either an ObjectID valid string or a filename.
  * @param cb {Function} The callback function. It must accept three parameters (err, fsfile, stream).
- * 
+ *
  * @return {Void}
  */
 function get(filter, cb) {

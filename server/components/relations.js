@@ -1,5 +1,3 @@
-/* jshint node: true */
-/* global component */
 'use strict';
 
 var mongoose = require('mongoose');
@@ -175,7 +173,7 @@ function membership(groupId, cb) { /** Returns a relation object with the group 
         for (i = 0; i < relation.group.members; i++) {
 
           if (relation.group.members[i].left.length && relation.group.members[i].joined.length < relation.group.members[i].left.length) {
-            
+
             relation.group.members.splice(i, 1);
             i -= 1;
           }
