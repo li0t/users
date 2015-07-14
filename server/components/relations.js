@@ -163,16 +163,16 @@ function membership(id, cb) { /** Returns a relation object with the group model
 
       if (relation.group) {
 
-        for (i = 0; i < relation.group.members; i++) {
+        for (i = 0; i < relation.group.members.length; i++) {
 
-          if (relation.group.members[i].left.length && relation.group.members[i].joined.length < relation.group.members[i].left.length) {
+          if (relation.group.members[i].left.length && relation.group.members[i].joined.length === relation.group.members[i].left.length) {
 
             relation.group.members.splice(i, 1);
             i -= 1;
           }
         }
       } else {
-        debug('Error! No gridoup found');
+        debug('Error! No group found');
       }
     }
   };

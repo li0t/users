@@ -1,4 +1,4 @@
-(function (ng) {
+(function(ng) {
   'use strict';
 
   ng.module('App').
@@ -6,7 +6,7 @@
   config([
     '$routeProvider', '$locationProvider',
 
-    function ($routeProvider, $locationProvider) {
+    function($routeProvider, $locationProvider) {
       /** Not found route **/
       $routeProvider.
 
@@ -25,11 +25,25 @@
   run([
     '$rootScope', '$location', '$session', '$http', '$moment',
 
-    function ($rootScope, $location, $session, $http, $moment) {
+    function($rootScope, $location, $session, $http, $moment) {
 
       /* Initialize the session */
       $session.init({
         url: '/api/session'
+      });
+
+      /* Retrieve current session */
+      $http.get('/api/session').
+
+      success(function(data) {
+        $session.signin(data.user);
+
+        $location.path('/welcome');
+
+      }).
+
+      error(function() {
+        //$location.path('/');
       });
 
       /* Calculate server time difference */

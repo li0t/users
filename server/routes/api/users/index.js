@@ -46,42 +46,41 @@ module.exports = function(router, mongoose) {
 
     save(function(err, profile) { /* Create a new Profile that will store the user information */
       if (err) {
-        next(err);
-      } else {
-
-        new User({
-          email: req.body.email,
-          password: req.body.password,
-          profile: profile._id,
-          state: statics.model('state', 'pending')._id
-        }).
-
-        save(function(err, user) {
-          if (err) {
-            /* Check for duplicated entry */
-            if (err.code && err.code === 11000) {
-              res.sendStatus(409);
-            } else if (err.name && err.name === 'ValidationError') {
-              res.sendStatus(400);
-            } else {
-              next(err);
-            }
-          } else {
-
-            new Contact({ /* Create a new ContactSchema that will store the user contacts */
-              user: user._id
-            }).
-
-            save(function(err) {
-              if (err) {
-                next(err);
-              } else {
-                res.redirect('/api/mandrill/signin/' + user._id);
-              }
-            });
-          }
-        });
+        return next(err);
       }
+
+      new User({
+        email: req.body.email,
+        password: req.body.password,
+        profile: profile._id,
+        state: statics.model('state', 'pending')._id
+      }).
+
+      save(function(err, user) {
+        if (err) {
+          /* Check for duplicated entry */
+          if (err.code && err.code === 11000) {
+            res.sendStatus(409);
+          } else if (err.name && err.name === 'ValidationError') {
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
+        } else {
+
+          new Contact({ /* Create a new ContactSchema that will store the user contacts */
+            user: user._id
+          }).
+
+          save(function(err) {
+            if (err) {
+              return next(err);
+            }
+            res.send(user._id);
+
+          });
+        }
+      });
     });
 
   });

@@ -49,13 +49,13 @@ module.exports = function(router, mongoose) {
   /**
    * Send confirmation email
    */
-  router.get('/signin/:id', function(req, res, next) {
+  router.post('/signup', function(req, res, next) {
 
     if (api) {
 
       var message = null;
 
-      User.findById(req.params.id, function(err, user) {
+      User.findById(req.body.id, function(err, user) {
 
         if (err) {
           return next(err);
@@ -105,7 +105,7 @@ module.exports = function(router, mongoose) {
 
             }, function(err) {
               debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-              res.sendStatus(500);
+              res.status(500).send(err);
             });
           });
         } else {

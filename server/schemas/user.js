@@ -3,6 +3,7 @@
 var validator = require('validator');
 var bcrypt = require('bcrypt');
 var deepPopulate = require('mongoose-deep-populate');
+var mongoose = require('mongoose');
 
 module.exports = function (Schema) {
 
@@ -70,6 +71,26 @@ module.exports = function (Schema) {
     }
 
   });
+
+  /** Check the set priority is valid */
+  UserSchema.path('state').validate(function(state, cb) {
+
+    mongoose.model('static.state').
+
+    findById(state).
+
+    exec(function(err, found){
+
+      if(!err && found) {
+        cb(true);
+
+      } else {
+        cb(false);
+
+      }
+    });
+
+  }, 'You must set a valid state!');
 
   /** Lets populate reach any level */
   UserSchema.plugin(deepPopulate, {

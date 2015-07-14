@@ -19,9 +19,11 @@ div.panel.panel-default
   
   div.panel-body(ng-show='!fetchingMembers && members')
     div.row
-      div.col-sm-4(ng-repeat='member in members', ng-init='href = ("/users/{0}/profile" | format : member._id)')
-        div.btn.btn-default.btn-block
-          a(ng-href='{{ href }}')
-            h4 {{ member.user.profile.name || member.user.email }}  
+      div.col-sm-4(ng-repeat='member in members')
+        div.btn.btn-default.btn-block(ng-click='addOrRemove(member.user._id)')
+           h4 {{ member.user.profile.name || member.user.email }}  
           
-    
+   div.panel-body(ng-show='admin && membersToRemove.length')
+     button.btn.btn-block.btn-default(ng-click='removeMembers()')
+       i.fa.fa-mr.fa-minus-square
+       | Eliminar miembros

@@ -57,7 +57,7 @@
           }).
 
           error(function() {
-            $session.flash('danger', 'Usuario no encontrado!');
+            $session.flash('warning', 'Usuario no encontrado!');
             $scope.notFoundUser = $scope.searchContact;
           });
         } else {

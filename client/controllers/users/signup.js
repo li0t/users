@@ -16,11 +16,28 @@
           email: $scope.data.email,
           password: $scope.data.password
 
-        }).success(function () {
-          $location.path('/');
-          $session.flash('success', 'Te ha sido enviado un mail de confirmación');
+        }).
 
-        }).error(function (data, status) {
+        success(function (user) {
+          $http.post('/api/mandrill/signup', {
+            id : user
+          }).
+
+          success(function () {
+            $location.path('/');
+            $session.flash('success', 'Te ha sido enviado un mail de confirmación');
+          }).
+
+          error(function (data) {
+            $session.flash('danger', data);
+          }).
+
+          finally(function () {
+            $scope.submitting = false;
+          });
+        }).
+
+        error(function (data, status) {
           if (status === 409) {
             /* TODO: Mail already exists! do something! */
             $session.flash('warning', 'That email account is already registered. Do you need to recover your password?');
@@ -31,10 +48,6 @@
             /* TODO: Another error ocurred! do something! */
             $session.flash('danger', 'Emmmm... The server doen\'t seem to like you...');
           }
-
-        }).finally(function () {
-          $scope.submitting = false;
-
         });
       };
     }

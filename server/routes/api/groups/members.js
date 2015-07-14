@@ -133,7 +133,7 @@ module.exports = function(router /*, mongoose */ ) {
   });
 
   /**
-   * Remove member from group
+   * Remove members from group
    */
   router.post('/:id/remove', function(req, res, next) {
 

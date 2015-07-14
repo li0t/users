@@ -7,14 +7,14 @@
     function ($scope, $http, $location, $session) {
       $scope.groups = null;
       $scope.fetching = false;
-      
+
       $scope.loadGroups = function () {
 
         $scope.fetching = true;
 
         $http.get('/api/groups/me').
 
-        success(function(groups){
+        success(function(groups) {
           $scope.groups = groups;
         }).
 
