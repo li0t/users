@@ -5,21 +5,21 @@ module.exports = function (grunt) {
 
   var scripts = {
     'client/assets/scripts/client.min.js': [
-      'client/app.js',
+      'client/scripts/app.js',
 
-      'client/filters/**/*.js',
-      'client/modules/**/*.js',
-      'client/services/**/*.js',
-      'client/directives/**/*.js',
-      'client/controllers/**/*.js',
-      'client/routes/**/*.js',
+      'client/scripts/modules/**/*.js',
+      'client/scripts/services/**/*.js',
+      'client/scripts/routes/**/*.js',
+      'client/scripts/controllers/**/*.js',
+      'client/scripts/directives/**/*.js',
 
-      'client/main.js'
+      'client/scripts/main.js'
+
     ]
   };
 
   var styles = {
-    'client/assets/styles/styles.min.css': 'client/styles/bootstrap.less'
+    'client/assets/styles/styles.min.css': 'client/styles/styles.less',
   };
 
   var templates = [{

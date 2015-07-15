@@ -1,28 +1,31 @@
+- var suffix = development ? '' : '.min';
+
 doctype html
 
-//- You may want to comment the manifest attr while developing
-//html(
-//  manifest='/appcache.mf',
-//  ng-app='App',
-//  lang='en')
-  
 html(
   ng-app='App',
-  lang='en')
+  lang='es')
 
   head
     include ./elements/head
 
-  body
-    //- Navbar
-    include ./elements/navbar
+  body(layout='row')
+    md-sidenav.md-sidenav-left(
+      md-is-locked-open='$mdMedia("gt-sm")',
+      md-component-id='left',
+      main-sidebar)
 
-    main
-      //- Flash messages
-      include ./elements/flash
-      
-      //- Angular viewport
-      div.container-fluid(ng-view)
+    md-content(
+      layout='column',
+      tabIndex='-1',
+      role='main',
+      flex)
 
-    //- App scripts
+      md-toolbar(main-navbar)
+
+      md-content(
+        autoscroll='true',
+        ng-view,
+        flex)
+
     include ./elements/scripts

@@ -5,14 +5,14 @@
 
 doctype html
 
-html(lang='en')
+html(lang='es')
 
   head
     include ./elements/head
 
   body.container-fluid
     h1
-      strong #{err.status}
-      |  - #{err.message}
+      strong= err.status
+      span= err.message
 
-    pre #{err.stack}
+    pre= err.stack

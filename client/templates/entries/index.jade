@@ -8,6 +8,11 @@ div.panel.panel-default
     a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
       i.fa.fa-mr.fa-user
       | Volver
+      
+  div.panel-body
+    a.btn.btn-block.btn-lg.btn-default(ng-href='/entries/create')
+      i.fa.fa-mr.fa-plus
+      | Crear Entrada      
           
   div.panel-body.text-center(ng-show='fetching && !entries')
     h4

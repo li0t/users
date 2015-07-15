@@ -1,25 +1,21 @@
 'use strict';
 
-var _ = require('underscore');
 var debug = require('debug')('app:api:entries');
 
 var relations = component('relations');
-var statics = component('statics');
 var gridfs = component('gridfs');
 
 module.exports = function(router, mongoose) {
 
   var Entry = mongoose.model('entry');
   var Tag = mongoose.model('tag');
-  var Task = mongoose.model('task');
 
   /**
    * Create a new entry
    */
-  router.post('/create', function(req, res, next) { /** TODO: always create without group */
+  router.post('/', function(req, res, next) {
 
     var entry; /* This is the target schema */
-    var group = req.body.group || null;
     var tagsSaved = 0;
 
     /**
@@ -28,10 +24,11 @@ module.exports = function(router, mongoose) {
     function saveEntry() {
       entry.save(function(err, entry) {
         if (err) {
-          next(err);
-        } else {
-          res.status(201).send(entry._id);
+          return next(err);
         }
+
+        res.status(201).send(entry._id);
+
       });
     }
 

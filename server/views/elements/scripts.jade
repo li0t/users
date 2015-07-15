@@ -1,19 +1,16 @@
-- var suffix = development ? '' : '.min';
-
-//- Include the Socket.IO client library
-script(src='/socket.io/socket.io.js')
+- var component = '/assets/components';
 
 //- Include other libraries
 script(src='/assets/components/moment/min/moment-with-locales#{ suffix }.js')
 
-//- Include Angular and it's dependencies
-script(src='/assets/components/angular/angular#{ suffix }.js')
-script(src='/assets/components/angular-aria/angular-aria#{ suffix }.js')
-script(src='/assets/components/angular-animate/angular-animate#{ suffix }.js')
-script(src='/assets/components/angular-material/angular-material#{ suffix }.js')
-script(src='/assets/components/angular-route/angular-route#{ suffix }.js')
-script(src='/assets/components/angular-i18n/angular-locale_es-cl.js')
-script(src='/assets/components/ng-file-upload/angular-file-upload#{ suffix }.js')
+//- Angular and related
+script(src='#{ component }/angular/angular.js')
+script(src='#{ component }/angular-route/angular-route#{ suffix }.js')
+script(src='#{ component }/angular-aria/angular-aria#{ suffix }.js')
+script(src='#{ component }/angular-animate/angular-animate#{ suffix }.js')
+script(src='#{ component }/angular-material/angular-material#{ suffix }.js')
+script(src='#{ component }/angular-i18n/angular-locale_es-cl.js')
+script(src='#{ component }/ng-file-upload/ng-file-upload#{ suffix }.js')
 
-//- Angular application main script
-script(src='/assets/scripts/client.min.js')
+//- Angular application client script
+script(src='/assets/scripts/client#{ suffix }.js')
