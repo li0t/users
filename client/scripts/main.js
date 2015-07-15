@@ -32,6 +32,7 @@
       $rootScope.$navigateTo = function (route) {
         $location.path(route);
       };
+
     }
   ]);
 

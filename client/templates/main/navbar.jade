@@ -1,7 +1,10 @@
 .md-toolbar-tools
-  h2 Fi Seed
+  h2 emeeter
     
   span(flex)
+  
+  md-button(ng-click='$signout()', ng-show='session.user')
+    | Salir
     
   md-button(ng-href='/help')
     | Ayuda
