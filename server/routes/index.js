@@ -9,6 +9,7 @@ module.exports = function(router) {
    */
   router.get([
 
+    /* Pages */
     '/', '/welcome', '/profile',
 
     /* Users */
@@ -30,6 +31,15 @@ module.exports = function(router) {
 
     /* Contacts */
     '/contacts', '/contacts/add/:id', '/contacts/remove/:id',
+
+    /* Meetings */
+    '/meetings',
+
+    /* Settings */
+    '/settings',
+
+    /* Analitycs */
+    '/analitycs',
 
   ], function(req, res) {
 

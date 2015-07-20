@@ -22,8 +22,7 @@ module.exports = function(router, mongoose) {
         }
       });
     } else {
-
-    res.sendStatus(403);
+      res.sendStatus(403);
     }
   });
 

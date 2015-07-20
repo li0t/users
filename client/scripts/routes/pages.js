@@ -8,21 +8,31 @@
 
     function ($routeProvider) {
 
-      $routeProvider.when('/', {
-        templateUrl: '/assets/templates/pages/home.html'
+      $routeProvider.
 
-      }).when('/help', {
+      when('/', {
+        templateUrl: '/assets/templates/pages/home.html'
+      }).
+
+      when('/help', {
         controller: 'Pages:Help',
         templateUrl: '/assets/templates/pages/help.html'
+      }).
 
-      }).when('/profile', {
+      when('/profile', {
         controller: 'Users:Profile',
         templateUrl: '/assets/templates/users/profile.html'
+      }).
 
-      }).when('/welcome', {
-        controller: 'Pages:Dashboard',
-        templateUrl: '/assets/templates/pages/welcome.html'
+      when('/settings', {
+        controller: 'Pages:Settings',
+        templateUrl: '/assets/templates/pages/settings.html'
 
+      }).
+
+      when('/analitycs', {
+        controller: 'Pages:Analitycs',
+        templateUrl: '/assets/templates/pages/analitycs.html'
       });
 
     }

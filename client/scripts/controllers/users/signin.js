@@ -18,7 +18,7 @@
 
         }).success(function (user) {
           $session.signin(user);
-          $location.path('/users/' + user._id + '/profile');
+          $location.path('/');
           $session.flash('success', 'Welcome back ' + user.email + '!');
 
         }).error(function () {

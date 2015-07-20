@@ -1,18 +1,40 @@
 md-toolbar
   h1.md-toolbar-tools
+  span(ng-show='session.user')
+  | {{ session.user.email }}
 
 md-list
   md-list-item(ng-click='$navigateTo("/")')
     md-icon(md-font-icon='material-icons') home
     p Home
 
-  md-subheader
+  md-subheader(ng-show='!session.user')
     | Users
 
-  md-list-item(ng-click='$navigateTo("/users/signin")')
+  md-list-item(ng-click='$navigateTo("/users/signin")', ng-show='!session.user')
     md-icon(md-font-icon='material-icons') person
     p My Account
 
-  md-list-item(ng-click='$navigateTo("/users/signup")')
+  md-list-item(ng-click='$navigateTo("/users/signup")', ng-show='!session.user')
     md-icon(md-font-icon='material-icons') person_add
     p Create account
+    
+  md-list-item(ng-click='$navigateTo("/groups")', ng-show='session.user')
+    md-icon(md-font-icon='material-icons') people
+    p Grupos
+    
+  md-list-item(ng-click='$navigateTo("/meetings")', ng-show='session.user')
+    md-icon(md-font-icon='material-icons') event_note
+    p Reuniones  
+
+  md-list-item(ng-click='$navigateTo("/tasks")', ng-show='session.user')
+    md-icon(md-font-icon='material-icons') more
+    p Tareas  
+    
+  md-list-item(ng-click='$navigateTo("/analitycs")', ng-show='session.user')
+    md-icon(md-font-icon='material-icons') trending_up
+    p Estadísticas 
+
+  md-list-item(ng-click='$navigateTo("/settings")', ng-show='session.user')
+    md-icon(md-font-icon='material-icons') settings
+    p Estadísticas 
