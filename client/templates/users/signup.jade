@@ -7,7 +7,7 @@ div.container
       div.panel.panel-default
         div.panel-heading
           h3.panel-title
-            i.fa.fa-mr.fa-fw.fa-pencil
+            md-icon(md-font-icon='material-icons') person
             | Datos de la cuenta
 
         form(
@@ -16,39 +16,36 @@ div.container
           role='form',
           novalidate)
 
-          div.panel-body
-            div.form-group
-              div.input-group
-                span.input-group-addon
-                  i.fa.fa-at.fa-fw
+          md-input-container.form-group
+            span.input-group-addon
+              md-icon(md-font-icon='material-icons') 
 
-                input.form-control(
-                  placeholder='Ingresa tu email',
-                  ng-model='data.email',
-                  type='email',
-                  required)
+            input.form-control(
+              placeholder='Ingresa tu email',
+              ng-model='data.email',
+              type='email',
+              required)
 
-            div.form-group
-              div.input-group
-                span.input-group-addon
-                  i.fa.fa-fw.fa-asterisk
+          md-input-container.form-group
+            span.input-group-addon
+              md-icon(md-font-icon='material-icons') 
 
-                input.form-control(
-                  placeholder='Ingresa tu clave',
-                  ng-model='data.password',
-                  ng-minlength='4',
-                  type='password',
-                  required)
+            input.form-control(
+              placeholder='Ingresa tu clave',
+              ng-model='data.password',
+              ng-minlength='4',
+              type='password',
+              required)
 
           div.panel-footer.text-right
             div.btn-group-grid
-              a.btn.btn-lg.btn-default(ng-href='/')
-                i.fa.fa-mr.fa-fw.fa-chevron-left
+              a.md-button(ng-href='/users/signin')
+                md-icon(md-font-icon='material-icons') chevron_left
                 | Ya tengo una cuenta
 
-              button.btn.btn-lg.btn-main.btn-default(
+              md-button(
                 ng-disabled='form.$invalid',
                 type='submit')
 
-                i.fa.fa-mr.fa-fw.fa-check
+                md-icon(md-font-icon='material-icons') check
                 | Crear cuenta

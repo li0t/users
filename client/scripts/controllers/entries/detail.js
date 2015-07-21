@@ -16,9 +16,7 @@
         $http.get('/api/entries/' + $routeParams.id).
 
         success(function(data) {
-
           $scope.entry = data;
-          console.log(JSON.stringify(data));
         }).
 
         finally(function(){

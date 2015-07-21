@@ -12,7 +12,7 @@
 
         $scope.fetching = true;
 
-        $http.get('/api/groups/me').
+        $http.get('/api/groups').
 
         success(function(groups) {
           $scope.groups = groups;

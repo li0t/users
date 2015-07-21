@@ -12,7 +12,7 @@
       $scope.fetch = function() {
         $scope.fetchingTasks = true;
 
-        $http.get('/api/tasks/me').
+        $http.get('/api/tasks').
 
         success(function(data) {
           $scope.tasks = data;

@@ -1,14 +1,38 @@
-md-toolbar
-  .md-padding
-    h1 Welcome!
-    p An so vulgar to on points wanted. Not rapturous resolving continued household northward gay. He it otherwise supported instantly.
+md-toolbar.md-padding.lightBlue
+  h1 EMEETER
 
 md-content(layout-padding)
-  md-card
-    md-card-content
-      h2.md-title Frankness applauded by supported ye household
+
+md-grid-list(md-cols="2") 
     
-  md-card
-    md-card-content
-      h2 Uneasy barton seeing remark happen his has
+  md-grid-tile
+  
+    md-grid-tile-header
+     h3 MOVIMIENTO FINAL
+    br
+    span
+      md-icon(md-font-icon='material-icons') trending_up
+        
+  md-grid-tile()
+    span
+    
+    md-grid-tile-footer
+      
+  
+  md-grid-list(
+      md-gutter="12px" md-gutter-gt-sm="8px"
+      md-cols="4"
+      md-row-height="1:1") 
+      
+    md-grid-tile(ng-repeat="entry in entries"
+                md-rowspan="{{ entry.row }}"
+                md-colspan="{{ entry.col }}"
+                ng-class="entry.background")
+      span
+        md-icon(md-font-icon='material-icons') {{ entry.icon }}
+        p {{ entry.span }}
+      
+      md-grid-tile-footer
+        h3 {{ entry.type === "entry" && entry.title + " : " +  entry.content || entry.type === "group" && "Creado por " + entry.admin.email || entry.type == "task" && entry.objective || "Creada por " + entry.author }}
+    
     

@@ -3,14 +3,8 @@ div.container
     div.col-sm-6.col-sm-offset-3.col-md-4.col-md-offset-4
       div.page-header
         h1 Crear entrada
-        
-        
-      div.panel.panel-default
-        div.panel-heading
-          h3.panel-title
-            i.fa.fa-mr.fa-fw.fa-pencil
-            | Datos de la cuenta
-
+        md-icon(md-font-icon='material-icons') edit 
+    
         form(
           ng-submit='form.$valid && submit()',
           name='form',
@@ -19,32 +13,43 @@ div.container
 
           md-input-container.form-group
             input.form-control(
-              placeholder='Ingresa tu email',
-              ng-model='data.email',
-              type='text',
+              placeholder='Titulo',
+              ng-model='data.title',
               required)
-                
-          div.form-group
-            md-input-container.input-group
-              span.input-group-addon
-                i.fa.fa-fw.fa-asterisk
-
-              input.form-control(
-                placeholder='Ingresa tu clave',
-                ng-model='data.password',
-                ng-minlength='4',
-                type='text',
-                required)
-
+          
+          md-input-container.form-group
+            textarea.form-control(
+              placeholder='Contenido',
+              ng-model='data.content',
+              required)
+              
+          md-autocomplete(
+            ng-disabled="isDisabled",
+            md-no-cache="noCache",
+            md-selected-item="selectedTag",
+            md-search-text-change="",
+            md-search-text="searchTag",
+            md-items="tag in tagSearch(searchTag)",
+            md-selected-item-change="",
+            md-item-text="tag.name",
+            md-min-length="0",
+            placeholder="Tags")
+          
+            md-item-template
+              span.item-title
+                md-icon(md-font-icon='material-icons') label
+                span {{tag.name}} 
+    
+        
           div.panel-footer.text-right
             div.btn-group-grid
-              a.btn.btn-lg.btn-default(ng-href='/entries')
-                i.fa.fa-mr.fa-fw.fa-chevron-left
+              a.md-button(ng-href='/entries')
+                md-icon(md-font-icon='material-icons') chevron_left
                 | Cancelar
 
-              button.btn.btn-lg.btn-main.btn-default(
+              md-button(
                 ng-disabled='form.$invalid',
                 type='submit')
 
-                i.fa.fa-mr.fa-fw.fa-check
+                md-icon(md-font-icon='material-icons') check
                 | Crear entrada

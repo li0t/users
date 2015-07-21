@@ -7,7 +7,7 @@ div.container
       div.panel.panel-default
         div.panel-heading
           h3.panel-title
-            i.fa.fa-mr.fa-fw.fa-user
+            md-icon(md-font-icon='material-icons') person
             |Datos de la cuenta
 
         form(
@@ -16,10 +16,9 @@ div.container
           ng-submit='form.$valid && submit()'
           novalidate)
 
-          div.panel-body
-            div.input-group
-              span.input-group-addon
-                i.fa.fa-at.fa-fw
+          md-input-container.form-group
+            span.input-group-addon
+              md-icon(md-font-icon='material-icons') 
 
               input.form-control(
                 placeholder='Ingrese su email',
@@ -29,13 +28,13 @@ div.container
 
           div.panel-footer
             div.btn-group-grid
-              a.btn.btn-lg.btn-default(ng-href='/')
-                i.fa.fa-mr.fa-fw.fa-chevron-left
+              a.md-button(ng-href='/')
+                md-icon(md-font-icon='material-icons') chevron_left
                 |Ya tengo mi clave
 
-              button.btn.btn-lg.btn-main.btn-default(
+              md-button(
                 ng-disabled='form.$invalid || submitting',
                 type='submit')
 
                 |Enviar
-                i.fa.fa-ml.fa-fw(class='fa-{{ submitting && "circle-o-notch fa-spin" || "send" }}')
+                md-icon(md-font-icon='material-icons') chevron_right

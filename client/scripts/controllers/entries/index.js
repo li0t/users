@@ -5,14 +5,13 @@
     '$scope', '$http', '$location', '$session',
 
     function ($scope, $http, $location, $session) {
-
       $scope.fetching = null;
       $scope.entries = null;
 
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/entries/users/' + $session.get('user')._id).
+        $http.get('/api/entries/users/' + $session.user('_id')).
 
         success(function(data) {
           $scope.entries = data;

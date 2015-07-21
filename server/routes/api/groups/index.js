@@ -160,7 +160,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get user groups
    */
-  router.get('/me', function(req, res, next) {
+  router.get('/', function(req, res, next) {
 
     var user = req.session.user._id;
     var groups = [];

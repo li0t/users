@@ -68,7 +68,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get session user tasks
    */
-  router.get('/me', function(req, res, next) {
+  router.get('/', function(req, res, next) {
 
     var i;
 

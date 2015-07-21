@@ -1,8 +1,13 @@
-md-toolbar
+md-toolbar.lightBlue
   h1.md-toolbar-tools
+  md-icon(md-font-icon='material-icons', ng-show='session.user') account_circle
+  br
+  br
   span(ng-show='session.user')
-  | {{ session.user.email }}
-
+    {{ session.user.email }}
+    md-icon(md-font-icon='material-icons') arrow_drop_down
+  
+  
 md-list
   md-list-item(ng-click='$navigateTo("/")')
     md-icon(md-font-icon='material-icons') home

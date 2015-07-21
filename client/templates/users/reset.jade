@@ -7,7 +7,7 @@ div.container
       div.panel.panel-default
         div.panel-heading
           h3.panel-title
-            i.fa.fa-mr.fa-asterisk
+            md-icon(md-font-icon='material-icons') edit
             |Crear nueva clave
 
         form(
@@ -17,22 +17,21 @@ div.container
           novalidate)
 
           div.panel-body
-            div.form-group
-              div.input-group
-                span.input-group-addon
-                  i.fa.fa-fw.fa-asterisk
-
-                input.form-control(
-                  placeholder='Ingresa tu nueva clave',
-                  ng-disabled='validating',
-                  ng-model='form.password',
-                  ng-minlength='4',
-                  type='password',
-                  required)
-
-            div.input-group
+            md-input-container.form-group
               span.input-group-addon
-                i.fa.fa-fw.fa-asterisk
+                md-icon(md-font-icon='material-icons') 
+
+                  input.form-control(
+                    placeholder='Ingresa tu nueva clave',
+                    ng-disabled='validating',
+                    ng-model='form.password',
+                    ng-minlength='4',
+                    type='password',
+                    required)
+
+            md-input-container.form-group
+              span.input-group-addon
+                md-icon(md-font-icon='material-icons') 
 
               input.form-control(
                 ng-disabled='form.password.length < 4 || validating',
@@ -45,14 +44,14 @@ div.container
           div.panel-footer.text-right
             div.row
               div.col-sm-5
-                a.btn.btn-lg.btn-lg.btn-block.btn-default(ng-href='/') 
-                  i.fa.fa-fw.fa-mr.fa-chevron-left
+                a.md-button(ng-href='/') 
+                  md-icon(md-font-icon='material-icons') chevron_left
                   |Cancelar
 
               div.col-sm-7
-                button.btn.btn-lg.btn-lg.btn-block.btn-default(
+                md-button(
                   ng-disabled='form.$invalid || validating || form.password !== form.vpassword',
                   type='submit')
 
                   |Cambiar clave
-                  i.fa.fa-ml.fa-check
+                  md-icon(md-font-icon='material-icons') check

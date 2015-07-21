@@ -11,6 +11,7 @@
       $routeProvider.
 
       when('/', {
+        controller: 'Pages:Home',
         templateUrl: '/assets/templates/pages/home.html'
       }).
 

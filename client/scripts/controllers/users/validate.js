@@ -5,7 +5,6 @@
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
-      console.log('validate');
       $http.put('/api/users/validate/' + $routeParams.token).
 
       success(function(user) {

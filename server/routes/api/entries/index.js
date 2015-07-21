@@ -268,4 +268,25 @@ module.exports = function(router, mongoose) {
 
   });
 
+  /**
+   * Get entries of session user
+   */
+  router.get('/', function(req, res, next) {
+
+    Entry.find().
+
+    where('user', req.session.user._id).
+
+    sort('-created').
+
+    exec(function(err, entries) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(entries);
+
+    });
+  });
+
 };

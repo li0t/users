@@ -30,8 +30,8 @@
 
       $http.get('/api/session').
 
-      success(function(user) {
-        $session.signin(user);
+      success(function(data) {
+        $session.signin(data.user);
       }).
 
       finally(function() {
@@ -47,8 +47,15 @@
       /* Convenience navigate to method */
       $rootScope.$signout = function () {
         $session.signout();
-      };
 
+        $http.get('/api/users/signout').
+
+        success(function() {
+
+          $session.signout();
+
+        });
+      };
     }
   ]);
 
