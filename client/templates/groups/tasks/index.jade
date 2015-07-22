@@ -1,77 +1,70 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-tasks
-      | Tareas del grupo
-      
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
-      i.fa.fa-mr.fa-users
-      | Volver al grupo
+md-toolbar
+  .md-padding.lightBlue
+    h1 EMEETER
+
+md-content
+  div(layout='column' layout-align="center start")    
+    h3 Grupos
+    
+    a.md-button(ng-href='/groups/{{session.group._id}}/profile')
+      md-icon(md-font-icon='material-icons') chevron_left
+      | Volver
   
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/tasks/create')
-      i.fa.fa-mr.fa-plus
-      | Crear Tarea
+  md-button(ng-href='/tasks/create')
+    md-icon(md-font-icon='material-icons') add
+    | Crear Tarea
       
-  div.panel-body.text-center(ng-show='fetchingTasks && !tasks')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Buscando Tareas
+  div(ng-show='fetchingTasks && !tasks')
+    md-icon(md-font-icon='material-icons') sync
+    | Buscando Tareas
       
-  div.panel-body.text-center(ng-show='!fetchingTasks && tasks && !tasks.length')
-    h4 No hay Tareas     
+  div(ng-show='!fetchingTasks && tasks && !tasks.length')
+    h4 No hay Tareas               
+
+  table(layout="column" layout-align="center" ng-show='!fetchingTasks && tasks && tasks.length')
+    thead
+      tr
+        th
+          md-button
+            md-icon(md-font-icon='material-icons') group
+            | Ojectivo
+
+        th
+          md-button
+            md-icon(md-font-icon='material-icons') group
+            | Prioridad
+
+        th
+          md-button
+            md-icon(md-font-icon='material-icons') group
+            | Fecha de Creación
+
+        th
+          md-button
+            md-icon(md-font-icon='material-icons') group
+            | Fecha de Entrega
             
-  div.table-responsive(ng-show='!fetchingTasks && tasks && tasks.length')
-    table.table.table-hover
-      thead
-        tr
-          th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-dashcube
-              | Ojectivo
+        th
+          md-button
+            md-icon(md-font-icon='material-icons') group
+            | Colaboradores    
+        
+    tbody
+      tr(
+        ng-repeat='task in tasks'
+        ng-init='href = ("/groups/" + session.group._id + "/tasks/{0}/detail" | format : task._id)')
 
-          th
-            button.btn.btn-block.btn-default
-              i.fa.fa-at.fa-exclamation-circle
-              | Prioridad
+        td
+          md-button(ng-href='{{ href }}') {{ task.objective }}
 
-          th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-calendar
-              | Fecha de Creación
+        td
+          md-button(ng-href='{{ href }}') {{ task.priority.name }}
 
-          th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-calendar
-              | Fecha de Entrega
-              
-          th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-users
-              | Colaboradores    
-          
-      tbody
-        tr(
-          ng-repeat='task in tasks',
-          ng-init='href = ("/groups/" + session.group._id + "/tasks/{0}/detail" | format : task._id)')
+        td
+          md-button(ng-href='{{ href }}') {{ task.created }}
 
-          td
-            a(ng-href='{{ href }}')
-              | {{ task.objective }}
-
-          td
-            a(ng-href='{{ href }}')
-              | {{ task.priority.name }}
-
-          td
-            a(ng-href='{{ href }}')
-              | {{ task.created }}
-
-          td
-            a(ng-href='{{ href }}')
-              | {{ task.dateTime  || "No definida" }}
-              
-          td
-            a(ng-href='{{ href }}')
-              | {{ task.collaborators.length }}
+        td
+          md-button(ng-href='{{ href }}') {{ task.dateTime  || "No definida" }}
+            
+        td
+          md-button(ng-href='{{ href }}') {{ task.collaborators.length }}

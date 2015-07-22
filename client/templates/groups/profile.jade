@@ -1,50 +1,53 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-users
-      | Grupos
+md-toolbar
+  .md-padding.lightBlue
+    h1 EMEETER
+
+md-content
+  div(layout='column' layout-align="center start")
+    
+    h3 Grupos
+    
+    a.md-button(ng-href='/groups')
+      md-icon(md-font-icon='material-icons') chevron_left
+      | Volver     
+  
+  div(ng-show='fetchingGroup && !group')        
+    md-icon(md-font-icon='material-icons') sync
+    | Buscando grupos
       
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups')
-      i.fa.fa-mr.fa-users
-      | Volver a Grupos
-          
-  div.panel-body.text-center(ng-show='fetchingGroup && !group')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
-      
-  div.panel-body.text-center(ng-show='!fetchingGroup && group')
+  div(layout='column' layout-align="center start" ng-show='!fetchingGroup && group') 
     h3 {{group.profile.name}}   
-      
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/members')
-      i.fa.fa-mr.fa-users
+    
+    md-button(ng-href='/groups/{{session.group._id}}/members')
+      md-icon(md-font-icon='material-icons') group
       | Miembros
       
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/tasks')
-      i.fa.fa-mr.fa-tasks
+    md-button(ng-href='/groups/{{session.group._id}}/tasks')
+      md-icon(md-font-icon='material-icons') more
       | Tareas  
-      
-  div.panel-body.text-center(ng-show='fetchingEntries && !entries')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
+    
+    div(ng-show='fetchingEntries && !entries')  
+      md-icon(md-font-icon='material-icons') sync
       | Buscando Entradas
-  
-  div.panel-body.text-center(ng-show='!fetchingEntries && entries && entries.length')
-    a(ng-href="/group/{{session.group._id}}/entries")
-    h4
-      i.fa.fa-mr.fa-th-large
+    
+    md-button(ng-show='!fetchingEntries && entries && entries.length' ng-href="/group/{{session.group._id}}/entries")
+      md-icon(md-font-icon='material-icons') comment
       | Últimas Entradas
-      
-  div.panel-body.text-center(ng-show='!fetchingEntries && entries && !entries.length')
-    a(ng-href="/group/{{session.group._id}}/entries")
-    h4 
-      i.fa.fa-mr.fa-th-large
+        
+    md-button(ng-show='!fetchingEntries && entries && !entries.length' ng-href="/group/{{session.group._id}}/entries")
+      md-icon(md-font-icon='material-icons') comment
       | No hay Entradas  
-      
-  div.panel-body(ng-show='!fetchingEntries && entries')
-    div.row
-      div.col-sm-4(ng-repeat='entry in entries | limitTo:entriesLimit ', ng-init='href = ("/groups/" + session.group._id + "/entries/{0}/detail" | format : entry._id)')
-        div.btn.btn-default.btn-block
-          a(ng-href='{{ href }}')
-            h3 {{ entry.title }}
+        
+    md-grid-list(
+        md-gutter="12px" md-gutter-gt-sm="8px"
+        md-cols="4"
+        md-row-height="1:1"
+        ng-show='!fetchingEntries && entries')
+        
+    md-grid-tile(
+      md-rowspan="1"
+      md-colspan="1"
+      ng-repeat='entry in entries | limitTo:entriesLimit'
+      ng-init='href = ("/groups/" + session.group._id + "/entries/{0}/detail" | format : entry._id)')
+        md-button(ng-href='{{ href }}')
+        h3 {{ entry.title }}

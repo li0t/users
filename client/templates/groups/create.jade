@@ -1,65 +1,62 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-users
-      | Crear grupo
+md-toolbar
+  .md-padding.lightBlue
+    h1 EMEETER
 
+      
+md-content
+  div(layout='column' layout-align="center start")
+    h3 Grupos
+    
+    a.md-button(ng-href='/groups')
+      md-icon(md-font-icon='material-icons') chevron_left
+      | Volver   
+  
+  div(layout-padding)
+  
   form(
-    ng-submit='data.members.length && form.$valid && submit()',
-    role='form',
+    ng-submit='data.members.length && form.$valid && submit()'
+    role='form'
     name='form')
 
-    div.panel-body
+    md-input-container.form-group
+        span.input-group-addon
+          md-icon(md-font-icon='material-icons') edit
+        input.form-control(
+          placeholder='Nombre del grupo',
+          ng-model='data.name',
+          required)
+              
       div.form-group
+        h4 Miembros
+        
+        div.input-group(ng-repeat='member in members.list')
+          md-icon(md-font-icon='material-icons') person
+          | {{ member.profile.name || member.email }}
+          
+          md-button
+            md-icon(md-font-icon='material-icons' ng-click='members.remove($index)') remove_circle
+
+        p(ng-hide='data.members.length') No has agregado miembros a este grupo.
+
+      md-input-container.form-group(ng-hide='members.list.length === posibleMembers.length')
         div.input-group
-          span.input-group-addon
-            i.fa.fa-fw.fa-pencil
+          md-select.form-control(
+            ng-change='members.add()'
+            ng-model='form.member'
+            placeholder="Selecciona un nuevo miembro")
 
-          input.form-control(
-            placeholder='Nombre del grupo',
-            ng-model='data.name',
-            required)
-
-      div.form-group(ng-repeat='member in members.list')
-        div.input-group
-          span.input-group-addon
-              i.fa.fa-fw.fa-user
-
-          span.form-control
-            | {{ member.profile.name || member.email }}
-
-          span.input-group-btn
-            button.btn.btn-default(ng-click='members.remove($index)')
-              i.fa.fa-fw.fa-trash
-
-      p.text-center(ng-hide='data.members.length') No has agregado miembros a este grupo.
-
-      div.form-group(ng-hide='members.list === posibleMembers')
-        div.input-group
-          span.input-group-addon
-            i.fa.fa-fw.fa-user
-
-          select.form-control(
-            ng-change='members.add()',
-            ng-model='form.member')
-
-            option(value='') Selecciona un nuevo miembro
-
-            option(
+            md-option(
               ng-repeat='member in posibleMembers',
               value='{{ $index }}')
-
               | {{ member.profile.name || member.email }}
 
-    div.panel-footer
-      div.btn-group.btn-group-grid
-        a.btn.btn-lg.btn-default(ng-href='/groups')
-          i.fa.fa-mr.fa-chevron-left
-          | Cancelar
+    div(layout='row')
+      md-button(ng-href='/groups')
+        md-icon(md-font-icon='material-icons') chevron_left
+        | Cancelar
 
-        button.btn.btn-default.btn-lg(
-          ng-disabled='form.$invalid',
-          type='submit')
-
-          | Crear
-          i.fa.fa-ml.fa-chevron-right
+      md-button(
+        ng-disabled='form.$invalid',
+        type='submit')
+        | Crear
+        md-icon(md-font-icon='material-icons') chevron_right

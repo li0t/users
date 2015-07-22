@@ -2,54 +2,46 @@ md-toolbar
   .md-padding.lightBlue
     h1 EMEETER
 
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-users
-      | Grupos
       
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
-      i.fa.fa-mr.fa-user
+md-content
+  div(layout='column' layout-align="center start")
+    
+    h3 Grupos
+    
+    a.md-button(ng-href='/')
+      md-icon(md-font-icon='material-icons') chevron_left
       | Volver     
-
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/create')
-      i.fa.fa-mr.fa-plus
-      | Crear grupo
+  
+    a.md-button(ng-href='/groups/create')
+      span
+        md-icon(md-font-icon='material-icons') group_add
+        | Crear grupo
       
-  div.panel-body.text-center(ng-show='fetching')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Buscando grupos
+  md-icon(md-font-icon='material-icons' ng-show='fetching') sync
+  | Buscando grupos
       
-  div.panel-body.text-center(ng-show='!fetching && groups && !groups.length')
-    h4
-      i.fa.fa-mr.fa-circle-thin
-      | No hay Grupos    
+  div(ng-show='!fetching && groups && !groups.length')
+    md-icon(md-font-icon='material-icons') circle
+    | No hay Grupos    
           
-  table.table.table-hover(ng-show='!fetching && groups && groups.length')
+  table(layout="column" layout-align="center" ng-show='!fetching && groups && groups.length')
     thead
       tr
         th
-          button.btn.btn-block.btn-default
-            i.fa.fa-mr.fa-fw.fa-user
+          md-button
+            md-icon(md-font-icon='material-icons') person
             | Nombre
 
         th
-          button.btn.btn-block.btn-default
-            i.fa.fa-mr.fa-fw.fa-users
+          md-button
+            md-icon(md-font-icon='material-icons') group
             | Cantidad de Miembros
 
         th
-          button.btn.btn-block.btn-default
-            i.fa.fa-mr.fa-fw.fa-eye
+          md-button
+            md-icon(md-font-icon='material-icons') supervisor_account
             | Administrador
 
-        th
-          button.btn.btn-block.btn-default
-            i.fa.fa-mr.fa-fw.fa-calendar
-            | Fecha de Creación
 
     tbody
       tr(
@@ -57,17 +49,10 @@ div.panel.panel-default
         ng-init='href = ("/groups/{0}/profile" | format : group._id)')
 
         td
-          a(ng-href='{{ href }}')
-            | {{ group.profile.name }}
+          md-button(ng-href='{{ href }}') {{ group.profile.name }}
 
         td
-          a(ng-href='{{ href }}')
-            | {{ group.members.length }}
+          md-button(ng-href='{{ href }}') {{ group.members.length }}
 
         td
-          a(ng-href='{{ href }}')
-            | {{ group.admin.profile.name || group.admin.email }}
-
-        td
-          a(ng-href='{{ href }}')
-            | {{ group.created | toLocal }}
+          md-button(ng-href='{{ href }}') {{ group.admin.profile.name || group.admin.email }}

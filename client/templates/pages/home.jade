@@ -1,5 +1,5 @@
 md-toolbar.md-padding.lightBlue
-  h1 EMEETER
+  h2 EMEETER
 
 md-content(layout-padding, ng-show='session.user')
   
@@ -36,7 +36,7 @@ md-content(layout-padding, ng-show='session.user')
         ng-class="entry.background")
         
         span
-          md-icon(md-font-icon='material-icons' style="color:{{entry.icon.color}}; height: 24px;  " ) {{ entry.icon.icon }}
+          md-icon(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}
           p {{ entry.span }}
         
         md-grid-tile-footer
