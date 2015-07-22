@@ -1,38 +1,45 @@
 md-toolbar.md-padding.lightBlue
   h1 EMEETER
 
-md-content(layout-padding)
-
-md-grid-list(md-cols="2") 
-    
-  md-grid-tile
+md-content(layout-padding, ng-show='session.user')
   
-    md-grid-tile-header
-     h3 MOVIMIENTO FINAL
-    br
-    span
-      md-icon(md-font-icon='material-icons') trending_up
+  div(layout='row')
+    div(flex='70')
+      img(ng-src="../assets/images/analitycs.png")
+          
+    div.blueGray.white(flex)
+      div
+        h4 PENDIENTES
         
-  md-grid-tile()
-    span
-    
-    md-grid-tile-footer
-      
+        md-list
+          md-list-item(ng-repeat='pending in pendings | limitTo:3')
+            div.md-list-item-text(flex='66')
+              h4 {{ pending.title }}
+              p {{ pending.description }}
+            md-checkbox(flex='99', ng-click='gotIt(pending)')
+          
+          md-list-item(ng-show='!pendings.length')
+            h4 No tienes asuntos pendientes
   
-  md-grid-list(
-      md-gutter="12px" md-gutter-gt-sm="8px"
-      md-cols="4"
-      md-row-height="1:1") 
+  div(layout-padding)
       
-    md-grid-tile(ng-repeat="entry in entries"
-                md-rowspan="{{ entry.row }}"
-                md-colspan="{{ entry.col }}"
-                ng-class="entry.background")
-      span
-        md-icon(md-font-icon='material-icons') {{ entry.icon }}
-        p {{ entry.span }}
-      
-      md-grid-tile-footer
-        h3 {{ entry.type === "entry" && entry.title + " : " +  entry.content || entry.type === "group" && "Creado por " + entry.admin.email || entry.type == "task" && entry.objective || "Creada por " + entry.author }}
+  div
+    md-grid-list(
+        md-gutter="12px" md-gutter-gt-sm="8px"
+        md-cols="4"
+        md-row-height="1:1") 
+        
+      md-grid-tile(
+        ng-repeat="entry in entries"
+        md-rowspan="{{ entry.row }}"
+        md-colspan="{{ entry.col }}"
+        ng-class="entry.background")
+        
+        span
+          md-icon(md-font-icon='material-icons' style="color:{{entry.icon.color}}; height: 24px;  " ) {{ entry.icon.icon }}
+          p {{ entry.span }}
+        
+        md-grid-tile-footer
+          h3 {{ entry.type === "entry" && entry.title + " : " +  entry.content || entry.type === "group" && "Creado por " + entry.admin.email || entry.type == "task" && entry.objective || "Creada por " + entry.author }}
     
     

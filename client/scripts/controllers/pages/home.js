@@ -2,11 +2,28 @@
   'use strict';
 
   ng.module('App').controller('Pages:Home', [
-    '$scope', '$http', '$location', '$session',
+    '$scope', '$http', '$location', '$session', '$timeout',
 
-    function($scope, $http, $location, $session) {
+    function($scope, $http, $location, $session, $timeout) {
       $scope.fetching = false;
       $scope.entries = [];
+
+      $scope.pendings = [{
+        'title': 'Tarea 1',
+        'description': 'Blah blah'
+      }, {
+        'title': 'Tarea 2',
+        'description': 'Blah blah blah'
+      }, {
+        'title': 'Reunión',
+        'description': 'Juntarse con ...'
+      }, {
+        'title': 'Reunión de amigos',
+        'description': 'Confirmar que J...'
+      }, {
+        'title': 'Tarea 3',
+        'description': 'Blah blah vlad...'
+      }];
 
       var meetings = [{
         'title': 'Reunión inicial',
@@ -18,16 +35,28 @@
 
       var backgrounds = {
         "entry": "yellow",
-        "group": "blue",
-        "task": "purple",
-        "meeting": "red"
+        "group": "green",
+        "task": "lightBlue",
+        "meeting": "blue"
       };
 
       var icons = {
-        "entry": "comment",
-        "group": "group",
-        "task": "more",
-        "meeting": "event_note"
+        "entry": {
+          "icon": "comment",
+          "color": "lightBlue"
+        },
+        "group": {
+          "icon": "group",
+          "color": "white"
+        },
+        "task": {
+          "icon": "more",
+          "color": "purple"
+        },
+        "meeting": {
+          "icon": "event_note",
+          "color": "green"
+        }
       };
 
       var spans = {
@@ -37,8 +66,8 @@
         "meeting": "Reunión"
       };
 
-      /* Based on Fisher–Yates */
-      function shuffle (a) {
+      /* Shuffle an array, Based on Fisher–Yates shuffle algorithm */
+      function shuffle(a) {
         var n = a.length;
         var aux;
         var i;
@@ -54,7 +83,7 @@
 
       }
 
-      function loadEntries() {
+      $scope.loadEntries = function() {
         var entry;
         var i = 1;
 
@@ -143,9 +172,19 @@
             });
           });
         });
-      }
+      };
 
-      return ($session.get('user')) && loadEntries();
+      $scope.gotIt = function(pending) {
+        var index = $scope.pendings.indexOf(pending);
+
+        if (index >= 0) {
+          $timeout(function() {
+            $scope.pendings.splice(index, 1);
+          }, 750);
+        }
+      };
+
+      return ($session.get('user')) && $scope.loadEntries();
 
     }
   ]);
