@@ -1,51 +1,45 @@
-div.container
-  div.row
-    div.col-sm-6.col-sm-offset-3.col-md-4.col-md-offset-4
-      div.page-header
-        h1 Crear cuenta
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
+    
+h3 Crear cuenta
 
-      div.panel.panel-default
-        div.panel-heading
-          h3.panel-title
-            md-icon(md-font-icon='material-icons') person
-            | Datos de la cuenta
+md-icon(md-font-icon='material-icons') person
+| Datos de la cuenta
 
-        form(
-          ng-submit='form.$valid && submit()',
-          name='form',
-          role='form',
-          novalidate)
+form(
+  ng-submit='form.$valid && submit()',
+  name='form',
+  role='form',
+  novalidate)
 
-          md-input-container.form-group
-            span.input-group-addon
-              md-icon(md-font-icon='material-icons') 
+  md-input-container.form-group
+    span.input-group-addon
+      md-icon(md-font-icon='material-icons') 
 
-            input.form-control(
-              placeholder='Ingresa tu email',
-              ng-model='data.email',
-              type='email',
-              required)
+    input.form-control(
+      placeholder='Ingresa tu email',
+      ng-model='data.email',
+      type='email',
+      required)
 
-          md-input-container.form-group
-            span.input-group-addon
-              md-icon(md-font-icon='material-icons') 
+  md-input-container.form-group
+    span.input-group-addon
+      md-icon(md-font-icon='material-icons') 
 
-            input.form-control(
-              placeholder='Ingresa tu clave',
-              ng-model='data.password',
-              ng-minlength='4',
-              type='password',
-              required)
+    input.form-control(
+      placeholder='Ingresa tu clave',
+      ng-model='data.password',
+      ng-minlength='4',
+      type='password',
+      required)
 
-          div.panel-footer.text-right
-            div.btn-group-grid
-              a.md-button(ng-href='/users/signin')
-                md-icon(md-font-icon='material-icons') chevron_left
-                | Ya tengo una cuenta
+  div(layout='row')
+    md-button(ng-href='/users/signin') Ya tengo una cuenta
 
-              md-button(
-                ng-disabled='form.$invalid',
-                type='submit')
+    md-button(
+      ng-disabled='form.$invalid',
+      type='submit')
 
-                md-icon(md-font-icon='material-icons') check
-                | Crear cuenta
+      md-icon(md-font-icon='material-icons') check
+      | Crear cuenta

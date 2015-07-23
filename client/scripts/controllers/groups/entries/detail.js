@@ -1,21 +1,21 @@
 (function(ng) {
   'use strict';
 
-  ng.module('App').controller('Groups:Entries', [
-    '$scope', '$http', '$location', '$session',
+  ng.module('App').controller('Groups:Entries:Detail', [
+    '$scope', '$http', '$location', '$session', '$routeParams',
 
-    function($scope, $http, $location, $session) {
+    function($scope, $http, $location, $session, $routeParams) {
 
       $scope.fetching = null;
-      $scope.entries = null;
+      $scope.entry = null;
 
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/entries/groups/' + $session.get('group')._id).
+        $http.get('/api/entries/' + $routeParams.id).
 
         success(function(data) {
-          $scope.entries = data;
+          $scope.entry = data;
         }).
 
         finally(function() {

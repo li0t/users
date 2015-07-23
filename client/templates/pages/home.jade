@@ -1,13 +1,14 @@
-md-toolbar.md-padding.lightBlue
-  h2 EMEETER
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
 
-md-content(layout-padding, ng-show='session.user')
+md-content.white(layout-padding, ng-show='session.user')
   
   div(layout='row')
     div(flex='70')
       img(ng-src="../assets/images/analitycs.png")
           
-    div.blueGray.white(flex)
+    div.blueGray(flex)
       div
         h4 PENDIENTES
         
@@ -30,16 +31,20 @@ md-content(layout-padding, ng-show='session.user')
         md-row-height="1:1") 
         
       md-grid-tile(
+        layout='column'
         ng-repeat="entry in entries"
         md-rowspan="{{ entry.row }}"
         md-colspan="{{ entry.col }}"
         ng-class="entry.background")
         
+        div.shine
+        
         span
-          md-icon(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}
-          p {{ entry.span }}
+          md-icon.icon48(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}z
+          h4 {{ entry.span }}
+          p {{ entry.created | fromNow}}
         
         md-grid-tile-footer
-          h3 {{ entry.type === "entry" && entry.title + " : " +  entry.content || entry.type === "group" && "Creado por " + entry.admin.email || entry.type == "task" && entry.objective || "Creada por " + entry.author }}
+          h3 {{ entry.type === "entry" && entry.title + " : " +  entry.content || entry.type === "group" && entry.admin.email + " ha creado un nuevo grupo" || entry.type == "task" && entry.objective || entry.author + " ha modificado una tarea" }}
     
     

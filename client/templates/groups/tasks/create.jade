@@ -1,8 +1,6 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-tasks
-      | Crear Tarea
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
 
   form(
     ng-submit='form.$valid && submit()',

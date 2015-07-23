@@ -1,22 +1,29 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-th-large
-      | Entradas del grupo
-      
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/profile')
-      i.fa.fa-mr.fa-users
-      | Volver al grupo
-          
-  div.panel-body.text-center(ng-show='fetchingGroup && !group')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
-      
-  div.panel-body.text-center(ng-show='fetchingEntries && !entries')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Buscando Entradas
-      
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
+
+md-content
+  div(layout='column' layout-align="center start")    
+    h3 {{ session.group.profile.name }}
+    
+    a.md-button(ng-href='/groups/{{session.group._id}}/profile')
+      md-icon(md-font-icon='material-icons') chevron_left
+      | Volver
   
+  md-button(ng-href='/groups/{{session.group._id}}/entries/create')
+    md-icon(md-font-icon='material-icons') add
+    | Crear Entrada
+  
+  md-grid-list(
+      md-gutter="12px" md-gutter-gt-sm="8px"
+      md-cols="4"
+      md-row-height="1:1"
+      ng-show='!fetching && entries')
+      
+    md-grid-tile(
+      md-rowspan="1"
+      md-colspan="1"
+      ng-repeat='entry in entries'
+      ng-init='href = ("/groups/" + session.group._id + "/entries/{0}/detail" | format : entry._id)')
+        md-button(ng-href='{{ href }}')
+        h3 {{ entry.title }}

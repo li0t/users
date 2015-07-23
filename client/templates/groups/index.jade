@@ -1,24 +1,16 @@
-md-toolbar
-  .md-padding.lightBlue
-    h1 EMEETER
-
-      
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 GRUPOS
+    
+md-button.md-fab.md-warn(ng-href='/groups/create')
+  md-icon(md-font-icon='material-icons') add
+        
 md-content
   div(layout='column' layout-align="center start")
-    
-    h3 Grupos
-    
-    a.md-button(ng-href='/')
-      md-icon(md-font-icon='material-icons') chevron_left
-      | Volver     
   
-    a.md-button(ng-href='/groups/create')
-      span
-        md-icon(md-font-icon='material-icons') group_add
-        | Crear grupo
-      
-  md-icon(md-font-icon='material-icons' ng-show='fetching') sync
-  | Buscando grupos
+  div(ng-show='fetching && !group')   
+    md-icon(md-font-icon='material-icons' ) sync
+    | Buscando grupos
       
   div(ng-show='!fetching && groups && !groups.length')
     md-icon(md-font-icon='material-icons') circle
@@ -28,31 +20,29 @@ md-content
     thead
       tr
         th
-          md-button
-            md-icon(md-font-icon='material-icons') person
-            | Nombre
+          md-button Grupo
 
         th
-          md-button
-            md-icon(md-font-icon='material-icons') group
-            | Cantidad de Miembros
-
+          md-button Administrador
+        
         th
-          md-button
-            md-icon(md-font-icon='material-icons') supervisor_account
-            | Administrador
-
-
-    tbody
+          md-button Última actualización
+        
+    tbody      
       tr(
         ng-repeat='group in groups',
         ng-init='href = ("/groups/{0}/profile" | format : group._id)')
-
+        
+        td 
+          md-button.md-fab(ng-disabled="true")
+        
         td
           md-button(ng-href='{{ href }}') {{ group.profile.name }}
 
         td
-          md-button(ng-href='{{ href }}') {{ group.members.length }}
-
-        td
           md-button(ng-href='{{ href }}') {{ group.admin.profile.name || group.admin.email }}
+            
+        td
+          md-button(ng-href='{{ href }}') {{ group.updated | toLocal }}
+
+        

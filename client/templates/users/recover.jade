@@ -1,40 +1,34 @@
-div.container
-  div.row
-    div.col-sm-8.col-sm-offset-2
-      div.page-header
-        h1 Recuperar cuenta
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
+    
+md-icon(md-font-icon='material-icons') edit
+| Recuperar cuenta
 
-      div.panel.panel-default
-        div.panel-heading
-          h3.panel-title
-            md-icon(md-font-icon='material-icons') person
-            |Datos de la cuenta
+form(
+  name='form'
+  role='form'
+  ng-submit='form.$valid && submit()'
+  novalidate)
 
-        form(
-          name='form'
-          role='form'
-          ng-submit='form.$valid && submit()'
-          novalidate)
+  md-input-container.form-group
+    span.input-group-addon
+      md-icon(md-font-icon='material-icons') 
 
-          md-input-container.form-group
-            span.input-group-addon
-              md-icon(md-font-icon='material-icons') 
+      input.form-control(
+        placeholder='Ingrese su email',
+        ng-model='form.email',
+        type='email',
+        required)
 
-              input.form-control(
-                placeholder='Ingrese su email',
-                ng-model='form.email',
-                type='email',
-                required)
+  div(layout='row')
+    md-button(ng-href='/')
+      md-icon(md-font-icon='material-icons') chevron_left
+      |Ya tengo mi clave
 
-          div.panel-footer
-            div.btn-group-grid
-              a.md-button(ng-href='/')
-                md-icon(md-font-icon='material-icons') chevron_left
-                |Ya tengo mi clave
+    md-button(
+      ng-disabled='form.$invalid || submitting',
+      type='submit')
 
-              md-button(
-                ng-disabled='form.$invalid || submitting',
-                type='submit')
-
-                |Enviar
-                md-icon(md-font-icon='material-icons') chevron_right
+      |Enviar
+      md-icon(md-font-icon='material-icons') chevron_right

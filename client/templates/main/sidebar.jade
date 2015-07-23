@@ -1,28 +1,27 @@
 md-toolbar.lightBlue
   h1.md-toolbar-tools
-  md-icon(md-font-icon='material-icons', ng-show='session.user') account_circle
-  br
-  br
-  span(ng-show='session.user')
+  
+  md-button(ng-show='!session.user' ng-click='$navigateTo("/")')
+    md-icon.icon48(md-font-icon='material-icons') account_circle
+    br
+    br
+    
+  md-button(ng-show='session.user' ng-click='$navigateTo("/")')  
+    md-icon.icon48(md-font-icon='material-icons') account_circle
+
+  md-button(ng-show='session.user' ng-click='$navigateTo("/")') 
     | {{ session.user.email }}
     md-icon(md-font-icon='material-icons') arrow_drop_down
   
   
 md-list
-  md-list-item(ng-click='$navigateTo("/")')
-    md-icon(md-font-icon='material-icons') home
-    p Home
-
-  md-subheader(ng-show='!session.user')
-    | Users
-
   md-list-item(ng-click='$navigateTo("/users/signin")', ng-show='!session.user')
     md-icon(md-font-icon='material-icons') person
-    p My Account
+    p Iniciar sesión
 
   md-list-item(ng-click='$navigateTo("/users/signup")', ng-show='!session.user')
     md-icon(md-font-icon='material-icons') person_add
-    p Create account
+    p Crear cuenta
     
   md-list-item(ng-click='$navigateTo("/groups")', ng-show='session.user')
     md-icon(md-font-icon='material-icons') people

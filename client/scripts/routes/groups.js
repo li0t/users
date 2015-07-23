@@ -57,8 +57,18 @@
         templateUrl: '/assets/templates/groups/profile.html',
       }).
 
-      when('/groups/:id/entries/:entry/detail', {
+      when('/groups/:id/entries', {
         controller: 'Groups:Entries',
+        templateUrl: '/assets/templates/groups/entries/index.html',
+      }).
+
+      when('/groups/:id/entries/create', {
+        controller: 'Groups:Entries:Create',
+        templateUrl: '/assets/templates/groups/entries/create.html',
+      }).
+
+      when('/groups/:id/entries/:entry/detail', {
+        controller: 'Groups:Entries:Detail',
         templateUrl: '/assets/templates/groups/entries/detail.html',
       });
     }

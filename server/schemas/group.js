@@ -26,7 +26,12 @@ module.exports = function (Schema) {
 
       left: [Date]
 
-    }]
+    }],
+    
+    updated: {
+      type: Date,
+      default: Date.now
+    }
 
   });
 

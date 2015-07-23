@@ -1,8 +1,6 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-tasks
-      | Tareas del grupo
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
       
   div.panel-body
     a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/tasks')

@@ -1,10 +1,10 @@
-md-toolbar
-  .md-padding.lightBlue
-    h1 EMEETER
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
 
 md-content
   div(layout='column' layout-align="center start")    
-    h3 Grupos
+    h3 {{ session.group.profile.name }}
     
     a.md-button(ng-href='/groups/{{session.group._id}}/profile')
       md-icon(md-font-icon='material-icons') chevron_left

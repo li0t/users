@@ -4,7 +4,7 @@
   ng.module('App').controller('Pages:Home', [
     '$scope', '$http', '$location', '$session', '$timeout',
 
-    function($scope, $http, $location, $session, $timeout) {
+    function($scope, $http, $location, $session, $timeout ) {
       $scope.fetching = false;
       $scope.entries = [];
 
@@ -27,10 +27,12 @@
 
       var meetings = [{
         'title': 'Reunión inicial',
-        'author': 'Egbert Dool'
+        'author': 'Egbert Dool',
+        'created' : '2015-07-14 17:28:33.208Z'
       }, {
         'title': 'Junta de amigos',
-        'author': 'Champion amigo'
+        'author': 'Champion amigo',
+        'created' : '2015-07-22 17:28:33.208Z'
       }];
 
       var backgrounds = {
@@ -61,9 +63,9 @@
 
       var spans = {
         "entry": "Nueva entrada",
-        "group": "Grupo",
-        "task": "Tarea",
-        "meeting": "Reunión"
+        "group": "Grupo creado",
+        "task": "Tarea modificada",
+        "meeting": "Nueva reunión"
       };
 
       /* Shuffle an array, Based on Fisher–Yates shuffle algorithm */

@@ -1,57 +1,52 @@
-div.container
-  div.row
-    div.col-sm-8.col-sm-offset-2
-      div.page-header
-        h1 Cambiar clave
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
+    
+md-icon(md-font-icon='material-icons') edit
+|Crear nueva clave
 
-      div.panel.panel-default
-        div.panel-heading
-          h3.panel-title
-            md-icon(md-font-icon='material-icons') edit
-            |Crear nueva clave
+form(
+  ng-submit='form.$valid && submit()',
+  name='form',
+  role='form',
+  novalidate)
 
-        form(
-          ng-submit='form.$valid && submit()',
-          name='form',
-          role='form',
-          novalidate)
+  div.panel-body
+    md-input-container.form-group
+      span.input-group-addon
+        md-icon(md-font-icon='material-icons') 
 
-          div.panel-body
-            md-input-container.form-group
-              span.input-group-addon
-                md-icon(md-font-icon='material-icons') 
+          input.form-control(
+            placeholder='Ingresa tu nueva clave',
+            ng-disabled='validating',
+            ng-model='form.password',
+            ng-minlength='4',
+            type='password',
+            required)
 
-                  input.form-control(
-                    placeholder='Ingresa tu nueva clave',
-                    ng-disabled='validating',
-                    ng-model='form.password',
-                    ng-minlength='4',
-                    type='password',
-                    required)
+    md-input-container.form-group
+      span.input-group-addon
+        md-icon(md-font-icon='material-icons') 
 
-            md-input-container.form-group
-              span.input-group-addon
-                md-icon(md-font-icon='material-icons') 
+      input.form-control(
+        ng-disabled='form.password.length < 4 || validating',
+        placeholder='Confirma tu nueva clave',
+        ng-model='form.vpassword',
+        ng-minlength='4',
+        type='password',
+        required)
 
-              input.form-control(
-                ng-disabled='form.password.length < 4 || validating',
-                placeholder='Confirma tu nueva clave',
-                ng-model='form.vpassword',
-                ng-minlength='4',
-                type='password',
-                required)
+  div.panel-footer.text-right
+    div.row
+      div.col-sm-5
+        a.md-button(ng-href='/') 
+          md-icon(md-font-icon='material-icons') chevron_left
+          |Cancelar
 
-          div.panel-footer.text-right
-            div.row
-              div.col-sm-5
-                a.md-button(ng-href='/') 
-                  md-icon(md-font-icon='material-icons') chevron_left
-                  |Cancelar
+      div.col-sm-7
+        md-button(
+          ng-disabled='form.$invalid || validating || form.password !== form.vpassword',
+          type='submit')
 
-              div.col-sm-7
-                md-button(
-                  ng-disabled='form.$invalid || validating || form.password !== form.vpassword',
-                  type='submit')
-
-                  |Cambiar clave
-                  md-icon(md-font-icon='material-icons') check
+          |Cambiar clave
+          md-icon(md-font-icon='material-icons') check
