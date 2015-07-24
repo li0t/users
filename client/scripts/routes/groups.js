@@ -32,6 +32,20 @@
         templateUrl: '/assets/templates/groups/tasks/index.html'
       }).
 
+      when('/groups/:id/tasks/create', {
+        controller: 'Groups:Tasks:Create',
+        templateUrl: '/assets/templates/groups/tasks/create.html',
+        resolve: {
+          priorities: [
+            '$statics',
+
+            function ($statics) {
+              return $statics.get('priorities');
+            }
+          ]
+        }
+      }).
+
       when('/groups/:id/tasks/:task/detail', {
         controller: 'Groups:Tasks:Detail',
         templateUrl: '/assets/templates/groups/tasks/detail.html'
@@ -42,14 +56,9 @@
         templateUrl: '/assets/templates/groups/members/index.html'
       }).
 
-      when('/groups/:id/members/add/:user', {
+      when('/groups/:id/members/add', {
         controller: 'Groups:Members:Add',
         templateUrl: '/assets/templates/groups/members/add.html'
-      }).
-
-      when('/groups/:id/members/remove/:user', {
-        controller: 'Groups:Members:Remove',
-        templateUrl: '/assets/templates/groups/members/remove.html'
       }).
 
       when('/groups/:id/profile', {

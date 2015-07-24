@@ -1,64 +1,55 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   md-button(ng-href='/')
-    h2 EMEETER
+    h2 {{ session.group.profile.name }} : ENTRADAS
 
 md-content
-  div(layout='column' layout-align="center start")    
-    h3 {{ session.group.profile.name }}
-    
-    h4
-      md-icon(md-font-icon='material-icons') edit
-      | Crear entrada
-      
-    a.md-button(ng-href='/groups/{{session.group._id}}/profile')
+  div(layout='row')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/profile')
       md-icon(md-font-icon='material-icons') chevron_left
-      | Volver
     
-    form(
-      ng-submit='form.$valid && submit()',
-      name='form',
-      role='form',
-      novalidate)
+  form(
+    ng-submit='form.$valid && submit()',
+    name='form',
+    role='form',
+    novalidate)
 
-      md-input-container.form-group
-        input.form-control(
-          placeholder='Titulo',
-          ng-model='data.title',
-          required)
-      
-      md-input-container.form-group
-        textarea.form-control(
-          placeholder='Contenido',
-          ng-model='data.content',
-          required)
-          
-      md-autocomplete(
-        ng-disabled="isDisabled",
-        md-no-cache="noCache",
-        md-selected-item="selectedTag",
-        md-search-text-change="",
-        md-search-text="searchTag",
-        md-items="tag in tagSearch(searchTag)",
-        md-selected-item-change="",
-        md-item-text="tag.name",
-        md-min-length="0",
-        placeholder="Tags")
-      
-        md-item-template
-          span.item-title
-            md-icon(md-font-icon='material-icons') label
-            span {{tag.name}} 
-
+    md-input-container.form-group
+      input.form-control(
+        placeholder='Titulo',
+        ng-model='data.title',
+        required)
     
-      div.panel-footer.text-right
-        div.btn-group-grid
-          a.md-button(ng-href='/entries')
-            md-icon(md-font-icon='material-icons') chevron_left
-            | Cancelar
+    md-input-container.form-group
+      textarea.form-control(
+        placeholder='Contenido',
+        ng-model='data.content',
+        required)
+        
+    md-autocomplete(
+      ng-disabled="isDisabled",
+      md-no-cache="noCache",
+      md-selected-item="selectedTag",
+      md-search-text-change="",
+      md-search-text="searchTag",
+      md-items="tag in tagSearch(searchTag)",
+      md-selected-item-change="",
+      md-item-text="tag.name",
+      md-min-length="0",
+      placeholder="Tags")
+    
+      md-item-template
+        span.item-title
+          md-icon(md-font-icon='material-icons') label
+          span {{tag.name}} 
 
-          md-button(
-            ng-disabled='form.$invalid',
-            type='submit')
+  
+      div(layout='row')
+        md-button(ng-href='/groups/{{session.group._id}}/profile')
+          md-icon(md-font-icon='material-icons') chevron_left
+          | Cancelar
 
-            md-icon(md-font-icon='material-icons') check
-            | Crear entrada
+        md-button(
+          ng-disabled='form.$invalid',
+          type='submit')
+          | Crear
+          md-icon(md-font-icon='material-icons') chevron_right

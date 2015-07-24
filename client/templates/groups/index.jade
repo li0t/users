@@ -34,7 +34,7 @@ md-content
         ng-init='href = ("/groups/{0}/profile" | format : group._id)')
         
         td 
-          md-button.md-fab(ng-disabled="true")
+          md-button.md-fab(ng-href='{{ href }}')
         
         td
           md-button(ng-href='{{ href }}') {{ group.profile.name }}

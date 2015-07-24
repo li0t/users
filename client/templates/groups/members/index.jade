@@ -1,18 +1,18 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   md-button(ng-href='/')
-    h2 EMEETER
+    h2 {{ session.group.profile.name }} : MIEMBROS
 
 md-content
-  div(layout='column' layout-align="center start")    
-    h3 {{ session.group.profile.name }}
-    
-    a.md-button(ng-href='/groups/{{session.group._id}}/profile')
+  div(layout='row')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/profile')
       md-icon(md-font-icon='material-icons') chevron_left
-      | Volver
-
-    div(ng-show='fetchingMembers && !members')        
-      md-icon(md-font-icon='material-icons') sync
-      | Buscando grupos
+       
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/members/add')
+      md-icon(md-font-icon='material-icons') add
+      
+  div(ng-show='fetchingMembers && !members')        
+    md-icon(md-font-icon='material-icons') sync
+    | Buscando grupos
       
   div(ng-show='!fetchingMembers && members')
     h3 Miembros del grupo 

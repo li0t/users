@@ -1,0 +1,11 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 {{ session.group.profile.name }} : MIEMBROS
+
+md-content
+  div(layout='row')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/profile')
+      md-icon(md-font-icon='material-icons') chevron_left
+       
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/members/add')
+      md-icon(md-font-icon='material-icons') add
