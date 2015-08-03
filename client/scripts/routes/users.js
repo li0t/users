@@ -35,7 +35,7 @@
 
       when('/users/validate/:token', {
         controller: 'Users:Validate',
-        templateUrl: '/assets/assets/templates/pages/home.html'
+        templateUrl: '/assets/templates/pages/home.html'
       }).
 
       when('/users/reset/:token', {

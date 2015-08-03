@@ -43,13 +43,13 @@ md-content
           span {{tag.name}} 
 
   
-      div(layout='row')
-        md-button(ng-href='/groups/{{session.group._id}}/profile')
-          md-icon(md-font-icon='material-icons') chevron_left
-          | Cancelar
+    div(layout='row')
+      md-button(ng-href='/groups/{{session.group._id}}/profile')
+        md-icon(md-font-icon='material-icons') chevron_left
+        | Cancelar
 
-        md-button(
-          ng-disabled='form.$invalid',
-          type='submit')
-          | Crear
-          md-icon(md-font-icon='material-icons') chevron_right
+      md-button(
+        ng-disabled='form.$invalid',
+        type='submit')
+        | Crear
+        md-icon(md-font-icon='material-icons') chevron_right

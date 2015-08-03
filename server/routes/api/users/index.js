@@ -377,20 +377,14 @@ module.exports = function(router, mongoose) {
 
         exec(function(err, user) {
           if (err) {
-            next(err);
-          } else {
-
-            req.session.user = user;
-            res.send(user);
-
-            Token.remove({
-              user: user._id
-            }, function(err) {
-              if (err) {
-                debug('Error! : %s', err);
-              }
-            });
+            return next(err);
           }
+
+          req.session.user = user;
+          res.status(204).end();
+
+          token.remove();
+
         });
       } else {
         res.status(498).send('This token is not active anymore');

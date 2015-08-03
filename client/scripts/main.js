@@ -32,12 +32,7 @@
 
       success(function(data) {
         $session.signin(data.user);
-      }).
-
-      finally(function() {
-        $location.path('/');
       });
-
 
       /* Convenience navigate to method */
       $rootScope.$navigateTo = function (route) {

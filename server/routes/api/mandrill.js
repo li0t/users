@@ -3,8 +3,8 @@
 var Mandrill = require('mandrill-api/mandrill').Mandrill;
 var debug = require('debug')('app:api:mandrill');
 var apiKey = 'DhTgCrDsRExbzSfSU-3dLw';
-var url = 'localhost:3030';
-var api = false;
+var url = '192.168.0.112:3030';
+var api = null;
 var sender = "emeeter";
 var senderEmail = "infoemeeter@gmail.com";
 
