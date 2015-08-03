@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('app:api:users:invited');
+//var debug = require('debug')('app:api:users:invited');
 
 var statics = component('statics');
 
@@ -10,6 +10,7 @@ module.exports = function(router, mongoose) {
   var Profile = mongoose.model('profile');
   var Contact = mongoose.model('contact');
   var Token = mongoose.model('token');
+  var Group = mongoose.model('group');
 
   /**
    * Create a new user and invite it to emeeter
@@ -28,7 +29,6 @@ module.exports = function(router, mongoose) {
         profile: profile._id,
         state: statics.model('state', 'pending')._id
       }).
-
       save(function(err, user) {
 
         if (err) {
@@ -42,25 +42,47 @@ module.exports = function(router, mongoose) {
           }
 
           /** Remove unnecessary new profile */
-          Profile.remove({ _id: profile._id }).
-          exec(function(err) { if (err) { debug(err); } });
+          profile.remove();
 
         } else {
 
           new Contact({ user: user._id }).
-
           save(function(err) {
             if (err) {
-              next(err);
-            } else {
-
-              res.send(user._id);
+              return next(err);
             }
+
+            new Profile({ name: 'own' }).
+            save(function(err, profile) {
+              if (err) {
+                return next(err);
+              }
+
+              new Group({ profile: profile._id }).
+              save(function(err, group) {
+                if (err) {
+                  return next(err);
+                }
+
+                group.members.push({
+                  user: user._id,
+                  joined: new Date()
+                });
+
+                group.save(function(err) {
+                  if (err) {
+                    return next(err);
+                  }
+
+                  res.send(user._id);
+
+                });
+              });
+            });
           });
         }
       });
     });
-
   });
 
   /**

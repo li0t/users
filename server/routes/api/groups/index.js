@@ -17,9 +17,9 @@ module.exports = function(router, mongoose) {
    */
   router.post('/', function(req, res, next) {
 
+    var group, name = req.body.name && req.body.name !== 'own' && req.body.name;
     var creator = req.session.user._id;
     var members = req.body.members;
-    var group, name = req.body.name;
     var now = new Date();
 
     function saveGroup() {
@@ -39,20 +39,14 @@ module.exports = function(router, mongoose) {
 
     if (name) {
 
-      new Profile({
-        name: name
-      }).
-
+      new Profile({ name: name }).
       save(function(err, profile) {
-
         if (err) {
-
           if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
             res.sendStatus(400);
           } else {
             next(err);
           }
-
         } else {
 
           group = new Group({
@@ -105,7 +99,7 @@ module.exports = function(router, mongoose) {
         }
       });
     } else {
-      res.status(400).send('The group must have a name');
+      res.sendStatus(400);
     }
 
   });
@@ -134,13 +128,12 @@ module.exports = function(router, mongoose) {
             group.save(function(err) {
 
               if (err) {
-                next(err);
-              } else {
-
-                debug('The group %s, has a new admin with id %s', group._id, user);
-                res.send('The group ' + group._id + ' has a new admin with id ' + user);
-
+                return next(err);
               }
+
+              debug('The group %s, has a new admin with id %s', group._id, user);
+              res.end();
+
             });
           } else {
             debug('No user with id %s found in group %s', req.body.id, req.params.id);
@@ -190,7 +183,7 @@ module.exports = function(router, mongoose) {
 
           relations.membership(group._id, function(err, relation) {
 
-            if (relation.isMember(user)) {
+            if (group.profile.name !== 'own' && relation.isMember(user)) {
 
               relation.group = group;
               relation.cleanMembers();
@@ -217,7 +210,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get a group
    */
-  router.get('/:id/profile', function(req, res, next) {
+  router.get('/:id', function(req, res, next) {
 
     var user = req.session.user._id;
 

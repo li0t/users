@@ -1,16 +1,13 @@
 'use strict';
 
-var _ = require('underscore');
 var debug = require('debug')('app:api:entries:tasks');
 
 var relations = component('relations');
-var statics = component('statics');
-var gridfs = component('gridfs');
+
 
 module.exports = function(router, mongoose) {
 
   var Entry = mongoose.model('entry');
-  var Tag = mongoose.model('tag');
   var Task = mongoose.model('task');
 
   /**
@@ -31,15 +28,13 @@ module.exports = function(router, mongoose) {
       if (checked === entries.length) {
 
         task.save(function(err) {
-
           if (err) {
-            next(err);
-          } else {
-
-            debug('%s of %s new entries added to task %s', saved, entries.length, task._id);
-            res.send(saved + ' of ' + entries.length + ' new entries added to task ' + task._id);
-
+            return next(err);
           }
+
+          debug('%s of %s new entries added to task %s', saved, entries.length, task._id);
+          res.end();
+
         });
       }
     }
@@ -213,13 +208,12 @@ module.exports = function(router, mongoose) {
 
               task.save(function(err) {
                 if (err) {
-                  next(err);
-                } else {
-
-                  debug('%s of %s entries removed from task %s', removed, entries.length, task._id);
-                  res.send(removed + ' of ' + entries.length + ' entries removed from task ' + task._id);
-
+                  return next(err);
                 }
+
+                debug('%s of %s entries removed from task %s', removed, entries.length, task._id);
+                res.end();
+
               });
             } else {
               debug('User %s is not part of task %s group', remover, task.group);

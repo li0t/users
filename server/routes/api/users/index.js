@@ -13,6 +13,7 @@ module.exports = function(router, mongoose) {
   var Profile = mongoose.model('profile');
   var Contact = mongoose.model('contact');
   var Token = mongoose.model('token');
+  var Group = mongoose.model('group');
 
   /**
    * Get users list.
@@ -43,7 +44,6 @@ module.exports = function(router, mongoose) {
   router.post('/', function(req, res, next) {
 
     new Profile().
-
     save(function(err, profile) { /* Create a new Profile that will store the user information */
       if (err) {
         return next(err);
@@ -55,7 +55,6 @@ module.exports = function(router, mongoose) {
         profile: profile._id,
         state: statics.model('state', 'pending')._id
       }).
-
       save(function(err, user) {
         if (err) {
           /* Check for duplicated entry */
@@ -66,18 +65,49 @@ module.exports = function(router, mongoose) {
           } else {
             next(err);
           }
+          profile.remove();
         } else {
 
-          new Contact({ /* Create a new ContactSchema that will store the user contacts */
+          /* Create a new ContactSchema that will store the user contacts */
+          new Contact({
             user: user._id
           }).
-
           save(function(err) {
             if (err) {
               return next(err);
             }
-            res.send(user._id);
 
+            new Profile({
+              name: 'own'
+            }).
+            save(function(err, groupProfile) {
+              if (err) {
+                return next(err);
+              }
+
+              new Group({
+                profile: groupProfile._id
+              }).
+              save(function(err, group) {
+                if (err) {
+                  return next(err);
+                }
+
+                group.members.push({
+                  user: user._id,
+                  joined: new Date()
+                });
+
+                group.save(function(err) {
+                  if (err) {
+                    return next(err);
+                  }
+
+                  res.send(user._id);
+
+                });
+              });
+            });
           });
         }
       });
@@ -118,20 +148,37 @@ module.exports = function(router, mongoose) {
 
           if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
 
-            req.session.user = user;
-            res.send(user);
+            Group.findOne().
+
+            where('profile.name', 'own').
+
+            where('members.user', user).
+
+            deepPopulate('profile').
+
+            exec(function(err, group) {
+              if (err) {
+                return next(err);
+              }
+
+              user = user.toObject();
+              user.group = group;
+              req.session.user = user;
+              res.send(user);
+
+            });
 
           } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
 
-            res.status(409).send("Looks like you havent confirmed your email yet.");
+            res.sendStatus(409);
 
           } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
 
-            res.status(409).send("Looks like you have disabled your account.");
+            res.sendStatus(403);
 
           } else {
 
-            res.status(409).send("There is an internal problem, contact the administrator");
+            res.sendStatus(500);
 
           }
         } else {
@@ -210,15 +257,10 @@ module.exports = function(router, mongoose) {
 
                   req.session.user = user;
 
-                  res.send('Password reset successful');
+                  res.end();
 
-                  Token.remove({
-                    _id: token._id
-                  }, function(err) {
-                    if (err) {
-                      debug('Error! ' + err);
-                    }
-                  });
+                  token.remove();
+
                 }
               });
             } else {
@@ -227,7 +269,7 @@ module.exports = function(router, mongoose) {
             }
           });
         } else {
-          res.status(400).send('You must set a new password');
+          res.sendStatus(400);
         }
       } else {
         res.sendStatus(498);
@@ -243,38 +285,33 @@ module.exports = function(router, mongoose) {
     var oldPassword = req.body.oldPassword;
     var newPassword = req.body.newPassword;
 
-    if (newPassword) {
+    if (newPassword && newPassword !== oldPassword) {
 
-      if (newPassword !== oldPassword) {
+      User.
 
-        User.
+      findById(req.session.user._id).
 
-        findById(req.session.user._id).
+      exec(function(err, user) {
 
-        exec(function(err, user) {
+        if (err) {
+          next(err);
 
-          if (err) {
-            next(err);
+        } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
 
-          } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
+          user.password = newPassword;
 
-            user.password = newPassword;
+          user.save(function(err, user) {
 
-            user.save(function(err, user) {
+            req.session.user = user;
+            res.send(user._id);
 
-              req.session.user = user;
-              res.send(user._id);
-
-            });
-          } else {
-            setTimeout(function() {
-              res.sendStatus(401);
-            }, 1000);
-          }
-        });
-      } else {
-        res.status(400).send('The new password should be different');
-      }
+          });
+        } else {
+          setTimeout(function() {
+            res.sendStatus(401);
+          }, 1000);
+        }
+      });
     } else {
       res.sendStatus(400);
     }
@@ -387,7 +424,7 @@ module.exports = function(router, mongoose) {
 
         });
       } else {
-        res.status(498).send('This token is not active anymore');
+        res.sendStatus(498);
       }
     });
 

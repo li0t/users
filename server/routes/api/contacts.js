@@ -171,12 +171,13 @@ module.exports = function(router, mongoose) {
               }
             });
           } else {
-            debug('No contacts list found for user with id %s', req.params.id);
+            debug('No contacts list found for user with id %s', token.user);
             res.sendStatus(404);
           }
         });
       } else {
-        res.status(498).send('No active token found.');
+        debug('Token %s not active', req.params.id);
+        res.sendStatus(498);
       }
     });
 
@@ -223,7 +224,7 @@ module.exports = function(router, mongoose) {
                   }
 
                   debug('User %s and %s are no longer contacts!', receiver.user, sender.user);
-                  res.send('User ' + receiver.user + ' and ' + sender.user + ' are no longer contacts!');
+                  res.end();
 
                 });
 
@@ -251,7 +252,7 @@ module.exports = function(router, mongoose) {
                     }
 
                     debug('The contact request between %s and %s has been deleted!', receiver.user, sender.user);
-                    res.send('The contact request between ' + receiver.user + ' and ' + sender.user + ' has been deleted!');
+                    res.end();
 
                     /**
                      * Remove contact request token

@@ -113,7 +113,7 @@ module.exports = function(router /*, mongoose */ ) {
                 }
 
                 debug('Saved group %s with %s new members', group._id, saved);
-                res.send('Added ' + saved + ' new members to group ' + group._id);
+                res.end();
 
               });
             });
@@ -212,8 +212,8 @@ module.exports = function(router /*, mongoose */ ) {
 
               }
 
-                debug('%s of %s members removed from group %s', removed, members.length, group._id);
-                res.send(removed + ' of ' + members.length + ' members removed from group ' + group._id);
+              debug('%s of %s members removed from group %s', removed, members.length, group._id);
+              res.end();
 
             });
 

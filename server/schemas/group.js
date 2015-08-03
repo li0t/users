@@ -14,8 +14,7 @@ module.exports = function (Schema) {
 
     admin: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
-      required: true
+      ref: 'user'
     },
 
     members: [{
@@ -27,7 +26,7 @@ module.exports = function (Schema) {
       left: [Date]
 
     }],
-    
+
     updated: {
       type: Date,
       default: Date.now

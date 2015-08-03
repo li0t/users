@@ -1,14 +1,10 @@
 'use strict';
 
-var _ = require('underscore');
 var debug = require('debug')('app:api:tasks:notes');
 
 var relations = component('relations');
-var statics = component('statics');
 
-module.exports = function(router, mongoose) {
-
-  var Task = mongoose.model('task');
+module.exports = function(router/*, mongoose*/) {
 
   /**
    * Add notes to a task
@@ -58,13 +54,12 @@ module.exports = function(router, mongoose) {
 
                 task.save(function(err) {
                   if (err) {
-                    next(err);
-                  } else {
-
-                    debug('%s of %s new notes added to task %s', saved, notes.length, task._id);
-                    res.send(saved + ' of ' + notes.length + ' new notes added to task ' + task._id);
-
+                    return next(err);
                   }
+
+                  debug('%s of %s new notes added to task %s', saved, notes.length, task._id);
+                  res.end();
+
                 });
               } else {
                 debug('User %s is not allowed to modify task %s', user, task._id);
@@ -144,13 +139,12 @@ module.exports = function(router, mongoose) {
 
                     task.save(function(err) {
                       if (err) {
-                        next(err);
-                      } else {
-
-                        debug('%s of %s notes removed from task %s', removed, notes.length, task._id);
-                        res.send(removed + ' of ' + notes.length + ' notes removed from task ' + task._id);
-
+                        return next(err);
                       }
+
+                      debug('%s of %s notes removed from task %s', removed, notes.length, task._id);
+                      res.end();
+
                     });
                   }
                 });

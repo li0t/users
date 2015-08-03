@@ -1,10 +1,8 @@
 'use strict';
 
-var _ = require('underscore');
 var debug = require('debug')('app:api:tasks:collaborators');
 
 var relations = component('relations');
-var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
@@ -136,13 +134,12 @@ module.exports = function(router, mongoose) {
 
                 task.save(function(err) {
                   if (err) {
-                    next(err);
-                  } else {
-
-                    debug('%s of %s new collaborators added to task %s', saved, collaborators.length, task._id);
-                    res.send(saved + ' of ' + collaborators.length + ' new collaborators added to task ' + task._id);
-
+                    return next(err);
                   }
+
+                  debug('%s of %s new collaborators added to task %s', saved, collaborators.length, task._id);
+                  res.end();
+
                 });
               } else {
                 debug('User is not part of task group %s', inviter, task.group);
@@ -213,14 +210,12 @@ module.exports = function(router, mongoose) {
 
                 task.save(function(err) {
                   if (err) {
-                    next(err);
-
-                  } else {
-
-                    debug('%s of %s collaborators removed from task %s', removed, collaborators.length, task._id);
-                    res.send(removed + ' of ' + collaborators.length + ' collaborators removed from task ' + task._id);
-
+                    return next(err);
                   }
+
+                  debug('%s of %s collaborators removed from task %s', removed, collaborators.length, task._id);
+                  res.end();
+
                 });
               } else {
                 debug('User %s is not part of task %s group', remover, task.group);

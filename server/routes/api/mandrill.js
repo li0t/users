@@ -101,7 +101,7 @@ module.exports = function(router, mongoose) {
 
             }, function(result) {
               debug(result);
-              res.send("You've been sent a confirmation email.");
+              res.end();
 
             }, function(err) {
               debug('A mandrill error occurred %s : %s', +err.nam, err.message);
@@ -171,7 +171,7 @@ module.exports = function(router, mongoose) {
 
             }, function(result) {
               debug(result);
-              res.send("You have sent a contact request! Good!");
+              res.end();
 
             }, function(err) {
               debug('A mandrill error occurred %s : %s', +err.nam, err.message);
@@ -312,7 +312,7 @@ module.exports = function(router, mongoose) {
 
             }, function(result) {
               debug(result);
-              res.send("A recovery email has been sent to " + user.email);
+              res.end();
 
             }, function(err) {
               debug('A mandrill error occurred %s : %s', +err.nam, err.message);
@@ -322,7 +322,7 @@ module.exports = function(router, mongoose) {
           });
         } else {
           debug('No user found for ' + req.params.email);
-          res.send("A recovery email has been sent to " + req.params.email);
+          res.sendStatus(400);
         }
       });
     } else {

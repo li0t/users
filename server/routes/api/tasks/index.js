@@ -1,10 +1,8 @@
 'use strict';
 
-var _ = require('underscore');
 var debug = require('debug')('app:api:tasks');
 
 var relations = component('relations');
-var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
@@ -37,21 +35,13 @@ module.exports = function(router, mongoose) {
             }).
 
             save(function(err, task) {
-
               if (err) {
-
-                if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
-                  res.status(400).send(err);
-                } else {
-                  next(err);
-                }
-
-              } else {
-
-                debug('Task %s created', task._id);
-                res.status(201).send(task._id);
-
+               return next(err);
               }
+
+              debug('Task %s created', task._id);
+              res.status(201).send(task._id);
+
             });
         } else {
           debug('User is not part of group %s', creator, group._id);
@@ -59,7 +49,7 @@ module.exports = function(router, mongoose) {
         }
       } else {
         debug('Group %s not found', req.body.group);
-        res.status(400).send('group not found');
+        res.sendStatus(400);
       }
     });
 
@@ -87,25 +77,23 @@ module.exports = function(router, mongoose) {
     exec(function(err, tasks) {
 
       if (err) {
-        next(err);
-
-      } else {
-
-        tasks.forEach(function(task) {
-
-          for (i = 0; i < task.collaborators.length; i++) {
-            /** Check if user is actual collaborator of task */
-            if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
-              /** Remove it from the array and reallocate index */
-              task.collaborators.splice(i, 1);
-              i -= 1;
-            }
-          }
-        });
-
-        res.send(tasks);
-
+       return next(err);
       }
+
+      tasks.forEach(function(task) {
+
+        for (i = 0; i < task.collaborators.length; i++) {
+          /** Check if user is actual collaborator of task */
+          if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
+            /** Remove it from the array and reallocate index */
+            task.collaborators.splice(i, 1);
+            i -= 1;
+          }
+        }
+      });
+
+      res.send(tasks);
+
     });
 
   });
@@ -125,12 +113,9 @@ module.exports = function(router, mongoose) {
 
         if (relation.isMember(user)) {
 
-          Task.
-
-          find().
+          Task.find().
 
           where('group', group).
-
           where('deleted', null).
 
           sort('-created').
@@ -140,25 +125,23 @@ module.exports = function(router, mongoose) {
           exec(function(err, tasks) {
 
             if (err) {
-              next(err);
-
-            } else {
-
-              tasks.forEach(function(task) {
-
-                for (i = 0; i < task.collaborators.length; i++) {
-                  /** Check if user is actual collaborator of task */
-                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
-                    /** Remove it from the array and reallocate index */
-                    task.collaborators.splice(i, 1);
-                    i -= 1;
-                  }
-                }
-              });
-
-              res.send(tasks);
-
+              return next(err);
             }
+
+            tasks.forEach(function(task) {
+
+              for (i = 0; i < task.collaborators.length; i++) {
+                /** Check if user is actual collaborator of task */
+                if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
+                  /** Remove it from the array and reallocate index */
+                  task.collaborators.splice(i, 1);
+                  i -= 1;
+                }
+              }
+            });
+
+            res.send(tasks);
+
           });
         } else {
           debug('User %s is not part of group %s', req.session.user._id, group);
@@ -197,13 +180,12 @@ module.exports = function(router, mongoose) {
 
               task.save(function(err) {
                 if (err) {
-                  next(err);
-                } else {
-
-                  debug('Task %s is now set as completed', task._id);
-                  res.send('Task ' + task._id + ' is now set as completed');
-
+                  return next(err);
                 }
+
+                debug('Task %s is now set as completed', task._id);
+                res.end();
+
               });
             } else {
               debug('User %s is not allowed to modify task %s', user, task._id);
@@ -247,13 +229,12 @@ module.exports = function(router, mongoose) {
 
               task.save(function(err) {
                 if (err) {
-                  next(err);
-                } else {
-
-                  debug('Task %s is now set as disabled', task._id);
-                  res.send('Task ' + task._id + ' was deleted');
-
+                  return next(err);
                 }
+
+                debug('Task %s is now set as disabled', task._id);
+                res.end();
+
               });
             } else {
               debug('User %s is not allowed to modify task %s', user, task._id);
@@ -297,13 +278,12 @@ module.exports = function(router, mongoose) {
 
               task.save(function(err) {
                 if (err) {
-                  next(err);
-                } else {
-
-                  debug('Task %s was reopened', task._id);
-                  res.send('Task ' + task._id + ' was reopened');
-
+                  return next(err);
                 }
+
+                debug('Task %s was reopened', task._id);
+                res.end();
+
               });
             } else {
               debug('User %s is not allowed to modify task %s', user, task._id);
@@ -346,15 +326,13 @@ module.exports = function(router, mongoose) {
               task.objective = req.body.objective || task.objective;
 
               task.save(function(err) {
-
                 if (err) {
-                  next(err);
-
-                } else {
-                  debug('Task %s objective changed to %s', task._id, task.objective);
-                  res.send('Task ' + task._id + ' objective changed to ' + task.objective);
-
+                  return next(err);
                 }
+
+                debug('Task %s objective changed to %s', task._id, task.objective);
+                res.end();
+
               });
             } else {
               debug('User %s is not allowed to modify task %s', user, task._id);
@@ -376,7 +354,7 @@ module.exports = function(router, mongoose) {
   /**
    * Edit task priority
    */
-  router.post('/:id/priority', function(req, res, next) {
+  router.put('/:id/priority', function(req, res, next) {
 
     var task = req.params.id;
     var user = req.session.user._id;
@@ -397,15 +375,13 @@ module.exports = function(router, mongoose) {
               task.priority = req.body.priority || task.priority;
 
               task.save(function(err) {
-
                 if (err) {
-                  next(err);
-
-                } else {
-                  debug('Task %s priority changed to %s', task._id, task.priority);
-                  res.send('Task ' + task._id + ' priority changed to ' + task.priority);
-
+                  return next(err);
                 }
+
+                  debug('Task %s priority changed to %s', task._id, task.priority);
+                  res.end();
+
               });
             } else {
               debug('User %s is not allowed to modify task %s', user, task._id);
@@ -414,7 +390,7 @@ module.exports = function(router, mongoose) {
           });
         } else {
           debug('Task %s is completed, no changes allowed', task._id);
-          res.sendStatus(403);
+          res.sendStatus(400);
         }
       } else {
         debug('Task %s was not found', req.params.id);
@@ -427,7 +403,7 @@ module.exports = function(router, mongoose) {
   /**
    * Set task datetime
    */
-  router.post('/:id/date-time', function(req, res, next) {
+  router.put('/:id/date-time', function(req, res, next) {
 
     var task = req.params.id;
     var user = req.session.user._id;
@@ -448,20 +424,19 @@ module.exports = function(router, mongoose) {
               task.dateTime = req.body.dateTime;
 
               task.save(function(err) {
-
                 if (err) {
-
                   if (err.name && (err.name === 'CastError' || err.name === 'ValidationError')) {
-                    res.status(400).send(err);
+                    res.sendStatus(400);
                   } else {
                     next(err);
                   }
-
-                } else {
-                  debug('Task %s dateTime was set to %s', task._id, task.dateTime);
-                  res.send('Task ' + task._id + ' dateTime was set to ' + task.dateTime);
-
+                  return;
                 }
+
+                debug('Task %s dateTime was set to %s', task._id, task.dateTime);
+                res.end();
+
+
               });
             } else {
               debug('User %s is not allowed to modify task %s', user, task._id);
@@ -501,22 +476,20 @@ module.exports = function(router, mongoose) {
           if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
             task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
-
               if (err) {
-                next(err);
-              } else {
-
-                for (i = 0; i < task.collaborators.length; i++) {
-                  /** Check if user is actual collaborator of task */
-                  if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
-                    /** Remove it from the array and reallocate index */
-                    task.collaborators.splice(i, 1);
-                    i -= 1;
-                  }
-                }
-
-                res.send(task);
+                return next(err);
               }
+
+              for (i = 0; i < task.collaborators.length; i++) {
+                /** Check if user is actual collaborator of task */
+                if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
+                  /** Remove it from the array and reallocate index */
+                  task.collaborators.splice(i, 1);
+                  i -= 1;
+                }
+              }
+
+              res.send(task);
 
             });
           } else {
