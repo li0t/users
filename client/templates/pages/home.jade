@@ -8,22 +8,20 @@ md-content.white(layout-padding, ng-show='session.user')
     div(flex='70')
       img(ng-src="../assets/images/analitycs.png")
           
-    div.blueGray(flex)
-      div
-        h4 PENDIENTES
+    div.blueGray(flex='30', layout-padding)
+      div(layout-padding)
+        h3.md-title PENDIENTES
         
         md-list
           md-list-item(ng-repeat='pending in pendings | limitTo:3')
-            div.md-list-item-text(flex='66')
+            div.md-list-item-text(flex='80')
               h4 {{ pending.title }}
               p {{ pending.description }}
-            md-checkbox(flex='99', ng-click='gotIt(pending)')
+            md-checkbox(flex, ng-click='gotIt(pending)')
           
           md-list-item(ng-show='!pendings.length')
             h4 No tienes asuntos pendientes
-  
-  div(layout-padding)
-      
+
   div
     md-grid-list(
         md-gutter="12px" md-gutter-gt-sm="8px"
