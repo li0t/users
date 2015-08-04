@@ -12,6 +12,7 @@ var gutil = require('gulp-util');
 var util = require('util');
 var gulp = require('gulp');
 var del = require('del');
+var shell = require('gulp-shell');
 
 var options = {
   plumber: {
@@ -166,8 +167,13 @@ gulp.task('build', ['scripts', 'styles', 'templates']);
 /* Default task */
 gulp.task('default', ['build']);
 
+/* Run dev */
+gulp.task('run-dev', shell.task([
+  'npm run dev'
+]))
+
 /* Watch for file changes */
-gulp.task('watch', ['build'], function () {
+gulp.task('watch', ['build', 'run-dev'], function () {
   gulp.watch(paths.watch.templates, ['templates']);
   gulp.watch(paths.watch.scripts, ['scripts']);
   gulp.watch(paths.watch.styles, ['styles']);
