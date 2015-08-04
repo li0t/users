@@ -120,6 +120,7 @@ module.exports = function(router, mongoose) {
    */
   router.post('/signin', function(req, res, next) {
 
+    var i;
     var email = req.body.email;
     var password = req.body.password;
 
@@ -148,24 +149,27 @@ module.exports = function(router, mongoose) {
 
           if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
 
-            Group.findOne().
-
-            where('profile.name', 'own').
+            Group.find().
 
             where('members.user', user).
 
-            deepPopulate('profile').
+            populate('profile').
 
-            exec(function(err, group) {
+            exec(function(err, groups) {
               if (err) {
                 return next(err);
               }
 
-              user = user.toObject();
-              user.group = group;
-              req.session.user = user;
-              res.send(user);
+              for (i = 0; i < groups.length; i++) {
+                if (groups[i].profile.name === 'own') {
 
+                  user = user.toObject();
+                  user.group = groups[i];
+                  req.session.user = user;
+                  return res.send(user);
+
+                }
+              }
             });
 
           } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {

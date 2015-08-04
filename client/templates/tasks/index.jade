@@ -1,54 +1,41 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   md-button(ng-href='/')
-    h2 EMEETER
+    h2 TAREAS
 
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-tasks
-      | Tareas
+md-button.md-fab.md-warn(ng-href='/tasks/create')
+  md-icon(md-font-icon='material-icons') add
       
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
-      i.fa.fa-mr.fa-user
-      | Volver 
+md-content 
+  div(layout='column' layout-align="center start")
+   
+  div(ng-show='fetching && !tasks')   
+    md-icon(md-font-icon='material-icons' ) sync
+    | Buscando tareas
       
-  div.panel-body.text-center(ng-show='fetchingTasks && !tasks')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Buscando Tareas
-      
-  div.panel-body.text-center(ng-show='!fetchingTasks && tasks && !tasks.length')
-    h4 No hay Tareas     
-            
-  div.table-responsive(ng-show='!fetchingTasks && tasks && tasks.length')
-    table.table.table-hover
+  div(ng-show='!fetching && tasks && !tasks.length')
+    md-icon(md-font-icon='material-icons') circle
+    | No hay tareas    
+    
+  table(ng-show='!fetching && tasks && tasks.length')
       thead
         tr
           th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-dashcube
-              | Ojectivo
+            md-button Ojectivo
 
           th
-            button.btn.btn-block.btn-default
-              i.fa.fa-at.fa-exclamation-circle
-              | Prioridad
+            md-button Prioridad
+            
+          th
+            md-button Grupo
 
           th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-calendar
-              | Fecha de Creación
+            md-button Fecha de Creación
 
           th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-calendar
-              | Fecha de Entrega
+            md-button Fecha de Entrega
               
           th
-            button.btn.btn-block.btn-default
-              i.fa.fa-mr.fa-fw.fa-users
-              | Colaboradores    
+            md-button Colaboradores    
           
       tbody
         tr(
@@ -56,21 +43,19 @@ div.panel.panel-default
           ng-init='href = ("/tasks/{0}/detail" | format : task._id)')
 
           td
-            a(ng-href='{{ href }}')
-              | {{ task.objective }}
+            md-button(ng-href='{{ href }}') {{ task.objective }}
 
           td
-            a(ng-href='{{ href }}')
-              | {{ task.priority.name }}
+            md-button(ng-href='{{ href }}') {{ task.priority.name }}
+            
+          td
+            md-button(ng-href='{{ href }}') {{ task.group.profile.name }}  
+            
+          td
+            md-button(ng-href='{{ href }}') {{ task.created | toLocal }}
 
           td
-            a(ng-href='{{ href }}')
-              | {{ task.created }}
-
-          td
-            a(ng-href='{{ href }}')
-              | {{ task.dateTime  || "No definida" }}
+            md-button(ng-href='{{ href }}') {{ task.dateTime  || "No definida" }}
               
           td
-            a(ng-href='{{ href }}')
-              | {{ task.collaborators.length }}
+            md-button(ng-href='{{ href }}') {{ task.collaborators.length }}

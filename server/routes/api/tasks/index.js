@@ -9,75 +9,25 @@ module.exports = function(router, mongoose) {
   var Task = mongoose.model('task');
 
   /**
-   * Create a new task
-   */
-  router.post('/', function(req, res, next) {
-
-    var group = req.body.group;
-    var dateTime = req.body.dateTime || null;
-    var creator = req.session.user._id;
-
-    relations.membership(group, function(err, membership) {
-
-      if (!err && membership.group) {
-
-      group = membership.group; /** The group model */
-
-        if (membership.isMember(creator)) {
-
-            new Task({
-              group: group._id,
-              creator: creator,
-              objective: req.body.objective,
-              priority: req.body.priority,
-              dateTime: dateTime,
-              notes: req.body.notes,
-            }).
-
-            save(function(err, task) {
-              if (err) {
-               return next(err);
-              }
-
-              debug('Task %s created', task._id);
-              res.status(201).send(task._id);
-
-            });
-        } else {
-          debug('User is not part of group %s', creator, group._id);
-          res.sendStatus(403);
-        }
-      } else {
-        debug('Group %s not found', req.body.group);
-        res.sendStatus(400);
-      }
-    });
-
-  });
-
-  /**
    * Get session user tasks
    */
   router.get('/', function(req, res, next) {
 
     var i;
 
-    Task.
-
-    find().
+    Task.find().
 
     where('creator', req.session.user._id).
-
     where('deleted', null).
 
-    populate('group collaborators entries priority').
+    deepPopulate('group.profile collaborators entries priority').
 
     sort('-created').
 
     exec(function(err, tasks) {
 
       if (err) {
-       return next(err);
+        return next(err);
       }
 
       tasks.forEach(function(task) {
@@ -97,6 +47,55 @@ module.exports = function(router, mongoose) {
     });
 
   });
+
+  /**
+   * Create a new task
+   */
+  router.post('/', function(req, res, next) {
+
+    var group = req.body.group;
+    var dateTime = req.body.dateTime || null;
+    var creator = req.session.user._id;
+
+    relations.membership(group, function(err, membership) {
+
+      if (!err && membership.group) {
+
+        group = membership.group; /** The group model */
+
+        if (membership.isMember(creator)) {
+
+          new Task({
+            group: group._id,
+            creator: creator,
+            objective: req.body.objective,
+            priority: req.body.priority,
+            dateTime: dateTime,
+            notes: req.body.notes,
+          }).
+
+          save(function(err, task) {
+            if (err) {
+              return next(err);
+            }
+
+            debug('Task %s created', task._id);
+            res.status(201).send(task._id);
+
+          });
+        } else {
+          debug('User is not part of group %s', creator, group._id);
+          res.sendStatus(403);
+        }
+      } else {
+        debug('Group %s not found', req.body.group);
+        res.sendStatus(400);
+      }
+    });
+
+  });
+
+
 
   /**
    * Get tasks of a group
@@ -168,7 +167,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (!err && collaboration.task) {
 
-      task = collaboration.task; /** The task model */
+        task = collaboration.task; /** The task model */
 
         if (!task.completed) {
 
@@ -217,7 +216,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (!err && collaboration.task) {
 
-      task = collaboration.task; /** The task model */
+        task = collaboration.task; /** The task model */
 
         if (!task.completed) {
 
@@ -266,7 +265,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (!err && collaboration.task) {
 
-      task = collaboration.task; /** The task model */
+        task = collaboration.task; /** The task model */
 
         if (task.completed) {
 
@@ -305,7 +304,7 @@ module.exports = function(router, mongoose) {
   /**
    * Edit task objective
    */
-  router.post('/:id/objective', function(req, res, next) {
+  router.put('/:id/objective', function(req, res, next) {
 
     var task = req.params.id;
     var user = req.session.user._id;
@@ -315,7 +314,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (!err && collaboration.task) {
 
-      task = collaboration.task; /** The task model */
+        task = collaboration.task; /** The task model */
 
         if (!task.completed) {
 
@@ -364,7 +363,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (!err && collaboration.task) {
 
-      task = collaboration.task; /** The task model */
+        task = collaboration.task; /** The task model */
 
         if (!task.completed) {
 
@@ -379,8 +378,8 @@ module.exports = function(router, mongoose) {
                   return next(err);
                 }
 
-                  debug('Task %s priority changed to %s', task._id, task.priority);
-                  res.end();
+                debug('Task %s priority changed to %s', task._id, task.priority);
+                res.end();
 
               });
             } else {
@@ -413,7 +412,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (!err && collaboration.task) {
 
-      task = collaboration.task; /** The task model */
+        task = collaboration.task; /** The task model */
 
         if (!task.completed) {
 
@@ -469,7 +468,7 @@ module.exports = function(router, mongoose) {
       /** Check if task exists and is available for changes */
       if (!err && collaboration.task) {
 
-      task = collaboration.task; /** The task model */
+        task = collaboration.task; /** The task model */
 
         relations.membership(task.group, function(err, taskGroup) {
 

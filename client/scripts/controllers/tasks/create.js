@@ -13,7 +13,7 @@
       };
 
       $scope.data = {
-        group: $session.get('group')._id,
+        group: $session.get('user').group._id,
         objetive: null,
         priority: null
       };
@@ -22,7 +22,7 @@
         $http.post('/api/tasks', $scope.data).
         success(function () {
           $session.flash('Tarea creada');
-          $location.path('/groups/'  +$session.get('group')._id + '/tasks');
+          $location.path('/tasks');
         }).
         error(function () {
           $session.flash('La tarea no pudo ser creada');

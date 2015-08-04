@@ -1,48 +1,39 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   md-button(ng-href='/')
-    h2 EMEETER
+    h2 TAREAS
+
+md-content
+  div(layout='row')
+    md-button.md-fab.md-warn(ng-href='/tasks')
+      md-icon(md-font-icon='material-icons') chevron_left
 
   form(
     ng-submit='form.$valid && submit()',
     role='form',
     name='form')
 
-    div.panel-body
-      div.form-group
-        div.input-group
-          span.input-group-addon
-            i.fa.fa-fw.fa-pencil
+    md-input-container.form-group
+      input.form-control(
+        placeholder='Objetivo',
+        ng-model='data.objective',
+        required)
 
-          input.form-control(
-            placeholder='Objetivo',
-            ng-model='data.objective',
-            required)
+    md-input-container.form-group
+      md-select.form-control(
+        ng-model='data.priority'
+        placeholder='Prioridad'
+        required)
+        
+        md-option(ng-repeat='priority in statics.priorities'
+        ng-value='priority._id') {{ priority.name }}
+            
+    div(layout='row')
+      md-button(ng-href='/tasks')
+        md-icon(md-font-icon='material-icons') chevron_left
+        | Cancelar
 
-      div.form-group
-        div.input-group
-          span.input-group-addon
-            i.fa.fa-fw.fa-dot-circle-o
-
-          select.form-control(
-            ng-model='data.priority',
-            required)
-
-            option(value='', hidden, disabled, selected) Prioridad
-
-            option(
-              ng-repeat='priority in statics.priorities',
-              label='{{ priority.name }}',
-              ng-value='priority._id')
-       
-    div.panel-footer
-      div.btn-group.btn-group-grid
-        a.btn.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/tasks')
-          i.fa.fa-mr.fa-chevron-left
-          | Cancelar
-
-        button.btn.btn-default.btn-lg(
-          ng-disabled='form.$invalid',
-          type='submit')
-
-          | Crear
-          i.fa.fa-ml.fa-chevron-right
+      md-button(
+        ng-disabled='form.$invalid',
+        type='submit')
+        | Crear
+        md-icon(md-font-icon='material-icons') chevron_right

@@ -6,20 +6,42 @@
 
     function ($scope, $http, $location, $session) {
 
-      $scope.fetchingTasks = null;
-      $scope.tasks = null;
+      $scope.fetching = null;
+      $scope.tasks = [];
+
+      function removeDuplicates(arr) {
+
+        var unique = {};
+        var newArr = [];
+
+        arr.forEach(function(item) {
+          console.log(item);
+          if (!unique[item._id]) {
+            newArr.push(item);
+            unique[item._id] = true;
+          }
+        });
+
+        return newArr;
+      }
 
       $scope.fetch = function() {
-        $scope.fetchingTasks = true;
+        $scope.fetching = true;
 
         $http.get('/api/tasks').
 
         success(function(data) {
-          $scope.tasks = data;
-        }).
+          $scope.tasks = (data);
 
-        finally(function() {
-          $scope.fetchingTasks = false;
+          $http.get('/api/tasks/collaborators/me').
+
+          success(function(data) {
+            $scope.tasks = $scope.tasks.concat(data);
+          }).
+          finally(function() {
+            $scope.tasks = removeDuplicates($scope.tasks);
+            $scope.fetching = false;
+          });
         });
       };
 

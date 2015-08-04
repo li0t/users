@@ -14,56 +14,40 @@ module.exports = function(router, mongoose) {
   router.get('/me', function(req, res, next) {
 
     var user = req.session.user._id;
-    var tasks = [];
-    var i;
-    var isCollaborator;
+    var i, j;
 
-    Task.
-
-    find().
+    Task.find().
 
     where('collaborators.user', user).
-
     where('deleted', null).
 
-    populate('group collaborators.user entries priority').
+    deepPopulate('group.profile collaborators.user entries priority').
 
     sort('-created').
 
-    exec(function(err, found) {
-
+    exec(function(err, tasks) {
       if (err) {
-        next(err);
+        return next(err);
+      }
 
-      } else {
+      for (i = 0; i < tasks.length; i++) {
 
-        found.forEach(function(task) {
+        for (j = 0; j < tasks[i].collaborators.length; j++) {
 
-          isCollaborator = false;
+          if (JSON.stringify(tasks[i].collaborators[j].user._id) === JSON.stringify(user)) {
 
-          for (i = 0; i < task.collaborators.length; i++) {
-
-            if (JSON.stringify(task.collaborators[i].user._id) === JSON.stringify(user)) {
-
-              if (!task.collaborators[i].left.length || (task.collaborators[i].left.length < task.collaborators[i].joined.length)) {
-
-                isCollaborator = true;
-                break;
-
-              }
+            if (tasks[i].collaborators[j].left.length && (tasks[i].collaborators[j].left.length === tasks[i].collaborators[j].joined.length)) {
+              /** Remove it from the array and reallocate index */
+              tasks.splice(i, 1);
+              i -= 1;
+              break;
             }
           }
-
-          if (isCollaborator) {
-
-            tasks.push(task);
-
-          }
-        });
-
-        res.send(tasks);
-
+        }
       }
+
+      res.send(tasks);
+
     });
 
   });
@@ -92,7 +76,7 @@ module.exports = function(router, mongoose) {
         /** Check if task exists and is available for changes */
         if (!err && relation.task) {
 
-        task = relation.task; /** The task model */
+          task = relation.task; /** The task model */
 
           if (!task.completed) {
 
@@ -185,7 +169,7 @@ module.exports = function(router, mongoose) {
         /** Check if task exists and is available for changes */
         if (!err && relation.task) {
 
-        task = relation.task; /** The task model */
+          task = relation.task; /** The task model */
 
           if (!task.completed) {
 
