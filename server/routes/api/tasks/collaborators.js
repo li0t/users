@@ -21,7 +21,7 @@ module.exports = function(router, mongoose) {
     where('collaborators.user', user).
     where('deleted', null).
 
-    deepPopulate('group.profile collaborators.user entries priority').
+    deepPopulate('group.profile creator.profile collaborators.user entries priority').
 
     sort('-created').
 
@@ -55,7 +55,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add collaborators to a task
    */
-  router.post('/:id/add', function(req, res, next) {
+  router.post('/:id', function(req, res, next) {
 
     var task = req.params.id;
     var inviter = req.session.user._id;
@@ -148,7 +148,7 @@ module.exports = function(router, mongoose) {
   /**
    * Remove collaborators from task
    */
-  router.post('/:id/remove', function(req, res, next) {
+  router.delete('/:id', function(req, res, next) {
 
     var removed = 0;
     var remover = req.session.user._id;

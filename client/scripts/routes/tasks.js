@@ -8,9 +8,14 @@
 
       $routeProvider.
 
-      when('/tasks', {
-        controller: 'Tasks:Index',
-        templateUrl: '/assets/templates/tasks/index.html'
+      when('/tasks/collaborator', {
+        controller: 'Tasks:Collaborator',
+        templateUrl: '/assets/templates/tasks/collaborator.html'
+      }).
+
+      when('/tasks/own', {
+        controller: 'Tasks:Own',
+        templateUrl: '/assets/templates/tasks/own.html'
       }).
 
       when('/tasks/create', {

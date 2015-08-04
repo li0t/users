@@ -27,7 +27,7 @@ module.exports = function(router) {
     '/entries', '/entries/create', '/entries/remove', '/entries/:id/detail',
 
     /* Tasks */
-    '/tasks', '/tasks/create', '/tasks/remove', '/tasks/:id/detail',
+    '/tasks', '/tasks/collaborator', '/tasks/own', '/tasks/create', '/tasks/remove', '/tasks/:id/detail',
 
     /* Contacts */
     '/contacts', '/contacts/add/:id', '/contacts/remove/:id',

@@ -1,12 +1,10 @@
-/* global angular */
-
-(function (ng) {
+(function(ng) {
   'use strict';
 
   ng.module('App').controller('Tasks:Create', [
     '$scope', '$location', '$http', '$session', 'priorities',
 
-    function ($scope, $location, $http, $session, priorities) {
+    function($scope, $location, $http, $session, priorities) {
 
       $scope.statics = {
         priorities: priorities.priorities
@@ -18,13 +16,26 @@
         priority: null
       };
 
-      $scope.submit = function () {
+      $scope.submit = function() {
+
         $http.post('/api/tasks', $scope.data).
-        success(function () {
-          $session.flash('Tarea creada');
-          $location.path('/tasks');
+
+        success(function(task) {
+
+          $http.post('/api/tasks/collaborators/' + task, {
+            collaborators: [$session.get('user')._id]
+          }).
+
+          success(function() {
+            $session.flash('Tarea creada');
+            $location.path('/tasks/collaborator');
+          }).
+
+          error(function() {
+            $session.flash('La tarea no pudo ser creada');
+          });
         }).
-        error(function () {
+        error(function() {
           $session.flash('La tarea no pudo ser creada');
         });
       };

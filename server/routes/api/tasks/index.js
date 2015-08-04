@@ -20,7 +20,7 @@ module.exports = function(router, mongoose) {
     where('creator', req.session.user._id).
     where('deleted', null).
 
-    deepPopulate('group.profile collaborators entries priority').
+    deepPopulate('group.profile creator.profile collaborators entries priority').
 
     sort('-created').
 

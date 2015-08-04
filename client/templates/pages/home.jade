@@ -1,5 +1,5 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
+  div
     h2 EMEETER
 
 md-content.white(layout-padding, ng-show='session.user')
@@ -40,7 +40,7 @@ md-content.white(layout-padding, ng-show='session.user')
         div.shine
         
         span
-          md-icon.icon48(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}z
+          md-icon.icon48(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}
           h4 {{ entry.span }}
           p {{ entry.created | fromNow}}
         

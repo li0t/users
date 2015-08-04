@@ -1,0 +1,48 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 TAREAS
+    
+    md-button(ng-href='/tasks/collaborator')  Mis Tareas
+      
+    md-button.md-raised(ng-href='/tasks/own')  Tareas Creadas
+
+md-button.md-fab.md-warn(ng-href='/tasks/create')
+  md-icon(md-font-icon='material-icons') add
+      
+md-content 
+  div(layout='column' layout-align="center start")
+   
+  div(ng-show='fetching && !tasks')   
+    md-icon(md-font-icon='material-icons' ) sync
+    | Buscando tareas
+      
+  div(ng-show='!fetching && tasks && !tasks.length')
+    md-icon(md-font-icon='material-icons') circle
+    | No hay tareas    
+    
+  div(layout-padding)
+        
+  div(ng-show='!fetching && tasks && tasks.length')
+    md-grid-list(
+        md-gutter="12px" md-gutter-gt-sm="8px"
+        md-cols="4"
+        md-row-height="1:1") 
+        
+      md-grid-tile.lightBlue(
+        layout='column'
+        ng-repeat="task in tasks"
+        md-rowspan="1"
+        md-colspan="1"
+        ng-click='$navigateTo("/tasks/" + task._id + "/detail")')
+        
+        div.shine
+        
+        span
+          md-icon.icon48(md-font-icon='material-icons' style="color:purple;" ) more
+          h4 {{ 'Grupo: ' + task.group.profile.name }} 
+          h4 {{ 'Prioridad: ' + task.priority.name }}
+          h4 {{ (task.dateTime && 'Para : ' + (task.dateTime | toLocal)) || 'Sin fecha de entrega'}}
+        
+        md-grid-tile-footer
+          h3 {{ 'Objectivo: ' + task.objective }}
+            

@@ -1,38 +1,52 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
-    h2 EMEETER
-      
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/tasks')
-      i.fa.fa-mr.fa-tasks
-      | Volver a las tareas 
-          
-  div.panel-body.text-center(ng-show='fetching && !task')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
-      
-  div.panel-body.text-center(ng-show='!fetching && task')
-    h4 {{ task.completed && "Completada" || "Abierta"}}
-    h3 {{ task.objective }}
+  div
+    h2 TAREAS
     
-    div.row(ng-show='!task.collaborators.length')
+    md-button(ng-href='/tasks/collaborator')  Mis Tareas
+      
+    md-button(ng-href='/tasks/own')  Tareas Creadas
+    
+md-button.md-fab.md-warn(ng-href='/tasks/collaborator')
+  md-icon(md-font-icon='material-icons') chevron_left
+      
+md-content(layout='column')      
+  div(ng-show='fetching && !tasks')   
+    md-icon(md-font-icon='material-icons' ) sync
+    | Recopilando Informaciòn
+      
+  div(ng-show='!fetching && task')
+    md-button(
+      ng-show='task.completed',
+      ng-click='reOpen()')
+      | Abrir
+      
+    md-button(
+      ng-show='!task.completed',
+      ng-click='close()')
+      | Cerrar    
+        
+    div
+      h4 {{ task.completed && "Completada" || "Abierta"}}
+      h3 {{ task.objective }}
+      p  Fecha de entrega : {{ (task.dateTime && (task.dateTime | toLocal)) || "No definida" }}
+    
+    div(ng-show='!task.collaborators.length')
       p No hay collaboradores asignados
     
-    div.row(ng-show='task.collaborators.length')
-      p Collaboradores:
+    div(ng-show='task.collaborators.length')
+      p Collaboradores:  
     
-    div.row(ng-repeat='collaborator in task.collaborators', ng-show='task.collaborators.length')
+    div(ng-repeat='collaborator in task.collaborators')
       p {{ collaborator.user.email }}
       
-    div.row(ng-show='!task.notes.length')
+    div(ng-show='!task.notes.length')
       p No hay notas
     
-    div.row(ng-show='task.notes.length')
+    div(ng-show='task.notes.length')
       p Notas:
     
-    div.row
-      div.col-sm-4(ng-repeat='note in task.notes', ng-show='task.notes.length')
+    div
+      div(ng-repeat='note in task.notes', ng-show='task.notes.length')
         p {{ note.note }}
               
       
