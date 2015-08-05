@@ -13,8 +13,8 @@
         $session.flash();
 
         $http.post('/api/users/signin', {
-          email: $scope.form.email,
-          password: $scope.form.password
+          email: $scope.data.email,
+          password: $scope.data.password
 
         }).success(function (user) {
           $session.signin(user);
