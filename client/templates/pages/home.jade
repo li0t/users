@@ -1,7 +1,7 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   md-button(ng-href='/')
     h2 EMEETER
-
+    
 md-content.white(layout-padding, ng-show='session.user')
   
   div(layout='row')
@@ -23,26 +23,5 @@ md-content.white(layout-padding, ng-show='session.user')
             h4 No tienes asuntos pendientes
 
   div
-    md-grid-list(
-        md-gutter="12px" md-gutter-gt-sm="8px"
-        md-cols="4"
-        md-row-height="1:1") 
-        
-      md-grid-tile(
-        layout='column'
-        ng-repeat="entry in entries"
-        md-rowspan="{{ entry.row }}"
-        md-colspan="{{ entry.col }}"
-        ng-class="entry.background")
-        
-        div.shine
-        
-        span
-          md-icon.icon48(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}z
-          h4 {{ entry.span }}
-          p {{ entry.created | fromNow}}
-        
-        md-grid-tile-footer
-          h3 {{ entry.type === "entry" && entry.title + " : " +  entry.content || entry.type === "group" && entry.admin.email + " ha creado un nuevo grupo" || entry.type == "task" && entry.objective || entry.author + " ha modificado una tarea" }}
-    
+    div(em-card)
     

@@ -17,7 +17,7 @@
   },
   "scripts": {
     "setup": "npm install && bower install && node install/statics",
-    "dev": "NODE_PATH=. NODE_ENV=development PORT=3030 DEBUG=app:* node server",
+    "dev": "NODE_PATH=. NODE_ENV=development PORT=3030 DEBUG=app:* node server & gulp watch",
     "start": "NODE_PATH=. NODE_ENV=production PORT=3030 node server",
     "reinstall": "rm -Rf node_modules/ client/assets/components/ && npm install && bower install",
     "prestart": "gulp"
