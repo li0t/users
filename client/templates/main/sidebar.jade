@@ -14,7 +14,7 @@ md-toolbar.lightBlue
     md-icon(md-font-icon='material-icons') arrow_drop_down
   
   
-md-list
+md-list(layout-padding)
   md-list-item(ng-click='$navigateTo("/users/signin")', ng-show='!session.user')
     md-icon(md-font-icon='material-icons') person
     p Iniciar sesión

@@ -1,45 +1,53 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   md-button(ng-href='/')
     h2 EMEETER
+
+div.md-padding
+  h2.md-title Crear cuenta
+  div(layout="row", layout-margin)
+    div(flex)
+      h2.md-title
+        md-icon(md-font-icon='material-icons') person
+        |  Datos de la cuenta
+
+      form(
+        ng-submit='form.$valid && submit()',
+        name='form',
+        role='form',
+        novalidate)
+
+        md-input-container.form-group
+          span.input-group-addon
+            md-icon(md-font-icon='material-icons') 
+
+          input.form-control(
+            placeholder='Ingresa tu email',
+            ng-model='data.email',
+            type='email',
+            required)
+
+        md-input-container.form-group
+          span.input-group-addon
+            md-icon(md-font-icon='material-icons') 
+
+          input.form-control(
+            placeholder='Ingresa tu clave',
+            ng-model='data.password',
+            ng-minlength='4',
+            type='password',
+            required)
+
+        div(layout='row')
+          md-button(ng-href='/users/signin') Ya tengo una cuenta
+
+          md-button(
+            ng-disabled='form.$invalid',
+            type='submit')
+
+            md-icon(md-font-icon='material-icons') check
+            | Crear cuenta
     
-h3 Crear cuenta
-
-md-icon(md-font-icon='material-icons') person
-| Datos de la cuenta
-
-form(
-  ng-submit='form.$valid && submit()',
-  name='form',
-  role='form',
-  novalidate)
-
-  md-input-container.form-group
-    span.input-group-addon
-      md-icon(md-font-icon='material-icons') 
-
-    input.form-control(
-      placeholder='Ingresa tu email',
-      ng-model='data.email',
-      type='email',
-      required)
-
-  md-input-container.form-group
-    span.input-group-addon
-      md-icon(md-font-icon='material-icons') 
-
-    input.form-control(
-      placeholder='Ingresa tu clave',
-      ng-model='data.password',
-      ng-minlength='4',
-      type='password',
-      required)
-
-  div(layout='row')
-    md-button(ng-href='/users/signin') Ya tengo una cuenta
-
-    md-button(
-      ng-disabled='form.$invalid',
-      type='submit')
-
-      md-icon(md-font-icon='material-icons') check
-      | Crear cuenta
+    div(flex)
+      h2.md-title
+        md-icon(md-font-icon='material-icons') person
+        | Texto de ejemplo

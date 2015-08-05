@@ -33,6 +33,21 @@
         'title': 'Junta de amigos',
         'author': 'Champion amigo',
         'created' : '2015-07-22 17:28:33.208Z'
+      },
+      {
+        'title': 'Partido de Futbol',
+        'author': 'Don Pedro',
+        'created' : '2015-07-22 17:28:33.208Z'
+      },
+      {
+        'title': 'Presentación Servicios',
+        'author': 'Amateru Caupolican',
+        'created' : '2015-07-22 17:28:33.208Z'
+      },
+      {
+        'title': 'Estado financiero',
+        'author': 'Lucas Cofre',
+        'created' : '2015-07-22 17:28:33.208Z'
       }];
 
       var backgrounds = {
