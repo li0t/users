@@ -12,7 +12,6 @@ var gutil = require('gulp-util');
 var util = require('util');
 var gulp = require('gulp');
 var del = require('del');
-var shell = require('gulp-shell');
 
 var options = {
   plumber: {
