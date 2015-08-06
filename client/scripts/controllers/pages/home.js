@@ -9,19 +9,19 @@
       $scope.entries = [];
 
       $scope.pendings = [{
-        'title': 'Tarea 1',
+        'title': 'Terminar presentación',
         'description': 'Blah blah'
       }, {
-        'title': 'Tarea 2',
+        'title': 'Llamar proeedores',
         'description': 'Blah blah blah'
       }, {
-        'title': 'Reunión',
+        'title': 'Prepara reunión de mark',
         'description': 'Juntarse con ...'
       }, {
         'title': 'Reunión de amigos',
         'description': 'Confirmar que J...'
       }, {
-        'title': 'Tarea 3',
+        'title': 'Medir perímetro',
         'description': 'Blah blah vlad...'
       }];
 
@@ -29,7 +29,8 @@
         'title': 'Reunión inicial',
         'author': 'Egbert Dool',
         'created' : '2015-07-14 17:28:33.208Z'
-      }, {
+      },
+      {
         'title': 'Junta de amigos',
         'author': 'Champion amigo',
         'created' : '2015-07-22 17:28:33.208Z'
@@ -54,7 +55,7 @@
         "entry": "yellow",
         "group": "green",
         "task": "lightBlue",
-        "meeting": "blue"
+        "meeting": "green"
       };
 
       var icons = {
@@ -64,7 +65,7 @@
         },
         "group": {
           "icon": "group",
-          "color": "white"
+          "color": "yellow"
         },
         "task": {
           "icon": "more",
@@ -173,16 +174,13 @@
                 entry.background = backgrounds[entry.type];
 
                 $scope.entries.push(entry);
-
-                if (i === 1) {
-                  break;
-                }
               }
 
 
             }).
 
             finally(function() {
+              console.log($scope.entries);
               $scope.fetching = false;
               $scope.entries = shuffle($scope.entries);
 

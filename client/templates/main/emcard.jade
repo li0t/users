@@ -3,19 +3,16 @@ md-grid-list(
     md-cols="4"
     md-row-height="1:1")
     
-  md-grid-tile(
+  md-grid-tile.whitebg(
     layout='column'
     ng-repeat="entry in entries"
     md-rowspan="{{ entry.row }}"
-    md-colspan="{{ entry.col }}"
-    ng-class="entry.background")
-    
-    div.shine
-    
-    span
-      md-icon.icon48(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}z
+    md-colspan="{{ entry.col }}")
+            
+    span(style="color: #747474;")
+      md-icon.icon48(md-font-icon='material-icons' style="color:{{entry.icon.color}};" ) {{ entry.icon.icon }}
       h4 {{ entry.span }}
       p {{ entry.created | fromNow}}
     
-    md-grid-tile-footer
+    md-grid-tile-footer(style="background: none; color: #747474;")
       h3 {{ entry.type === "entry" && entry.title + " : " +  entry.content || entry.type === "group" && entry.admin.email + " ha creado un nuevo grupo" || entry.type == "task" && entry.objective || entry.author + " ha modificado una tarea" }}

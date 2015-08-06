@@ -1,26 +1,26 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 EMEETER
-    
-md-content.white(layout-padding, ng-show='session.user')
-  
-  div(layout='row')
+
+md-content.darkGray(layout-padding, ng-show='session.user')
+
+  div.green(layout='row')
     div(flex='70')
-      img(ng-src="../assets/images/analitycs.png")
-          
-    div.blueGray(flex='30', layout-padding)
+
+    div.deepBlue(flex='30', style="color: white; font-size: small;")
       div(layout-padding)
         h3.md-title PENDIENTES
-        
+
         md-list
           md-list-item(ng-repeat='pending in pendings | limitTo:3')
             div.md-list-item-text(flex='80')
               h4 {{ pending.title }}
               p {{ pending.description }}
             md-checkbox(flex, ng-click='gotIt(pending)')
-          
+
           md-list-item(ng-show='!pendings.length')
             h4 No tienes asuntos pendientes
 
+  md-divider
   div
     div(em-card)
