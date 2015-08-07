@@ -79,7 +79,7 @@ app.use(bodyParser.urlencoded({
   extended: false
 }));
 app.use(fileman.multiparser);
-app.use(security.csrf(configs.security.csrf));
+//app.use(security.csrf(configs.security.csrf));
 app.use(security.csp(configs.security.csp));
 app.use(security.xframe(configs.security.xframe));
 app.use(security.hsts(configs.security.hsts));
