@@ -15,7 +15,7 @@
       $scope.fetchMembers = function() {
         $scope.fetchingMembers = true;
 
-        $http.get('/api/groups/members/' + $routeParams.id).
+        $http.get('/api/groups/members/of/' + $routeParams.id).
 
         success(function(data) {
 
@@ -64,7 +64,7 @@
       $scope.removeMembers = function() {
         if ($scope.admin) {
 
-          $http.post('/api/groups/members/' + $routeParams.id + '/remove', {
+          $http.post('/api/groups/members/remove/' + $routeParams.id, {
             members: $scope.membersToRemove
           }).
 

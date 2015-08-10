@@ -2,14 +2,17 @@
     
   span(flex)
   
-  md-button(ng-click='$signout()', ng-show='session.user')
-    | Salir
+  md-button(ng-href='/contacts' ng-show='session.user')
+    md-icon(md-font-icon='material-icons') search
     
   md-button(ng-href='/help')
     | Ayuda
     
   md-button(ng-href='/about')
     | Acerca de
+    
+  md-button(ng-click='$signout()', ng-show='session.user')
+    | Salir
 
   md-menu
     md-button.md-icon-button(ng-click='$mdOpenMenu()')

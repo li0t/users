@@ -1,6 +1,6 @@
 'use strict';
 
-//var debug = require('debug')('app:api:users:invited');
+var debug = require('debug')('app:api:users:invited');
 
 var statics = component('statics');
 
@@ -43,44 +43,49 @@ module.exports = function(router, mongoose) {
 
           /** Remove unnecessary new profile */
           profile.remove();
+          return;
+        }
 
-        } else {
+        new Contact({
+          user: user._id
+        }).
+        save(function(err) {
+          if (err) {
+            return next(err);
+          }
 
-          new Contact({ user: user._id }).
-          save(function(err) {
+          new Profile({
+            name: 'own'
+          }).
+          save(function(err, profile) {
             if (err) {
               return next(err);
             }
 
-            new Profile({ name: 'own' }).
-            save(function(err, profile) {
+            new Group({
+              profile: profile._id
+            }).
+            save(function(err, group) {
               if (err) {
                 return next(err);
               }
 
-              new Group({ profile: profile._id }).
-              save(function(err, group) {
+              group.members.push({
+                user: user._id,
+                joined: new Date()
+              });
+
+              group.save(function(err) {
                 if (err) {
                   return next(err);
                 }
 
-                group.members.push({
-                  user: user._id,
-                  joined: new Date()
-                });
+                res.send(user._id);
 
-                group.save(function(err) {
-                  if (err) {
-                    return next(err);
-                  }
-
-                  res.send(user._id);
-
-                });
               });
             });
           });
-        }
+        });
       });
     });
   });
@@ -90,51 +95,69 @@ module.exports = function(router, mongoose) {
    */
   router.put('/validate/:token', function(req, res, next) {
 
-    var password = req.body.password;
+    var i, password = req.body.password;
 
-    if (password) {
+    if (!password) {
+      return res.sendStatus(400);
+    }
 
-      Token.findById(req.params.token, function(err, token) {
+    Token.findById(req.params.token, function(err, token) {
+      if (err) {
+        if (err.name && err.name === 'CastError') {
+          return res.sendStatus(400);
+        }
+        return next(err);
+      }
+      debug(token);
+      if (!token || !token.user || !token.sender) {
+        return res.sendStatus(498);
+      }
+
+      User.findById(token.user, function(err, user) {
         if (err) {
-          if (err.name && err.name === 'CastError') {
-            res.sendStatus(400);
-          } else {
-            next(err);
+          return next(err);
+
+        }
+
+        if (!user) {
+          return res.sendStatus(404);
+        }
+
+        user.password = password;
+
+        user.state = statics.model('state', 'active')._id;
+
+        user.save(function(err) {
+          if (err) {
+            return next(err);
           }
 
-        } else if (token && token.user && token.sender) {
+          Group.find().
 
-          User.findById(token.user, function(err, user) {
+          where('members.user', user).
+
+          populate('profile').
+
+          exec(function(err, groups) {
             if (err) {
-              next(err);
+              return next(err);
+            }
 
-            } else if (user) {
+            for (i = 0; i < groups.length; i++) {
+              if (groups[i].profile.name === 'own') {
 
-              user.password = password;
-
-              user.state = statics.model('state', 'active')._id;
-
-              user.save(function(err) {
-                if (err) {
-                  return next(err);
-                }
+                user = user.toObject();
+                user.group = groups[i];
 
                 req.session.user = user;
+                return res.send(token._id);
 
-                res.send(token._id);
-
-              });
-            } else {
-              res.sendStatus(404);
+              }
             }
           });
-        } else {
-          res.sendStatus(498);
-        }
+        });
       });
-    } else {
-      res.sendStatus(400);
-    }
+    });
 
   });
 

@@ -42,13 +42,13 @@
 
       /* Convenience navigate to method */
       $rootScope.$signout = function () {
-        $session.signout();
 
         $http.get('/api/users/signout').
 
         success(function() {
 
           $session.signout();
+          $location.path('/');
 
         });
       };

@@ -10,7 +10,7 @@ module.exports = function(router) {
   router.get([
 
     /* Pages */
-    '/', '/profile',
+    '/', '/search',
 
     /* Users */
     '/users', '/users/:id/profile', '/users/signup', '/users/signin', '/users/recover', '/users/validate/:token', '/users/reset/:token',

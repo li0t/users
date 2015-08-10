@@ -1,84 +1,67 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-user-plus
-      | Contactos
-      
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/profile')
-      i.fa.fa-mr.fa-user
-      | Volver
-      
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 CONTACTOS
+  
+md-content
   div.form-group(ng-show='!fetchingContacts && contacts')
-    div.input-group
-      span.input-group-addon
-        i.fa.fa-at.fa-fw
-
+    md-input-container
       input.form-control(
         placeholder='Busca un Contacto',
         ng-model='searchContact',
         ng-change='resetFound()')
+        
+    md-button(
+      ng-click='search()'
+      ng-show='!fetchingContacts && searchContact.length && !filteredContacts.length')
+      | Buscar en eMeeter
   
-          
-  div.panel-body.text-center(ng-show='fetchingContacts && !contacts && fetchingPending && !pendings')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Buscando Contactos
+  div(ng-show='fetchingContacts && !contacts && fetchingPending && !pendings')   
+    md-icon(md-font-icon='material-icons' ) sync
+    | Buscando contactos
     
-  div.panel-body.text-center(ng-show='!fetchingPending && pendings.length')
+  div(ng-show='!fetchingPending && pendings.length')
     h4
-      i.fa.fa-mr.fa-plus-circle
+      md-icon(md-font-icon='material-icons' ) add
       | Solicitudes de contacto
               
-  div.panel-body(ng-show='!fetchingPending && pendings')
-    div.row
-      div.col-sm-4(ng-repeat='pending in pendings', ng-init='confirm = ("/contacts/confirm/{0}" | format : pending.token); reject = ("/contacts/reject/{0}" | format : pending._id)')
-        p {{ pending.profile.name || pending.email }}
-        div.btn.btn-default.btn-block
-          a(ng-href='{{ confirm }}')
-            p Confirmar
-        div.btn.btn-default.btn-block
-          a(ng-href='{{ reject }}')
-            p Rechazar        
+  md-list(ng-show='!fetchingPending && pendings')
+    md-list-item(ng-repeat='pending in pendings', ng-init='confirm = ("/contacts/confirm/{0}" | format : pending.token); reject = ("/contacts/reject/{0}" | format : pending._id)')
+      p {{ pending.profile.name || pending.email }}
+      div
+        md-button(ng-href='{{ confirm }}') Confirmar
+        md-button(ng-href='{{ reject }}') Rechazar        
 
-  div.panel-body.text-center(ng-show='!fetchingContacts && contacts')
-    div.row
-      i.fa.fa-mr.fa-circle-thin
+  div(ng-show='!fetchingContacts && contacts')
+    h4
+      md-icon(md-font-icon='material-icons' ) radio_button_unchecked
       | {{ contacts.length && "Contactos" || "No hay Contactos" }}
 
-  div.panel-body.text-center(ng-show='!fetchingContacts && contacts')
-    div.row
-      div.col-sm-4(ng-repeat='contact in filteredContacts = (contacts | filter: searchContact)', ng-init='href = ("/users/{0}/detail" | format : contact._id); delete = ("/contacts/delete/{0}" | format : contact._id)')
-        div.btn.btn-default.btn-block
-          a(ng-href='{{ href }}')
-            p {{ contact.profile.name || contact.email }}
-          a(ng-href='{{ delete }}')
-            i.fa.fa-mr.fa-times
-              p Eliminar
-  
-  div.panel-body.text-center(ng-show='!fetchingContacts && searchContact.length && !filteredContacts.length')
-    div.row
-      div.btn.btn-default.btn-block(ng-click='search()')
-        p Buscar en eMeeter
+  md-grid-list(
+    md-gutter="12px" md-gutter-gt-sm="8px"
+    md-cols="4"
+    md-row-height="1:1")
+    
+    md-grid-tile(
+      md-rowspan="1"
+      md-colspan="1"
+      ng-repeat='contact in filteredContacts = (contacts | filter: searchContact)'
+      ng-init='href = ("/users/{0}/detail" | format : contact._id); delete = ("/contacts/delete/{0}" | format : contact._id)')
+        p {{ contact.profile.name || contact.email }}
+        md-button(ng-href='{{ delete }}')
+          md-icon(md-font-icon='material-icons' ) close
+          |  Eliminar
         
-  div.panel-body.text-center(ng-show='foundUser')
-    div.row
-      div.btn.btn-default.btn-block(ng-click='search()')
-        p {{ foundUser.email }}
-        a(ng-href='/contacts/add/{{foundUser._id}}')
-          i.fa.fa-mr.fa-plus
-            p Agregar
+  md-button(ng-show='foundUser' ng-href='/contacts/add/{{foundUser._id}}')
+    p {{ foundUser.email }}
+    md-icon(md-font-icon='material-icons' ) add
+    | Agregar
   
-  div.panel-body.text-center(ng-show='notFoundUser')
-    div.row
-      div.btn.btn-default.btn-block(ng-click='inviteNotFound()')
-        p {{ notFoundUser }}
-        i.fa.fa-mr.fa-plus
-        | Invitar a emeeter          
+  md-button(ng-show='notFoundUser' ng-click='inviteNotFound()')
+    p {{ notFoundUser }}
+    md-icon(md-font-icon='material-icons' ) add
+    | Invitar a emeeter          
             
-  div.panel-body.text-center(ng-show='foundPendingUser')
-    div.row
-      div.btn.btn-default.btn-block
-        p {{ foundPendingUser.email }}
-        i.fa.fa-mr.fa-clock-o
-        p Esperando confirmación         
+  div(ng-show='foundPendingUser')
+    p {{ foundPendingUser.email }}
+    md-icon(md-font-icon='material-icons' ) access_time
+    | Esperando confirmación         

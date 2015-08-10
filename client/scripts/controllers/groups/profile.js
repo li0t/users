@@ -5,14 +5,11 @@
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
-      $scope.fetchingEntries = null;
-      $scope.fetchingGroup = null;
-      $scope.entriesLimit = 2;
-      $scope.entries = null;
+      $scope.fetching = null;
       $scope.group = null;
 
       $scope.fetchGroup = function() {
-        $scope.fetchingGroup = true;
+        $scope.fetching = true;
 
         $http.post('/api/groups/set/' + $routeParams.id).
 
@@ -22,26 +19,11 @@
         }).
 
         finally(function() {
-          $scope.fetchingGroup = false;
-        });
-      };
-
-      $scope.fetchEntries = function() {
-        $scope.fetchingEntries = true;
-
-        $http.get('/api/entries/of-group/'  + $routeParams.id ).
-
-        success(function(data) {
-          $scope.entries = data;
-        }).
-
-        finally(function() {
-          $scope.fetchingEntries = false;
+          $scope.fetching = false;
         });
       };
 
       $scope.fetchGroup();
-      $scope.fetchEntries();
 
     }
   ]);

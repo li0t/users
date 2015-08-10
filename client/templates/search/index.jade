@@ -1,0 +1,30 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  md-button(ng-href='/')
+    h2 EMEETER
+    
+div.md-padding
+  h2.md-title Buscar
+  div(layout="row", layout-margin)
+    div(flex)
+      form(
+        name='form',
+        role='form',
+        ng-submit='form.$valid && submit()',
+        novalidate)
+        
+        md-input-container.form-group
+          md-icon(md-font-icon='material-icons') 
+          input.form-control(
+            placeholder='email'
+            ng-model='data.email'
+            type='email'
+            required)
+
+        md-button(ng-click='search()' ng-disabled='!form.$valid')
+          md-icon(md-font-icon='material-icons')
+          |  Buscar
+  
+  
+  md-button(ng-show='user') {{ user.email }}
+
+            
