@@ -119,6 +119,7 @@ module.exports = function(router, mongoose) {
    * Log a user in.
    */
   router.post('/signin', function(req, res, next) {
+    console.log('im here');
 
     var i;
     var email = req.body.email;

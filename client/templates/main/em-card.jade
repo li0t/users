@@ -1,0 +1,7 @@
+span(layout='column', style="color: #747474;")
+  md-icon.icon48(md-font-icon='material-icons' style="color:{{ card.color }};" ) {{ card.icon }}
+  h4 {{ card.span }}
+  p {{ card.created | fromNow}}
+
+md-grid-tile-footer(style="background: none; color: #747474;")  
+  h3 {{ card.type === "card" && card.title + " : " +  card.content || card.type === "group" && card.admin.email + " ha creado un nuevo grupo" || card.type == "task" && card.objective || card.author + " ha modificado una tarea" }}

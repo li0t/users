@@ -39,6 +39,11 @@ module.exports = function (Schema) {
     return this._id.getTimestamp();
   });
 
+  /** Group Object type */
+  GroupSchema.virtual('type').get(function () {
+    return 'group';
+  });
+
   /** Show virtuals on JSON conversion */
   GroupSchema.set('toJSON', {
     virtuals: true

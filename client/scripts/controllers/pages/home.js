@@ -28,61 +28,34 @@
       var meetings = [{
         'title': 'Reunión inicial',
         'author': 'Egbert Dool',
-        'created' : '2015-07-14 17:28:33.208Z'
+        'created' : '2015-07-14 17:28:33.208Z',
+        'type': 'meeting'
       },
       {
         'title': 'Junta de amigos',
         'author': 'Champion amigo',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'created' : '2015-07-22 17:28:33.208Z',
+        'type': 'meeting'
       },
       {
         'title': 'Partido de Futbol',
         'author': 'Don Pedro',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'created' : '2015-07-22 17:28:33.208Z',
+        'type': 'meeting'
       },
       {
         'title': 'Presentación Servicios',
         'author': 'Amateru Caupolican',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'created' : '2015-07-22 17:28:33.208Z',
+        'type': 'meeting'
       },
       {
         'title': 'Estado financiero',
         'author': 'Lucas Cofre',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'created' : '2015-07-22 17:28:33.208Z',
+        'type': 'meeting'
       }];
 
-      var backgrounds = {
-        "entry": "yellow",
-        "group": "green",
-        "task": "lightBlue",
-        "meeting": "green"
-      };
-
-      var icons = {
-        "entry": {
-          "icon": "comment",
-          "color": "lightBlue"
-        },
-        "group": {
-          "icon": "group",
-          "color": "yellow"
-        },
-        "task": {
-          "icon": "more",
-          "color": "purple"
-        },
-        "meeting": {
-          "icon": "event_note",
-          "color": "green"
-        }
-      };
-
-      var spans = {
-        "entry": "Nueva entrada",
-        "group": "Grupo creado",
-        "task": "Tarea modificada",
-        "meeting": "Nueva reunión"
-      };
 
       /* Shuffle an array, Based on Fisher–Yates shuffle algorithm */
       function shuffle(a) {
@@ -110,80 +83,38 @@
         $http.get('/api/entries').
 
         success(function(data) {
-
           for (i = 0; i < data.length; i++) {
-
             entry = data[i];
-            entry.type = "entry";
-            entry.icon = icons[entry.type];
-            entry.span = spans[entry.type];
-            entry.background = backgrounds[entry.type];
-
             $scope.entries.push(entry);
-
-            if (i === 1) {
-              break;
-            }
           }
 
           $http.get('/api/groups').
 
           success(function(data) {
-
             for (i = 0; i < data.length; i++) {
-
               entry = data[i];
-              entry.type = "group";
-              entry.icon = icons[entry.type];
-              entry.span = spans[entry.type];
-              entry.background = backgrounds[entry.type];
-
               $scope.entries.push(entry);
-
-              if (i === 1) {
-                break;
-              }
             }
 
             $http.get('/api/tasks').
 
             success(function(data) {
-
               for (i = 0; i < data.length; i++) {
-
                 entry = data[i];
-                entry.type = "task";
-                entry.icon = icons[entry.type];
-                entry.span = spans[entry.type];
-                entry.background = backgrounds[entry.type];
-
                 $scope.entries.push(entry);
-
-                if (i === 1) {
-                  break;
-                }
               }
 
               /** MOCK DATA */
               for (i = 0; i < meetings.length; i++) {
-
                 entry = meetings[i];
-                entry.type = "meeting";
-                entry.icon = icons[entry.type];
-                entry.span = spans[entry.type];
-                entry.background = backgrounds[entry.type];
-
                 $scope.entries.push(entry);
               }
-
 
             }).
 
             finally(function() {
-              console.log($scope.entries);
               $scope.fetching = false;
               $scope.entries = shuffle($scope.entries);
-
             });
           });
         });

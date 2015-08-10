@@ -91,6 +91,11 @@ module.exports = function(Schema) {
     return this._id.getTimestamp();
   });
 
+  /** Declares Object type */
+  TaskSchema.virtual('type').get(function () {
+    return 'task';
+  });
+
   /** Check the date time is set in the future */
   TaskSchema.path('dateTime').validate(function(dateTime, cb) {
 

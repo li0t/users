@@ -2,12 +2,12 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 EMEETER
 
-md-content.darkGray(layout-padding, ng-show='session.user')
+md-content.darkGray(ng-show='session.user')
 
   div#maincontiner(layout='row')
     div(flex='70', em-graph)
 
-    div.deepBlue(flex='30', style="color: white; font-size: small;")
+    div.deepBlue(flex='30', style="color: white;")
       div(layout-padding)
         h3.md-title PENDIENTES
 
@@ -23,4 +23,14 @@ md-content.darkGray(layout-padding, ng-show='session.user')
 
   md-divider
   div
-    div(em-card)
+    md-grid-list(
+      md-gutter="12px",
+      md-gutter-gt-sm="8px",
+      md-cols="4",
+      md-row-height="1:1")
+      md-grid-tile.whitebg(
+        layout='column',
+        ng-repeat="entry in entries",
+        md-rowspan="{{ entry.row }}",
+        md-colspan="{{ entry.col }}")
+        em-card(card='entry')
