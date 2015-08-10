@@ -31,7 +31,7 @@
         'created' : '2015-07-14 17:28:33.208Z'
       }, {
         'title': 'Junta de amigos',
-        'author': 'Champion amigo',
+        'author': 'Champion Amigo',
         'created' : '2015-07-22 17:28:33.208Z'
       },
       {

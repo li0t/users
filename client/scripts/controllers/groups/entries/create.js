@@ -13,16 +13,20 @@
       $scope.submit = function() {
         $scope.fetching = true;
 
-        $http.post('/api/entries/groups/', $scope.data).
+        $scope.data.group = $session.get('group')._id;
+
+        $http.post('/api/entries/', $scope.data).
 
         success(function() {
-          $location.path('/groups/' + $session.get('group')._id + '/entries');
           $session.flash('success', 'Entrada creada con éxito');
         }).
 
         error(function() {
-          $location.path('/groups/' + $session.get('group')._id + '/entries');
           $session.flash('danger', 'Hubo un error creando la entrada');
+        }).
+
+        finally(function(){
+          $location.path('/groups/' + $session.get('group')._id + '/entries');
         });
       };
 

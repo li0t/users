@@ -10,7 +10,7 @@ md-button.md-fab.md-warn(ng-href='/tasks/collaborator')
   md-icon(md-font-icon='material-icons') chevron_left
       
 md-content(layout='column')      
-  div(ng-show='fetching && !tasks')   
+  div(ng-show='fetching && !task')   
     md-icon(md-font-icon='material-icons' ) sync
     | Recopilando Informaciòn
       
@@ -29,15 +29,6 @@ md-content(layout='column')
       h4 {{ task.completed && "Completada" || "Abierta"}}
       h3 {{ task.objective }}
       p  Fecha de entrega : {{ (task.dateTime && (task.dateTime | toLocal)) || "No definida" }}
-    
-    div(ng-show='!task.collaborators.length')
-      p No hay collaboradores asignados
-    
-    div(ng-show='task.collaborators.length')
-      p Collaboradores:  
-    
-    div(ng-repeat='collaborator in task.collaborators')
-      p {{ collaborator.user.email }}
       
     div(ng-show='!task.notes.length')
       p No hay notas
@@ -47,7 +38,13 @@ md-content(layout='column')
     
     div
       div(ng-repeat='note in task.notes', ng-show='task.notes.length')
-        p {{ note.note }}
+        p * {{ note.note }}
+          md-icon(md-font-icon='material-icons', ng-show='!task.completed', ng-click='removeNote(note.note)' ) close
+          
+    div(ng-show='!task.completed')
+      textarea(ng-model='note')
+      md-button(ng-click='addNote(note)') Agregar
+        
               
       
   

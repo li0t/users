@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Tasks:Detail', [
-    '$scope', '$http', '$location', '$session', '$route',  '$routeParams',
+    '$scope', '$http', '$location', '$session', '$route', '$routeParams',
 
-    function($scope, $http, $location, $session, $route ,$routeParams) {
+    function($scope, $http, $location, $session, $route, $routeParams) {
 
       $scope.fetching = null;
       $scope.task = null;
@@ -28,12 +28,12 @@
         });
       };
 
-      $scope.close = function () {
+      $scope.close = function() {
 
-        $http.put('/api/tasks/' + $routeParams.id + '/complete').
+        $http.put('/api/tasks/close/' + $routeParams.id).
 
         success(function() {
-          $route.reload();
+          $scope.fetch();
           $session.flash('success', 'La tarea ha sido completada!');
         }).
 
@@ -43,16 +43,45 @@
 
       };
 
-      $scope.reOpen = function () {
-        $http.put('/api/tasks/' + $routeParams.id + '/re-open').
+      $scope.reOpen = function() {
+        $http.put('/api/tasks/re-open/' + $routeParams.id).
 
         success(function() {
-        $route.reload();
+          $scope.fetch();
           $session.flash('success', 'La tarea ha sido abierta!');
         }).
 
         error(function() {
           $session.flash('danger', 'Hubo un error abriendo la tarea!');
+        });
+      };
+
+      $scope.removeNote = function(note) {
+
+        $http.post('/api/tasks/notes/remove-from/' + $routeParams.id, { notes: [note] }).
+
+        success(function() {
+          $scope.fetch();
+          $session.flash('success', 'Nota eliminada');
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la nota!');
+        });
+      };
+
+      $scope.addNote = function(note) {
+
+        $http.post('/api/tasks/notes/add-to/' + $routeParams.id, {
+          notes: [note]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error agregando la nota!');
         });
       };
 

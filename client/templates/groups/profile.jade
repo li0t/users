@@ -21,28 +21,3 @@ md-content
       md-icon(md-font-icon='material-icons') more
       | Tareas  
     
-    div(ng-show='fetchingEntries && !entries')  
-      md-icon(md-font-icon='material-icons') sync
-      | Buscando Entradas
-    
-    md-button(ng-show='!fetchingEntries && entries && entries.length' ng-href="/groups/{{session.group._id}}/entries")
-      md-icon(md-font-icon='material-icons') comment
-      | Últimas Entradas
-        
-    md-button(ng-show='!fetchingEntries && entries && !entries.length' ng-href="/groups/{{session.group._id}}/entries")
-      md-icon(md-font-icon='material-icons') comment
-      | No hay Entradas  
-        
-    md-grid-list(
-        md-gutter="12px" md-gutter-gt-sm="8px"
-        md-cols="4"
-        md-row-height="1:1"
-        ng-show='!fetchingEntries && entries')
-        
-      md-grid-tile(
-        md-rowspan="1"
-        md-colspan="1"
-        ng-repeat='entry in entries | limitTo:entriesLimit'
-        ng-init='href = ("/groups/" + session.group._id + "/entries/{0}/detail" | format : entry._id)')
-          md-button(ng-href='{{ href }}')
-          h3 {{ entry.title }}

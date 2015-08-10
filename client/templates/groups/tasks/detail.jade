@@ -1,51 +1,55 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
-    h2 EMEETER
+  div
+    h2 {{ session.group.profile.name }} : TAREAS
+
+md-content(layout='column')  
+  md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks')
+    md-icon(md-font-icon='material-icons') chevron_left
       
-md-content
-  div(layout='row')
-    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks')
-      md-icon(md-font-icon='material-icons') chevron_left
-          
-  div.panel-body.text-center(ng-show='fetchingTask && !task')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
+  div(ng-show='fetching && !task')   
+    md-icon(md-font-icon='material-icons' ) sync
+    | Recopilando Informaciòn
       
-  div.panel-body.text-center(ng-show='!fetchingTask && task')
-    div.row
-        button.btn.btn-default.btn-lg(
-          ng-show='task.completed',
-          ng-click='reOpen()')
-          | Abrir
-          
-        button.btn.btn-default.btn-lg(
-          ng-show='!task.completed',
-          ng-click='close()')
-          | Cerrar    
+  div(ng-show='!fetching && task')
+    md-button(
+      ng-show='task.completed',
+      ng-click='reOpen()')
+      | Abrir
+      
+    md-button(
+      ng-show='!task.completed',
+      ng-click='close()')
+      | Cerrar    
         
-    div.row
+    div
       h4 {{ task.completed && "Completada" || "Abierta"}}
       h3 {{ task.objective }}
-    
-    div.row(ng-show='!task.collaborators.length')
-      p No hay collaboradores asignados
-    
-    div.row(ng-show='task.collaborators.length')
-      p Collaboradores:  
-    
-    div.row(ng-repeat='collaborator in task.collaborators')
-      p {{ collaborator.user.email }}
+      p  Fecha de entrega : {{ (task.dateTime && (task.dateTime | toLocal)) || "No definida" }}
       
-    div.row(ng-show='!task.notes.length')
+    div(ng-show='!task.notes.length')
       p No hay notas
     
-    div.row(ng-show='task.notes.length')
+    div(ng-show='task.notes.length')
       p Notas:
     
-    div.row
-      div.col-sm-4(ng-repeat='note in task.notes', ng-show='task.notes.length')
-        p {{ note.note }}
+    div
+      div(ng-repeat='note in task.notes', ng-show='task.notes.length')
+        p * {{ note.note }}
+          md-icon(md-font-icon='material-icons', ng-show='!task.completed', ng-click='removeNote(note.note)' ) close
+          
+    div(ng-show='!task.completed')
+      textarea(ng-model='note')
+      md-button(ng-click='addNote(note)') Agregar
+        
+    div(ng-show='!task.collaborators.length')
+      p No hay collaboradores asignados
+    
+    div(ng-show='task.collaborators.length')
+      p Collaboradores:  
+    
+    div(ng-repeat='collaborator in task.collaborators')
+      p {{ collaborator.user.email }}
+      
               
       
   

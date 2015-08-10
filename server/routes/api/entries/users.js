@@ -16,7 +16,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of an user
    */
-  router.get('/:id', function(req, res, next) {
+  router.get('/of/:id', function(req, res, next) {
 
     var user = req.params.id;
 
@@ -61,7 +61,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries with files of an user
    */
-  router.get('/:id/with-files', function(req, res, next) {
+  router.get('/of/:id/with-files', function(req, res, next) {
 
     var user = req.params.id;
 

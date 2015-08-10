@@ -12,7 +12,7 @@
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/entries/groups/' + $session.get('group')._id).
+        $http.get('/api/entries/of-group/' + $session.get('group')._id).
 
         success(function(data) {
           $scope.entries = data;

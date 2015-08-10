@@ -14,7 +14,7 @@
       $scope.fetchGroup = function() {
         $scope.fetchingGroup = true;
 
-        $http.get('/api/groups/' + $routeParams.id +'/profile').
+        $http.post('/api/groups/set/' + $routeParams.id).
 
         success(function(data) {
           $scope.group = data;
@@ -29,7 +29,7 @@
       $scope.fetchEntries = function() {
         $scope.fetchingEntries = true;
 
-        $http.get('/api/entries/groups/'  + $routeParams.id ).
+        $http.get('/api/entries/of-group/'  + $routeParams.id ).
 
         success(function(data) {
           $scope.entries = data;

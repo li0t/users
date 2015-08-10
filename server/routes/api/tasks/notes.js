@@ -9,7 +9,7 @@ module.exports = function(router/*, mongoose*/) {
   /**
    * Add notes to a task
    */
-  router.post('/:id/add', function(req, res, next) {
+  router.post('/add-to/:id', function(req, res, next) {
 
     var task = req.params.id;
     var user = req.session.user._id;
@@ -38,7 +38,6 @@ module.exports = function(router/*, mongoose*/) {
               if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
 
                 notes.forEach(function(note) {
-
                   if (note && typeof note === "string") {
 
                     saved += 1;
@@ -84,7 +83,7 @@ module.exports = function(router/*, mongoose*/) {
   /**
    * Remove notes from task
    */
-  router.post('/:id/remove', function(req, res, next) {
+  router.post('/remove-from/:id', function(req, res, next) {
 
     var task = req.params.id;
     var user = req.session.user._id;

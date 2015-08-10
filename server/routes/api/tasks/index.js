@@ -100,7 +100,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get tasks of a group
    */
-  router.get('/group/:id', function(req, res, next) {
+  router.get('/of-group/:id', function(req, res, next) {
 
     var i;
     var user = req.session.user._id;
@@ -157,7 +157,7 @@ module.exports = function(router, mongoose) {
   /**
    * Set task as completed
    */
-  router.put('/:id/complete', function(req, res, next) { /** TODO: implement this change as a date field  */
+  router.put('/close/:id', function(req, res, next) { /** TODO: implement this change as a date field  */
 
     var task = req.params.id;
     var user = req.session.user._id;
@@ -255,7 +255,7 @@ module.exports = function(router, mongoose) {
   /**
    * Re-open task
    */
-  router.put('/:id/re-open', function(req, res, next) {
+  router.put('/re-open/:id', function(req, res, next) {
 
     var task = req.params.id;
     var user = req.session.user._id;
