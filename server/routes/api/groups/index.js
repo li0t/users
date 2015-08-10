@@ -240,4 +240,38 @@ module.exports = function(router, mongoose) {
 
   });
 
+  /**
+   * Set session group
+   */
+  router.post('/set/:id', function(req, res, next) {
+
+    var user = req.session.user._id;
+
+    relations.membership(req.params.id, function(err, relation) {
+
+      if (!err && relation.group) {
+
+        if (relation.isMember(user)) {
+
+          relation.cleanMembers();
+
+          relation.group.deepPopulate('profile admin.profile', function(err, group) {
+            if (err) {
+              return next(err);
+            }
+
+            req.session.group = group;
+            res.send(group);
+
+          });
+        } else {
+          res.sendStatus(403);
+        }
+      } else {
+        res.sendStatus(404);
+      }
+    });
+
+  });
+
 };

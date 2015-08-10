@@ -32,6 +32,7 @@
 
       success(function(data) {
         $session.signin(data.user);
+        $session.set('group', data.group);
       });
 
       /* Convenience navigate to method */
