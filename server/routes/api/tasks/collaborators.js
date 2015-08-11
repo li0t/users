@@ -55,7 +55,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add collaborators to a task
    */
-  router.post('/:id', function(req, res, next) {
+  router.post('/add-to/:id', function(req, res, next) {
 
     var task = req.params.id;
     var inviter = req.session.user._id;
@@ -148,7 +148,7 @@ module.exports = function(router, mongoose) {
   /**
    * Remove collaborators from task
    */
-  router.delete('/:id', function(req, res, next) {
+  router.post('/remove-from/:id', function(req, res, next) {
 
     var removed = 0;
     var remover = req.session.user._id;

@@ -7,15 +7,16 @@
     function($scope, $http, $location, $session, $routeParams) {
 
       $scope.group = $session.get('group');
-      $scope.fetchingMembers = null;
+      $scope.fetching = null;
       $scope.members = null;
-      $scope.membersToRemove = [];
+      $scope.membersToRemove = null;
       $scope.admin = $scope.group && ($scope.group.admin._id === $session.get('user')._id) ? $scope.group.admin._id : null;
 
-      $scope.fetchMembers = function() {
-        $scope.fetchingMembers = true;
+      $scope.fetch = function() {
+        $scope.membersToRemove = [];
+        $scope.fetching = true;
 
-        $http.get('/api/groups/members/' + $routeParams.id).
+        $http.get('/api/groups/members/of/' + $routeParams.id).
 
         success(function(data) {
 
@@ -43,7 +44,7 @@
         }).
 
         finally(function() {
-          $scope.fetchingMembers = false;
+          $scope.fetching = false;
         });
       };
 
@@ -64,12 +65,12 @@
       $scope.removeMembers = function() {
         if ($scope.admin) {
 
-          $http.post('/api/groups/members/' + $routeParams.id + '/remove', {
+          $http.post('/api/groups/members/remove-from/' + $routeParams.id, {
             members: $scope.membersToRemove
           }).
 
           success(function() {
-            $location.path('/groups/' + $routeParams.id + '/members');
+            $scope.fetch();
             $session.flash('success', 'Miembros eliminados con éxito!');
           }).
 
@@ -80,7 +81,7 @@
         }
       };
 
-      $scope.fetchMembers();
+      $scope.fetch();
     }
   ]);
 

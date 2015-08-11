@@ -2,49 +2,35 @@
   'use strict';
 
   ng.module('App').directive('mainFlash', [
-    '$timeout', '$session',
-
-    function ($timeout, $session) {
-
+    function () {
       return {
-        restrict: 'E',
         templateUrl: '/assets/templates/main/flash.html',
+        restrict: 'E',
+
+        scope: false,
+
         link: function ($scope) {
-          var timeout;
+          $scope.icon = function (type) {
+            switch (type) {
+              case 'danger':
+                return 'warning';
 
-          $scope.hidden = true;
-          $scope.icons = {
-            danger: 'exclamation-triangle',
-            warning: 'exclamation-circle',
-            success: 'check-circle',
-            info: 'info-circle'
-          };
+              case 'warning':
+                return 'error_outline';
 
-          $scope.$watch(function () {
-            return $session.get('flash');
-          }, function () {
-            $timeout.cancel(timeout);
+              case 'info':
+                return 'info_outline';
 
-            if ($session.get('flash')) {
-              $scope.hidden = false;
+              case 'success':
+                return 'check_circle';
 
-              timeout = $timeout(function () {
-                $scope.hidden = true;
-              }, 10000);
-            } else {
-              $scope.hidden = true;
+              default:
+                return 'radio_button_unchecked';
             }
-          });
-
-          $scope.dismiss = function () {
-            $timeout.cancel(timeout);
-            $scope.hidden = true;
           };
         }
       };
-
     }
-
   ]);
 
 }(angular));

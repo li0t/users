@@ -12,7 +12,7 @@ module.exports = function(router /*, mongoose */ ) {
   /**
    * Get group members
    */
-  router.get('/:id', function(req, res, next) {
+  router.get('/of/:id', function(req, res, next) {
 
     relations.membership(req.params.id, function(err, relation) {
       if (err) {
@@ -48,7 +48,7 @@ module.exports = function(router /*, mongoose */ ) {
   /**
    * Add member to a group
    */
-  router.post('/:id/add', function(req, res, next) {
+  router.post('/add-to/:id', function(req, res, next) {
 
     var adder = req.session.user._id;
     var group = req.params.id;
@@ -101,7 +101,7 @@ module.exports = function(router /*, mongoose */ ) {
                   } else {
                     debug('User %s already belongs to the group %s', member, group._id);
                   }
-                } else {
+                }  else {
                   debug('User %s and %s are not contacts with each other', adder, member);
                 }
               });
@@ -135,7 +135,7 @@ module.exports = function(router /*, mongoose */ ) {
   /**
    * Remove members from group
    */
-  router.post('/:id/remove', function(req, res, next) {
+  router.post('/remove-from/:id', function(req, res, next) {
 
     var toRemove, removed = 0;
     var lostAdmin = false;

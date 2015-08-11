@@ -25,8 +25,8 @@
             this.list.push(item);
           }
 
-          if ($scope.data.members.indexOf(item._id) < 0) {
-            $scope.data.members.push(item._id);
+          if ($scope.data.members.indexOf(item.user._id) < 0) {
+            $scope.data.members.push(item.user._id);
           }
 
           $scope.form.member = '';

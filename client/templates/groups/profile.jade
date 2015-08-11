@@ -1,16 +1,16 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
+  div
     h2 {{group.profile.name}}   
 
 md-content
   md-button.md-fab.md-warn(ng-href='/groups')
     md-icon(md-font-icon='material-icons') chevron_left
   
-  div(ng-show='fetchingGroup && !group')        
+  div(ng-show='fetching && !group')        
     md-icon(md-font-icon='material-icons') sync
     | Recopilando información
       
-  div(layout='column' layout-align="center start" ng-show='!fetchingGroup && group') 
+  div(layout='column' layout-align="center start" ng-show='!fetching && group') 
     h3 
     
     md-button(ng-href='/groups/{{session.group._id}}/members')
@@ -21,28 +21,3 @@ md-content
       md-icon(md-font-icon='material-icons') more
       | Tareas  
     
-    div(ng-show='fetchingEntries && !entries')  
-      md-icon(md-font-icon='material-icons') sync
-      | Buscando Entradas
-    
-    md-button(ng-show='!fetchingEntries && entries && entries.length' ng-href="/groups/{{session.group._id}}/entries")
-      md-icon(md-font-icon='material-icons') comment
-      | Últimas Entradas
-        
-    md-button(ng-show='!fetchingEntries && entries && !entries.length' ng-href="/groups/{{session.group._id}}/entries")
-      md-icon(md-font-icon='material-icons') comment
-      | No hay Entradas  
-        
-    md-grid-list(
-        md-gutter="12px" md-gutter-gt-sm="8px"
-        md-cols="4"
-        md-row-height="1:1"
-        ng-show='!fetchingEntries && entries')
-        
-      md-grid-tile(
-        md-rowspan="1"
-        md-colspan="1"
-        ng-repeat='entry in entries | limitTo:entriesLimit'
-        ng-init='href = ("/groups/" + session.group._id + "/entries/{0}/detail" | format : entry._id)')
-          md-button(ng-href='{{ href }}')
-          h3 {{ entry.title }}

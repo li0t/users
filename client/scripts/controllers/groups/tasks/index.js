@@ -6,20 +6,20 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      $scope.fetchingTasks = null;
+      $scope.fetching = null;
       $scope.tasks = null;
 
       $scope.fetch = function() {
-        $scope.fetchingTasks = true;
+        $scope.fetching = true;
 
-        $http.get('/api/tasks/group/' + $routeParams.id).
+        $http.get('/api/tasks/of-group/' + $routeParams.id).
 
         success(function(data) {
           $scope.tasks = data;
         }).
 
         finally(function() {
-          $scope.fetchingTasks = false;
+          $scope.fetching = false;
         });
       };
 

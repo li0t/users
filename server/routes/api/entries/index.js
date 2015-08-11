@@ -152,7 +152,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of a group
    */
-  router.get('/group/:id', function(req, res, next) {
+  router.get('/of-group/:id', function(req, res, next) {
 
     var user = req.session.user._id;
     var group = req.params.id;
@@ -194,7 +194,7 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries with files of a group
    */
-  router.get('/:id/with-files', function(req, res, next) {
+  router.get('/of-group/:id/with-files', function(req, res, next) {
 
     var user = req.session.user._id;
     var group = req.params.id;

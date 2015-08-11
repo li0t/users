@@ -51,6 +51,16 @@
         templateUrl: '/assets/templates/groups/tasks/detail.html'
       }).
 
+      when('/groups/:id/tasks/:task/collaborators', {
+        controller: 'Groups:Tasks:Collaborators',
+        templateUrl: '/assets/templates/groups/tasks/collaborators/index.html'
+      }).
+
+      when('/groups/:id/tasks/:task/collaborators/add', {
+        controller: 'Groups:Tasks:Collaborators:Add',
+        templateUrl: '/assets/templates/groups/tasks/collaborators/add.html'
+      }).
+
       when('/groups/:id/members', {
         controller: 'Groups:Members',
         templateUrl: '/assets/templates/groups/members/index.html'

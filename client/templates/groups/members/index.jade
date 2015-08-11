@@ -1,5 +1,5 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
+  div
     h2 {{ session.group.profile.name }} : MIEMBROS
 
 md-content
@@ -10,11 +10,11 @@ md-content
     md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/members/add')
       md-icon(md-font-icon='material-icons') add
       
-  div(ng-show='fetchingMembers && !members')        
+  div(ng-show='fetching && !members')        
     md-icon(md-font-icon='material-icons') sync
     | Buscando grupos
       
-  div(ng-show='!fetchingMembers && members')
+  div(ng-show='!fetching && members')
     h3 Miembros del grupo 
   
     md-button.md-raised(ng-repeat='member in members' ng-click='addOrRemove(member.user._id)')

@@ -12,6 +12,41 @@ module.exports = function(router, mongoose) {
   var Token = mongoose.model('token');
 
   /**
+   * Get contacts of session user
+   */
+  router.get('/', function(req, res, next) {
+
+    var contacts = [];
+
+    Contact.findOne().
+
+    where('user', req.session.user._id).
+
+    deepPopulate('contacts.user.profile').
+
+    exec(function(err, found) {
+
+      if (err) {
+        return next(err);
+
+      }
+
+      found.contacts.forEach(function(contact) {
+
+        if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
+
+          contacts.push(contact);
+
+        }
+      });
+
+      res.send(contacts);
+
+    });
+
+  });
+
+  /**
    * Add contact
    */
   router.post('/', function(req, res, next) {
@@ -156,8 +191,8 @@ module.exports = function(router, mongoose) {
                       debug('User %s and %s are now contacts!', receiver.user, sender.user);
                       res.end();
 
-                      Token.remove({
-                        _id: token._id
+                      token.remove(function(err){
+                        if (err) { debug(err); }
                       });
 
                     });
@@ -261,11 +296,15 @@ module.exports = function(router, mongoose) {
                     remove({
                       user: receiver.user,
                       sender: sender.user
+                    }, function(err) {
+                      if (err) { debug(err); }
                     });
 
                     Token.remove({
                       user: sender.user,
                       sender: receiver.user
+                    }, function(err) {
+                      if (err) { debug(err); }
                     });
                   });
                 });
@@ -361,41 +400,6 @@ module.exports = function(router, mongoose) {
       } else {
         res.send(found.contacts);
       }
-    });
-
-  });
-
-  /**
-   * Get contacts of session user
-   */
-  router.get('/', function(req, res, next) {
-
-    var contacts = [];
-
-    Contact.findOne().
-
-    where('user', req.session.user._id).
-
-    deepPopulate('contacts.user.profile').
-
-    exec(function(err, found) {
-
-      if (err) {
-        return next(err);
-
-      }
-
-      found.contacts.forEach(function(contact) {
-
-        if (_.isEqual(contact.state, statics.model('state', 'active')._id)) {
-
-          contacts.push(contact.user);
-
-        }
-      });
-
-      res.send(contacts);
-
     });
 
   });

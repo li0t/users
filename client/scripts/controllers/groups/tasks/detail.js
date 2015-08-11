@@ -5,46 +5,58 @@
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
-
-      $scope.fetchingTask = null;
+      $scope.fetching = null;
+      $scope.members = null;
       $scope.task = null;
 
       $scope.fetch = function() {
-        $scope.fetchingTask = true;
+        $scope.fetching = true;
 
         $http.get('/api/tasks/' + $routeParams.task).
 
         success(function(data) {
           $scope.task = data;
-        }).
 
-        finally(function() {
-          $scope.fetchingTask = false;
+          $http.get('/api/groups/members/of/' + $routeParams.id).
+
+          success(function(data) {
+            $scope.members = data;
+          }).
+
+          error(function(data) {
+            $location.path($routeParams.id +  '/tasks');
+            $session.flash('danger', data);
+          }).
+          finally(function() {
+            $scope.fetching = false;
+          });
+        }).
+        error(function(data) {
+          $location.path($routeParams.id +  '/tasks');
+          $session.flash('danger', data);
         });
       };
 
-      $scope.fetch();
+      $scope.close = function() {
 
-      $scope.close = function () {
+        $http.put('/api/tasks/close/' + $routeParams.task).
 
-        $http.put('/api/tasks/' + $routeParams.task + '/complete').
-
-        success(function(data) {
-          $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/detail');
+        success(function() {
+          $scope.fetch();
           $session.flash('success', 'La tarea ha sido completada!');
         }).
 
         error(function() {
           $session.flash('danger', 'Hubo un error completando la tarea!');
-        }); 
+        });
 
       };
 
-      $scope.reOpen = function () {
-        $http.put('/api/tasks/' + $routeParams.task + '/re-open').
+      $scope.reOpen = function() {
+        $http.put('/api/tasks/re-open/' + $routeParams.task).
 
-        success(function(data) {
-          $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/detail');
+        success(function() {
+          $scope.fetch();
           $session.flash('success', 'La tarea ha sido abierta!');
         }).
 
@@ -52,6 +64,41 @@
           $session.flash('danger', 'Hubo un error abriendo la tarea!');
         });
       };
+
+      $scope.removeNote = function(note) {
+
+        $http.post('/api/tasks/notes/remove-from/' + $routeParams.task, { notes: [note] }).
+
+        success(function() {
+          $scope.fetch();
+          $session.flash('success', 'Nota eliminada');
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la nota!');
+        }).
+
+        finally(function() {
+          note = "";
+        });
+      };
+
+      $scope.addNote = function(note) {
+
+        $http.post('/api/tasks/notes/add-to/' + $routeParams.task, {
+          notes: [note]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error agregando la nota!');
+        });
+      };
+
+      $scope.fetch();
 
     }
   ]);

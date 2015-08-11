@@ -6,6 +6,9 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
+      $session.signout();
+      $session.set('group', null);
+
       $session.flash('success', 'Bienvenido, porfavor llena el formulario!');
 
       $scope.submit = function() {
@@ -17,14 +20,17 @@
           $http.put('/api/contacts/confirm/' + token).
 
           success(function() {
-            $location.path('/');
             $session.flash('success', 'Cuenta activada, bienvenido a emeeter!');
+          }).
 
-          }).error(function() {
-            $location.path('/');
+          error(function() {
             $session.flash('danger', 'This token is not valid!');
+          }).
+          finally(function() {
+            $location.path('/');
           });
-        }).error(function() {
+        }).
+        error(function() {
           $location.path('/');
           $session.flash('danger', 'This token is not valid!');
         });
