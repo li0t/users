@@ -42,7 +42,9 @@ module.exports = function(router, mongoose) {
           }
 
           /** Remove unnecessary new profile */
-          profile.remove();
+          profile.remove(function(err) {
+            if (err) { debug(err); }
+          });
           return;
         }
 

@@ -65,6 +65,8 @@ module.exports = function(router, mongoose) {
 
           Token.remove({
             user: user._id
+          }, function(err) {
+            if (err) { debug(err); }
           });
 
           new Token({

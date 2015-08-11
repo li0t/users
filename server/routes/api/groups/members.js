@@ -101,7 +101,7 @@ module.exports = function(router /*, mongoose */ ) {
                   } else {
                     debug('User %s already belongs to the group %s', member, group._id);
                   }
-                } else {
+                }  else {
                   debug('User %s and %s are not contacts with each other', adder, member);
                 }
               });

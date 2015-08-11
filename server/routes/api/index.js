@@ -29,6 +29,7 @@ module.exports = function(router /*, mongoose*/ ) {
           _id: req.session.group._id,
           profile : { name: req.session.group.profile.name },
           admin: {
+            _id: req.session.group.admin._id,
             profile : { name: req.session.group.admin.profile.name },
           }
         };

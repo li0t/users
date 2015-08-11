@@ -65,7 +65,11 @@ module.exports = function(router, mongoose) {
           } else {
             next(err);
           }
-          profile.remove();
+          profile.remove(function(err) {
+            if (err) {
+              debug(err);
+            }
+          });
         } else {
 
           /* Create a new ContactSchema that will store the user contacts */
@@ -238,46 +242,44 @@ module.exports = function(router, mongoose) {
         return next(err);
       }
 
-      if (token) {
+      if (!token) {
+        return res.sendStatus(498);
+      }
 
-        if (password) {
+      if (!password) {
+        return res.sendStatus(400);
+      }
 
-          User.findById(token.user, function(err, user) { /** Find user that sent the reset request */
+      User.findById(token.user, function(err, user) { /** Find user that sent the reset request */
+        if (err) {
+          return next(err);
+        }
+
+        if (!user) {
+          debug('No user found for id ' + req.session.token.user);
+          return res.sendStatus(404);
+        }
+
+        user.password = password;
+
+        user.save(function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          delete req.session.token;
+
+          req.session.user = user;
+
+          res.end();
+
+          token.remove(function(err) {
             if (err) {
-              next(err);
-
-            } else if (user) {
-
-              user.password = password;
-
-              user.save(function(err) {
-
-                if (err) {
-                  next(err);
-
-                } else {
-
-                  delete req.session.token;
-
-                  req.session.user = user;
-
-                  res.end();
-
-                  token.remove();
-
-                }
-              });
-            } else {
-              debug('No user found for id ' + req.session.token.user);
-              res.sendStatus(404);
+              debug(err);
             }
           });
-        } else {
-          res.sendStatus(400);
-        }
-      } else {
-        res.sendStatus(498);
-      }
+        });
+      });
     });
   });
 
@@ -424,7 +426,9 @@ module.exports = function(router, mongoose) {
           req.session.user = user;
           res.status(204).end();
 
-          token.remove();
+          token.remove(function(err) {
+            if (err) { debug(err); }
+          });
 
         });
       } else {
