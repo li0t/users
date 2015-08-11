@@ -51,6 +51,11 @@ module.exports = function (Schema) {
     return this._id.getTimestamp();
   });
 
+  /** Declares Object type */
+  EntrySchema.virtual('type').get(function () {
+    return 'entry';
+  });
+
   /**  */
   EntrySchema.pre('save', function (next) {
     next();

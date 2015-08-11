@@ -9,79 +9,53 @@
       $scope.entries = [];
 
       $scope.pendings = [{
-        'title': 'Tarea 1',
+        'title': 'Terminar presentación',
         'description': 'Blah blah'
       }, {
-        'title': 'Tarea 2',
+        'title': 'Llamar proeedores',
         'description': 'Blah blah blah'
       }, {
-        'title': 'Reunión',
+        'title': 'Prepara reunión de mark',
         'description': 'Juntarse con ...'
       }, {
         'title': 'Reunión de amigos',
         'description': 'Confirmar que J...'
       }, {
-        'title': 'Tarea 3',
+        'title': 'Medir perímetro',
         'description': 'Blah blah vlad...'
       }];
 
       var meetings = [{
         'title': 'Reunión inicial',
         'author': 'Egbert Dool',
-        'created' : '2015-07-14 17:28:33.208Z'
-      }, {
+        'created' : '2015-07-10 17:28:33.208Z',
+        'type': 'audio'
+      },
+      {
         'title': 'Junta de amigos',
-        'author': 'Champion Amigo',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'author': 'Champion amigo',
+        'created' : '2015-03-22 17:28:33.208Z',
+        'type': 'document'
       },
       {
         'title': 'Partido de Futbol',
         'author': 'Don Pedro',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'created' : '2015-05-22 17:28:33.208Z',
+        'type': 'entry'
       },
       {
         'title': 'Presentación Servicios',
         'author': 'Amateru Caupolican',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'created' : '2015-07-12 17:28:33.208Z',
+        'type': 'image'
       },
       {
         'title': 'Estado financiero',
         'author': 'Lucas Cofre',
-        'created' : '2015-07-22 17:28:33.208Z'
+        'created' : '2015-09-22 17:28:33.208Z',
+        'type': 'meeting'
       }];
 
-      var backgrounds = {
-        "entry": "yellow",
-        "group": "green",
-        "task": "lightBlue",
-        "meeting": "blue"
-      };
-
-      var icons = {
-        "entry": {
-          "icon": "comment",
-          "color": "lightBlue"
-        },
-        "group": {
-          "icon": "group",
-          "color": "white"
-        },
-        "task": {
-          "icon": "more",
-          "color": "purple"
-        },
-        "meeting": {
-          "icon": "event_note",
-          "color": "green"
-        }
-      };
-
-      var spans = {
-        "entry": "Nueva entrada",
-        "group": "Grupo creado",
-        "task": "Tarea modificada",
-        "meeting": "Nueva reunión"
-      };
 
       /* Shuffle an array, Based on Fisher–Yates shuffle algorithm */
       function shuffle(a) {
@@ -109,83 +83,38 @@
         $http.get('/api/entries').
 
         success(function(data) {
-
           for (i = 0; i < data.length; i++) {
-
             entry = data[i];
-            entry.type = "entry";
-            entry.icon = icons[entry.type];
-            entry.span = spans[entry.type];
-            entry.background = backgrounds[entry.type];
-
             $scope.entries.push(entry);
-
-            if (i === 1) {
-              break;
-            }
           }
 
           $http.get('/api/groups').
 
           success(function(data) {
-
             for (i = 0; i < data.length; i++) {
-
               entry = data[i];
-              entry.type = "group";
-              entry.icon = icons[entry.type];
-              entry.span = spans[entry.type];
-              entry.background = backgrounds[entry.type];
-
               $scope.entries.push(entry);
-
-              if (i === 1) {
-                break;
-              }
             }
 
             $http.get('/api/tasks').
 
             success(function(data) {
-
               for (i = 0; i < data.length; i++) {
-
                 entry = data[i];
-                entry.type = "task";
-                entry.icon = icons[entry.type];
-                entry.span = spans[entry.type];
-                entry.background = backgrounds[entry.type];
-
                 $scope.entries.push(entry);
-
-                if (i === 1) {
-                  break;
-                }
               }
 
               /** MOCK DATA */
               for (i = 0; i < meetings.length; i++) {
-
                 entry = meetings[i];
-                entry.type = "meeting";
-                entry.icon = icons[entry.type];
-                entry.span = spans[entry.type];
-                entry.background = backgrounds[entry.type];
-
                 $scope.entries.push(entry);
-
-                if (i === 1) {
-                  break;
-                }
               }
-
 
             }).
 
             finally(function() {
               $scope.fetching = false;
               $scope.entries = shuffle($scope.entries);
-
             });
           });
         });

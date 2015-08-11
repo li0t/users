@@ -1,26 +1,37 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 EMEETER
-    
-md-content.white(layout-padding, ng-show='session.user')
-  
-  div(layout='row')
-    div(flex='70')
-      img(ng-src="../assets/images/analitycs.png")
-          
-    div.blueGray(flex='30', layout-padding)
-      div(layout-padding)
-        h3.md-title PENDIENTES
-        
-        md-list
-          md-list-item(ng-repeat='pending in pendings | limitTo:3')
-            div.md-list-item-text(flex='80')
-              h4 {{ pending.title }}
-              p {{ pending.description }}
-            md-checkbox(flex, ng-click='gotIt(pending)')
-          
-          md-list-item(ng-show='!pendings.length')
-            h4 No tienes asuntos pendientes
 
-  div
-    div(em-card)
+md-content.darkGray(ng-show='session.user')
+
+  div#maincontiner(layout-padding, layout='row', style='padding-right: 0;')
+    div(flex='60', em-graph, style='background: #fff;')
+
+    md-content.bluebg(flex='40', style="height: 230px; font-size: small; color: #fff;")
+      md-list
+        md-subheader.md-no-sticky(style='background: transparent; color: white; text-transform: uppercase; font-weight: 300; font-size: large;')
+          div(flex, layout="row" layout-align="space-between center")
+            | Pendientes
+            div
+              | Hoy
+              md-icon.icon20(md-font-icon='material-icons', style='color: white;') chevron_right
+        md-list-item(ng-repeat='pending in pendings | limitTo:5')
+          md-icon.icon20(md-font-icon='material-icons', style='color: white;') star_half
+          p {{ pending.title }} - {{ pending.description }}
+          md-checkbox(style="border-color: #fff;", ng-click='gotIt(pending)')
+
+        md-list-item(ng-show='!pendings.length')
+          h4 No tienes asuntos pendientes
+
+  div(layout-padding, style='padding-top: 0;')
+    md-grid-list(
+      md-gutter="12px",
+      md-gutter-gt-sm="8px",
+      md-cols="4",
+      md-row-height="1:1")
+      md-grid-tile.whitebg(
+        layout='column',
+        ng-repeat="entry in entries",
+        md-rowspan="{{ entry.row }}",
+        md-colspan="{{ entry.col }}")
+        em-card(card='entry')

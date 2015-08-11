@@ -8,7 +8,7 @@ div.md-padding
     div(flex)
       h2.md-title
         md-icon(md-font-icon='material-icons') person
-        | Datos de la cuenta
+        |  Datos de la cuenta
 
       form(
         name='form',
@@ -18,24 +18,26 @@ div.md-padding
         
         md-input-container.form-group
           span.input-group-addon
-            md-icon(md-font-icon='material-icons') 
+            md-icon(md-font-icon='material-icons')
+ 
           input.form-control(
             placeholder='Ingresa tu email',
-            ng-model='form.email',
+            ng-model='data.email',
             type='email',
             required)
-            
+
         md-input-container.form-group
           span.input-group-addon
             md-icon(md-font-icon='material-icons') 
+
           input.form-control(
             placeholder='Ingresa tu clave',
-            ng-model='form.password',
+            ng-model='data.password',
             ng-minlength='4',
             type='password',
             required)
             
-        div(layout="row")
+        div(layout='row')
           md-button(ng-href='/users/signup') No tengo cuenta
           
           md-button(ng-href='/users/recover') Olvidé mi clave
@@ -43,6 +45,7 @@ div.md-padding
           md-button(
             ng-disabled='form.$invalid || submitting',
             type='submit')
+            
             md-icon(md-font-icon='material-icons')
             |  Sign In
 
