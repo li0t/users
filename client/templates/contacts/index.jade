@@ -46,7 +46,7 @@ md-content
       md-colspan="1"
       ng-repeat='contact in filteredContacts = (contacts | filter: searchContact)'
       ng-init='href = ("/users/{0}/detail" | format : contact._id); delete = ("/contacts/delete/{0}" | format : contact._id)')
-        p {{ contact.profile.name || contact.email }}
+        p {{ contact.user.profile.name || contact.user.email }}
         md-button(ng-href='{{ delete }}')
           md-icon(md-font-icon='material-icons' ) close
           |  Eliminar

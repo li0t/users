@@ -11,18 +11,19 @@
         members: []
       };
 
-      function filterContacts(groupMembers) {
+      function filterContacts(contacts, members) {
         var i, j;
 
-        for (i = 0; i < $scope.contacts.length; i++) {
-          for (j = 0; j < groupMembers.length; j++) {
-            if ($scope.contacts[i].user.email === groupMembers[j].user.email) {
-              $scope.contacts.splice(i, 1);
+        for (i = 0; i < contacts.length; i++) {
+          for (j = 0; j < members.length; j++) {
+            if (contacts[i].user.email === members[j].user.email) {
+              contacts.splice(i, 1);
               i -= 1;
               break;
             }
           }
         }
+        return contacts;
       }
 
       $scope.fetch = function () {
@@ -31,13 +32,12 @@
 
         $http.get('/api/contacts').
 
-        success(function(data) {
-          $scope.contacts = data;
+        success(function(contacts) {
 
           $http.get('/api/groups/members/of/' + $session.get('group')._id).
 
-          success(function(data) {
-            filterContacts(data);
+          success(function(members) {
+            $scope.contacts = filterContacts(contacts, members);
           }).
 
           finally(function(){

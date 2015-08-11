@@ -26,7 +26,7 @@ md-content
         
         div.input-group(ng-repeat='member in members.list')
           md-icon(md-font-icon='material-icons') person
-          | {{ member.profile.name || member.email }}
+          | {{ member.user.profile.name || member.user.email }}
           
           md-button
             md-icon(md-font-icon='material-icons' ng-click='members.remove($index)') remove_circle
@@ -43,7 +43,7 @@ md-content
             md-option(
               ng-repeat='member in posibleMembers',
               value='{{ $index }}')
-              | {{ member.profile.name || member.email }}
+              | {{ member.user.profile.name || member.user.email }}
 
     div(layout='row')
       md-button(ng-href='/groups')

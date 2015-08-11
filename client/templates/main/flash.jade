@@ -1,6 +1,4 @@
-.flash(class='{{ hidden && "flash-hidden" || "" }}')
-  .alert(
-    class='alert-{{ session.flash.type && session.flash.type || "info" }}',
-    ng-click='dismiss()')
+md-button(ng-click='session.flash = null')
 
-    | #[i.fa.fa-fw(class="fa-{{ icons[session.flash.type] }}")] #[strong {{ session.flash.title }}] {{ session.flash.message }}
+  md-icon(md-font-icon='material-icons') {{ session.flash.type }}
+  | {{ session.flash.message }}
