@@ -6,7 +6,9 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
+      $scope.task = $routeParams.task;
       $scope.fetching = false;
+      
       $scope.data = {
         collaborators: []
       };
@@ -46,6 +48,20 @@
         });
       };
 
+      $scope.submit = function() {
+
+        $http.post('/api/tasks/collaborators/add-to/' + $routeParams.task, $scope.data).
+
+        success(function() {
+          $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/collaborators');
+          $session.flash('Colaboradores agregados');
+        }).
+
+        error(function() {
+          $session.flash('Hubo un error agregando colaboradores');
+        });
+      };
+
       $scope.collaborators = {
         list: [],
 
@@ -67,20 +83,6 @@
           $scope.data.collaborators.splice($index, 1);
           this.list.splice($index, 1);
         }
-      };
-
-      $scope.submit = function() {
-
-        $http.post('/api/tasks/collaborators/add-to/' + $routeParams.task, $scope.data).
-
-        success(function() {
-          $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/collaborators');
-          $session.flash('Colaboradores agregados');
-        }).
-
-        error(function() {
-          $session.flash('Hubo un error agregando colaboradores');
-        });
       };
 
       $scope.fetch();

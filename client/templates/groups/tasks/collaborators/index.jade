@@ -4,7 +4,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
 
 md-content
   div(layout='row')
-    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task}}')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task}}/detail')
       md-icon(md-font-icon='material-icons') chevron_left
        
     md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task}}/collaborators/add')

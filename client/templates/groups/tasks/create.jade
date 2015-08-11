@@ -7,33 +7,54 @@ md-content
     md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks')
       md-icon(md-font-icon='material-icons') chevron_left
 
-  form(
-    ng-submit='form.$valid && submit()',
-    role='form',
-    name='form')
+  div(ng-show='!fetching && members')
+    form(
+      ng-submit='form.$valid && submit()',
+      role='form',
+      name='form')
 
-    md-input-container.form-group
-      input.form-control(
-        placeholder='Objetivo',
-        ng-model='data.objective',
-        required)
+      md-input-container.form-group
+        input.form-control(
+          placeholder='Objetivo',
+          ng-model='data.objective',
+          required)
 
-    md-input-container.form-group
-      md-select.form-control(
-        ng-model='data.priority'
-        placeholder='Prioridad'
-        required)
-        
-        md-option(ng-repeat='priority in statics.priorities'
-        ng-value='priority._id') {{ priority.name }}
-            
-    div(layout='row')
-      md-button(ng-href='/groups/{{session.group._id}}/profile')
-        md-icon(md-font-icon='material-icons') chevron_left
-        | Cancelar
+      md-input-container.form-group
+        md-select.form-control(
+          ng-model='data.priority'
+          placeholder='Prioridad'
+          required)
+          
+          md-option(ng-repeat='priority in statics.priorities'
+          ng-value='priority._id') {{ priority.name }}
+      
+      div(layout='row')  
+        h4 Collaboradores
+          
+        md-button.md-raised(ng-repeat='collaborator in collaborators.list')
+          | {{ collaborator.user.email }}
+          md-icon(md-font-icon='material-icons', ng-click='collaborators.remove($index)') close
+      
+      md-divider
+      
+      md-input-container
+        md-select(
+          ng-change='collaborators.add()',
+          ng-model='form.collaborator'
+          placeholder='Agrega colaboradores')
+          
+          md-option(
+            ng-repeat='member in members',
+            value='{{ $index }}')
+            | {{ member.user.email }}
+              
+      div(layout='row')
+        md-button(ng-href='/groups/{{session.group._id}}/profile')
+          md-icon(md-font-icon='material-icons') chevron_left
+          | Cancelar
 
-      md-button(
-        ng-disabled='form.$invalid',
-        type='submit')
-        | Crear
-        md-icon(md-font-icon='material-icons') chevron_right
+        md-button(
+          ng-disabled='form.$invalid',
+          type='submit')
+          | Crear
+          md-icon(md-font-icon='material-icons') chevron_right

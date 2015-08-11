@@ -7,7 +7,7 @@ md-content
     md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/profile')
       md-icon(md-font-icon='material-icons') chevron_left
        
-    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/members/add')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/members/add' ng-show='admin')
       md-icon(md-font-icon='material-icons') add
       
   div(ng-show='fetching && !members')        
