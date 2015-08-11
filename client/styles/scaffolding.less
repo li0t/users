@@ -1,14 +1,55 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,300,500);
+
 html,
 body {
-  font-family: Ubuntu, sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
+
+::-webkit-scrollbar {
+  height: 0;
+  overflow: visible;
+  width: 10px;
+  //border-left:1px solid rgb(229, 229, 229);
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, .2);
+  background-clip: padding-box;
+  min-height: 28px;
+  padding: 100px 0 0;
+  box-shadow: inset 1px 1px 0 rgba(0,0,0,.1),inset 0 -1px 0 rgba(0,0,0,.07);
+  border-width: 1px 1px 1px 6px;
+}
+::-webkit-scrollbar-button {
+  height: 0;
+  width: 0;
+}
+::-webkit-scrollbar-track {
+  background-clip: padding-box;
+  border: solid transparent;
+  border-width: 0 0 0 4px;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+md-checkbox .md-icon {
+  border-color: #fff;
+}
+
+em-card{
+  p,
+  h1, h2, h3, h4 {
+    font-weight: 300;
+  }
+}
+
 /* Fix material icons alignment */
 md-icon.material-icons {
   line-height: 0.75em!important;
 }
 
 img {
-    width:100%;
+  width:100%;
 }
 
 .content {
@@ -81,4 +122,31 @@ img {
 .whitebg {
   background: url(../images/whitebg.png) no-repeat center center;
   background-size: 100%;
+}
+.bluebg {
+  background: url(../images/bluebg.png) no-repeat center center;
+  background-size: cover;
+}
+
+// Cards color
+.entry-color {
+  color: #f34235;
+}
+.meeting-color {
+  color: #8ac248;
+}
+.audio-color {
+  color: #00bbd3;
+}
+.document-color {
+  color: #ffc006;
+}
+.task-color {
+  color: #9b26af;
+}
+.image-color {
+  color: #3e50b4;
+}
+.group-color {
+  color: #02A8F3;
 }

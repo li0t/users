@@ -20,26 +20,44 @@
         link: function ($scope, $element, $attrs) {
           var config = {
             "entry": {
-              icon: "comment",
-              color: "lightBlue",
-              span: 'Nueva entrada',
+              icon: "edit",
+              color: "#f34235",
+              span: 'Nueva Nota',
+              background: 'yellow'
+            },
+            "document": {
+              icon: "insert_drive_file",
+              color: "#ffc006",
+              span: 'Nuevo Documento',
+              background: 'yellow'
+            },
+            "image": {
+              icon: "image",
+              color: "#3e50b4",
+              span: 'Nueva Imagen',
+              background: 'yellow'
+            },
+            "audio": {
+              icon: "mic",
+              color: "#00bbd3",
+              span: 'Nuevo Audio',
               background: 'yellow'
             },
             "group": {
               icon: "group",
-              color: "yellow",
+              color: "#02A8F3",
               span: "Grupo creado",
               background: "green"
             },
             "task": {
               icon: "more",
-              color: "purple",
+              color: "#9b26af",
               span: "Tarea modificada",
               background: "lightBlue"
             },
             "meeting": {
               icon: "event_note",
-              color: "green",
+              color: "#8ac248",
               span: "Nueva reunión",
               background: "green"
             }

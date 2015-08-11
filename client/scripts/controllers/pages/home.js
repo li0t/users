@@ -29,25 +29,25 @@
         'title': 'Reunión inicial',
         'author': 'Egbert Dool',
         'created' : '2015-07-14 17:28:33.208Z',
-        'type': 'meeting'
+        'type': 'audio'
       },
       {
         'title': 'Junta de amigos',
         'author': 'Champion amigo',
         'created' : '2015-07-22 17:28:33.208Z',
-        'type': 'meeting'
+        'type': 'document'
       },
       {
         'title': 'Partido de Futbol',
         'author': 'Don Pedro',
         'created' : '2015-07-22 17:28:33.208Z',
-        'type': 'meeting'
+        'type': 'entry'
       },
       {
         'title': 'Presentación Servicios',
         'author': 'Amateru Caupolican',
         'created' : '2015-07-22 17:28:33.208Z',
-        'type': 'meeting'
+        'type': 'image'
       },
       {
         'title': 'Estado financiero',
