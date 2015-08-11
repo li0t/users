@@ -28,31 +28,31 @@
       var meetings = [{
         'title': 'Reunión inicial',
         'author': 'Egbert Dool',
-        'created' : '2015-07-14 17:28:33.208Z',
+        'created' : '2015-07-10 17:28:33.208Z',
         'type': 'audio'
       },
       {
         'title': 'Junta de amigos',
         'author': 'Champion amigo',
-        'created' : '2015-07-22 17:28:33.208Z',
+        'created' : '2015-03-22 17:28:33.208Z',
         'type': 'document'
       },
       {
         'title': 'Partido de Futbol',
         'author': 'Don Pedro',
-        'created' : '2015-07-22 17:28:33.208Z',
+        'created' : '2015-05-22 17:28:33.208Z',
         'type': 'entry'
       },
       {
         'title': 'Presentación Servicios',
         'author': 'Amateru Caupolican',
-        'created' : '2015-07-22 17:28:33.208Z',
+        'created' : '2015-07-12 17:28:33.208Z',
         'type': 'image'
       },
       {
         'title': 'Estado financiero',
         'author': 'Lucas Cofre',
-        'created' : '2015-07-22 17:28:33.208Z',
+        'created' : '2015-09-22 17:28:33.208Z',
         'type': 'meeting'
       }];
 
