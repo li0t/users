@@ -271,6 +271,25 @@ function collaboration(id, cb) {
       }
 
       return collaborator;
+    },
+
+    cleanCollaborators: function() {
+
+      var i;
+
+      if (relation.task) {
+
+        for (i = 0; i < relation.group.members.length; i++) {
+
+          if (relation.group.members[i].left.length && relation.group.members[i].joined.length === relation.group.members[i].left.length) {
+
+            relation.group.members.splice(i, 1);
+            i -= 1;
+          }
+        }
+      } else {
+        debug('Error! No task found');
+      }
     }
 
   };

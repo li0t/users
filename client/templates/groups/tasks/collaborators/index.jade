@@ -1,0 +1,27 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 {{ session.group.profile.name }} : TAREAS : COLABORADORES
+
+md-content
+  div(layout='row')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task}}')
+      md-icon(md-font-icon='material-icons') chevron_left
+       
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task}}/collaborators/add')
+      md-icon(md-font-icon='material-icons') add
+      
+  div(ng-show='fetching && !collaborators')        
+    md-icon(md-font-icon='material-icons') sync
+    | Recopilando Informaciòn 
+      
+  div(ng-show='!fetching && collaborators')
+    h3 Collaboradores
+    
+    h4(ng-show='!collaborators.length') No hay colaboradores
+    
+    md-button.md-raised(ng-repeat='collaborator in collaborators' ng-click='addOrRemove(collaborator.user._id)')
+      h4 {{ collaborator.user.profile.name || collaborator.user.email }}  
+          
+    md-button(ng-show='collaboratorsToRemove.length' ng-click='removeMembers()')
+      md-icon(md-font-icon='material-icons') remove_circle
+      | Eliminar Collaboradores

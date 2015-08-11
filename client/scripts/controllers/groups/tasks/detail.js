@@ -5,8 +5,8 @@
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
-
       $scope.fetching = null;
+      $scope.members = null;
       $scope.task = null;
 
       $scope.fetch = function() {
@@ -16,15 +16,24 @@
 
         success(function(data) {
           $scope.task = data;
-        }).
 
+          $http.get('/api/groups/members/of/' + $routeParams.id).
+
+          success(function(data) {
+            $scope.members = data;
+          }).
+
+          error(function(data) {
+            $location.path($routeParams.id +  '/tasks');
+            $session.flash('danger', data);
+          }).
+          finally(function() {
+            $scope.fetching = false;
+          });
+        }).
         error(function(data) {
           $location.path($routeParams.id +  '/tasks');
           $session.flash('danger', data);
-        }).
-
-        finally(function() {
-          $scope.fetching = false;
         });
       };
 
@@ -69,7 +78,7 @@
           $session.flash('danger', 'Hubo un error eliminando la nota!');
         }).
 
-        finally(function(){
+        finally(function() {
           note = "";
         });
       };

@@ -466,40 +466,38 @@ module.exports = function(router, mongoose) {
     relations.collaboration(task, function(err, collaboration) {
 
       /** Check if task exists and is available for changes */
-      if (!err && collaboration.task) {
-
-        task = collaboration.task; /** The task model */
-
-        relations.membership(task.group, function(err, taskGroup) {
-
-          if (!err && taskGroup.group && taskGroup.isMember(user)) { /** Check if user is part of the task group */
-
-            task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
-              if (err) {
-                return next(err);
-              }
-
-              for (i = 0; i < task.collaborators.length; i++) {
-                /** Check if user is actual collaborator of task */
-                if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
-                  /** Remove it from the array and reallocate index */
-                  task.collaborators.splice(i, 1);
-                  i -= 1;
-                }
-              }
-
-              res.send(task);
-
-            });
-          } else {
-            debug('User %s is not allowed to modify task %s', user, task._id);
-            res.sendStatus(403);
-          }
-        });
-      } else {
+      if (err || !collaboration.task) {
         debug('Task %s was not found', req.params.id);
-        res.sendStatus(404);
+        return res.sendStatus(404);
       }
+
+      task = collaboration.task; /** The task model */
+
+      relations.membership(task.group, function(err, taskGroup) {
+
+        if (err || !taskGroup.group || !taskGroup.isMember(user)) { /** Check if user is part of the task group */
+          debug('User %s is not allowed to modify task %s', user, task._id);
+          return res.sendStatus(403);
+        }
+
+        for (i = 0; i < task.collaborators.length; i++) {
+          /** Check if user is actual collaborator of task */
+          if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
+            /** Remove it from the array and reallocate index */
+            task.collaborators.splice(i, 1);
+            i -= 1;
+          }
+        }
+
+        task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
+          if (err) {
+            return next(err);
+          }
+
+          res.send(task);
+
+        });
+      });
     });
 
   });
