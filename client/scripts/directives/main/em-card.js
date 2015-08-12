@@ -18,6 +18,10 @@
         restrict: 'E',
         templateUrl: '/assets/templates/main/em-card.html',
         link: function ($scope, $element, $attrs) {
+
+          // Card actions variables
+          $scope.hasTimer = false;
+
           var config = {
             "entry": {
               icon: "edit",
@@ -38,7 +42,7 @@
               background: 'yellow'
             },
             "audio": {
-              icon: "mic",
+              icon: "mic_none",
               color: "#00bbd3",
               span: 'Nuevo Audio',
               background: 'yellow'
@@ -62,11 +66,54 @@
               background: "green"
             }
           };
+          // Type to int helper for switch
+          function typeToInt(type) {
+            if(type === 'entry'){
+              return 0;
+            } else if (type === 'document') {
+              return 1;
+            } else if (type === 'image'){
+              return 2;
+            } else if (type === 'audio') {
+              return 3;
+            } else if (type === 'group'){
+              return 4;
+            } else if (type === 'task') {
+              return 5;
+            } else if (type === 'meeting') {
+              return 6;
+            }
+          }
 
           $scope.card.icon = config[$scope.card.type].icon;
           $scope.card.color = config[$scope.card.type].color;
           $scope.card.span = config[$scope.card.type].span;
           $scope.card.background = config[$scope.card.type].background;
+          $scope.card.relevantDate = $scope.card.created;
+
+
+
+          // Setup configuration for card
+          switch(typeToInt($scope.card.type)){
+            case 3:
+              $scope.card.action = function(){
+                $scope.card.icon = 'mic';
+              }
+              break;
+            // Card is Task
+            case 5:
+              $scope.hasTimer = true;
+              $scope.card.span = $scope.card.objective;
+              if($scope.card.hasOwnProperty('dateTime') && $scope.card.dateTime != null){
+                  $scope.card.relevantDate = $scope.card.dateTime;
+              }
+              break;
+            // Card is Meeting
+            case 6:
+              $scope.hasTimer = true;
+              $scope.card.span = $scope.card.title;
+              break;
+          }
 
         }
       }

@@ -18,7 +18,8 @@ md-content.darkGray(ng-show='session.user')
         md-list-item(ng-repeat='pending in pendings | limitTo:5')
           md-icon.icon20(md-font-icon='material-icons', style='color: white;') star_half
           p {{ pending.title }} - {{ pending.description }}
-          md-checkbox(style="border-color: #fff;", ng-click='gotIt(pending)')
+          //md-checkbox(style="border-color: #fff;", ng-click='gotIt(pending)')
+          md-icon.icon20(md-font-icon='material-icons', style='color: white;') av_timer
 
         md-list-item(ng-show='!pendings.length')
           h4 No tienes asuntos pendientes
@@ -27,7 +28,9 @@ md-content.darkGray(ng-show='session.user')
     md-grid-list(
       md-gutter="12px",
       md-gutter-gt-sm="8px",
-      md-cols="4",
+      md-cols-sm="1",
+      md-cols-md="2",
+      md-cols-gt-lg="4",
       md-row-height="1:1")
       md-grid-tile.whitebg(
         layout='column',
