@@ -7,7 +7,7 @@ md-content
     md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/detail')
       md-icon(md-font-icon='material-icons') chevron_left
        
-    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/collaborators/add' ng-show='!task.completed')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/collaborators/add' ng-show='!fetching && task.collaborators && !task.completed')
       md-icon(md-font-icon='material-icons') add
       
   div(ng-show='fetching && !task.collaborators')        
