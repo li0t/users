@@ -2,7 +2,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 {{ session.group.profile.name }} : TAREAS
 
-md-content(layout='column')  
+md-content.md-padding(layout='column')  
   md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks')
     md-icon(md-font-icon='material-icons') chevron_left
       
@@ -12,20 +12,34 @@ md-content(layout='column')
       
   div(ng-show='!fetching && task')
     md-button(
-      ng-show='task.completed',
+      ng-show='task.completed'
       ng-click='reOpen()')
       | Abrir
       
     md-button(
-      ng-show='!task.completed',
+      ng-show='!task.completed'
       ng-click='close()')
       | Cerrar    
-        
+    
     div
-      h4 {{ task.completed && "Completada" || "Abierta"}}
       h3 {{ task.objective }}
-      p  Fecha de entrega : {{ (task.dateTime && (task.dateTime | toLocal)) || "No definida" }}
+    
+    div
+      h4 {{ task.completed && ("Completada el " + (task.completed | toLocal)) || "Abierta"}}
+
+    div(layout='row')  
+      md-input-container
+        label Fecha de Entrega
+        input.form-control(
+          ng-change='dateTimeChanged = true'
+          ng-disabled='task.completed'
+          ng-model='task.dateTime'
+          type='date')
       
+      md-button(ng-click='editDateTime()' ng-show='!task.completed' ng-disabled='!dateTimeChanged') 
+        md-icon(md-font-icon='material-icons') edit
+        | Editar
+    
     div(ng-show='!task.notes.length')
       p No hay notas
     
@@ -35,11 +49,11 @@ md-content(layout='column')
     div
       div(ng-repeat='note in task.notes', ng-show='task.notes.length')
         p * {{ note.note }}
-          md-icon(md-font-icon='material-icons', ng-show='!task.completed', ng-click='removeNote(note.note)' ) close
+          md-icon(md-font-icon='material-icons' ng-show='!task.completed' ng-click='removeNote(note.note)' ) close
           
     div(ng-show='!task.completed')
       textarea(ng-model='note')
-      md-button(ng-click='addNote(note)') Agregar
+      md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar
         
     md-button(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/collaborators')
       md-icon(md-font-icon='material-icons') group

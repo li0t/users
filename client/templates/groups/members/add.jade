@@ -16,16 +16,16 @@ md-content
       
     md-button.md-raised(ng-repeat='member in members.list')
       | {{ member.user.email }}
-      md-icon(md-font-icon='material-icons', ng-click='members.remove($index)') close
+      md-icon(md-font-icon='material-icons' ng-click='members.remove($index)') close
 
     md-input-container
+      label Agrega miembros
       md-select(
-        ng-change='members.add()',
-        ng-model='form.member'
-        placeholder='Agrega miembros')
+        ng-change='members.add()'
+        ng-model='form.member')
         
         md-option(
-          ng-repeat='contact in contacts',
+          ng-repeat='contact in contacts'
           value='{{ $index }}')
           | {{ contact.user.email }}
     
@@ -35,7 +35,8 @@ md-content
         | Cancelar
 
       md-button(
-        ng-disabled='!members.list.length',
+        ng-disabled='!members.list.length'
         ng-click='submit()')
+        
         | Listo
         md-icon(md-font-icon='material-icons') check

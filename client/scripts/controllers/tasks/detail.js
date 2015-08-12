@@ -16,6 +16,7 @@
 
         success(function(data) {
           $scope.task = data;
+          $scope.task.dateTime = data.dateTime && new Date(data.dateTime);
         }).
 
         error(function(data) {
@@ -56,6 +57,25 @@
         });
       };
 
+      $scope.addNote = function(note) {
+
+        $http.post('/api/tasks/notes/add-to/' + $routeParams.id, {
+          notes: [note]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error agregando la nota!');
+        }).
+
+        finally(function() {
+            $scope.note = null;
+        });
+      };
+
       $scope.removeNote = function(note) {
 
         $http.post('/api/tasks/notes/remove-from/' + $routeParams.id, { notes: [note] }).
@@ -70,10 +90,10 @@
         });
       };
 
-      $scope.addNote = function(note) {
+      $scope.editDateTime = function() {
 
-        $http.post('/api/tasks/notes/add-to/' + $routeParams.id, {
-          notes: [note]
+        $http.put('/api/tasks/' + $scope.task._id + '/date-time' , {
+          dateTime: $scope.task.dateTime
         }).
 
         success(function() {
@@ -81,7 +101,11 @@
         }).
 
         error(function() {
-          $session.flash('danger', 'Hubo un error agregando la nota!');
+          $session.flash('danger', 'Hubo un editando la tarea!');
+        }).
+
+        finally(function() {
+            $scope.dateTimeChanged = null;
         });
       };
 

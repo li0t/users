@@ -19,13 +19,13 @@ md-content
       md-icon(md-font-icon='material-icons', ng-click='collaborators.remove($index)') close
 
     md-input-container
+      label Agrega colaboradores
       md-select(
-        ng-change='collaborators.add()',
-        ng-model='form.collaborator'
-        placeholder='Agrega colaboradores')
+        ng-change='collaborators.add()'
+        ng-model='form.collaborator')
         
         md-option(
-          ng-repeat='member in members',
+          ng-repeat='member in members'
           value='{{ $index }}')
           | {{ member.user.email }}
     

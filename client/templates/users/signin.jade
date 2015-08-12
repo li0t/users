@@ -11,30 +11,28 @@ div.md-padding
         |  Datos de la cuenta
 
       form(
-        name='form',
-        role='form',
-        ng-submit='form.$valid && submit()',
+        ng-submit='form.$valid && submit()'
+        name='form'
+        role='form'
         novalidate)
         
         md-input-container.form-group
           span.input-group-addon
             md-icon(md-font-icon='material-icons')
- 
+          label Ingresa tu email
           input.form-control(
-            placeholder='Ingresa tu email',
-            ng-model='data.email',
-            type='email',
+            ng-model='data.email'
+            type='email'
             required)
 
         md-input-container.form-group
           span.input-group-addon
             md-icon(md-font-icon='material-icons') 
-
+          label Ingresa tu clave
           input.form-control(
-            placeholder='Ingresa tu clave',
-            ng-model='data.password',
-            ng-minlength='4',
-            type='password',
+            ng-model='data.password'
+            ng-minlength='4'
+            type='password'
             required)
             
         div(layout='row')
@@ -43,7 +41,7 @@ div.md-padding
           md-button(ng-href='/users/recover') Olvidé mi clave
           
           md-button(
-            ng-disabled='form.$invalid || submitting',
+            ng-disabled='form.$invalid || submitting'
             type='submit')
             
             md-icon(md-font-icon='material-icons')

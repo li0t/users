@@ -6,7 +6,6 @@
 
     function($scope, $http, $location, $session, $routeParams) {
       $scope.fetching = null;
-      $scope.members = null;
       $scope.task = null;
 
       $scope.fetch = function() {
@@ -16,24 +15,16 @@
 
         success(function(data) {
           $scope.task = data;
-
-          $http.get('/api/groups/members/of/' + $routeParams.id).
-
-          success(function(data) {
-            $scope.members = data;
-          }).
-
-          error(function(data) {
-            $location.path($routeParams.id +  '/tasks');
-            $session.flash('danger', data);
-          }).
-          finally(function() {
-            $scope.fetching = false;
-          });
+          $scope.task.dateTime = data.dateTime && new Date(data.dateTime);
         }).
+
         error(function(data) {
           $location.path($routeParams.id +  '/tasks');
           $session.flash('danger', data);
+        }).
+
+        finally(function() {
+          $scope.fetching = false;
         });
       };
 
@@ -53,6 +44,7 @@
       };
 
       $scope.reOpen = function() {
+
         $http.put('/api/tasks/re-open/' + $routeParams.task).
 
         success(function() {
@@ -62,6 +54,25 @@
 
         error(function() {
           $session.flash('danger', 'Hubo un error abriendo la tarea!');
+        });
+      };
+
+      $scope.addNote = function(note) {
+
+        $http.post('/api/tasks/notes/add-to/' + $routeParams.task, {
+          notes: [note]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error agregando la nota!');
+        }).
+
+        finally(function() {
+            $scope.note = null;
         });
       };
 
@@ -83,10 +94,10 @@
         });
       };
 
-      $scope.addNote = function(note) {
+      $scope.editDateTime = function() {
 
-        $http.post('/api/tasks/notes/add-to/' + $routeParams.task, {
-          notes: [note]
+        $http.put('/api/tasks/' + $routeParams.task + '/date-time' , {
+          dateTime: $scope.task.dateTime
         }).
 
         success(function() {
@@ -94,7 +105,11 @@
         }).
 
         error(function() {
-          $session.flash('danger', 'Hubo un error agregando la nota!');
+          $session.flash('danger', 'Hubo un editando la tarea!');
+        }).
+
+        finally(function() {
+            $scope.dateTimeChanged = null;
         });
       };
 

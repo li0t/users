@@ -8,34 +8,34 @@ md-content
       md-icon(md-font-icon='material-icons') chevron_left
     
   form(
-    ng-submit='form.$valid && submit()',
-    name='form',
-    role='form',
+    ng-submit='form.$valid && submit()'
+    name='form'
+    role='form'
     novalidate)
 
     md-input-container.form-group
+      label Titulo
       input.form-control(
-        placeholder='Titulo',
-        ng-model='data.title',
+        ng-model='data.title'
         required)
     
     md-input-container.form-group
+      label Contenido
       textarea.form-control(
-        placeholder='Contenido',
-        ng-model='data.content',
+        ng-model='data.content'
         required)
         
     md-autocomplete(
-      ng-disabled="isDisabled",
-      md-no-cache="noCache",
-      md-selected-item="selectedTag",
-      md-search-text-change="",
-      md-search-text="searchTag",
-      md-items="tag in tagSearch(searchTag)",
-      md-selected-item-change="",
-      md-item-text="tag.name",
-      md-min-length="0",
-      placeholder="Tags")
+      md-items="tag in tagSearch(searchTag)"
+      md-selected-item="selectedTag"
+      md-search-text="searchTag"
+      md-selected-item-change=""
+      md-search-text-change=""
+      ng-disabled="isDisabled"
+      md-item-text="tag.name"
+      md-no-cache="noCache"
+      placeholder="Tags"
+      md-min-length="0")
     
       md-item-template
         span.item-title
@@ -49,7 +49,8 @@ md-content
         | Cancelar
 
       md-button(
-        ng-disabled='form.$invalid',
+        ng-disabled='form.$invalid'
         type='submit')
         | Crear
+        
         md-icon(md-font-icon='material-icons') chevron_right

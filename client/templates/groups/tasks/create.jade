@@ -2,49 +2,55 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 {{ session.group.profile.name }} : TAREAS
 
-md-content
+md-content.md-padding
   div(layout='row')
     md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks')
       md-icon(md-font-icon='material-icons') chevron_left
 
   div(ng-show='!fetching && members')
     form(
-      ng-submit='form.$valid && submit()',
-      role='form',
+      ng-submit='form.$valid && submit()'
+      role='form'
       name='form')
 
       md-input-container.form-group
+        label Objetivo
         input.form-control(
-          placeholder='Objetivo',
-          ng-model='data.objective',
+          ng-model='data.objective'
           required)
 
       md-input-container.form-group
+        label Prioridad
         md-select.form-control(
           ng-model='data.priority'
-          placeholder='Prioridad'
           required)
           
           md-option(ng-repeat='priority in statics.priorities'
           ng-value='priority._id') {{ priority.name }}
-      
+          
+      md-input-container.form-group
+        label Fecha de Entrega
+        input.form-control(
+          ng-model='data.dateTime'
+          type='date')
+          
       div(layout='row')  
         h4 Collaboradores
           
-        md-button.md-raised(ng-repeat='collaborator in collaborators.list')
+        md-button.md-raised(ng-repeat='collaborator in collaborators.list' type='button')
           | {{ collaborator.user.email }}
-          md-icon(md-font-icon='material-icons', ng-click='collaborators.remove($index)') close
+          md-icon(md-font-icon='material-icons' ng-click='collaborators.remove($index)') close
       
       md-divider
       
       md-input-container
+        label Agrega colaboradores
         md-select(
-          ng-change='collaborators.add()',
-          ng-model='form.collaborator'
-          placeholder='Agrega colaboradores')
+          ng-change='collaborators.add()'
+          ng-model='form.collaborator')
           
           md-option(
-            ng-repeat='member in members',
+            ng-repeat='member in members'
             value='{{ $index }}')
             | {{ member.user.email }}
               

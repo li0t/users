@@ -5,8 +5,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
 md-content
   div.form-group(ng-show='!fetchingContacts && contacts')
     md-input-container
+      label Busca un Contacto
       input.form-control(
-        placeholder='Busca un Contacto',
         ng-model='searchContact',
         ng-change='resetFound()')
         

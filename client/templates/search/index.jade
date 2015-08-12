@@ -13,9 +13,8 @@ div.md-padding
         novalidate)
         
         md-input-container.form-group
-          md-icon(md-font-icon='material-icons') 
+          label Email
           input.form-control(
-            placeholder='email'
             ng-model='data.email'
             type='email'
             required)
@@ -23,7 +22,6 @@ div.md-padding
         md-button(ng-click='search()' ng-disabled='!form.$valid')
           md-icon(md-font-icon='material-icons')
           |  Buscar
-  
   
   md-button(ng-show='user') {{ user.email }}
 

@@ -12,14 +12,11 @@ form(
   novalidate)
 
   md-input-container.form-group
-    span.input-group-addon
-      md-icon(md-font-icon='material-icons') 
-
-      input.form-control(
-        placeholder='Ingrese su email',
-        ng-model='form.email',
-        type='email',
-        required)
+    label Ingrese su email
+    input.form-control(
+      ng-model='form.email'
+      type='email'
+      required)
 
   div(layout='row')
     md-button(ng-href='/')

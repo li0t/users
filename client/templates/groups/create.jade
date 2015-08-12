@@ -2,7 +2,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 GRUPOS
 
-md-content
+md-content.md-padding
   md-button.md-fab.md-warn(ng-href='/groups')
     md-icon(md-font-icon='material-icons') chevron_left  
   
@@ -14,36 +14,33 @@ md-content
     name='form')
 
     md-input-container.form-group
-        span.input-group-addon
-          md-icon(md-font-icon='material-icons') edit
-        input.form-control(
-          placeholder='Nombre del grupo',
-          ng-model='data.name',
-          required)
+      span.input-group-addon
+        md-icon(md-font-icon='material-icons') edit
+      label Nombre
+      input.form-control(
+        ng-model='data.name'
+        required)
               
-      div.form-group
-        h4 Miembros
-        
-        div.input-group(ng-repeat='member in members.list')
-          md-icon(md-font-icon='material-icons') person
-          | {{ member.user.profile.name || member.user.email }}
+    div.form-group(layout='row')
+      p Miembros
+      
+      md-button(ng-repeat='member in members.list' type='button')
+        md-icon(md-font-icon='material-icons') person
+        | {{ member.user.profile.name || member.user.email }}
+        md-icon(md-font-icon='material-icons' ng-click='members.remove($index)') remove_circle
           
-          md-button
-            md-icon(md-font-icon='material-icons' ng-click='members.remove($index)') remove_circle
+    md-divider
+      
+    md-input-container.form-group(ng-hide='members.list.length === posibleMembers.length')
+      label Selecciona un miembro
+      md-select.form-control(
+        ng-change='members.add()'
+        ng-model='form.member')
 
-        p(ng-hide='data.members.length') No has agregado miembros a este grupo.
-
-      md-input-container.form-group(ng-hide='members.list.length === posibleMembers.length')
-        div.input-group
-          md-select.form-control(
-            ng-change='members.add()'
-            ng-model='form.member'
-            placeholder="Selecciona un nuevo miembro")
-
-            md-option(
-              ng-repeat='member in posibleMembers',
-              value='{{ $index }}')
-              | {{ member.user.profile.name || member.user.email }}
+        md-option(
+          ng-repeat='member in posibleMembers'
+          value='{{ $index }}')
+          | {{ member.user.profile.name || member.user.email }}
 
     div(layout='row')
       md-button(ng-href='/groups')
@@ -51,7 +48,7 @@ md-content
         | Cancelar
 
       md-button(
-        ng-disabled='form.$invalid',
+        ng-disabled='form.$invalid'
         type='submit')
         | Crear
         md-icon(md-font-icon='material-icons') chevron_right

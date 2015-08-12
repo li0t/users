@@ -4,22 +4,22 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
 
 md-content
   div(layout='row')
-    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task}}/detail')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/detail')
       md-icon(md-font-icon='material-icons') chevron_left
        
-    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task}}/collaborators/add')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/collaborators/add' ng-show='!task.completed')
       md-icon(md-font-icon='material-icons') add
       
-  div(ng-show='fetching && !collaborators')        
+  div(ng-show='fetching && !task.collaborators')        
     md-icon(md-font-icon='material-icons') sync
     | Recopilando Informaciòn 
       
-  div(ng-show='!fetching && collaborators')
+  div(ng-show='!fetching && task.collaborators')
     h3 Collaboradores
     
-    h4(ng-show='!collaborators.length') No hay colaboradores
+    h4(ng-show='!task.collaborators.length') No hay colaboradores
     
-    md-button.md-raised(ng-repeat='collaborator in collaborators' ng-click='addOrRemove(collaborator.user._id)')
+    md-button.md-raised(ng-repeat='collaborator in task.collaborators' ng-click='addOrRemove(collaborator.user._id)')
       h4 {{ collaborator.user.profile.name || collaborator.user.email }}  
           
     md-button(ng-show='collaboratorsToRemove.length' ng-click='removeMembers()')

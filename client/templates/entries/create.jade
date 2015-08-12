@@ -10,27 +10,27 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
           novalidate)
 
           md-input-container.form-group
+            label Título
             input.form-control(
-              placeholder='Titulo',
-              ng-model='data.title',
+              ng-model='data.title'
               required)
           
           md-input-container.form-group
+            label Contenido
             textarea.form-control(
-              placeholder='Contenido',
-              ng-model='data.content',
+              ng-model='data.content'
               required)
               
           md-autocomplete(
-            ng-disabled="isDisabled",
-            md-no-cache="noCache",
-            md-selected-item="selectedTag",
-            md-search-text-change="",
-            md-search-text="searchTag",
-            md-items="tag in tagSearch(searchTag)",
-            md-selected-item-change="",
-            md-item-text="tag.name",
-            md-min-length="0",
+            ng-disabled="isDisabled"
+            md-no-cache="noCache"
+            md-selected-item="selectedTag"
+            md-search-text-change=""
+            md-search-text="searchTag"
+            md-items="tag in tagSearch(searchTag)"
+            md-selected-item-change=""
+            md-item-text="tag.name"
+            md-min-length="0"
             placeholder="Tags")
           
             md-item-template

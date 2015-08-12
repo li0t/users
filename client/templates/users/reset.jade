@@ -6,34 +6,32 @@ md-icon(md-font-icon='material-icons') edit
 |Crear nueva clave
 
 form(
-  ng-submit='form.$valid && submit()',
-  name='form',
-  role='form',
+  ng-submit='form.$valid && submit()'
+  name='form'
+  role='form'
   novalidate)
 
   div.panel-body
     md-input-container.form-group
       span.input-group-addon
         md-icon(md-font-icon='material-icons') 
-
-          input.form-control(
-            placeholder='Ingresa tu nueva clave',
-            ng-disabled='validating',
-            ng-model='form.password',
-            ng-minlength='4',
-            type='password',
-            required)
+      label Ingresa tu nueva clave
+      input.form-control(
+        ng-disabled='validating'
+        ng-model='form.password'
+        ng-minlength='4'
+        type='password'
+        required)
 
     md-input-container.form-group
       span.input-group-addon
         md-icon(md-font-icon='material-icons') 
-
+      label Confirma tu nueva clave
       input.form-control(
-        ng-disabled='form.password.length < 4 || validating',
-        placeholder='Confirma tu nueva clave',
-        ng-model='form.vpassword',
-        ng-minlength='4',
-        type='password',
+        ng-disabled='form.password.length < 4 || validating'
+        ng-model='form.vpassword'
+        ng-minlength='4'
+        type='password'
         required)
 
   div.panel-footer.text-right
@@ -45,7 +43,7 @@ form(
 
       div.col-sm-7
         md-button(
-          ng-disabled='form.$invalid || validating || form.password !== form.vpassword',
+          ng-disabled='form.$invalid || validating || form.password !== form.vpassword'
           type='submit')
 
           |Cambiar clave

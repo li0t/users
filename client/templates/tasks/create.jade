@@ -16,20 +16,26 @@ md-content
     name='form')
 
     md-input-container.form-group
+      label Objetivo
       input.form-control(
-        placeholder='Objetivo',
-        ng-model='data.objective',
+        ng-model='data.objective'
         required)
 
     md-input-container.form-group
+      label Prioridad
       md-select.form-control(
         ng-model='data.priority'
-        placeholder='Prioridad'
         required)
         
         md-option(ng-repeat='priority in statics.priorities'
         ng-value='priority._id') {{ priority.name }}
-            
+      
+    md-input-container.form-group
+      label Fecha de Entrega
+      input.form-control(
+        ng-model='data.dateTime'
+        type='date')
+              
     div(layout='row')
       md-button(ng-href='/tasks/collaborator')
         md-icon(md-font-icon='material-icons') chevron_left
