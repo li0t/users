@@ -10,7 +10,7 @@
 
       when('/groups/:id/entries/documents', {
         controller: 'Groups:Entries:Documents',
-        templateUrl: '/assets/templates/groups/entries/index/documents.html',
+        templateUrl: '/assets/templates/groups/entries/documents/index.html',
       }).
 
       when('/groups/:id/entries/documents/create', {

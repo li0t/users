@@ -11,7 +11,7 @@
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/entries/users/' + $session.user('_id')).
+        $http.get('/api/entries/of/user/' + $session.user('_id')).
 
         success(function(data) {
           $scope.entries = data;

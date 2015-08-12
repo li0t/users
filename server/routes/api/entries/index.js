@@ -4,6 +4,7 @@
 var debug = require('debug')('app:api:entries');
 
 var relations = component('relations');
+var gridfs = component('gridfs');
 
 module.exports = function(router, mongoose) {
 
@@ -74,27 +75,32 @@ module.exports = function(router, mongoose) {
       if (typeof req.body.tags === 'string') {
         req.body.tags = [req.body.tags];
       }
+
       req.body.tags.forEach(function(tag) {
+
         Tag.findOne().
         where('name', tag).
+
         exec(function(err, found) {
-            if (err) {
-              debug('Error! : %s', err);
-            } else if (found) {
-              debug('Tag found : %s', found.name);
-              onTagReady(found);
-            } else {
-              debug('Creating new Tag : %s', tag);
-              new Tag({ name: tag }).
-              save(function(err, newTag) {
-                if (err) {
-                  debug('Error! : %s', err);
-                } else {
-                  onTagReady(newTag);
-                }
-              });
-            }
-          });
+          if (err) {
+            debug('Error! : %s', err);
+          } else if (found) {
+            debug('Tag found : %s', found.name);
+            onTagReady(found);
+          } else {
+            debug('Creating new Tag : %s', tag);
+            new Tag({
+              name: tag
+            }).
+            save(function(err, newTag) {
+              if (err) {
+                debug('Error! : %s', err);
+              } else {
+                onTagReady(newTag);
+              }
+            });
+          }
+        });
       });
     }
 
@@ -131,106 +137,116 @@ module.exports = function(router, mongoose) {
 
     /** Get the group model */
     relations.membership(group, function(err, relation) {
-      if (!err && relation.group) {
 
-        if (relation.isMember(req.session.user._id)) {
+      if (err || !relation.group) {
+        debug('User %s is not part of group %s', req.session.user._id, group);
+        return res.sendStatus(403);
+      }
 
-          createEntry();
-
-        } else {
-          debug('User %s is not part of group %s', req.session.user._id, group);
-          res.sendStatus(403);
-        }
-      } else {
+      if (!relation.isMember(req.session.user._id)) {
         debug('Group %s not found', group);
-        res.sendStatus(404);
+        return res.sendStatus(404);
       }
+
+      createEntry();
+
     });
 
   });
 
   /**
-   * Get entries of a group
+   * Upload files of a type to an entry
    */
-  router.get('/of-group/:id', function(req, res, next) {
+  router.post('/:id/:type', function(req, res, next) {
 
-    var user = req.session.user._id;
-    var group = req.params.id;
+    var type = req.params.type;
+    var entry; /* This is the target schema */
+    var filesSaved = 0;
 
-    relations.membership(group, function(err, relation) {
-
-      if (!err && relation.group) {
-
-        if (relation.isMember(user)) {
-
-          Entry.find().
-
-          where('group', group).
-
-          populate('pictures'). /* Retrieves data from linked schemas */
-
-          sort('-created').
-
-          exec(function(err, entries) {
-            if (err) {
-              return next(err);
-            }
-
-            res.send(entries);
-
-          });
-        } else {
-          debug('User %s is not part of group %s', req.session.user._id, group);
-          res.sendStatus(403);
+    /**
+     * Save the document
+     */
+    function saveEntry() {
+      entry.save(function(err, entry) {
+        if (err) {
+          return next(err);
         }
-      } else {
-        debug('Group  %s was not found', group);
-        res.sendStatus(404);
+
+        debug('%s files saved to entry %s', filesSaved, entry._id);
+        res.send(filesSaved + ' files save to entry ' + entry._id);
+
+      });
+    }
+
+    /**
+     * Save files with gridfs and store de ids
+     */
+    function saveFiles() {
+
+      function onclose(fsFile) {
+        debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
+
+        entry[type].push(fsFile._id);
+
+        filesSaved += 1;
+
+        /* Check if all files were streamed to the database */
+        if (filesSaved === req.files.length) {
+          debug('All files saved');
+          saveEntry();
+        }
       }
-    });
 
-  });
+      function onerror(err) {
+        debug('Error streaming file!');
+        next(err);
+      }
 
-  /**
-   * Get entries with files of a group
-   */
-  router.get('/of-group/:id/with-files', function(req, res, next) {
+      req.files.forEach(function(file) {
+        debug('Saving %s', file.filename);
 
-    var user = req.session.user._id;
-    var group = req.params.id;
+        var writestream = gridfs.save(file.data, {
+          content_type: file.mimetype,
+          filename: file.filename,
+          mode: 'w'
+        });
+        writestream.on('close', onclose); /* The stream has finished */
+        writestream.on('error', onerror); /* Oops! */
+      });
+    }
 
-    relations.membership(group, function(err, relation) {
-      if (!err && relation.group) {
+    Entry.findById(req.params.id).
 
-        if (relation.isMember(user)) {
-
-          Entry.
-
-          find({
-            $where: 'this.pictures.length > 0'
-          }).
-
-          where('group', group).
-
-          populate('pictures'). /* Retrieves data from linked schemas */
-
-          sort('-created').
-
-          exec(function(err, entries) {
-            if (err) {
-             return next(err);
-            }
-
-            res.send(entries);
-
-          });
+    exec(function(err, data) {
+      if (err) {
+        if (err.name && err.name === 'CastError') {
+          res.sendStatus(400);
         } else {
-          debug('User %s is not part of group %s', req.session.user._id, group);
-          res.sendStatus(403);
+          next(err);
         }
-      } else {
-        debug('Group  %s was not found', group);
-        res.sendStatus(404);
+        return;
+      }
+
+      if (!data) {
+        debug('Entry %s was not found', req.params.id);
+        return res.sendStatus(404);
+      }
+
+      entry = data;
+
+      if (!entry[type]) {
+        debug('Type %s is not present in entries', req.params.type);
+        res.sendStatus(400);
+      }
+
+      if (JSON.stringify(entry.user) !== JSON.stringify(req.session.user._id)) {
+        return res.sendStatus(403);
+      }
+
+      if (req.files && req.files.length) { /* If there are any files, save them */
+        saveFiles();
+      } else { /* If not, just save the document */
+        saveEntry();
       }
     });
 
