@@ -1,12 +1,32 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 {{ session.group.profile.name }} : ENTRADAS
-
-md-content
-  div(layout='row')
-    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/entries/notes')
-      md-icon(md-font-icon='material-icons') chevron_left
+    h2 {{ session.group.profile.name }}   
     
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/profile')
+        md-icon(md-font-icon='material-icons') chevron_left
+        
+      md-button(ng-href='/groups/{{session.group._id}}/members')
+        md-icon(md-font-icon='material-icons') group
+        | Miembros
+        
+      md-button(ng-href='/groups/{{session.group._id}}/tasks')
+        md-icon(md-font-icon='material-icons') more
+        | Tareas  
+      
+      md-button(ng-href='/groups/{{session.group._id}}/entries/note')
+        md-icon(md-font-icon='material-icons') speaker_notes
+        | Notas
+        
+      md-button(ng-href='/groups/{{session.group._id}}/entries/document')
+        md-icon(md-font-icon='material-icons') developer_board
+        | Documentos  
+        
+      md-button(ng-href='/groups/{{session.group._id}}/entries/image')
+        md-icon(md-font-icon='material-icons') image
+        | Imágenes 
+        
+md-content.md-padding
   form(
     ng-submit='form.$valid && submit()'
     name='form'
@@ -14,43 +34,39 @@ md-content
     novalidate)
 
     md-input-container.form-group
-      label Titulo
+      label Agrega una descripción opcional...
       input.form-control(
-        ng-model='data.title'
-        required)
-    
-    md-input-container.form-group
-      label Contenido
-      textarea.form-control(
-        ng-model='data.content'
-        required)
+        ng-model='data.title')
         
-    md-autocomplete(
-      md-items="tag in tagSearch(searchTag)"
-      md-selected-item="selectedTag"
-      md-search-text="searchTag"
-      md-selected-item-change=""
-      md-search-text-change=""
-      ng-disabled="isDisabled"
-      md-item-text="tag.name"
-      md-no-cache="noCache"
-      placeholder="Tags"
-      md-min-length="0")
-    
-      md-item-template
-        span.item-title
-          md-icon(md-font-icon='material-icons') label
-          span {{tag.name}} 
-
-  
+    md-button(
+      ngf-accept='filesSupported'
+      ng-disabled='submitting'
+      ngf-multiple='false'
+      ng-model='files'
+      ngf-keep='true'
+      ngf-select)
+      
+      md-icon(md-font-icon='material-icons') file_upload
+      | examinar...     
+                          
     div(layout='row')
       md-button(ng-href='/groups/{{session.group._id}}/profile')
         md-icon(md-font-icon='material-icons') chevron_left
         | Cancelar
 
       md-button(
-        ng-disabled='form.$invalid'
+        ng-disabled='!files.length || form.$invalid'
         type='submit')
         | Crear
         
         md-icon(md-font-icon='material-icons') chevron_right
+        
+    div.form-group(ng-repeat='file in files')
+      md-icon(md-font-icon='material-icons') insert_drive_file
+      | {{ file.name }}
+      
+      md-button(
+        type='button'
+        ng-click='discard($index)'
+        ng-disabled='submitting')
+        md-icon(md-font-icon='material-icons') close

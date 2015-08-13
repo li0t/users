@@ -23,7 +23,7 @@
           $scope.hasTimer = false;
 
           var config = {
-            "entry": {
+            "note": {
               icon: "edit",
               color: "#f34235",
               span: 'Nueva Nota',
@@ -68,7 +68,7 @@
           };
           // Type to int helper for switch
           function typeToInt(type) {
-            if(type === 'entry'){
+            if(type === 'note'){
               return 0;
             } else if (type === 'document') {
               return 1;
@@ -98,13 +98,14 @@
             case 3:
               $scope.card.action = function(){
                 $scope.card.icon = 'mic';
-              }
+              };
+
               break;
             // Card is Task
             case 5:
               $scope.hasTimer = true;
               $scope.card.span = $scope.card.objective;
-              if($scope.card.hasOwnProperty('dateTime') && $scope.card.dateTime != null){
+              if($scope.card.hasOwnProperty('dateTime') && $scope.card.dateTime !== null) {
                   $scope.card.relevantDate = $scope.card.dateTime;
               }
               break;
@@ -116,7 +117,7 @@
           }
 
         }
-      }
+      };
     }
   ]);
 

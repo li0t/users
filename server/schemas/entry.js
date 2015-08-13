@@ -19,8 +19,7 @@ module.exports = function (Schema) {
     },
 
     title: {
-      type: String,
-      required: true
+      type: String
     },
 
     content: {
@@ -58,7 +57,7 @@ module.exports = function (Schema) {
 
   /** Declares Object type */
   EntrySchema.virtual('type').get(function () {
-    var type = 'entry';
+    var type = 'note';
 
     if (this.pictures.length > 0 && !this.content) {
       type = 'image';

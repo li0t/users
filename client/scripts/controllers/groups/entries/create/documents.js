@@ -5,8 +5,15 @@
     '$scope', '$http', '$location', '$session', 'Upload',
 
     function($scope, $http, $location, $session, $upload) {
+
+      $scope.files = [];
+
       $scope.data = {
         group: $session.get('group')._id
+      };
+
+      $scope.discard = function($index) {
+        $scope.files.splice($index, 1);
       };
 
       $scope.submit = function() {
@@ -32,8 +39,7 @@
           }).
 
           finally(function() {
-            $location.path('/groups/' + $session.get('group')._id + '/entries/documents');
-            $scope.submitting = false;
+            $location.path('/groups/' + $session.get('group')._id + '/entries/document');
           });
         }).
         error(function() {

@@ -6,7 +6,7 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      $scope.collaboratorsToRemove = null;
+      $scope.collaboratorsToRemove = [];
       $scope.task = $routeParams.task;
       $scope.fetching = null;
 
@@ -39,7 +39,7 @@
 
       $scope.addOrRemove = function(collaborator) {
 
-        var indexOf = $scope.task.collaboratorsToRemove.indexOf(collaborator);
+        var indexOf = $scope.collaboratorsToRemove.indexOf(collaborator);
 
         return (indexOf > -1) ?
           $scope.collaboratorsToRemove.splice(indexOf, 1):
@@ -49,8 +49,8 @@
 
       $scope.removeMembers = function() {
 
-        $http.post('/api/tasks/collaborators/remove-from/' + $routeParams.task, {
-          collaborators: $scope.task.collaboratorsToRemove
+        $http.post('/api/tasks/collaborators/remove/from/' + $routeParams.task, {
+          collaborators: $scope.collaboratorsToRemove
         }).
 
         success(function() {

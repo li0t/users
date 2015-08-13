@@ -4,7 +4,7 @@
   ng.module('App').controller('Groups:Entries:Detail', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
-    function($scope, $http, $location, $session, $routeParams) { 
+    function($scope, $http, $location, $session, $routeParams) {
 
       $scope.fetching = null;
       $scope.entry = null;

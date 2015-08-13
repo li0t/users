@@ -25,8 +25,8 @@
           $session.flash('danger', 'Hubo un error creando la entrada');
         }).
 
-        finally(function(){
-          $location.path('/groups/' + $session.get('group')._id + '/entries/notes');
+        finally(function() {
+          $location.path('/groups/' + $session.get('group')._id + '/entries/note');
         });
       };
 

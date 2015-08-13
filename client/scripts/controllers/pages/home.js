@@ -41,7 +41,7 @@
         'title': 'Partido de Futbol',
         'author': 'Don Pedro',
         'created' : '2015-05-22 17:28:33.208Z',
-        'type': 'entry'
+        'type': 'note'
       },
       {
         'title': 'Presentación Servicios',

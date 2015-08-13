@@ -5,8 +5,15 @@
     '$scope', '$http', '$location', '$session', 'Upload',
 
     function($scope, $http, $location, $session, $upload) {
+
+      $scope.files = [];
+
       $scope.data = {
         group: $session.get('group')._id
+      };
+
+      $scope.discard = function($index) {
+        $scope.files.splice($index, 1);
       };
 
       $scope.submit = function() {
@@ -19,22 +26,21 @@
         success(function(entry) {
 
           $upload.upload({
-              url: '/api/entries/' + entry + '/pictures',
-              file: $scope.files,
-            }).
+            url: '/api/entries/' + entry + '/pictures',
+            file: $scope.files,
+          }).
 
-            success(function () {
-              $session.flash('success', "Entrada Creada!");
-            }).
+          success(function() {
+            $session.flash('success', "Entrada Creada!");
+          }).
 
-            error(function () {
-              $session.flash('danger', "No crear la entrada");
-            }).
+          error(function() {
+            $session.flash('danger', "No crear la entrada");
+          }).
 
-            finally(function () {
-              $location.path('/groups/' + $session.get('group')._id + '/entries/images');
-              $scope.submitting = false;
-            });
+          finally(function() {
+            $location.path('/groups/' + $session.get('group')._id + '/entries/image');
+          });
         }).
         error(function() {
           $session.flash('danger', 'Hubo un error creando la entrada');

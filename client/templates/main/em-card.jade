@@ -1,6 +1,6 @@
 span(layout='column', layout-align='center center', style="color: #747474;")
   md-grid-tile-header(style="background: none; color: #747474;")
-    md-switch.md-primary(ng-if='hasTimer')
+    md-switch.md-primary(ng-if='hasTimer' aria-label='em-card-switch')
   div(layout='column', layout-align='center center', style='cursor: pointer;', ng-click='card.action()')
     md-icon.icon48(md-font-icon='material-icons', style="color: {{ card.color }};") {{ card.icon }}
     h4(style='text-align: center;')

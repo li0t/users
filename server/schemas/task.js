@@ -92,16 +92,16 @@ module.exports = function(Schema) {
   });
 
   /** Declares Object type */
-  TaskSchema.virtual('type').get(function () {
+  TaskSchema.virtual('type').get(function() {
     return 'task';
   });
 
   /** Check the date time is set in the future */
   TaskSchema.path('dateTime').validate(function(dateTime, cb) {
 
-    if (dateTime && dateTime <= new Date()) {
-      cb(false);
-    }
+      if (dateTime && dateTime !== this.dateTime && dateTime <= new Date()) {
+        cb(false);
+      }
 
     cb(true);
 
@@ -114,9 +114,9 @@ module.exports = function(Schema) {
 
     findById(priority).
 
-    exec(function(err, found){
+    exec(function(err, found) {
 
-      if(!err && found) {
+      if (!err && found) {
         cb(true);
 
       } else {
@@ -131,7 +131,7 @@ module.exports = function(Schema) {
   TaskSchema.plugin(deepPopulate, {
     populate: {
 
-      'notes' :{
+      'notes': {
         select: 'note added'
       },
 
