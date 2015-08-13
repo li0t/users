@@ -1,11 +1,14 @@
 span(layout='column', layout-align='center center', style="color: #747474;")
-  md-icon.icon48(md-font-icon='material-icons', style="color: {{ card.color }};") {{ card.icon }}
-  h4(style='text-align: center;')
-    span(style='text-transform: uppercase;')
-      | {{ card.span }}
-    br
-    span(style='font-size: small;')
-      | {{ card.created | fromNow}}
+  md-grid-tile-header(style="background: none; color: #747474;")
+    md-switch.md-primary(ng-if='hasTimer')
+  div(layout='column', layout-align='center center', style='cursor: pointer;', ng-click='card.action()')
+    md-icon.icon48(md-font-icon='material-icons', style="color: {{ card.color }};") {{ card.icon }}
+    h4(style='text-align: center;')
+      span(style='text-transform: uppercase;')
+        | {{ card.span }}
+      br
+      span(style='font-size: small;')
+        | {{ card.relevantDate | fromNow}}
 
 md-grid-tile-footer(layout-padding, layout-align='center center', style="background: none; color: #747474;")  
   p(style='font-size: small;') {{ card.type === "card" && card.title + " : " +  card.content || card.type === "group" && card.admin.email + " ha creado un nuevo grupo" || card.type == "task" && card.objective || card.author + " ha modificado una tarea" }}
