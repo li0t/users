@@ -23,7 +23,8 @@ var app = express();
 var server = http.createServer(app);
 
 /**** Components ****/
-var fileman = component('fileman');
+//var fileman = component('fileman');
+var multiParser = component('multiparse');
 var schemas = component('schemas');
 var statics = component('statics');
 var routes = component('routes');
@@ -78,13 +79,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-app.use(fileman.multiparser);
-//app.use(security.csrf(configs.security.csrf));
+//app.use(fileman.multiparser);
+app.use(multiParser()); /* Form multipart body parser */
+app.use(security.csrf(configs.security.csrf));
 app.use(security.csp(configs.security.csp));
 app.use(security.xframe(configs.security.xframe));
 app.use(security.hsts(configs.security.hsts));
 app.use(security.xssProtection(configs.security.xssProtection));
-app.use(fileman.uploadedFilesCleaner);
+//app.use(fileman.uploadedFilesCleaner);
 app.use(compression());
 
 /**** Initialization ****/
