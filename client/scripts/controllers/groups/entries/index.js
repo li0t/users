@@ -7,9 +7,10 @@
     function($scope, $http, $location, $session, $routeParams) {
 
       $scope.type = $routeParams.type;
-      $scope.limit = 0;
       $scope.fetching = null;
       $scope.entries = null;
+      $scope.limit = 0;
+      $scope.skip = 0;
 
       $scope.fetch = function() {
         $scope.fetching = true;
@@ -20,11 +21,15 @@
 
           /** If type is set, filter entries */
           $scope.entries =
-          (!$scope.type) ?
+            (!$scope.type) ?
             data :
             data.filter(function(entry) {
               return entry.type === $scope.type;
             });
+        }).
+
+        error(function() {
+          $session.flash('danger', "Hubo un error obteniendo las entradas");
         }).
 
         finally(function() {

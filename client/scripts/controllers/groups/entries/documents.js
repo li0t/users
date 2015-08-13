@@ -19,22 +19,22 @@
         success(function(entry) {
 
           $upload.upload({
-              url: '/api/entries/' + entry + '/documents',
-              file: $scope.files,
-            }).
+            url: '/api/entries/' + entry + '/documents',
+            file: $scope.files,
+          }).
 
-            success(function () {
-              $session.flash('success', "Entrada Creada!");
-            }).
+          success(function() {
+            $session.flash('success', "Entrada Creada!");
+          }).
 
-            error(function () {
-              $session.flash('danger', "No crear la entrada");
-            }).
+          error(function() {
+            $session.flash('danger', "No crear la entrada");
+          }).
 
-            finally(function () {
-              $location.path('/groups/' + $session.get('group')._id + '/entries/documents');
-              $scope.submitting = false;
-            });
+          finally(function() {
+            $location.path('/groups/' + $session.get('group')._id + '/entries/documents');
+            $scope.submitting = false;
+          });
         }).
         error(function() {
           $session.flash('danger', 'Hubo un error creando la entrada');

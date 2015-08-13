@@ -97,7 +97,8 @@ module.exports = function(router, mongoose) {
     var user = req.session.user._id;
     var group = req.params.id;
     var limit = req.query.limit;
-    
+    var skip = req.query.skip;
+
     relations.membership(group, function(err, relation) {
 
       if (err || !relation.group) {
@@ -115,6 +116,7 @@ module.exports = function(router, mongoose) {
       where('group', group).
 
       limit(limit).
+      skip(skip).
 
       populate('pictures documents').
 
