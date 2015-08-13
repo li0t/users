@@ -21,3 +21,10 @@ md-content
       md-icon(md-font-icon='material-icons') more
       | Tareas  
     
+    md-button(ng-href='/groups/{{session.group._id}}/entries/notes')
+      md-icon(md-font-icon='material-icons') speaker_notes
+      | Notas
+      
+    md-button(ng-href='/groups/{{session.group._id}}/entries/documents')
+      md-icon(md-font-icon='material-icons') developer_board
+      | Documentos  

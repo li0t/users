@@ -1,7 +1,7 @@
 (function(ng) {
   'use strict';
 
-  ng.module('App').controller('Groups:Entries:Detail', [
+  ng.module('App').controller('Groups:Entries:Notes:Detail', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
@@ -12,7 +12,7 @@
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/entries/' + $routeParams.entry).
+        $http.get('/api/entries/' + $routeParams.id).
 
         success(function(data) {
           $scope.entry = data;

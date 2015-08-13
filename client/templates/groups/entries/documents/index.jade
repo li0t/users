@@ -1,20 +1,15 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 {{ session.group.profile.name }} : ENTRADAS
+    h2 {{ session.group.profile.name }} : DOCUMENTOS
 
 md-content
   div(layout='row')
     md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/profile')
       md-icon(md-font-icon='material-icons') chevron_left
-      
-    md-button(ng-href='/groups/{{session.group._id}}/entries/notes')
-      md-icon(md-font-icon='material-icons')
-      | Notas
-      
-    md-button(ng-href='/groups/{{session.group._id}}/entries/documents')
-      md-icon(md-font-icon='material-icons')
-      | Documents
-        
+       
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/entries/documents/create')
+      md-icon(md-font-icon='material-icons') add
+  
   md-grid-list(
       md-gutter="12px" md-gutter-gt-sm="8px"
       md-cols="4"

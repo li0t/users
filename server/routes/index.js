@@ -18,10 +18,18 @@ module.exports = function(router) {
 
     /* Groups */
     '/groups', '/groups/create', '/groups/:id/profile',
+
+    /* Groups Members */
     '/groups/:id/members', '/groups/:id/members/add', '/groups/:id/members/remove',
-    '/groups/:id/entries', '/groups/:id/entries/create', '/groups/:id/entries/:entry/detail',  '/groups/:id/entries/remove/:entry',
-    '/groups/:id/tasks', '/groups/:id/tasks/:task/detail', '/groups/:id/tasks/:task/collaborators', '/groups/:id/tasks/:task/collaborators/add',
-    '/groups/:id/tasks/create',
+
+    /* Groups Entries */
+    '/groups/:id/entries', '/groups/:id/entries/create', '/groups/:id/entries/:entry/detail',
+    '/groups/:id/entries/notes', '/groups/:id/entries/notes/create', '/groups/:id/entries/notes/:note/detail',
+    '/groups/:id/entries/documents', '/groups/:id/entries/documents/create', '/groups/:id/entries/documents/:document/detail',
+
+    /* Groups Tasks */
+    '/groups/:id/tasks', '/groups/:id/tasks/:task/detail', '/groups/:id/tasks/:task/collaborators',
+    '/groups/:id/tasks/:task/collaborators/add', '/groups/:id/tasks/create',
 
     /* Entries */
     '/entries', '/entries/create', '/entries/remove', '/entries/:id/detail',

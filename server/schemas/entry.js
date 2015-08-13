@@ -14,7 +14,8 @@ module.exports = function (Schema) {
 
     group : {
       type: Schema.Types.ObjectId,
-      ref: 'group'
+      ref: 'group',
+      required: true
     },
 
     title: {
@@ -23,11 +24,15 @@ module.exports = function (Schema) {
     },
 
     content: {
-      type: String,
-      required: true
+      type: String
     },
 
     pictures: [{
+      type: Schema.Types.ObjectId,
+      ref: 'fs.file'
+    }],
+
+    documents: [{
       type: Schema.Types.ObjectId,
       ref: 'fs.file'
     }],
@@ -53,7 +58,16 @@ module.exports = function (Schema) {
 
   /** Declares Object type */
   EntrySchema.virtual('type').get(function () {
-    return 'entry';
+    var type = 'entry';
+
+    if (this.pictures.length > 0 && !this.content) {
+      type = 'image';
+    } else if (this.documents.length > 0) {
+      type = 'document';
+    }
+
+    return type;
+
   });
 
   /**  */
