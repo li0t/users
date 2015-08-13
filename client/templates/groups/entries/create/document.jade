@@ -1,0 +1,52 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 {{ session.group.profile.name }} : DOCUMENTOS
+
+md-content.md-padding
+  div(layout='row')
+    md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/entries/documents')
+      md-icon(md-font-icon='material-icons') chevron_left
+    
+  form(
+    ng-submit='form.$valid && submit()'
+    name='form'
+    role='form'
+    novalidate)
+
+    md-input-container.form-group
+      label Titulo
+      input.form-control(
+        ng-model='data.title'
+        required)
+        
+    md-button(
+      ngf-accept='filesSupported'
+      ng-disabled='submitting'
+      ngf-multiple='true'
+      ng-model='files'
+      ngf-keep='true'
+      ngf-select)
+      
+      md-icon(md-font-icon='material-icons') file_upload
+      | Agregar archivos                 
+                          
+    div(layout='row')
+      md-button(ng-href='/groups/{{session.group._id}}/profile')
+        md-icon(md-font-icon='material-icons') chevron_left
+        | Cancelar
+
+      md-button(
+        ng-disabled='!files.length || form.$invalid'
+        type='submit')
+        | Crear
+        
+        md-icon(md-font-icon='material-icons') chevron_right
+        
+    div.form-group(ng-repeat='file in files')
+      md-icon(md-font-icon='material-icons') insert_drive_file
+      | {{ file.name }}
+      
+      md-button(
+        ng-click='discard($index)'
+        ng-disabled='submitting')
+        md-icon(md-font-icon='material-icons') close

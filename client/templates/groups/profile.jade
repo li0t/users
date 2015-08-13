@@ -21,10 +21,14 @@ md-content
       md-icon(md-font-icon='material-icons') more
       | Tareas  
     
-    md-button(ng-href='/groups/{{session.group._id}}/entries/notes')
+    md-button(ng-href='/groups/{{session.group._id}}/entries/note')
       md-icon(md-font-icon='material-icons') speaker_notes
       | Notas
       
-    md-button(ng-href='/groups/{{session.group._id}}/entries/documents')
+    md-button(ng-href='/groups/{{session.group._id}}/entries/document')
       md-icon(md-font-icon='material-icons') developer_board
       | Documentos  
+      
+    md-button(ng-href='/groups/{{session.group._id}}/entries/image')
+      md-icon(md-font-icon='material-icons') image
+      | Imágenes 

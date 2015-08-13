@@ -8,7 +8,7 @@
 
       $routeProvider.
 
-      when('/entries', {
+      when('/entries/:type', {
         controller: 'Entries:Index',
         templateUrl: '/assets/templates/entries/index.html'
       }).
@@ -18,7 +18,7 @@
         templateUrl: '/assets/templates/entries/create.html'
       }).
 
-      when('/entries/:id/detail', {
+      when('/entries/:type/:id', {
         controller: 'Entries:Detail',
         templateUrl: '/assets/templates/entries/detail.html'
       });

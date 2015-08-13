@@ -47,10 +47,11 @@ module.exports = function(router, mongoose) {
     function saveEntry() {
       entry.save(function(err, entry) {
         if (err) {
-          next(err);
-        } else {
-          res.status(201).send(entry._id);
+          return next(err);
         }
+
+        res.status(201).send(entry._id);
+
       });
     }
 
