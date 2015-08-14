@@ -55,7 +55,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add collaborators to a task
    */
-  router.post('/add-to/:id', function(req, res, next) {
+  router.post('/add/to/:id', function(req, res, next) {
 
     var task = req.params.id;
     var inviter = req.session.user._id;
@@ -148,7 +148,7 @@ module.exports = function(router, mongoose) {
   /**
    * Remove collaborators from task
    */
-  router.post('/remove-from/:id', function(req, res, next) {
+  router.post('/remove/from/:id', function(req, res, next) {
 
     var removed = 0;
     var remover = req.session.user._id;
@@ -157,67 +157,66 @@ module.exports = function(router, mongoose) {
     var collaborator;
     var now = new Date();
 
-    if (collaborators && collaborators.length) {
+    if (!collaborators || !collaborators.length) {
+      return res.sendStatus(400);
+    }
 
-      /** Prevent a mistype error */
-      if (typeof collaborators === 'string') {
-        collaborators = [collaborators];
+    /** Prevent a mistype error */
+    if (typeof collaborators === 'string') {
+      collaborators = [collaborators];
+    }
+
+    relations.collaboration(task, function(err, relation) {
+
+      /** Check if task exists and is available for changes */
+      if (err || !relation.task) {
+        debug('Task %s was not found', req.params.id);
+        return res.sendStatus(404);
       }
 
-      relations.collaboration(task, function(err, relation) {
+      /** The task model */
+      task = relation.task;
 
-        /** Check if task exists and is available for changes */
-        if (!err && relation.task) {
+      if (task.completed) {
+        debug('Task %s is completed, no changes allowed', task._id);
+        return res.sendStatus(403);
+      }
 
-          task = relation.task; /** The task model */
+      relations.membership(task.group, function(err, taskGroup) {
 
-          if (!task.completed) {
-
-            relations.membership(task.group, function(err, taskGroup) {
-
-              if (!err && taskGroup.group && taskGroup.isMember(remover)) { /** Check if remover is part of the task group */
-
-                collaborators.forEach(function(_collaborator) {
-
-                  collaborator = relation.isCollaborator(_collaborator);
-
-                  if (collaborator) { /** Check if user is a task collaborator */
-
-                    removed += 1;
-                    debug('Collaborator %s removed from task %s', _collaborator, task._id);
-                    task.collaborators[collaborator.index].left.push(now); /** Add one left instance for task collaborator */
-
-                  } else {
-                    debug('User %s is not collaborator of task %s', _collaborator, task._id);
-                  }
-                });
-
-                task.save(function(err) {
-                  if (err) {
-                    return next(err);
-                  }
-
-                  debug('%s of %s collaborators removed from task %s', removed, collaborators.length, task._id);
-                  res.end();
-
-                });
-              } else {
-                debug('User %s is not part of task %s group', remover, task.group);
-                res.sendStatus(403);
-              }
-            });
-          } else {
-            debug('Task %s is completed, no changes allowed', task._id);
-            res.sendStatus(404);
-          }
-        } else {
-          debug('Task %s was not found', req.params.id);
-          res.sendStatus(403);
+        /** Check if remover is part of the task group */
+        if (err || !taskGroup.group || !taskGroup.isMember(remover)) {
+          debug('User %s is not part of task %s group', remover, task.group);
+          return res.sendStatus(403);
         }
+
+        collaborators.forEach(function(_collaborator) {
+
+          collaborator = relation.isCollaborator(_collaborator);
+
+          /** Check if user is a task collaborator */
+          if (collaborator) {
+
+            removed += 1;
+            debug('Collaborator %s removed from task %s', _collaborator, task._id);
+            task.collaborators[collaborator.index].left.push(now); /** Add one left instance for task collaborator */
+
+          } else {
+            debug('User %s is not collaborator of task %s', _collaborator, task._id);
+          }
+        });
+
+        task.save(function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          debug('%s of %s collaborators removed from task %s', removed, collaborators.length, task._id);
+          res.end();
+
+        });
       });
-    } else {
-      res.sendStatus(400);
-    }
+    });
 
   });
 

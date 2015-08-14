@@ -13,8 +13,9 @@ module.exports = function(router) {
     '/', '/search',
 
     /* Users */
-    '/users', '/users/:id/profile', '/users/signup', '/users/signin', '/users/recover', '/users/validate/:token', '/users/reset/:token',
-    '/users/invited/validate/:token',
+    '/users', '/users/:id/profile', '/users/signup',
+    '/users/signin', '/users/recover', '/users/validate/:token',
+    '/users/reset/:token', '/users/invited/validate/:token',
 
     /* Groups */
     '/groups', '/groups/create', '/groups/:id/profile',
@@ -23,16 +24,17 @@ module.exports = function(router) {
     '/groups/:id/members', '/groups/:id/members/add', '/groups/:id/members/remove',
 
     /* Groups Entries */
-    '/groups/:id/entries', '/groups/:id/entries/create', '/groups/:id/entries/:entry/detail',
-    '/groups/:id/entries/notes', '/groups/:id/entries/notes/create', '/groups/:id/entries/notes/:note/detail',
-    '/groups/:id/entries/documents', '/groups/:id/entries/documents/create', '/groups/:id/entries/documents/:document/detail',
+    '/groups/:id/entries', '/groups/:id/entries/:type',
+    '/groups/:id/entries/:entry/detail', '/groups/:id/entries/create/note',
+    '/groups/:id/entries/create/document', '/groups/:id/entries/create/image',
 
     /* Groups Tasks */
     '/groups/:id/tasks', '/groups/:id/tasks/:task/detail', '/groups/:id/tasks/:task/collaborators',
     '/groups/:id/tasks/:task/collaborators/add', '/groups/:id/tasks/create',
 
     /* Entries */
-    '/entries', '/entries/create', '/entries/remove', '/entries/:id/detail',
+    '/entries', '/entries/:type', '/entries/:id/detail',
+    '/entries/create/note', '/entries/create/document', '/entries/create/image',
 
     /* Tasks */
     '/tasks', '/tasks/collaborator', '/tasks/own', '/tasks/create', '/tasks/remove', '/tasks/:id/detail',

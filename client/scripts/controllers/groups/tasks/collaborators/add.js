@@ -8,7 +8,7 @@
 
       $scope.task = $routeParams.task;
       $scope.fetching = false;
-      
+
       $scope.data = {
         collaborators: []
       };
@@ -50,7 +50,7 @@
 
       $scope.submit = function() {
 
-        $http.post('/api/tasks/collaborators/add-to/' + $routeParams.task, $scope.data).
+        $http.post('/api/tasks/collaborators/add/to/' + $routeParams.task, $scope.data).
 
         success(function() {
           $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/collaborators');

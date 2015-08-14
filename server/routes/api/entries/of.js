@@ -92,10 +92,12 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of a group
    */
-  router.get('/group/:id', function(req, res, next) {
+  router.get('/group/:id*', function(req, res, next) {
 
     var user = req.session.user._id;
     var group = req.params.id;
+    var limit = req.query.limit;
+    var skip = req.query.skip;
 
     relations.membership(group, function(err, relation) {
 
@@ -112,6 +114,9 @@ module.exports = function(router, mongoose) {
       Entry.find().
 
       where('group', group).
+
+      limit(limit).
+      skip(skip).
 
       populate('pictures documents').
 

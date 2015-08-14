@@ -1,30 +1,41 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  div
-    h2 {{group.profile.name}}   
+  div(ng-show='!fetching && group')       
+    h2 {{ session.group.profile.name }}   
 
-md-content
-  md-button.md-fab.md-warn(ng-href='/groups')
-    md-icon(md-font-icon='material-icons') chevron_left
-  
-  div(ng-show='fetching && !group')        
-    md-icon(md-font-icon='material-icons') sync
-    | Recopilando información
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/groups')
+        md-icon(md-font-icon='material-icons') chevron_left
+        
+      md-button(ng-href='/groups/{{session.group._id}}/members')
+        md-icon(md-font-icon='material-icons') group
+        | Miembros
+        
+      md-button(ng-href='/groups/{{session.group._id}}/tasks')
+        md-icon(md-font-icon='material-icons') more
+        | Tareas  
       
-  div(layout='column' layout-align="center start" ng-show='!fetching && group') 
-    h3 
+      md-button(ng-href='/groups/{{session.group._id}}/entries/note')
+        md-icon(md-font-icon='material-icons') speaker_notes
+        | Notas
+        
+      md-button(ng-href='/groups/{{session.group._id}}/entries/document')
+        md-icon(md-font-icon='material-icons') developer_board
+        | Documentos  
+        
+      md-button(ng-href='/groups/{{session.group._id}}/entries/image')
+        md-icon(md-font-icon='material-icons') image
+        | Imágenes 
+      
+md-content.md-padding
+  md-grid-list(
+    md-gutter="12px" md-gutter-gt-sm="8px"
+    md-cols="4"
+    md-row-height="1:1")
     
-    md-button(ng-href='/groups/{{session.group._id}}/members')
-      md-icon(md-font-icon='material-icons') group
-      | Miembros
-      
-    md-button(ng-href='/groups/{{session.group._id}}/tasks')
-      md-icon(md-font-icon='material-icons') more
-      | Tareas  
-    
-    md-button(ng-href='/groups/{{session.group._id}}/entries/notes')
-      md-icon(md-font-icon='material-icons') speaker_notes
-      | Notas
-      
-    md-button(ng-href='/groups/{{session.group._id}}/entries/documents')
-      md-icon(md-font-icon='material-icons') developer_board
-      | Documentos  
+    md-grid-tile(
+      md-rowspan="1"
+      md-colspan="1"
+      ng-repeat='entry in entries'
+      ng-init='href = ("/groups/" + session.group._id + "/entries/{0}/detail" | format : entry._id)')
+        md-button(ng-href='{{ href }}' aria-label="entrada")
+        h3 {{ entry.title }}

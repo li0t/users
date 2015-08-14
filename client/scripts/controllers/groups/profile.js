@@ -5,8 +5,11 @@
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
+
       $scope.fetching = null;
       $scope.group = null;
+      $scope.limit = 10;
+      $scope.skip = 0;
 
       $scope.fetchGroup = function() {
         $scope.fetching = true;
@@ -16,10 +19,23 @@
         success(function(data) {
           $scope.group = data;
           $session.set('group', data);
-        }).
 
-        finally(function() {
-          $scope.fetching = false;
+          $http.get('/api/entries/of/group/' + $session.get('group')._id + '?limit=' + $scope.limit + '&skip=' + $scope.skip).
+
+          success(function(data) {
+            $scope.entries = data;
+          }).
+
+          error(function() {
+            $session.flash('danger', "Hubo un error obteniendo las entradas");
+          }).
+
+          finally(function() {
+            $scope.fetching = false;
+          });
+        }).
+        error(function() {
+          $session.flash('danger', "Hubo un error la información del grupo");
         });
       };
 

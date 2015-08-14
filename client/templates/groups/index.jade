@@ -33,15 +33,15 @@ md-content(layout='column' layout-align="center start")
         ng-init='href = ("/groups/{0}/profile" | format : group._id)')
         
         td 
-          md-button.md-fab(ng-href='{{ href }}')
+          md-button.md-fab(ng-href='{{ href }}' aria-label="grupo")
         
         td
-          md-button(ng-href='{{ href }}') {{ group.profile.name }}
+          md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.profile.name }}
 
         td
-          md-button(ng-href='{{ href }}') {{ group.admin.profile.name || group.admin.email }}
+          md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.admin.profile.name || group.admin.email }}
             
         td
-          md-button(ng-href='{{ href }}') {{ group.updated | toLocal }}
+          md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.updated | toLocal }}
 
         
