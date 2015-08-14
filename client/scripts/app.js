@@ -6,6 +6,7 @@
     'ngRoute',
     'ngMaterial',
     'ngFileUpload',
+    'timer',
 
     /** Modules */
     'Moment',
