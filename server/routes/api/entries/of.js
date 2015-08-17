@@ -102,13 +102,13 @@ module.exports = function(router, mongoose) {
     relations.membership(group, function(err, relation) {
 
       if (err || !relation.group) {
-        debug('User %s is not part of group %s', req.session.user._id, group);
-        return res.sendStatus(403);
+        debug('Group  %s was not found', group);
+        return res.sendStatus(404);
       }
 
       if (!relation.isMember(user)) {
-        debug('Group  %s was not found', group);
-        return res.sendStatus(404);
+        debug('User %s is not part of group %s', req.session.user._id, group);
+        return res.sendStatus(403);
       }
 
       Entry.find().

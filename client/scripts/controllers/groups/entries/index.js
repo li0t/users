@@ -4,7 +4,7 @@
   ng.module('App').controller('Groups:Entries', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
-    function($scope, $http, $location, $session, $routeParams) {
+    function($scope, $http, $location, $session, $routeParams) { /** TODO: add watch to reduce server calls */
 
       $scope.type = $routeParams.type;
       $scope.fetching = null;

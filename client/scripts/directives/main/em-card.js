@@ -24,7 +24,7 @@
           // Card actions variables
           $scope.hasTimer = false;
 
-          var config = {
+          var config = { /**  TODO: Member card **/
             "note": {
               icon: "edit",
               color: "#f34235",
@@ -86,7 +86,7 @@
               return 6;
             }
           }
-
+          
           $scope.card.icon = config[$scope.card.type].icon;
           $scope.card.color = config[$scope.card.type].color;
           $scope.card.span = config[$scope.card.type].span;

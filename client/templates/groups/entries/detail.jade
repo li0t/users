@@ -1,28 +1,29 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 EMEETER
-      
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/groups/{{session.group._id}}/entries')
-      i.fa.fa-mr.fa-users
-      | Volver al grupo
-          
-  div.panel-body.text-center(ng-show='fetching && !entry')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
-      
-  div.panel-body.text-center(ng-show='!fetching && entry')
-    h3 {{entry.title}}
-    p {{entry.content}}
+    h2 {{ session.group.profile.name }}   
     
-    div.row(ng-show='entry.tags.length')
-      p Tags:
-    
-    div.row
-      div.col-sm-4(ng-repeat='tag in entry.tags', ng-show='entry.tags.length')
-        p {{ tag }}
-              
-    div.row
-      div.col-sm-4(ng-repeat='picture in entry.pictures', ng-show='entry.pictures.length', ng-init='href = ("/api/files/{0}" | format : picture._id)')
-        img(src='{{ href }}', style="max-heigth: 200px; max-width:200px;")
+    div(layout='row' )
+      md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/profile')
+        md-icon(md-font-icon='material-icons') chevron_left
+        
+      md-button(ng-href='/groups/{{session.group._id}}/members')
+        md-icon(md-font-icon='material-icons') group
+        | Miembros
+        
+      md-button(ng-href='/groups/{{session.group._id}}/tasks')
+        md-icon(md-font-icon='material-icons') more
+        | Tareas  
+      
+      md-button(ng-href='/groups/{{session.group._id}}/entries/note')
+        md-icon(md-font-icon='material-icons') speaker_notes
+        | Notas
+        
+      md-button(ng-href='/groups/{{session.group._id}}/entries/document')
+        md-icon(md-font-icon='material-icons') developer_board
+        | Documentos  
+        
+      md-button(ng-href='/groups/{{session.group._id}}/entries/image')
+        md-icon(md-font-icon='material-icons') image
+        | Imágenes 
+        
+md-content.md-padding(ng-show='!fetching && entry')

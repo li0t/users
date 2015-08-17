@@ -13,7 +13,7 @@
         templateUrl: '/assets/templates/groups/entries/index.html',
       }).
 
-      when('/groups/:id/entries/:id/detail', {
+      when('/groups/:id/entries/:entry/detail', {
         controller: 'Groups:Entries:Detail',
         templateUrl: '/assets/templates/groups/entries/detail.html',
       }).

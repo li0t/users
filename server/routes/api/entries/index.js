@@ -253,4 +253,52 @@ module.exports = function(router, mongoose) {
 
   });
 
+  /**
+   * Get an entry
+   */
+  router.get('/:id', function(req, res, next) {
+
+    var user = req.session.user._id;
+
+    Entry.findById(req.params.id).
+
+    populate('pictures documents').
+
+    exec(function(err, entry) {
+      if (err) {
+        return next(err);
+      }
+
+      relations.membership(entry.group, function(err, membership) {
+
+        if (err || !membership.group) {
+          debug('Group %s was not found', membership.group);
+          return res.sendStatus(404);
+        }
+
+        if (membership.isMember(user)) {
+          res.send(entry);
+
+        } else {
+
+          relations.contact(entry.user, function(err, relation) {
+
+            if (err || !relation.contact) {
+              return res.sendStatus(400);
+            }
+
+            if (!relation.isContact(user)) {
+              debug('User %s is not part of group %s and is not contact of entry creator', req.session.user._id, membership.group, entry.user);
+              return res.sendStatus(403);
+            }
+
+            res.send(entry);
+
+          });
+        }
+      });
+    });
+
+  });
+
 };
