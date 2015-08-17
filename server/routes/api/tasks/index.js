@@ -18,6 +18,7 @@ module.exports = function(router, mongoose) {
     Task.find().
 
     where('creator', req.session.user._id).
+    where('collaborators.user').ne(req.session.user._id).
     where('deleted', null).
 
     deepPopulate('group.profile creator.profile collaborators entries priority').
