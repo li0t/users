@@ -40,8 +40,18 @@ module.exports = function(router, mongoose) {
               /** Remove it from the array and reallocate index */
               tasks.splice(i, 1);
               i -= 1;
-              break;
+
+              /* Check if user is currently working on task */
+            } else {
+
+              tasks[i] = tasks[i].toObject();
+              tasks[i].isCollaborator = true;
+
+              if (tasks[i].collaborators[j].workedTimes.length % 2 !== 0) {
+                tasks[i].isWorking = true;
+              }
             }
+            break;
           }
         }
       }
@@ -81,6 +91,7 @@ module.exports = function(router, mongoose) {
             if (!found[i].collaborators[j].left.length || (found[i].collaborators[j].joined.length > found[i].collaborators[j].left.length)) {
 
               if (found[i].collaborators[j].workedTimes.length % 2 !== 0) {
+
                 tasks.push(found[i]._id);
 
               }
@@ -99,7 +110,7 @@ module.exports = function(router, mongoose) {
   /**
    * Add collaborators to a task
    */
-  router.post('/add/to/:id', function(req, res, next) {
+  router.post('/add-to/:id', function(req, res, next) {
 
     var task = req.params.id;
     var inviter = req.session.user._id;
@@ -187,7 +198,7 @@ module.exports = function(router, mongoose) {
   /**
    * Remove collaborators from task
    */
-  router.post('/remove/from/:id', function(req, res, next) {
+  router.post('/remove-from/:id', function(req, res, next) {
 
     var removed = 0;
     var remover = req.session.user._id;

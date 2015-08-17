@@ -88,6 +88,11 @@ module.exports = function(Schema) {
     virtuals: true
   });
 
+  /** Show virtuals on JSON conversion */
+  TaskSchema.set('toObject', {
+    virtuals: true
+  });
+
   /** Task creation time */
   TaskSchema.virtual('created').get(function() {
     return this._id.getTimestamp();
