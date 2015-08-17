@@ -4,7 +4,7 @@
   ng.module('App').controller('Pages:Home', [
     '$scope', '$http', '$location', '$session', '$timeout',
 
-    function($scope, $http, $location, $session, $timeout ) {
+    function($scope, $http, $location, $session, $timeout) {
       $scope.fetching = false;
       $scope.entries = [];
 
@@ -28,31 +28,27 @@
       var meetings = [{
         'title': 'Reunión inicial',
         'author': 'Egbert Dool',
-        'created' : '2015-07-10 17:28:33.208Z',
+        'created': '2015-07-10 17:28:33.208Z',
         'type': 'audio'
-      },
-      {
+      }, {
         'title': 'Junta de amigos',
         'author': 'Champion amigo',
-        'created' : '2015-03-22 17:28:33.208Z',
+        'created': '2015-03-22 17:28:33.208Z',
         'type': 'document'
-      },
-      {
+      }, {
         'title': 'Partido de Futbol',
         'author': 'Don Pedro',
-        'created' : '2015-05-22 17:28:33.208Z',
+        'created': '2015-05-22 17:28:33.208Z',
         'type': 'note'
-      },
-      {
+      }, {
         'title': 'Presentación Servicios',
         'author': 'Amateru Caupolican',
-        'created' : '2015-07-12 17:28:33.208Z',
+        'created': '2015-07-12 17:28:33.208Z',
         'type': 'image'
-      },
-      {
+      }, {
         'title': 'Estado financiero',
         'author': 'Lucas Cofre',
-        'created' : '2015-09-22 17:28:33.208Z',
+        'created': '2015-09-22 17:28:33.208Z',
         'type': 'meeting'
       }];
 
@@ -75,46 +71,40 @@
       }
 
       $scope.loadEntries = function() {
-        var entry;
-        var i = 1;
 
         $scope.fetching = true;
 
         $http.get('/api/entries').
 
         success(function(data) {
-          for (i = 0; i < data.length; i++) {
-            entry = data[i];
-            $scope.entries.push(entry);
-          }
+
+          $scope.entries = $scope.entries.concat(data);
 
           $http.get('/api/groups').
 
           success(function(data) {
-            for (i = 0; i < data.length; i++) {
-              entry = data[i];
-              $scope.entries.push(entry);
-            }
+
+            $scope.entries = $scope.entries.concat(data);
 
             $http.get('/api/tasks').
 
             success(function(data) {
-              for (i = 0; i < data.length; i++) {
-                entry = data[i];
-                $scope.entries.push(entry);
-              }
 
-              /** MOCK DATA */
-              for (i = 0; i < meetings.length; i++) {
-                entry = meetings[i];
-                $scope.entries.push(entry);
-              }
+              $scope.entries = $scope.entries.concat(data);
 
-            }).
+              $http.get('/api/tasks/collaborators/me').
 
-            finally(function() {
-              $scope.fetching = false;
-              $scope.entries = shuffle($scope.entries);
+              success(function(data) {
+
+                $scope.entries = $scope.entries.concat(data);
+                $scope.entries = $scope.entries.concat(meetings);
+
+              }).
+
+              finally(function() {
+                $scope.fetching = false;
+                $scope.entries = shuffle($scope.entries);
+              });
             });
           });
         });

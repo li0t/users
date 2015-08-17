@@ -3,7 +3,7 @@ span(layout='column', layout-align='center center', style="color: #747474;")
     md-switch.md-primary(
       ng-change='toogleWorking(card._id)'
       aria-label='em-card-switch'
-      ng-model='isWorking'
+      ng-model='card.isWorking'
       ng-if='hasTimer')
     
   div(layout='column', layout-align='center center', style='cursor: pointer;', ng-click='card.action()')
@@ -13,7 +13,7 @@ span(layout='column', layout-align='center center', style="color: #747474;")
         | {{ card.span }}
       br
       span(style='font-size: small;')
-        | {{ card.relevantDate | fromNow }}
+        | {{ card.relevantDate && (card.relevantDate | fromNow) }}
 
 md-grid-tile-footer(layout-padding, layout-align='center center', style="background: none; color: #747474;")  
   p(style='font-size: small;') {{ card.type === "card" && card.title + " : " +  card.content || card.type === "group" && card.admin.email + " ha creado un nuevo grupo" || card.type == "task" && card.objective || card.author + " ha modificado una tarea" }}

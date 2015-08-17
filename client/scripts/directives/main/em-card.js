@@ -1,17 +1,17 @@
 /**
-* Main Sidebar Directive.
-*
-* @type AngularJS Directive.
-*/
+ * Main Sidebar Directive.
+ *
+ * @type AngularJS Directive.
+ */
 
-(function (ng) {
+(function(ng) {
   'use strict';
 
   ng.module('App').directive('emCard', [
 
     '$http',
 
-    function ($http) {
+    function($http) {
 
       return {
         scope: {
@@ -19,7 +19,7 @@
         },
         restrict: 'E',
         templateUrl: '/assets/templates/main/em-card.html',
-        link: function ($scope, $element, $attrs) {
+        link: function($scope, $element, $attrs) {
 
           // Card actions variables
           $scope.hasTimer = false;
@@ -93,34 +93,38 @@
           $scope.card.background = config[$scope.card.type].background;
           $scope.card.relevantDate = $scope.card.created;
 
-
-
           // Setup configuration for card
-          switch(typeToInt($scope.card.type)) {
+          switch (typeToInt($scope.card.type)) {
             case 3:
               $scope.card.action = function() {
-                $scope.card.icon = ($scope.card.icon === 'mic') ? 'mic_none' :  'mic';
+                $scope.card.icon = ($scope.card.icon === 'mic') ? 'mic_none' : 'mic';
               };
 
               break;
-            // Card is Task
+              // Card is Task
             case 5:
 
-              $scope.hasTimer = !$scope.card.completed;
-              $scope.toogleWorking = function (task) {
+              if ($scope.card.isCollaborator) {
 
-                $http.put('/api/tasks/' + task + '/worked-time').
-                error(function() {
-                  console.log('Hubo un con la tarea');
-                });
+                $scope.card.isWorking = !!$scope.card.isWorking;
+                $scope.hasTimer = !$scope.card.completed;
 
-              };
-              $scope.card.span = $scope.card.objective;
-              if($scope.card.hasOwnProperty('dateTime') && $scope.card.dateTime !== null) {
-                  $scope.card.relevantDate = $scope.card.dateTime;
+                $scope.toogleWorking = function(task) {
+
+                  $http.put('/api/tasks/' + task + '/worked-time').
+
+                  error(function() {
+                    console.log('Hubo un error con la tarea');
+                  });
+
+                };
               }
+
+              $scope.card.span = $scope.card.objective;
+              $scope.card.relevantDate = $scope.card.dateTime;
+
               break;
-            // Card is Meeting
+              // Card is Meeting
             case 6:
               $scope.hasTimer = true;
               $scope.card.span = $scope.card.title;
