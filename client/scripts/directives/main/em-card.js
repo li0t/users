@@ -9,7 +9,9 @@
 
   ng.module('App').directive('emCard', [
 
-    function () {
+    '$http',
+
+    function ($http) {
 
       return {
         scope: {
@@ -68,15 +70,15 @@
           };
           // Type to int helper for switch
           function typeToInt(type) {
-            if(type === 'note'){
+            if (type === 'note') {
               return 0;
             } else if (type === 'document') {
               return 1;
-            } else if (type === 'image'){
+            } else if (type === 'image') {
               return 2;
             } else if (type === 'audio') {
               return 3;
-            } else if (type === 'group'){
+            } else if (type === 'group') {
               return 4;
             } else if (type === 'task') {
               return 5;
@@ -94,16 +96,25 @@
 
 
           // Setup configuration for card
-          switch(typeToInt($scope.card.type)){
+          switch(typeToInt($scope.card.type)) {
             case 3:
-              $scope.card.action = function(){
-                $scope.card.icon = 'mic';
+              $scope.card.action = function() {
+                $scope.card.icon = ($scope.card.icon === 'mic') ? 'mic_none' :  'mic';
               };
 
               break;
             // Card is Task
             case 5:
-              $scope.hasTimer = true;
+
+              $scope.hasTimer = !$scope.card.completed;
+              $scope.toogleWorking = function (task) {
+
+                $http.put('/api/tasks/' + task + '/worked-time').
+                error(function() {
+                  console.log('Hubo un con la tarea');
+                });
+
+              };
               $scope.card.span = $scope.card.objective;
               if($scope.card.hasOwnProperty('dateTime') && $scope.card.dateTime !== null) {
                   $scope.card.relevantDate = $scope.card.dateTime;

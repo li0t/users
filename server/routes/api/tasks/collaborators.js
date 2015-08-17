@@ -53,6 +53,50 @@ module.exports = function(router, mongoose) {
   });
 
   /**
+   * Get tasks where session user is currently working
+   */
+  router.get('/me/working', function(req, res, next) {
+
+    var user = req.session.user._id;
+    var tasks = [];
+    var i, j;
+
+    Task.find().
+
+    where('collaborators.user', user).
+    where('completed', null).
+    where('deleted', null).
+
+    exec(function(err, found) {
+      if (err) {
+        return next(err);
+      }
+
+      for (i = 0; i < found.length; i++) {
+
+        for (j = 0; j < found[i].collaborators.length; j++) {
+
+          if (JSON.stringify(found[i].collaborators[j].user) === JSON.stringify(user)) {
+
+            if (!found[i].collaborators[j].left.length || (found[i].collaborators[j].joined.length > found[i].collaborators[j].left.length)) {
+
+              if (found[i].collaborators[j].workedTimes.length % 2 !== 0) {
+                tasks.push(found[i]._id);
+
+              }
+            }
+            break;
+          }
+        }
+      }
+
+      res.send(tasks);
+
+    });
+
+  });
+
+  /**
    * Add collaborators to a task
    */
   router.post('/add/to/:id', function(req, res, next) {
