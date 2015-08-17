@@ -64,84 +64,79 @@ module.exports = function(router, mongoose) {
     var now = new Date();
     var wasCollaborator;
 
-    if (collaborators && collaborators.length) {
+    if (!collaborators || !collaborators.length) {
+      return res.sendStatus(400);
+    }
+    /** Prevent a mistype error */
+    if (typeof collaborators === 'string') {
+      collaborators = [collaborators];
+    }
 
-      /** Prevent a mistype error */
-      if (typeof collaborators === 'string') {
-        collaborators = [collaborators];
+    relations.collaboration(task, function(err, relation) {
+
+      /** Check if task exists and is available for changes */
+      if (err || !relation.task) {
+        debug('Task %s was not found', req.params.id);
+        return res.sendStatus(404);
       }
 
-      relations.collaboration(task, function(err, relation) {
+      task = relation.task; /** The task model */
 
-        /** Check if task exists and is available for changes */
-        if (!err && relation.task) {
+      if (task.completed) {
+        debug('Task %s is completed, no changes allowed', task._id);
+        return res.sendStatus(403);
+      }
 
-          task = relation.task; /** The task model */
+      relations.membership(task.group, function(err, taskGroup) {
 
-          if (!task.completed) {
-
-            relations.membership(task.group, function(err, taskGroup) {
-
-              if (!err && taskGroup.group && taskGroup.isMember(inviter)) {
-
-                collaborators.forEach(function(collaborator) {
-
-                  if (taskGroup.isMember(collaborator)) {
-
-                    if (!relation.isCollaborator(collaborator)) {
-
-                      wasCollaborator = relation.wasCollaborator(collaborator);
-
-                      if (!wasCollaborator) {
-
-                        debug('New collaborator %s added to task %s', collaborator, task._id);
-                        task.collaborators.push({
-                          user: collaborator,
-                          joined: [now]
-                        });
-                        saved += 1;
-
-                      } else {
-
-                        debug('Collaborator %s re-joined task %s', collaborator, task._id);
-                        task.collaborators[wasCollaborator.index].joined.push(now);
-                        saved += 1;
-
-                      }
-                    } else {
-                      debug('User %s is already collaborating in task %s', collaborator, task._id);
-                    }
-                  } else {
-                    debug('Users %s and %s are not in the same group', inviter, collaborator);
-                  }
-                });
-
-                task.save(function(err) {
-                  if (err) {
-                    return next(err);
-                  }
-
-                  debug('%s of %s new collaborators added to task %s', saved, collaborators.length, task._id);
-                  res.end();
-
-                });
-              } else {
-                debug('User is not part of task group %s', inviter, task.group);
-                res.sendStatus(403);
-              }
-            });
-          } else {
-            debug('Task %s is completed, no changes allowed', task._id);
-            res.sendStatus(403);
-          }
-        } else {
-          debug('Task %s was not found', req.params.id);
-          res.sendStatus(404);
+        if (err || !taskGroup.group || !taskGroup.isMember(inviter)) {
+          debug('User is not part of task group %s', inviter, task.group);
+          return res.sendStatus(403);
         }
+
+        collaborators.forEach(function(collaborator) {
+
+          if (taskGroup.isMember(collaborator)) {
+
+            if (!relation.isCollaborator(collaborator)) {
+
+              wasCollaborator = relation.wasCollaborator(collaborator);
+
+              if (!wasCollaborator) {
+
+                debug('New collaborator %s added to task %s', collaborator, task._id);
+                task.collaborators.push({
+                  user: collaborator,
+                  joined: [now]
+                });
+                saved += 1;
+
+              } else {
+
+                debug('Collaborator %s re-joined task %s', collaborator, task._id);
+                task.collaborators[wasCollaborator.index].joined.push(now);
+                saved += 1;
+
+              }
+            } else {
+              debug('User %s is already collaborating in task %s', collaborator, task._id);
+            }
+          } else {
+            debug('Users %s and %s are not in the same group', inviter, collaborator);
+          }
+        });
+
+        task.save(function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          debug('%s of %s new collaborators added to task %s', saved, collaborators.length, task._id);
+          res.end();
+
+        });
       });
-    } else {
-      res.sendStatus(400);
-    }
+    });
 
   });
 

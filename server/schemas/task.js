@@ -41,6 +41,8 @@ module.exports = function(Schema) {
         ref: 'user'
       },
 
+      workedTimes: [Date],
+
       joined: [Date],
 
       left: [Date]
