@@ -1,0 +1,23 @@
+md-button(ng-href='/groups/{{session.group._id}}/members')
+  md-icon(md-font-icon='material-icons') group
+  | Miembros
+  
+md-button(ng-href='/groups/{{session.group._id}}/entries/document')
+  md-icon(md-font-icon='material-icons') developer_board
+  | .Doc  
+  
+md-button(ng-href='/groups/{{session.group._id}}/entries/note')
+  md-icon(md-font-icon='material-icons') speaker_notes
+  | Notas
+    
+md-button(ng-href='/groups/{{session.group._id}}/tasks')
+  md-icon(md-font-icon='material-icons') more
+  | Tareas  
+
+md-button(ng-href='/groups/{{session.group._id}}/entries/image')
+  md-icon(md-font-icon='material-icons') image
+  | Imagen
+  
+md-button(ng-href='/groups/{{session.group._id}}/entries/audio')
+  md-icon(md-font-icon='material-icons') mic
+  | Audio 
