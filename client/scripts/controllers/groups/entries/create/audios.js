@@ -18,7 +18,7 @@
       };
 
       $scope.submit = function() {
-        $scope.fetching = true;
+        $scope.submitting = true;
 
         $scope.data.group = $session.get('group')._id;
 
@@ -40,6 +40,7 @@
           }).
 
           finally(function() {
+            $scope.submitting = false;
             $location.path('/groups/' + $session.get('group')._id + '/entries/audio');
           });
         }).
