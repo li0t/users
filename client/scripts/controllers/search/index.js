@@ -6,35 +6,34 @@
 
     function($scope, $http, $location, $session) {
 
-      $scope.user = null;
+      $scope.keywords = null;
+      $scope.limit = 0;
+      $scope.skip = 0;
 
       $scope.search = function() {
+        $scope.searching = true;
 
-        $http.post('/api/search/email', $scope.data).
+        var
+          limit = 'limit=' + $scope.limit + '&',
+          skip = 'skip=' + $scope.skip + '&',
+          keywords = 'keywords=' + $scope.keywords;
 
-        success(function(user) {
-          $scope.user = user;
+        var query = '/api/entries/like?' + limit + skip + keywords;
+
+        $http.get(query).
+
+        success(function(entries) {
+          console.log(entries);
+          $scope.entries = entries;
         }).
 
-        error(function(data, status) {
-          if (status === 404) {
-            if (confirm('Usuario no encontrado, desea invitarlo a emeeter?')) {
+        error(function(error) {
+          console.log(error);
+        }).
 
-              $http.post('/api/users/invited', $scope.data).
-
-              success(function() {
-                $location.path('/');
-                $session.flash('success', 'Usuario invitado');
-              }).
-
-              error(function(data) {
-                $session.flash('warning', data);
-              });
-            }
-          }
-          $session.flash('warning', data);
+        finally(function() {
+          $scope.searching = false;
         });
-
       };
 
     }

@@ -50,6 +50,9 @@ module.exports = function (Schema) {
 
   });
 
+  /** Index string fields */
+  EntrySchema.index({ '$**': 'text' });
+
   /** Show virtuals on JSON conversion */
   EntrySchema.set('toJSON', {
     virtuals: true
