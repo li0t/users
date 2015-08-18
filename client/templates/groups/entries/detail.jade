@@ -11,15 +11,11 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
 md-content.md-padding(ng-show='!fetching && entry')
   md-input-container
     input(readonly aria-label='entry-title') 
-    | {{ entry.title && entry.title || "Sin título" }}
+    | Titulo : {{ entry.title && entry.title || "Sin título" }}
   
   md-input-container
-    input(readonly aria-label='entry-user') 
-    | {{ entry.user.email }}
-    
-  md-input-container
     input(readonly aria-label='entry-group') 
-    | {{ entry.group.profile && entry.group.profile.name }}
+    | Grupo:  {{ entry.group.profile && entry.group.profile.name }}
         
   div(ng-if='entry.type == "image"')
     div(ng-repeat='pic in entry.pictures')
@@ -27,11 +23,13 @@ md-content.md-padding(ng-show='!fetching && entry')
       
   div(ng-if='entry.type == "document"')
     div(ng-repeat='doc in entry.documents')
-      iframe(ng-src='{{"api/files/" + doc._id }}' alt='{{doc.filename}}' style='max-height: 800px; max-width:600px;')
+      iframe(ng-src='{{"api/files/" + doc._id }}' alt='{{doc.filename}}' height='1000px' width='1000px')
   
   div(ng-if='entry.type == "audio"')
     div(ng-repeat='audio in entry.audios')
-      audio(ng-src='{{"api/files/" + audio._id }}' alt='{{audio.filename}}')
-  
+      audio(ng-src='{{"api/files/" + audio._id }}' alt='{{audio.filename}}' controls)
+        p Tu navegador no soporta el elemento audio.
+      
   div(ng-if='entry.type == "note"')
     p {{ entry.content }}
+  

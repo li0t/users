@@ -24,6 +24,10 @@ md-content.md-padding
     div.form-group(layout='row')
       p Miembros
       
+      md-button(type='button')
+        md-icon(md-font-icon='material-icons') person
+        | {{ session.user.profile.name || session.user.email }}
+        
       md-button(ng-repeat='member in members.list' type='button')
         md-icon(md-font-icon='material-icons') person
         | {{ member.user.profile.name || member.user.email }}
