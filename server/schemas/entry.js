@@ -36,6 +36,11 @@ module.exports = function (Schema) {
       ref: 'fs.file'
     }],
 
+    audios: [{
+      type: Schema.Types.ObjectId,
+      ref: 'fs.file'
+    }],
+
     tags: [String],
 
     updated: {
@@ -63,6 +68,8 @@ module.exports = function (Schema) {
       type = 'image';
     } else if (this.documents.length > 0) {
       type = 'document';
+    } else if (this.audios.length > 0) {
+      type = 'audio';
     }
 
     return type;

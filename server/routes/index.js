@@ -13,34 +13,61 @@ module.exports = function(router) {
     '/', '/search',
 
     /* Users */
-    '/users', '/users/:id/profile', '/users/signup',
-    '/users/signin', '/users/recover', '/users/validate/:token',
-    '/users/reset/:token', '/users/invited/validate/:token',
+    '/users',
+    '/users/signin',
+    '/users/signup',
+    '/users/recover',
+    '/users/:id/profile',
+    '/users/reset/:token',
+    '/users/validate/:token',
+    '/users/invited/validate/:token',
 
     /* Groups */
-    '/groups', '/groups/create', '/groups/:id/profile',
+    '/groups',
+    '/groups/create',
+    '/groups/:id/profile',
 
     /* Groups Members */
-    '/groups/:id/members', '/groups/:id/members/add', '/groups/:id/members/remove',
+    '/groups/:id/members',
+    '/groups/:id/members/add',
+    '/groups/:id/members/remove',
 
     /* Groups Entries */
-    '/groups/:id/entries', '/groups/:id/entries/:type',
-    '/groups/:id/entries/:entry/detail', '/groups/:id/entries/create/note',
-    '/groups/:id/entries/create/document', '/groups/:id/entries/create/image',
+    '/groups/:id/entries',
+    '/groups/:id/entries/:type',
+    '/groups/:id/entries/create/note',
+    '/groups/:id/entries/create/image',
+    '/groups/:id/entries/create/audio',
+    '/groups/:id/entries/create/document',
+    '/groups/:id/entries/:entry/detail',
 
     /* Groups Tasks */
-    '/groups/:id/tasks', '/groups/:id/tasks/:task/detail', '/groups/:id/tasks/:task/collaborators',
-    '/groups/:id/tasks/:task/collaborators/add', '/groups/:id/tasks/create',
+    '/groups/:id/tasks',
+    '/groups/:id/tasks/create',
+    '/groups/:id/tasks/:task/detail',
+    '/groups/:id/tasks/:task/collaborators',
+    '/groups/:id/tasks/:task/collaborators/add',
 
     /* Entries */
-    '/entries', '/entries/:type', '/entries/:id/detail',
-    '/entries/create/note', '/entries/create/document', '/entries/create/image',
+    '/entries',
+    '/entries/:type',
+    '/entries/:id/detail',
+    '/entries/create/note',
+    '/entries/create/image',
+    '/entries/create/document',
 
     /* Tasks */
-    '/tasks', '/tasks/collaborator', '/tasks/own', '/tasks/create', '/tasks/remove', '/tasks/:id/detail',
+    '/tasks',
+    '/tasks/own',
+    '/tasks/create',
+    '/tasks/remove',
+    '/tasks/:id/detail',
+    '/tasks/collaborator',
 
     /* Contacts */
-    '/contacts', '/contacts/add/:id', '/contacts/remove/:id',
+    '/contacts',
+    '/contacts/add/:id',
+    '/contacts/remove/:id',
 
     /* Meetings */
     '/meetings',

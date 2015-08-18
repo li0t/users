@@ -262,7 +262,7 @@ module.exports = function(router, mongoose) {
 
     Entry.findById(req.params.id).
 
-    deepPopulate('user.profile group.profile pictures documents').
+    deepPopulate('user.profile group.profile pictures documents audios').
 
     exec(function(err, entry) {
       if (err) {

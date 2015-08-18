@@ -31,7 +31,7 @@ module.exports = function(router, mongoose) {
 
       where('user', user).
 
-      populate('pictures documents').
+      populate('pictures documents audios').
 
       sort('-created').
 
@@ -118,7 +118,7 @@ module.exports = function(router, mongoose) {
       limit(limit).
       skip(skip).
 
-      populate('pictures documents').
+      populate('pictures documents audios').
 
       sort('-created').
 

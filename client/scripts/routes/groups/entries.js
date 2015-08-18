@@ -31,6 +31,11 @@
       when('/groups/:id/entries/create/image', {
         controller: 'Groups:Entries:Images',
         templateUrl: '/assets/templates/groups/entries/create/image.html',
+      }).
+
+      when('/groups/:id/entries/create/audio', {
+        controller: 'Groups:Entries:Audios',
+        templateUrl: '/assets/templates/groups/entries/create/audio.html',
       });
 
     }
