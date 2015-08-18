@@ -27,3 +27,26 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
         | Imágenes 
         
 md-content.md-padding(ng-show='!fetching && entry')
+  md-input-container
+    input(readonly aria-label='entry-title') 
+    | {{ entry.title && entry.title || "Sin título" }}
+  
+  md-input-container
+    input(readonly aria-label='entry-user') 
+    | {{ entry.user.email }}
+    
+  md-input-container
+    input(readonly aria-label='entry-group') 
+    | {{ entry.group.profile && entry.group.profile.name }}
+        
+  div(ng-if='entry.type == "image"')
+    div(ng-repeat='pic in entry.pictures')
+      img(ng-src='{{"api/files/" + pic._id }}' alt='{{pic.filename}}' style='max-height: 400px; max-width:400px;')
+      
+  div(ng-if='entry.type == "document"')
+    div(ng-repeat='doc in entry.documents')
+      img(ng-src='{{"api/files/" + doc._id }}' alt='{{doc.filename}}' style='max-height: 400px; max-width:400px;')
+      
+  div(ng-if='entry.type == "note"')
+    p {{ entry.content }}
+  

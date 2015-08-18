@@ -6,6 +6,7 @@
 
     function($scope, $http, $location, $session, $upload) {
 
+      $scope.filesSupported = 'image/*';
       $scope.files = [];
 
       $scope.data = {

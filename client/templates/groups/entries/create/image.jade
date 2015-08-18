@@ -41,13 +41,12 @@ md-content.md-padding
     md-button(
       ngf-accept='filesSupported'
       ng-disabled='submitting'
-      ngf-multiple='false'
+      ngf-multiple='true'
       ng-model='files'
       ngf-keep='true'
       ngf-select)
       
-      md-icon(md-font-icon='material-icons') file_upload
-      | examinar...     
+      md-icon(md-font-icon='material-icons') image
                           
     div(layout='row')
       md-button(ng-href='/groups/{{session.group._id}}/profile')

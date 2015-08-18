@@ -49,7 +49,7 @@
 
       $scope.removeMembers = function() {
 
-        $http.post('/api/tasks/collaborators/remove/from/' + $routeParams.task, {
+        $http.post('/api/tasks/collaborators/remove-from/' + $routeParams.task, {
           collaborators: $scope.collaboratorsToRemove
         }).
 

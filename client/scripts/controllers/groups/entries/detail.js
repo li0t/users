@@ -16,6 +16,7 @@
 
         success(function(data) {
           $scope.entry = data;
+          console.log(data);
         }).
 
         finally(function() {
