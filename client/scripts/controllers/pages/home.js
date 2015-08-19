@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Pages:Home', [
-    '$scope', '$http', '$location', '$session', '$timeout',
+    '$scope', '$http', '$location', '$session', '$timeout', '$emCard',
 
-    function($scope, $http, $location, $session, $timeout) {
+    function($scope, $http, $location, $session, $timeout, $emCard) {
       $scope.fetching = false;
       $scope.entries = [];
 
@@ -24,7 +24,7 @@
         'title': 'Medir perímetro',
         'description': 'Blah blah vlad...'
       }];
-
+/*
       var meetings = [{
         'title': 'Reunión inicial',
         'author': 'Egbert Dool',
@@ -51,8 +51,7 @@
         'created': '2015-09-22 17:28:33.208Z',
         'type': 'meeting'
       }];
-
-
+*/
       /* Shuffle an array, Based on Fisher–Yates shuffle algorithm */
       function shuffle(a) {
         var n = a.length;
@@ -97,7 +96,7 @@
               success(function(data) {
 
                 $scope.entries = $scope.entries.concat(data);
-                $scope.entries = $scope.entries.concat(meetings);
+                //$scope.entries = $scope.entries.concat(meetings);
 
               }).
 

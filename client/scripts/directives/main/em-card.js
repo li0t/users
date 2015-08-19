@@ -1,26 +1,28 @@
 /**
- * Main Sidebar Directive.
- *
- * @type AngularJS Directive.
- */
+* emCard Directive.
+*
+* @type AngularJS Directive.
+*/
 
 (function(ng) {
   'use strict';
 
   ng.module('App').directive('emCard', [
 
-    '$http',
+    '$http', '$mdSidenav', '$emCard',
 
-    function($http) {
+    function($http, $mdSidenav, $emCard) {
 
       return {
         scope: {
           card: '='
         },
-        restrict: 'E',
-        templateUrl: '/assets/templates/main/em-card.html',
-        link: function($scope, $element, $attrs) {
 
+        restrict: 'E',
+
+        templateUrl: '/assets/templates/main/em-card.html',
+
+        link: function($scope, $element, $attrs) {
           // Card actions variables
           $scope.hasTimer = false;
 
@@ -44,7 +46,7 @@
               background: 'yellow'
             },
             "audio": {
-              icon: "mic_none",
+              icon: "mic",
               color: "#00bbd3",
               span: 'Nuevo Audio',
               background: 'yellow'
@@ -86,50 +88,51 @@
               return 6;
             }
           }
-          
+
+          // Cards basic configuration, will be override when needed
           $scope.card.icon = config[$scope.card.type].icon;
           $scope.card.color = config[$scope.card.type].color;
           $scope.card.span = config[$scope.card.type].span;
           $scope.card.background = config[$scope.card.type].background;
           $scope.card.relevantDate = $scope.card.created;
 
-          // Setup configuration for card
+          // Specific configuration for each card
           switch (typeToInt($scope.card.type)) {
-            case 3:
-              $scope.card.action = function() {
-                $scope.card.icon = ($scope.card.icon === 'mic') ? 'mic_none' : 'mic';
-              };
 
-              break;
-              // Card is Task
             case 5:
+            // Card is Task
+            if ($scope.card.isCollaborator) {
 
-              if ($scope.card.isCollaborator) {
+              $scope.card.isWorking = !!$scope.card.isWorking;
+              $scope.hasTimer = !$scope.card.completed;
 
-                $scope.card.isWorking = !!$scope.card.isWorking;
-                $scope.hasTimer = !$scope.card.completed;
+              $scope.toogleWorking = function(task) {
 
-                $scope.toogleWorking = function(task) {
+                $http.put('/api/tasks/' + task + '/worked-time').
 
-                  $http.put('/api/tasks/' + task + '/worked-time').
+                error(function() {
+                  console.log('Hubo un error con la tarea');
+                });
 
-                  error(function() {
-                    console.log('Hubo un error con la tarea');
-                  });
+              };
+            }
 
-                };
-              }
+            $scope.card.span = $scope.card.objective;
+            $scope.card.relevantDate = $scope.card.dateTime;
 
-              $scope.card.span = $scope.card.objective;
-              $scope.card.relevantDate = $scope.card.dateTime;
+            break;
 
-              break;
-              // Card is Meeting
             case 6:
-              $scope.hasTimer = true;
-              $scope.card.span = $scope.card.title;
-              break;
+            // Card is Meeting
+            $scope.hasTimer = true;
+            $scope.card.span = $scope.card.title;
+            break;
           }
+          
+          $scope.card.action = function() {
+            $emCard.setCard($scope.card);
+            $emCard.showDetailsBar(true);
+          };
 
         }
       };

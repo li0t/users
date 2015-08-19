@@ -20,9 +20,9 @@
   constant('DOMAIN', 'https://github.com/finaldevstudio/fi-seed').
 
   run([
-    '$rootScope', '$http', '$session', '$location', 'APP_NAME', 'YEAR', 'DOMAIN',
+    '$rootScope', '$http', '$session', '$location', 'APP_NAME', 'YEAR', 'DOMAIN', '$emCard',
 
-    function($rootScope, $http, $session, $location, APP_NAME, YEAR, DOMAIN) {
+    function($rootScope, $http, $session, $location, APP_NAME, YEAR, DOMAIN, $emCard) {
       /* Constants set */
       $rootScope.APP_NAME = APP_NAME;
       $rootScope.DOMAIN = DOMAIN;
@@ -94,6 +94,12 @@
           }
         });
       };
+      
+      //Add watcher to details sidebar
+      $rootScope.$watch( function () { return $emCard.showDetails }, function (data) {
+        $rootScope.showDetails = data;
+      }, true);
+
     }
   ]);
 
