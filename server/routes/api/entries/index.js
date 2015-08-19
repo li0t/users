@@ -51,6 +51,8 @@ module.exports = function(router, mongoose) {
     skip(skip).
     limit(limit).
 
+    populate('group').
+
     exec(function(err, entries) {
       if (err) {
         return next(err);

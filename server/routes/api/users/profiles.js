@@ -13,7 +13,7 @@ module.exports = function(router, mongoose) {
    */
   router.put('/', function(req, res, next) {
 
-    Profile.findById(req.session.user.profile, function(err, profile) {
+    Profile.findById(req.session.user.profile._id, function(err, profile) {
       if (err) {
         return next(err);
       }

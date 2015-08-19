@@ -9,7 +9,7 @@ md-toolbar.lightBlue
   md-button(ng-show='session.user' ng-click='$navigateTo("/")')  
     md-icon.icon48(md-font-icon='material-icons') account_circle
 
-  md-button(ng-show='session.user' ng-click='$navigateTo("/")') 
+  md-button(ng-show='session.user' ng-click='$navigateTo("/users/" + session.user._id + "/profile")') 
     | {{ session.user.email }}
     md-icon(md-font-icon='material-icons') arrow_drop_down
   

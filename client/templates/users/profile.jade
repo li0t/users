@@ -1,20 +1,33 @@
-.panel.panel-default
-  .panel-heading
-    h3.panel-title
-      | Bienvenido
-  
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/groups')
-    i.fa.fa-mr.fa-users
-    | Grupos
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 Tu Perfil
     
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/contacts')
-    i.fa.fa-mr.fa-user-plus
-    | Contactos
+    div(layout='row' )
+      md-button.md-fab.md-warn(ng-href='/')
+        md-icon(md-font-icon='material-icons') chevron_left
+        
+md-content.md-padding(ng-show='!fetching && user')
+  form(ng-submit='submit()')
+    md-input-container
+      label Email
+      input(ng-model='user.email' aria-label='user-email' readonly)
+      
+    md-input-container
+      label Nombre
+      input(ng-model='user.profile.name' aria-label='user-name')
     
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/tasks/collaborator')
-    i.fa.fa-mr.fa-tasks
-    | Tareas
+    md-input-container
+      label Género
+      md-select(ng-model='user.profile.gender')
+        md-option(
+          ng-repeat='gender in statics.genders'
+          ng-value='gender._id')
+          | {{ gender.name }}
+          
+    md-input-container
+      label Fecha de Nacimiento
+      input.form-control(
+        ng-model='user.profile.birthdate'
+        type='date')
     
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/entries')
-    i.fa.fa-mr.fa-th-large
-    | Entradas
+    md-button(ng-disabled='submitting') Editar

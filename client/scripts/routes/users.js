@@ -40,12 +40,22 @@
 
       when('/users/reset/:token', {
         controller: 'Users:Reset',
-        templateUrl: '/assets/templates/users/reset.html'
+        templateUrl: '/assets/templates/users/reset.html',
+
       }).
 
       when('/users/:id/profile', {
         controller: 'Users:Profile',
-        templateUrl: '/assets/templates/users/profile.html'
+        templateUrl: '/assets/templates/users/profile.html',
+        resolve: {
+          statics: [
+            '$statics',
+
+            function($statics) {
+              return $statics.get('genders');
+            }
+          ]
+        }
       }).
 
       when('/users/invited/validate/:token', {
