@@ -33,7 +33,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get entries of session user
+   * Get entries by keywords
    */
   router.get('/like*', function(req, res, next) {
 

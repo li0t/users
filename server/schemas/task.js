@@ -83,6 +83,9 @@ module.exports = function(Schema) {
 
   });
 
+  /** Index string fields */
+  TaskSchema.index({ '$**': 'text' });
+
   /** Show virtuals on JSON conversion */
   TaskSchema.set('toJSON', {
     virtuals: true
