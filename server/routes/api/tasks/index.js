@@ -50,6 +50,35 @@ module.exports = function(router, mongoose) {
   });
 
   /**
+   * Get tasks by keywords
+   */
+  router.get('/like*', function(req, res, next) {
+
+    var keywords = req.query.keywords;
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    var score = { score: { $meta: "textScore" }};
+    var find = { $text: { $search: keywords }};
+
+    Task.find(find, score).
+
+    sort('created').
+    sort(score).
+
+    skip(skip).
+    limit(limit).
+
+    exec(function(err, tasks) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(tasks);
+
+    });
+  });
+
+  /**
    * Create a new task
    */
   router.post('/', function(req, res, next) {

@@ -1,28 +1,36 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
-    h2 EMEETER
+  div
+    h2 Buscar
     
-div.md-padding
-  h2.md-title Buscar
-  div(layout="row", layout-margin)
-    div(flex)
-      form(
-        name='form',
-        role='form',
-        ng-submit='form.$valid && submit()',
-        novalidate)
-        
-        md-input-container.form-group
-          label Email
-          input.form-control(
-            ng-model='data.email'
-            type='email'
-            required)
-
-        md-button(ng-click='search()' ng-disabled='!form.$valid')
-          md-icon(md-font-icon='material-icons')
-          |  Buscar
+    md-button(ng-href='/search')
+      md-icon(md-font-icon='material-icons') more
+      | Entradas
   
-  md-button(ng-show='user') {{ user.email }}
-
-            
+    md-button(ng-href='/contacts')
+      md-icon(md-font-icon='material-icons') group
+      | Personas
+      
+md-content.md-padding
+  form(ng-submit='search()')
+    md-input-container
+      label Palabras Clave
+      input(ng-model='keywords' required)
+    
+    md-button(ng-disabled='!keywords || searching' type='submit')
+      md-icon(md-font-icon='material-icons' ) search
+    
+  md-grid-list(
+    ng-show='entries',
+    md-gutter="12px",
+    md-gutter-gt-sm="8px",
+    md-cols-sm="1",
+    md-cols-md="2",
+    md-cols-gt-lg="4",
+    md-row-height="1:1")
+    md-grid-tile.whitebg(
+      layout='column',
+      ng-repeat='entry in entries',
+      md-rowspan='1',
+      md-colspan='1')
+      em-card(card='entry' ng-click='$navigateTo("/groups/" + entry.group + "/entries/" + entry._id + "/detail")')
+    

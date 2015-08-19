@@ -38,7 +38,7 @@ md-content.md-padding
         | Cancelar
 
       md-button(
-        ng-disabled='!files.length || form.$invalid'
+        ng-disabled='!files.length || form.$invalid || submitting'
         type='submit')
         | Crear
         

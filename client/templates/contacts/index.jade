@@ -1,8 +1,16 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 CONTACTOS
+    h2 Contactos
+    
+    md-button(ng-href='/search')
+      md-icon(md-font-icon='material-icons') more
+      | Entradas
+      
+    md-button(ng-href='/contacts')
+      md-icon(md-font-icon='material-icons') group
+      | Personas
   
-md-content
+md-content.md-padding
   div.form-group(ng-show='!fetchingContacts && contacts')
     md-input-container
       label Busca un Contacto
