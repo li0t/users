@@ -78,7 +78,7 @@ module.exports = function(router, mongoose) {
 
         debug('Saved %s file with id %s', fsFile.filename, fsFile._id);
 
-        profile.pictures.push(fsFile._id);
+        profile.pictures.unshift(fsFile._id);
 
         saved += 1;
 
@@ -108,7 +108,8 @@ module.exports = function(router, mongoose) {
       });
     }
 
-    Profile.findById(req.session.user.profile, function(err, data) {
+    Profile.findById(req.session.user.profile._id).
+    exec(function(err, data) {
       if (err) {
         return next(err);
       }
@@ -126,6 +127,45 @@ module.exports = function(router, mongoose) {
       } else {
         res.sendStatus(404);
       }
+    });
+
+  });
+
+  /**
+   * Choose main profile picture
+   */
+  router.put('/pictures/:id', function(req, res, next) {
+
+    var picture = req.params.id;
+    var index;
+
+    Profile.findById(req.session.user.profile._id).
+    exec(function(err, profile) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!profile) {
+        return res.sendStatus(404);
+      }
+
+      index = profile.pictures.indexOf(picture);
+
+      if (index < 0) {
+        return res.sendStatus(400);
+      }
+
+      profile.pictures[index] = profile.pictures[0];
+      profile.pictures[0] = picture;
+
+      profile.save(function(err) {
+        if (err) {
+          return next(err);
+        }
+
+        res.sendStatus(204);
+
+      });
     });
 
   });

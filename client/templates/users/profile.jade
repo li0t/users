@@ -6,28 +6,66 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       md-button.md-fab.md-warn(ng-href='/')
         md-icon(md-font-icon='material-icons') chevron_left
         
-md-content.md-padding(ng-show='!fetching && user')
-  form(ng-submit='submit()')
-    md-input-container
-      label Email
-      input(ng-model='user.email' aria-label='user-email' readonly)
+md-content.md-padding(ng-show='!fetching && user' layout='row')
+  div.md-padding(flex)
+    h4 Datos Personales
+    form(ng-submit='submit()')
+      md-input-container
+        label Email
+        input(ng-model='user.email' aria-label='user-email' readonly)
+        
+      md-input-container
+        label Nombre
+        input(ng-model='user.profile.name' aria-label='user-name')
       
-    md-input-container
-      label Nombre
-      input(ng-model='user.profile.name' aria-label='user-name')
+      md-input-container
+        label Género
+        md-select(ng-model='user.profile.gender')
+          md-option(
+            ng-repeat='gender in statics.genders'
+            ng-value='gender._id')
+            | {{ gender.name }}
+            
+      md-input-container
+        label Fecha de Nacimiento
+        input.form-control(
+          ng-model='user.profile.birthdate'
+          type='date')
+      
+      md-button(ng-disabled='submitting') Editar
     
-    md-input-container
-      label Género
-      md-select(ng-model='user.profile.gender')
-        md-option(
-          ng-repeat='gender in statics.genders'
-          ng-value='gender._id')
-          | {{ gender.name }}
+  div.md-padding(flex)
+    h4 Fotos de perfil
+    
+    md-icon(md-font-icon='material-icons') user
+    
+    md-virtual-repeat-container(md-orient-horizontal)
+      div.repeated-item(md-virtual-repeat='pic in user.profile.pictures')
+        img(ng-src='{{"api/files/" + pic._id }}' alt='{{pic.filename}}')
+        
+    div(ng-repeat='pic in user.profile.pictures') 
+      img(ng-src='{{"api/files/" + pic._id }}' alt='{{pic.filename}}' style='max-height: 400px; max-width:400px;')
+    
+    div(layout='row')
+      md-button(ng-disabled='!files.length || submitting' ng-click='upload()') {{ (user.profile.pictures.length && "Subir màs...") || "Subir foto" }}
+      
+      md-button(
+        ngf-accept='filesSupported'
+        ng-disabled='submitting'
+        ngf-multiple='false'
+        ng-model='files'
+        ngf-keep='false'
+        ngf-select)
+        
+        md-icon(md-font-icon='material-icons') image 
+      
+    div(ng-repeat='file in files')
+      md-icon(md-font-icon='material-icons') insert_drive_file
+      | {{ file.name }}
+      
+      md-button(
+        type='button'
+        ng-click='discard($index)'
+        ng-disabled='submitting')
+        md-icon(md-font-icon='material-icons') close
           
-    md-input-container
-      label Fecha de Nacimiento
-      input.form-control(
-        ng-model='user.profile.birthdate'
-        type='date')
-    
-    md-button(ng-disabled='submitting') Editar
