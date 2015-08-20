@@ -300,6 +300,10 @@ module.exports = function(router, mongoose) {
         return next(err);
       }
 
+      if (!entry) {
+        return res.sendStatus(404);
+      }
+
       relations.membership(entry.group, function(err, membership) {
 
         if (err || !membership.group) {
