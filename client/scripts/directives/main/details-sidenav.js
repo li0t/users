@@ -18,7 +18,7 @@
         link: function ($scope, $element, $attrs) {
 
           $scope.$watch( function () { return $emCard.activeCard }, function (data) {
-            //$routeParams.id = data.id;
+            console.log(data);
             $scope.activeCard = data;
           }, true);
 
