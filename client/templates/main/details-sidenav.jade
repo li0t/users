@@ -1,6 +1,8 @@
 md-button(ng-click='close()') Close
 
-md-content(ng-if="activeCard.type === 'task'", ng-controller='Tasks:Detail', layout='column', layout-padding)
+json {{ activeCard }}
+//- ng-if false && for testing
+md-content(ng-if="false && activeCard.type === 'task'", ng-controller='Tasks:Detail', layout='column', layout-padding)
   div(ng-show='fetching && !task')   
     md-icon(md-font-icon='material-icons' ) sync
     | Recopilando Informaciòn
@@ -50,7 +52,8 @@ md-content(ng-if="activeCard.type === 'task'", ng-controller='Tasks:Detail', lay
       textarea(ng-model='note')
       md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar
 
-md-content(ng-if="activeCard.type != 'task'", ng-controller='Entries:Detail', layout='column', layout-padding)
+//- ng-if false && for testing
+md-content(ng-if="false && activeCard.type != 'task'", ng-controller='Entries:Detail', layout='column', layout-padding)
   div.panel-body.text-center(ng-show='fetching && !entry')
     h4
       i.fa.fa-mr.fa-circle-o-notch.fa-spin
