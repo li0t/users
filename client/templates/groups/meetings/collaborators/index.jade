@@ -1,0 +1,26 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 {{ session.group.profile.name }}
+    
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/meetings/{{meeting._id}}/attendants/add')
+        md-icon(md-font-icon='material-icons') add
+        
+      group-items 
+      
+md-content.md-padding    
+  div(ng-show='fetching && !meeting.attendants')        
+    md-icon(md-font-icon='material-icons') sync
+    | Recopilando Informaciòn 
+      
+  div(ng-show='!fetching && meeting.attendants')
+    h3 Asistentes
+    
+    h4(ng-show='!meeting.attendants.length') No hay asistentes
+    
+    md-button.md-raised(ng-repeat='attendant in meeting.attendants' ng-click='addOrRemove(attendant.user._id)')
+      h4 {{ attendant.user.profile.name || attendant.user.email }}  
+          
+    md-button(ng-show='attendantsToRemove.length' ng-click='removeMembers()')
+      md-icon(md-font-icon='material-icons') remove_circle
+      | Eliminar Asistentes
