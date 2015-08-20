@@ -6,12 +6,17 @@ md-toolbar.lightBlue
     br
     br
     
-  md-button(ng-show='session.user' ng-click='$navigateTo("/")')  
-    md-icon.icon48(md-font-icon='material-icons') account_circle
-
-  md-button(ng-show='session.user' ng-click='$navigateTo("/")') 
-    | {{ session.user.email }}
-    md-icon(md-font-icon='material-icons') arrow_drop_down
+  md-list
+    md-list-item
+      img.profilePicture(ng-if='session.user'
+       ng-src='{{"api/files/" + session.user.profile.pictures[0] }}'
+        alt='{{pic.filename}}'
+        class='md-avatar')
+        
+    md-list-item
+      md-button(ng-show='session.user' ng-click='$navigateTo("/users/" + session.user._id + "/profile")') 
+        | {{ session.user.email }}
+        md-icon(md-font-icon='material-icons') arrow_drop_down
   
   
 md-list(layout-padding)

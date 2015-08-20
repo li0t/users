@@ -1,20 +1,79 @@
-.panel.panel-default
-  .panel-heading
-    h3.panel-title
-      | Bienvenido
-  
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/groups')
-    i.fa.fa-mr.fa-users
-    | Grupos
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 Tu Perfil
     
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/contacts')
-    i.fa.fa-mr.fa-user-plus
-    | Contactos
+    div(layout='row' )
+      md-button.md-fab.md-warn(ng-href='/')
+        md-icon(md-font-icon='material-icons') chevron_left
+        
+md-content.md-padding(ng-show='!fetching && user' layout='row')
+  div.md-padding(flex)
+    h4 Datos Personales
+    form(ng-submit='submit()')
+      md-input-container
+        label Email
+        input(ng-model='user.email' aria-label='user-email' readonly)
+        
+      md-input-container
+        label Nombre
+        input(ng-model='user.profile.name' aria-label='user-name')
+      
+      md-input-container
+        label Género
+        md-select(ng-model='user.profile.gender')
+          md-option(
+            ng-repeat='gender in statics.genders'
+            ng-value='gender._id')
+            | {{ gender.name }}
+            
+      md-input-container
+        label Fecha de Nacimiento
+        input.form-control(
+          ng-model='user.profile.birthdate'
+          type='date')
+      
+      md-button(ng-disabled='submitting') Editar
     
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/tasks/collaborator')
-    i.fa.fa-mr.fa-tasks
-    | Tareas
+  div.md-padding(flex)
+    h4 Fotos de perfil
     
-  a.btn.btn-block.btn-lg.btn-default(ng-href='/entries')
-    i.fa.fa-mr.fa-th-large
-    | Entradas
+    md-content.md-padding(style='height:400px; width:400px; overflow-x:auto;')
+      div.md-padding(ng-repeat='pic in user.profile.pictures' ng-hide='setting')
+        
+        md-button.md-raised.md-primary(
+          style=' position:absolute;'
+          ng-click='select(pic._id)' 
+          ng-if='$index > 0')
+          
+          md-icon(md-font-icon='material-icons') check
+          
+        img(
+        style='max-height:400px; max-width:400px;'
+        ng-src='{{"api/files/" + pic._id }}'
+        alt='{{pic.filename}}')
+        
+        
+    
+    div(layout='row') 
+      md-button(
+        ngf-accept='filesSupported'
+        ng-disabled='submitting'
+        ngf-multiple='false'
+        ng-model='files'
+        ngf-keep='false'
+        ngf-select)
+        
+        md-icon(md-font-icon='material-icons') image 
+        
+      md-button(ng-disabled='!files.length || submitting' ng-click='upload()') Subir foto
+      
+    div(ng-repeat='file in files')
+      md-icon(md-font-icon='material-icons') insert_drive_file
+      | {{ file.name }}
+      
+      md-button(
+        type='button'
+        ng-click='discard($index)'
+        ng-disabled='submitting')
+        md-icon(md-font-icon='material-icons') close
+        

@@ -51,6 +51,8 @@ module.exports = function(router, mongoose) {
     skip(skip).
     limit(limit).
 
+    populate('group').
+
     exec(function(err, entries) {
       if (err) {
         return next(err);
@@ -296,6 +298,10 @@ module.exports = function(router, mongoose) {
     exec(function(err, entry) {
       if (err) {
         return next(err);
+      }
+
+      if (!entry) {
+        return res.sendStatus(404);
       }
 
       relations.membership(entry.group, function(err, membership) {

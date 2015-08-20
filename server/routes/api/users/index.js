@@ -447,7 +447,7 @@ module.exports = function(router, mongoose) {
     User.
 
     findById(req.params.id).
-    deepPopulate('profile.gender profile.pictures'). /* Retrieve data from linked schemas */
+    deepPopulate('profile.pictures'). /* Retrieve data from linked schemas */
 
     exec(function(err, user) {
 
