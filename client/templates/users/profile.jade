@@ -37,18 +37,24 @@ md-content.md-padding(ng-show='!fetching && user' layout='row')
   div.md-padding(flex)
     h4 Fotos de perfil
     
-    md-icon(md-font-icon='material-icons') user
-    
-    md-virtual-repeat-container(md-orient-horizontal)
-      div.repeated-item(md-virtual-repeat='pic in user.profile.pictures')
-        img(ng-src='{{"api/files/" + pic._id }}' alt='{{pic.filename}}')
+    md-content.md-padding(style='height:400px; width:400px; overflow-x:auto;')
+      div.md-padding(ng-repeat='pic in user.profile.pictures' ng-hide='setting')
         
-    div(ng-repeat='pic in user.profile.pictures') 
-      img(ng-src='{{"api/files/" + pic._id }}' alt='{{pic.filename}}' style='max-height: 400px; max-width:400px;')
+        md-button.md-raised.md-primary(
+          style=' position:absolute;'
+          ng-click='select(pic._id)' 
+          ng-if='$index > 0')
+          
+          md-icon(md-font-icon='material-icons') check
+          
+        img(
+        style='max-height:400px; max-width:400px;'
+        ng-src='{{"api/files/" + pic._id }}'
+        alt='{{pic.filename}}')
+        
+        
     
-    div(layout='row')
-      md-button(ng-disabled='!files.length || submitting' ng-click='upload()') {{ (user.profile.pictures.length && "Subir màs...") || "Subir foto" }}
-      
+    div(layout='row') 
       md-button(
         ngf-accept='filesSupported'
         ng-disabled='submitting'
@@ -58,6 +64,8 @@ md-content.md-padding(ng-show='!fetching && user' layout='row')
         ngf-select)
         
         md-icon(md-font-icon='material-icons') image 
+        
+      md-button(ng-disabled='!files.length || submitting' ng-click='upload()') Subir foto
       
     div(ng-repeat='file in files')
       md-icon(md-font-icon='material-icons') insert_drive_file
@@ -68,4 +76,4 @@ md-content.md-padding(ng-show='!fetching && user' layout='row')
         ng-click='discard($index)'
         ng-disabled='submitting')
         md-icon(md-font-icon='material-icons') close
-          
+        

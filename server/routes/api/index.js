@@ -1,6 +1,8 @@
 'use strict';
 
-module.exports = function(router /*, mongoose*/ ) {
+module.exports = function(router, mongoose) {
+
+  var User = mongoose.model('user');
 
   /**
    * Get current session's public data.
@@ -11,26 +13,31 @@ module.exports = function(router /*, mongoose*/ ) {
     if (req.session.user) {
       var data = {
         user: {
-          _id: req.session.user._id,
-          email: req.session.user.email,
-          group: req.session.user.group,
           /* "own" group */
+          group: req.session.user.group,
+          email: req.session.user.email,
+          _id: req.session.user._id,
           profile: {
-            name: req.session.user.profile.name,
             gender: req.session.user.profile.gender && req.session.user.profile.gender.name,
+            birthdate: req.session.user.profile.birthdate,
             location: req.session.user.profile.location,
-            birthdate: req.session.user.profile.birthdate
+            pictures: req.session.user.profile.pictures,
+            name: req.session.user.profile.name
           }
         }
       };
 
       if (req.session.group) {
         data.group = {
+          profile: {
+            name: req.session.group.profile.name
+          },
           _id: req.session.group._id,
-          profile : { name: req.session.group.profile.name },
           admin: {
-            _id: req.session.group.admin._id,
-            profile : { name: req.session.group.admin.profile.name },
+            profile: {
+              name: req.session.group.admin.profile.name
+            },
+            _id: req.session.group.admin._id
           }
         };
       }
@@ -39,6 +46,38 @@ module.exports = function(router /*, mongoose*/ ) {
     } else {
       res.sendStatus(403);
     }
+  });
+
+  /**
+   * Get current session's public data.
+   */
+  router.get('/session/pictures', function(req, res, next) {
+
+    /* Check if there's a user in session */
+    if (!req.session.user) {
+      return res.sendStatus(403);
+    }
+
+    User.findById(req.session.user._id).
+
+    populate('profile').
+
+    exec(function(err, user) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!user || !user.profile || !user.profile.pictures) {
+        return res.sendStatus(400);
+      }
+
+      var pictures = user.profile.pictures;
+
+      req.session.user.profile.pictures = pictures;
+
+      res.send(pictures);
+
+    });
   });
 
 };

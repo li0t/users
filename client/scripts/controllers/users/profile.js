@@ -12,6 +12,22 @@
       $scope.user = null;
       $scope.files = [];
 
+      function updateProfilePic() {
+
+        $http.get('/api/session/pictures').
+
+        success(function(pics) {
+          $session.get('user').profile.pictures = pics;
+        }).
+
+        error(function() {
+          $session.flash('danger', "Hubo error actualizando la foto de perfil");
+        }).
+        finally(function() {
+          $scope.fetching = false;
+        });
+      }
+
       $scope.discard = function(index) {
         $scope.files.splice(index, 1);
       };
@@ -25,7 +41,6 @@
         success(function(user) {
           user.profile.birthdate = user.profile.birthdate && new Date(user.profile.birthdate);
           $scope.user = user;
-          console.log(user.profile.pictures);
         }).
 
         error(function() {
@@ -60,7 +75,9 @@
         }).
 
         success(function() {
+          $scope.files = [];
           $scope.fetch();
+          updateProfilePic();
         }).
 
         error(function() {
@@ -73,14 +90,15 @@
 
       };
 
-      $scope.select = function (pic) {
+      $scope.select = function(pic) {
 
-        $scope.submitting = true;
+        $scope.setting = true;
 
         $http.put('/api/users/profiles/pictures/' + pic).
 
         success(function() {
           $scope.fetch();
+          updateProfilePic();
         }).
 
         error(function() {
@@ -88,7 +106,7 @@
         }).
 
         finally(function() {
-          $scope.submitting = false;
+          $scope.setting = false;
         });
 
       };

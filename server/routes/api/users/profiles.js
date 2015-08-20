@@ -155,8 +155,8 @@ module.exports = function(router, mongoose) {
         return res.sendStatus(400);
       }
 
-      profile.pictures[index] = profile.pictures[0];
-      profile.pictures[0] = picture;
+      profile.pictures.splice(index, 1);
+      profile.pictures.unshift(picture);
 
       profile.save(function(err) {
         if (err) {
