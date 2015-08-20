@@ -7,6 +7,7 @@ var debug = require('debug')('app:relations');
 var statics = component('statics');
 
 var Contact = mongoose.model('contact');
+var Meeting = mongoose.model('meeting');
 var Group = mongoose.model('group');
 var Task = mongoose.model('task');
 
@@ -317,9 +318,97 @@ function collaboration(id, cb) {
 
 }
 
+function attendance(id, cb) {
+
+  var i;
+
+  var relation = {
+
+    meeting: null,
+
+    isAttendant: function(id) { /** Looks for an attendant of a meeting */
+
+      var attendant = null;
+
+      if (relation.meeting) {
+
+        for (i = 0; i < relation.meeting.attendants.length; i++) {
+
+          if (JSON.stringify(relation.meeting.attendants[i].user) === JSON.stringify(id)) {
+
+            if (!relation.meeting.attendants[i].left.length || relation.meeting.attendants[i].left.length < relation.meeting.attendants[i].joined.length) {
+
+              attendant = {
+                attendant: relation.meeting.attendants[i],
+                index: i
+              };
+
+            }
+          }
+        }
+      } else {
+        debug('Error! No meeting found');
+      }
+
+      return attendant;
+    },
+
+    wasAttendant: function(id) {
+
+      var attendant = null;
+
+      if (relation.meeting) {
+
+        for (i = 0; i < relation.meeting.attendants.length; i++) {
+
+          if (JSON.stringify(relation.meeting.attendants[i].user) === JSON.stringify(id)) {
+
+            attendant = {
+              user: relation.meeting.attendants[i].user,
+              index: i
+            };
+
+            break;
+          }
+        }
+      } else {
+        debug('Error! No meeting found');
+      }
+
+      return attendant;
+    }
+
+  };
+
+  Meeting.findOne().
+
+  where('_id', id).
+  where('deleted', null).
+
+  exec(function(err, meeting) {
+    if (cb) {
+
+      if (err) {
+        return cb(err, null);
+      }
+
+      relation.meeting = meeting;
+
+      cb(null, relation);
+
+    } else {
+      debug('No callback provided');
+    }
+  });
+
+}
+
+
 module.exports = {
 
   contact: contact,
+
+  attendance: attendance,
 
   membership: membership,
 
