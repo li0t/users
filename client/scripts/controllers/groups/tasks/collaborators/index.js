@@ -55,11 +55,11 @@
 
         success(function() {
           $scope.fetch();
-          $session.flash('success', 'Miembros eliminados con éxito!');
+          $session.flash('success', 'Colaboradores eliminados con éxito!');
         }).
 
         error(function() {
-          $session.flash('danger', 'Hubo un error elimando miembros!');
+          $session.flash('danger', 'Hubo un error elimando colaboradores!');
         });
       };
 

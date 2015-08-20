@@ -48,6 +48,13 @@ module.exports = function(router) {
     '/groups/:id/tasks/:task/collaborators',
     '/groups/:id/tasks/:task/collaborators/add',
 
+    /* Groups Meetings */
+    '/groups/:id/meetings',
+    '/groups/:id/meetings/create',
+    '/groups/:id/meetings/:meeting/detail',
+    '/groups/:id/meetings/:meeting/attendants',
+    '/groups/:id/meetings/:meeting/attendants/add',
+
     /* Entries */
     '/entries',
     '/entries/:type',
