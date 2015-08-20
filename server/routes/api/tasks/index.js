@@ -26,7 +26,6 @@ module.exports = function(router, mongoose) {
     sort('-created').
 
     exec(function(err, tasks) {
-
       if (err) {
         return next(err);
       }
