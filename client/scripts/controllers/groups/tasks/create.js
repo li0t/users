@@ -14,9 +14,10 @@
 
       $scope.data = {
         group: $session.get('group')._id,
+        collaborators: [],
         objetive: null,
         priority: null,
-        collaborators: []
+        tags: []
       };
 
       $scope.fetch = function() {
@@ -44,15 +45,26 @@
 
           success(function() {
 
-            $session.flash('Tarea creada');
+            if ($scope.data.tags.lenght) {
+
+              $http.post('/api/tasks/' + task + '/tags', $scope.data).
+
+              success(function() {
+                $location.path('/groups/' + $session.get('group')._id + '/tasks');
+                $session.flash('success', 'Tarea creada con éxito!');
+              }).
+
+              error(function(data) {
+                $session.flash('danger', data);
+              });
+            } else {
+              $location.path('/groups/' + $session.get('group')._id + '/tasks');
+              $session.flash('success', 'Tarea creada con éxito!');
+            }
           }).
 
           error(function() {
             $session.flash('La tarea no pudo ser creada');
-          }).
-
-          finally(function() {
-            $location.path('/groups/' + $session.get('group')._id + '/tasks');
           });
         }).
 
@@ -81,6 +93,48 @@
         remove: function remove($index) {
           $scope.data.collaborators.splice($index, 1);
           this.list.splice($index, 1);
+        }
+      };
+
+      $scope.removeTag = function(tag) {
+        var index = $scope.data.tags.indexOf(tag);
+        if (index >= 0) {
+          $scope.data.tags.splice(index, 1);
+        }
+      };
+
+      $scope.searchTags = function(tag) {
+
+        tag = tag && tag.replace(/\s+/g, '');
+
+        if (tag && tag.length) {
+
+          var
+            limit = 'limit=' + $scope.limit + '&',
+            skip = 'skip=' + $scope.skip + '&',
+            keywords = 'keywords=' + tag,
+            tags = '/api/tags/like?' + limit + skip + keywords;
+
+          return $http.get(tags).
+          then(function(tags) {
+            return (tags.data.length && tags.data) || [{ name : tag}];
+          });
+        }
+      };
+
+      $scope.selectedTagChange = function(tag) {
+
+        tag = tag && tag.replace(/\s+/g, '');
+
+        if (tag && tag.length) {
+
+          var index = $scope.data.tags.indexOf(tag);
+          if (index < 0) {
+            $scope.data.tags.push(tag);
+          }
+
+          $scope.selectedTag = null;
+          $scope.text = '';
         }
       };
 
