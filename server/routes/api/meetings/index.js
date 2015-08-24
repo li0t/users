@@ -18,7 +18,6 @@ module.exports = function(router, mongoose) {
     Meeting.find().
 
     where('creator', req.session.user._id).
-    where('attendants.user').ne(req.session.user._id).
     where('deleted', null).
 
     deepPopulate('group.profile creator.profile attendants entries ').

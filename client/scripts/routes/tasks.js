@@ -13,9 +13,9 @@
         templateUrl: '/assets/templates/tasks/collaborator.html'
       }).
 
-      when('/tasks/own', {
-        controller: 'Tasks:Own',
-        templateUrl: '/assets/templates/tasks/own.html'
+      when('/tasks/creator', {
+        controller: 'Tasks:Creator',
+        templateUrl: '/assets/templates/tasks/creator.html'
       }).
 
       when('/tasks/create', {

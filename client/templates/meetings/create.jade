@@ -1,19 +1,29 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 {{ session.group.profile.name }}
+    h2 REUNIONES
     
     div(layout='row')
-      md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/meetings/create')
+      md-button.md-fab.md-warn(ng-href='/meetings/create')
         md-icon(md-font-icon='material-icons') add
-        
-      group-items 
       
 md-content.md-padding
-  div(ng-show='!fetching && members')
+  div(ng-show='!fetching && groups')
     form(
       ng-submit='form.$valid && submit()'
       role='form'
       name='form')
+      
+      md-input-container
+        label Grupo
+        md-select(
+          ng-change='fetchGroupMembers()'
+          ng-model='data.group'
+          required)
+          
+          md-option(
+            ng-repeat='group in groups'
+            value='{{ group._id }}')
+            | {{ group.profile.name }}
 
       md-input-container.form-group
         label Objetivo
@@ -42,6 +52,7 @@ md-content.md-padding
       md-input-container
         label Agrega asistentes
         md-select(
+          ng-disabled='!members'
           ng-change='attendants.add()'
           ng-model='form.attendant')
           

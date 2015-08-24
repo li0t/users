@@ -8,10 +8,26 @@
 
       $routeProvider.
 
-      when('/meetings', {
-        controller: 'Meetings:Index',
-        templateUrl: '/assets/templates/meetings/index.html'
+      when('/meetings/attendant', {
+        controller: 'Meetings:Attendant',
+        templateUrl: '/assets/templates/meetings/attendant.html'
+      }).
+
+      when('/meetings/creator', {
+        controller: 'Meetings:Creator',
+        templateUrl: '/assets/templates/meetings/creator.html'
+      }).
+
+      when('/meetings/create', {
+        controller: 'Meetings:Create',
+        templateUrl: '/assets/templates/meetings/create.html'
+      }).
+
+      when('/meetings/:id/detail', {
+        controller: 'Meetings:Detail',
+        templateUrl: '/assets/templates/meetings/detail.html'
       });
+
     }
 
   ]);

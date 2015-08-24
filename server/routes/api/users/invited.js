@@ -26,8 +26,8 @@ module.exports = function(router, mongoose) {
         email: email,
         /** Randomized alphanumeric password */
         password: Math.random().toString(36).slice(-8),
-        profile: profile._id,
-        state: statics.model('state', 'pending')._id
+        state: statics.model('state', 'pending')._id,
+        profile: profile._id
       }).
       save(function(err, user) {
 

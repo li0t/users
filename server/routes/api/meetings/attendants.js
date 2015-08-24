@@ -47,9 +47,6 @@ module.exports = function(router, mongoose) {
               meetings[i] = meetings[i].toObject();
               meetings[i].isAttendant = true;
 
-              if (meetings[i].attendants[j].workedTimes.length % 2 !== 0) {
-                meetings[i].isWorking = true;
-              }
             }
             break;
           }

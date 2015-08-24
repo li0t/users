@@ -1,7 +1,7 @@
 (function(ng) {
   'use strict';
 
-  ng.module('App').controller('Tasks:Own', [
+  ng.module('App').controller('Tasks:Creator', [
     '$scope', '$http', '$location', '$session',
 
     function($scope, $http, $location, $session) {
@@ -17,7 +17,7 @@
         success(function(data) {
           $scope.tasks = data;
         }).
-        
+
         finally(function() {
           $scope.fetching = false;
         });

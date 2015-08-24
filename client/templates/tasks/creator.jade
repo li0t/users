@@ -2,13 +2,14 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 TAREAS
     
-    md-button(ng-href='/tasks/collaborator')  Mis Tareas
-      
-    md-button.md-raised(ng-href='/tasks/own')  Tareas Creadas
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/tasks/create')
+        md-icon(md-font-icon='material-icons') add
+            
+      md-button(ng-href='/tasks/collaborator')  Mis Tareas
+        
+      md-button.md-raised(ng-href='/tasks/creator')  Tareas Creadas
 
-md-button.md-fab.md-warn(ng-href='/tasks/create')
-  md-icon(md-font-icon='material-icons') add
-      
 md-content.md-padding
   md-grid-list(
     md-gutter="12px",

@@ -65,9 +65,8 @@ module.exports = function(router) {
 
     /* Tasks */
     '/tasks',
-    '/tasks/own',
     '/tasks/create',
-    '/tasks/remove',
+    '/tasks/creator',
     '/tasks/:id/detail',
     '/tasks/collaborator',
 
@@ -78,6 +77,10 @@ module.exports = function(router) {
 
     /* Meetings */
     '/meetings',
+    '/meetings/create',
+    '/meetings/creator',
+    '/meetings/attendant',
+    '/meetings/:id/detail',
 
     /* Settings */
     '/settings',
