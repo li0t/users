@@ -117,7 +117,7 @@
           then(function(tags) {
             return (tags.data.length && tags.data) || $timeout(function() {
                 return [{ name : tag}];
-              }, 750);
+              }, 600);
           });
         }
       };
