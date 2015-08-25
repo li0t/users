@@ -2,67 +2,62 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 TAREAS
     
-    md-button(ng-href='/tasks/collaborator')  Mis Tareas
-      
-    md-button(ng-href='/tasks/own')  Tareas Creadas
-    
-md-button.md-fab.md-warn(ng-href='/tasks/collaborator')
-  md-icon(md-font-icon='material-icons') chevron_left
-      
-md-content(layout='column')      
-  div(ng-show='fetching && !task')   
-    md-icon(md-font-icon='material-icons' ) sync
-    | Recopilando Informaciòn
-      
-  div(ng-show='!fetching && task')
-    md-button(
-      ng-show='task.completed'
-      ng-click='reOpen()')
-      | Abrir
-      
-    md-button(
-      ng-show='!task.completed'
-      ng-click='close()')
-      | Cerrar    
-    
-    div
-      h3 {{ task.objective }}
-    
-    div
-      h4 {{ task.completed && ("Completada el " + (task.completed | toLocal)) || "Abierta"}}
-
-    div(layout='row')  
-      md-input-container
-        label Fecha de Entrega
-        input.form-control(
-          ng-change='dateTimeChanged = true'
-          ng-disabled='task.completed'
-          ng-model='task.dateTime'
-          type='date')
-      
-      md-button(ng-click='editDateTime()' ng-show='!task.completed' ng-disabled='!dateTimeChanged') 
-        md-icon(md-font-icon='material-icons') edit
-        | Editar
-    
-    div(ng-show='!task.notes.length')
-      p No hay notas
-    
-    div(ng-show='task.notes.length')
-      p Notas:
-    
-    div
-      div(ng-repeat='note in task.notes', ng-show='task.notes.length')
-        p * {{ note.note }}
-          md-icon(md-font-icon='material-icons' ng-show='!task.completed' ng-click='removeNote(note.note)' ) close
-          
-    div(ng-show='!task.completed')
-      textarea(ng-model='note')
-      md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar
-    
-    h5 Tags  
     div(layout='row')
-      md-button.md-raised(ng-repeat='tag in task.tags') {{ tag }}
+      md-button.md-fab.md-warn(ng-href='/tasks/create')
+        md-icon(md-font-icon='material-icons') add
       
-            
+      md-button(ng-href='/tasks/collaborator')  Mis Tareas
+        
+      md-button(ng-href='/tasks/creator')  Tareas Asignadas
       
+md-content.md-padding(layout='column' ng-show='!fetching && task')
+  md-button(
+    ng-show='task.completed'
+    ng-click='reOpen()')
+    | Abrir
+    
+  md-button(
+    ng-show='!task.completed'
+    ng-click='close()')
+    | Cerrar    
   
+  div
+    h3 {{ task.objective }}
+  
+  div
+    h4 {{ task.completed && ("Completada el " + (task.completed | toLocal)) || "Abierta"}}
+
+  div(layout='row')  
+    md-input-container
+      label Fecha de Entrega
+      input.form-control(
+        ng-change='dateTimeChanged = true'
+        ng-disabled='task.completed'
+        ng-model='task.dateTime'
+        type='date')
+    
+    md-button(ng-click='editDateTime()' ng-show='!task.completed' ng-disabled='!dateTimeChanged') 
+      md-icon(md-font-icon='material-icons') edit
+      | Editar
+  
+  div(ng-show='!task.notes.length')
+    p No hay notas
+  
+  div(ng-show='task.notes.length')
+    p Notas:
+  
+  div
+    div(ng-repeat='note in task.notes', ng-show='task.notes.length')
+      p * {{ note.note }}
+        md-icon(md-font-icon='material-icons' ng-show='!task.completed' ng-click='removeNote(note.note)' ) close
+        
+  div(ng-show='!task.completed')
+    textarea(ng-model='note')
+    md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar
+  
+  h5 Tags  
+  div(layout='row')
+    md-button.md-raised(ng-repeat='tag in task.tags') {{ tag }}
+    
+          
+    
