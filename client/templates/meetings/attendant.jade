@@ -1,15 +1,15 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 TAREAS
+    h2 REUNIONES
     
     div(layout='row')
-      md-button.md-fab.md-warn(ng-href='/tasks/create')
+      md-button.md-fab.md-warn(ng-href='/meetings/create')
         md-icon(md-font-icon='material-icons') add
-      
-      md-button.md-raised(ng-href='/tasks/collaborator')  Mis Tareas
         
-      md-button(ng-href='/tasks/creator')  Tareas Creadas
-      
+      md-button.md-raised(ng-href='/meetings/attendant')  Mis Reuniones
+        
+      md-button(ng-href='/meetings/creator')  Reuniones Creadas
+            
 md-content.md-padding
   md-grid-list(
     md-gutter="12px",
@@ -20,8 +20,7 @@ md-content.md-padding
     md-row-height="1:1")
     md-grid-tile.whitebg(
       layout='column',
-      ng-repeat='task in tasks',
+      ng-repeat='meeting in meetings',
       md-rowspan='1',
       md-colspan='1')
-      em-card(card='task' ng-click='$navigateTo("/tasks/" + task._id + "/detail")')
-            
+      em-card(card='meeting' ng-click='$navigateTo("/meetings/" + meeting._id + "/detail")')

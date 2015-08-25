@@ -7,7 +7,7 @@ md-toolbar.lightBlue
     br
     
   md-list
-    md-list-item
+    md-list-item(ng-click='$navigateTo("/")')
       img.profilePicture(ng-if='session.user'
        ng-src='{{"api/files/" + session.user.profile.pictures[0] }}'
         alt='{{pic.filename}}'
@@ -32,7 +32,7 @@ md-list(layout-padding)
     md-icon(md-font-icon='material-icons') people
     p Grupos
     
-  md-list-item(ng-click='$navigateTo("/meetings")', ng-show='session.user')
+  md-list-item(ng-click='$navigateTo("/meetings/attendant")', ng-show='session.user')
     md-icon(md-font-icon='material-icons') event_note
     p Reuniones  
 

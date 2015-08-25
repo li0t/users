@@ -48,6 +48,13 @@ module.exports = function(router) {
     '/groups/:id/tasks/:task/collaborators',
     '/groups/:id/tasks/:task/collaborators/add',
 
+    /* Groups Meetings */
+    '/groups/:id/meetings',
+    '/groups/:id/meetings/create',
+    '/groups/:id/meetings/:meeting/detail',
+    '/groups/:id/meetings/:meeting/attendants',
+    '/groups/:id/meetings/:meeting/attendants/add',
+
     /* Entries */
     '/entries',
     '/entries/:type',
@@ -58,9 +65,8 @@ module.exports = function(router) {
 
     /* Tasks */
     '/tasks',
-    '/tasks/own',
     '/tasks/create',
-    '/tasks/remove',
+    '/tasks/creator',
     '/tasks/:id/detail',
     '/tasks/collaborator',
 
@@ -71,6 +77,10 @@ module.exports = function(router) {
 
     /* Meetings */
     '/meetings',
+    '/meetings/create',
+    '/meetings/creator',
+    '/meetings/attendant',
+    '/meetings/:id/detail',
 
     /* Settings */
     '/settings',

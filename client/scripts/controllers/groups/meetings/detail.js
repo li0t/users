@@ -5,21 +5,22 @@
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
+      
       $scope.fetching = null;
-      $scope.task = null;
+      $scope.meeting = null;
 
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/tasks/' + $routeParams.task).
+        $http.get('/api/meetings/' + $routeParams.meeting).
 
         success(function(data) {
-          $scope.task = data;
-          $scope.task.dateTime = data.dateTime && new Date(data.dateTime);
+          $scope.meeting = data;
+          $scope.meeting.dateTime = data.dateTime && new Date(data.dateTime);
         }).
 
         error(function(data) {
-          $location.path($routeParams.id +  '/tasks');
+          $location.path($routeParams.id +  '/meetings');
           $session.flash('danger', data);
         }).
 
@@ -28,38 +29,9 @@
         });
       };
 
-      $scope.close = function() {
-
-        $http.put('/api/tasks/close/' + $routeParams.task).
-
-        success(function() {
-          $scope.fetch();
-          $session.flash('success', 'La tarea ha sido completada!');
-        }).
-
-        error(function() {
-          $session.flash('danger', 'Hubo un error completando la tarea!');
-        });
-
-      };
-
-      $scope.reOpen = function() {
-
-        $http.put('/api/tasks/re-open/' + $routeParams.task).
-
-        success(function() {
-          $scope.fetch();
-          $session.flash('success', 'La tarea ha sido abierta!');
-        }).
-
-        error(function() {
-          $session.flash('danger', 'Hubo un error abriendo la tarea!');
-        });
-      };
-
       $scope.addNote = function(note) {
 
-        $http.post('/api/tasks/notes/add-to/' + $routeParams.task, {
+        $http.post('/api/meetings/notes/add-to/' + $routeParams.meeting, {
           notes: [note]
         }).
 
@@ -78,7 +50,7 @@
 
       $scope.removeNote = function(note) {
 
-        $http.post('/api/tasks/notes/remove-from/' + $routeParams.task, { notes: [note] }).
+        $http.post('/api/meetings/notes/remove-from/' + $routeParams.meeting, { notes: [note] }).
 
         success(function() {
           $scope.fetch();
@@ -96,8 +68,8 @@
 
       $scope.editDateTime = function() {
 
-        $http.put('/api/tasks/' + $routeParams.task + '/date-time' , {
-          dateTime: $scope.task.dateTime
+        $http.put('/api/meetings/' + $routeParams.meeting + '/date-time' , {
+          dateTime: $scope.meeting.dateTime
         }).
 
         success(function() {
@@ -105,7 +77,7 @@
         }).
 
         error(function() {
-          $session.flash('danger', 'Hubo un error editando la tarea!');
+          $session.flash('danger', 'Hubo un error editando la reunión!');
         }).
 
         finally(function() {

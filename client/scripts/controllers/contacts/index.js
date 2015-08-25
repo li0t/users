@@ -93,7 +93,9 @@
           }).error(function() {
             $session.flash('danger', 'An error ocurred!');
           });
-        }).error(function() {
+        }).error(function(err, data) {
+          console.log(err);
+          console.log(data);
           $session.flash('danger', 'An error ocurred!');
         });
       };

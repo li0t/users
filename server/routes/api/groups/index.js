@@ -13,6 +13,63 @@ module.exports = function(router, mongoose) {
   var Profile = mongoose.model('profile');
 
   /**
+   * Get user groups
+   */
+  router.get('/', function(req, res, next) {
+
+    var user = req.session.user._id;
+    var groups = [];
+    var toCheck = 0;
+    var checked = 0;
+
+    Group.find().
+
+    where('members.user', user).
+
+    sort('created').
+
+    select('id admin profile members created').
+
+    deepPopulate('profile admin.profile').
+
+    exec(function(err, found) {
+      if (err) {
+        return next(err);
+      }
+
+      if (found.length) {
+
+        toCheck = found.length;
+
+        found.forEach(function(group) {
+
+          relations.membership(group._id, function(err, relation) {
+
+            if (group.profile.name !== 'own' && relation.isMember(user)) {
+
+              relation.group = group;
+              relation.cleanMembers();
+
+              groups.push(relation.group);
+            }
+
+            checked += 1;
+
+            if (checked === toCheck) {
+              res.send(groups);
+            }
+
+          });
+        });
+
+      } else {
+        res.send(groups);
+      }
+    });
+
+  });
+
+  /**
    * Create new group
    */
   router.post('/', function(req, res, next) {
@@ -150,62 +207,6 @@ module.exports = function(router, mongoose) {
 
   });
 
-  /**
-   * Get user groups
-   */
-  router.get('/', function(req, res, next) {
-
-    var user = req.session.user._id;
-    var groups = [];
-    var toCheck = 0;
-    var checked = 0;
-
-    Group.find().
-
-    where('members.user', user).
-
-    sort('created').
-
-    select('id admin profile members created').
-
-    deepPopulate('profile admin.profile').
-
-    exec(function(err, found) {
-      if (err) {
-        return next(err);
-      }
-
-      if (found.length) {
-
-        toCheck = found.length;
-
-        found.forEach(function(group) {
-
-          relations.membership(group._id, function(err, relation) {
-
-            if (group.profile.name !== 'own' && relation.isMember(user)) {
-
-              relation.group = group;
-              relation.cleanMembers();
-
-              groups.push(relation.group);
-            }
-
-            checked += 1;
-
-            if (checked === toCheck) {
-              res.send(groups);
-            }
-
-          });
-        });
-
-      } else {
-        res.send(groups);
-      }
-    });
-
-  });
 
   /**
    * Get a group
