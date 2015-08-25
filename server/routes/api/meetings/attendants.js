@@ -109,12 +109,12 @@ module.exports = function(router, mongoose) {
    */
   router.post('/add-to/:id', function(req, res, next) {
 
-    var meeting = req.params.id;
-    var inviter = req.session.user._id;
     var attendants = req.body.attendants;
-    var saved = 0;
+    var inviter = req.session.user._id;
+    var meeting = req.params.id;
     var now = new Date();
     var wasAttendant;
+    var saved = 0;
 
     if (!attendants || !attendants.length) {
       return res.sendStatus(400);
@@ -197,12 +197,12 @@ module.exports = function(router, mongoose) {
    */
   router.post('/remove-from/:id', function(req, res, next) {
 
-    var removed = 0;
+    var attendants = req.body.attendants;
     var remover = req.session.user._id;
     var meeting = req.params.id;
-    var attendants = req.body.attendants;
-    var attendant;
     var now = new Date();
+    var removed = 0;
+    var attendant;
 
     if (!attendants || !attendants.length) {
       return res.sendStatus(400);

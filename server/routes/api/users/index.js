@@ -9,11 +9,11 @@ var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
-  var User = mongoose.model('user');
   var Profile = mongoose.model('profile');
   var Contact = mongoose.model('contact');
   var Token = mongoose.model('token');
   var Group = mongoose.model('group');
+  var User = mongoose.model('user');
 
   /**
    * Get users list.
@@ -25,14 +25,12 @@ module.exports = function(router, mongoose) {
     where('state', statics.model('state', 'active')._id).
 
     exec(function(err, users) {
-
       if (err) {
-        next(err);
+        return next(err);
 
-      } else {
-
-        res.send(users);
       }
+
+      res.send(users);
 
     });
 
@@ -70,50 +68,50 @@ module.exports = function(router, mongoose) {
               debug(err);
             }
           });
-        } else {
+          return;
+        }
 
-          /* Create a new ContactSchema that will store the user contacts */
-          new Contact({
-            user: user._id
+        /* Create a new ContactSchema that will store the user contacts */
+        new Contact({
+          user: user._id
+        }).
+        save(function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          new Profile({
+            name: 'own'
           }).
-          save(function(err) {
+          save(function(err, groupProfile) {
             if (err) {
               return next(err);
             }
 
-            new Profile({
-              name: 'own'
+            new Group({
+              profile: groupProfile._id
             }).
-            save(function(err, groupProfile) {
+            save(function(err, group) {
               if (err) {
                 return next(err);
               }
 
-              new Group({
-                profile: groupProfile._id
-              }).
-              save(function(err, group) {
+              group.members.push({
+                user: user._id,
+                joined: new Date()
+              });
+
+              group.save(function(err) {
                 if (err) {
                   return next(err);
                 }
 
-                group.members.push({
-                  user: user._id,
-                  joined: new Date()
-                });
+                res.send(user._id);
 
-                group.save(function(err) {
-                  if (err) {
-                    return next(err);
-                  }
-
-                  res.send(user._id);
-
-                });
               });
             });
           });
-        }
+        });
       });
     });
 
@@ -123,83 +121,81 @@ module.exports = function(router, mongoose) {
    * Log a user in.
    */
   router.post('/signin', function(req, res, next) {
-    console.log('im here');
 
-    var i;
-    var email = req.body.email;
     var password = req.body.password;
+    var email = req.body.email;
+    var i;
 
-    if (email && password) {
-
-      /* Logout any previous user */
-      delete req.session.user;
-      delete req.session.workplace;
-
-      /* Find the user by its email address */
-      User.findOne().
-
-      where('email', email).
-
-      deepPopulate('profile.gender').
-
-      exec(function(err, user) {
-        if (err) {
-          if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
-            res.sendStatus(400);
-          } else {
-            next(err);
-          }
-
-        } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
-
-          if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
-
-            Group.find().
-
-            where('members.user', user).
-
-            populate('profile').
-
-            exec(function(err, groups) {
-              if (err) {
-                return next(err);
-              }
-
-              for (i = 0; i < groups.length; i++) {
-                if (groups[i].profile.name === 'own') {
-
-                  user = user.toObject();
-                  user.group = groups[i];
-                  req.session.user = user;
-                  return res.send(user);
-
-                }
-              }
-            });
-
-          } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
-
-            res.sendStatus(409);
-
-          } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
-
-            res.sendStatus(403);
-
-          } else {
-
-            res.sendStatus(500);
-
-          }
-        } else {
-          setTimeout(function() {
-            res.sendStatus(401);
-          }, 1000);
-        }
-      });
-
-    } else {
-      res.sendStatus(400);
+    if (!email || !password) {
+      return res.sendStatus(400);
     }
+
+    /* Logout any previous user */
+    delete req.session.user;
+    delete req.session.workplace;
+
+    /* Find the user by its email address */
+    User.findOne().
+
+    where('email', email).
+
+    deepPopulate('profile.gender').
+
+    exec(function(err, user) {
+      if (err) {
+        if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
+          res.sendStatus(400);
+        } else {
+          next(err);
+        }
+
+      } else if (user && bcrypt.compareSync(password, user.password)) { /* Check if there's a user and compare the passwords */
+
+        if (_.isEqual(user.state, statics.model('state', 'active')._id)) { /* Check if the user has confirmed it's email */
+
+          Group.find().
+
+          where('members.user', user).
+
+          populate('profile').
+
+          exec(function(err, groups) {
+            if (err) {
+              return next(err);
+            }
+
+            for (i = 0; i < groups.length; i++) {
+              if (groups[i].profile.name === 'own') {
+
+                user = user.toObject();
+                user.group = groups[i];
+                req.session.user = user;
+                return res.send(user);
+
+              }
+            }
+          });
+
+        } else if (_.isEqual(user.state, statics.model('state', 'pending')._id)) {
+
+          res.sendStatus(409);
+
+        } else if (_.isEqual(user.state, statics.model('state', 'disabled')._id)) {
+
+          res.sendStatus(403);
+
+        } else {
+
+          res.sendStatus(500);
+
+        }
+      } else {
+        setTimeout(function() {
+          res.sendStatus(401);
+        }, 1000);
+      }
+    });
+
 
   });
 
@@ -209,7 +205,6 @@ module.exports = function(router, mongoose) {
   router.get('/signout', function(req, res /*, next*/ ) {
 
     delete req.session.user;
-
     res.end();
 
   });
@@ -217,7 +212,7 @@ module.exports = function(router, mongoose) {
   /**
    * Begin password reset.
    */
-  router.post('/recover', function(req, res /*, next*/ ) {
+  router.post('/recover', function(req, res /*, next*/ ) { /* ? */
 
     var email = req.body.email;
 
@@ -238,7 +233,8 @@ module.exports = function(router, mongoose) {
 
     var password = req.body.password;
 
-    Token.findById(req.params.token, function(err, token) {
+    Token.findById(req.params.token).
+    exec(function(err, token) {
       if (err) {
         return next(err);
       }
@@ -292,36 +288,34 @@ module.exports = function(router, mongoose) {
     var oldPassword = req.body.oldPassword;
     var newPassword = req.body.newPassword;
 
-    if (newPassword && newPassword !== oldPassword) {
-
-      User.
-
-      findById(req.session.user._id).
-
-      exec(function(err, user) {
-
-        if (err) {
-          next(err);
-
-        } else if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
-
-          user.password = newPassword;
-
-          user.save(function(err, user) {
-
-            req.session.user = user;
-            res.send(user._id);
-
-          });
-        } else {
-          setTimeout(function() {
-            res.sendStatus(401);
-          }, 1000);
-        }
-      });
-    } else {
-      res.sendStatus(400);
+    if (!newPassword || (newPassword === oldPassword)) {
+      return res.sendStatus(400);
     }
+
+    User.findById(req.session.user._id).
+
+    exec(function(err, user) {
+      if (err) {
+        return next(err);
+      }
+
+      if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
+
+        user.password = newPassword;
+
+        user.save(function(err, user) {
+
+          req.session.user = user;
+          res.send(user._id);
+
+        });
+      } else {
+        setTimeout(function() {
+          res.sendStatus(401);
+        }, 1000);
+      }
+    });
+
 
   });
 
@@ -336,63 +330,59 @@ module.exports = function(router, mongoose) {
 
     relations.contact(user, function(err, relation) {
 
-      if (!err && relation.contact) {
+      if (err || !relation.contact) {
+        debug('No contacts list for user %s was found', user);
+        return res.sendStatus(404);
+      }
 
-        userContact = relation.contact; /** The user contact model */
+      userContact = relation.contact; /** The user contact model */
 
-        userContact.contacts.forEach(function(contact) {
+      userContact.contacts.forEach(function(contact) {
 
-          contact.state = statics.model('state', 'disabled')._id; /** Set the user contact as disabled */
+        contact.state = statics.model('state', 'disabled')._id; /** Set the user contact as disabled */
 
-          relations.contact(contact.user, function(err, relation) {
+        relations.contact(contact.user, function(err, relation) {
 
-            if (!err && relation.contact) {
+          if (!err && relation.contact) {
 
-              index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
+            index = relation.isContact(user, true).index; /** The index of session user in the contact contacts list */
 
-              contact = relation.contact;
+            contact = relation.contact;
 
-              contact.contacts[index].state = statics.model('state', 'disabled')._id; /** Set itself as disabled in the contact contacts list */
+            contact.contacts[index].state = statics.model('state', 'disabled')._id; /** Set itself as disabled in the contact contacts list */
 
-              contact.save(function(err) {
-                if (err) {
-                  debug(err);
-                }
-              });
-            }
-          });
-        });
-
-        userContact.save(function(err) {
-          if (err) {
-            next(err);
-          } else {
-
-            User.findById(user, function(err, user) {
+            contact.save(function(err) {
               if (err) {
-                next(err);
-              } else {
-
-                user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
-
-                user.save(function(err) {
-
-                  if (err) {
-                    next(err);
-
-                  } else {
-                    delete req.session.user;
-                    res.sendStatus(204);
-                  }
-                });
+                debug(err);
               }
             });
           }
         });
-      } else {
-        debug('No contacts list for user %s was found', user);
-        res.sendStatus(404);
-      }
+      });
+
+      userContact.save(function(err) {
+        if (err) {
+          return next(err);
+        }
+
+        User.findById(user, function(err, user) {
+          if (err) {
+            return next(err);
+          }
+
+          user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
+
+          user.save(function(err) {
+            if (err) {
+              return next(err);
+
+            }
+            delete req.session.user;
+            res.sendStatus(204);
+
+          });
+        });
+      });
     });
 
   });
@@ -402,39 +392,41 @@ module.exports = function(router, mongoose) {
    */
   router.put('/validate/:token', function(req, res, next) {
 
-    Token.findById(req.params.token, function(err, token) {
+    Token.findById(req.params.token).
+    exec(function(err, token) {
       if (err) {
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
         } else {
           next(err);
         }
+        return;
 
-      } else if (token) {
-
-        User.
-        findOneAndUpdate({
-          _id: token.user
-        }, {
-          state: statics.model('state', 'active')._id
-        }).
-
-        exec(function(err, user) {
-          if (err) {
-            return next(err);
-          }
-
-          req.session.user = user;
-          res.status(204).end();
-
-          token.remove(function(err) {
-            if (err) { debug(err); }
-          });
-
-        });
-      } else {
-        res.sendStatus(498);
       }
+
+      if (!token) {
+        return res.sendStatus(498);
+      }
+
+      User.findOneAndUpdate({
+        _id: token.user
+      }, {
+        state: statics.model('state', 'active')._id
+      }).
+      exec(function(err, user) {
+        if (err) {
+          return next(err);
+        }
+
+        req.session.user = user;
+        res.status(204).end();
+
+        token.remove(function(err) {
+          if (err) {
+            debug(err);
+          }
+        });
+      });
     });
 
   });
@@ -444,9 +436,8 @@ module.exports = function(router, mongoose) {
    */
   router.get('/:id', function(req, res, next) {
 
-    User.
+    User.findById(req.params.id).
 
-    findById(req.params.id).
     deepPopulate('profile.pictures'). /* Retrieve data from linked schemas */
 
     exec(function(err, user) {
@@ -458,14 +449,15 @@ module.exports = function(router, mongoose) {
         } else {
           next(err);
         }
-
-      } else if (user) {
-
-        res.send(user);
-
-      } else {
-        res.sendStatus(404);
+        return;
       }
+
+      if (!user) {
+        return res.sendStatus(404);
+      }
+
+      res.send(user);
+
     });
 
   });

@@ -48,6 +48,7 @@ module.exports = function(router /*, mongoose*/ ) {
         }
 
         notes.forEach(function(note) {
+
           if (note && typeof note === "string") {
 
             saved += 1;
@@ -56,9 +57,7 @@ module.exports = function(router /*, mongoose*/ ) {
               note: note,
               added: now
             });
-
           }
-
         });
 
         task.save(function(err) {

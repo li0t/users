@@ -25,7 +25,26 @@ md-content.md-padding
       textarea.form-control(
         ng-model='data.content'
         required)
-  
+        
+    div(layout='row')  
+      h4 Tags
+        
+      md-button.md-raised(ng-repeat='tag in data.tags' type='button') {{ tag }}
+        md-icon(md-font-icon='material-icons' ng-click='removeTag(tag)') close
+        
+    md-divider
+      
+    md-autocomplete(
+      md-selected-item-change="selectedTagChange(tag.name)"
+      placeholder='Agrega tags a la nota'
+      md-items='tag in searchTags(text)'
+      md-selected-item='selectedTag'
+      md-search-text='text'
+      md-no-cache='true'
+      md-delay='100')
+      md-item-template
+        span {{ tag.name }}
+      
     div(layout='row')
       md-button(ng-href='/groups/{{session.group._id}}/profile')
         md-icon(md-font-icon='material-icons') chevron_left

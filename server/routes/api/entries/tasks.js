@@ -15,13 +15,13 @@ module.exports = function(router, mongoose) {
    */
   router.post('/add-to/:id', function(req, res, next) {
 
-    var now = new Date();
-    var i;
-    var task = req.params.id;
     var user = req.session.user._id;
     var entries = req.body.entries;
+    var task = req.params.id;
+    var now = new Date();
     var checked = 0;
     var saved = 0;
+    var i;
 
     function checkAndSave() {
 
@@ -158,11 +158,11 @@ module.exports = function(router, mongoose) {
   router.post('/remove-from/:id', function(req, res, next) {
 
     var remover = req.session.user._id;
-    var task = req.params.id;
     var entries = req.body.entries;
-    var i;
-    var index;
+    var task = req.params.id;
     var removed = 0;
+    var index;
+    var i;
 
     if (!entries || !entries.length) {
       return res.sendStatus(400);

@@ -62,7 +62,9 @@ module.exports = function(Schema) {
 
       added: Date
 
-    }]
+    }],
+
+    tags: [String]
 
   });
 

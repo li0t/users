@@ -1,15 +1,17 @@
 md-toolbar.lightBlue
   h1.md-toolbar-tools
   
-  md-button(ng-show='!session.user' ng-click='$navigateTo("/")')
+  md-button(aria-label='profile-picture' ng-show='!session.user' ng-click='$navigateTo("/")')
     md-icon.icon48(md-font-icon='material-icons') account_circle
-    br
     br
     
   md-list
-    md-list-item(ng-click='$navigateTo("/")')
-      img.profilePicture(ng-if='session.user'
-       ng-src='{{"api/files/" + session.user.profile.pictures[0] }}'
+    md-list-item(
+      aria-label='profile-picture'
+      ng-click='$navigateTo("/")'
+      ng-if='session.user')
+      img.profilePicture(
+        ng-src='{{"api/files/" + session.user.profile.pictures[0] }}'
         alt='{{pic.filename}}'
         class='md-avatar')
         

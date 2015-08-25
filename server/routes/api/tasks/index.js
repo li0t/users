@@ -7,6 +7,7 @@ var relations = component('relations');
 module.exports = function(router, mongoose) {
 
   var Task = mongoose.model('task');
+  var Tag = mongoose.model('tag');
 
   /**
    * Get session user tasks
@@ -51,13 +52,22 @@ module.exports = function(router, mongoose) {
   /**
    * Get tasks by keywords
    */
-  router.get('/like*', function(req, res, next) {
+  router.get('/like', function(req, res, next) {
 
     var keywords = req.query.keywords;
     var limit = req.query.limit;
     var skip = req.query.skip;
-    var score = { score: { $meta: "textScore" }};
-    var find = { $text: { $search: keywords }};
+
+    var score = {
+      score: {
+        $meta: "textScore"
+      }
+    };
+    var find = {
+      $text: {
+        $search: keywords
+      }
+    };
 
     Task.find(find, score).
 
@@ -84,9 +94,9 @@ module.exports = function(router, mongoose) {
    */
   router.post('/', function(req, res, next) {
 
-    var group = req.body.group;
     var dateTime = req.body.dateTime || null;
     var creator = req.session.user._id;
+    var group = req.body.group;
 
     relations.membership(group, function(err, membership) {
 
@@ -124,58 +134,98 @@ module.exports = function(router, mongoose) {
 
   });
 
-
-
   /**
-   * Get tasks of a group
+   * Add Tags to a Task
    */
-  router.get('/of-group/:id', function(req, res, next) {
+  router.post('/:id/tags', function(req, res, next) {
 
-    var i;
     var user = req.session.user._id;
-    var group = req.params.id;
+    var tags = req.body.tags;
+    var tagsSaved = 0;
+    var task;
 
-    relations.membership(group, function(err, relation) {
+    /* Check if all tags were found and/or created */
+    function onTagReady(tag) {
 
-      if (err || !relation.group) {
-        debug('Group  %s was not found', group);
+      task.tags.push(tag.name);
+
+      tagsSaved += 1;
+
+      if (tagsSaved === req.body.tags.length) {
+        task.save(function(err) {
+          if (err) {
+            return next(err);
+          }
+          res.sendStatus(204);
+
+        });
+      }
+    }
+
+    if (!tags || !tags.length) {
+      return res.sendStatus(400);
+    }
+
+    /* Convert the tags string to array if necessary */
+    if (typeof req.body.tags === 'string') {
+      req.body.tags = [req.body.tags];
+    }
+
+    Task.findById(req.params.id).
+
+    exec(function(err, data) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!data) {
         return res.sendStatus(404);
       }
 
-      if (!relation.isMember(user)) {
-        debug('User %s is not part of group %s', req.session.user._id, group);
-        return res.sendStatus(403);
-      }
+      task = data;
 
-      Task.find().
+      tags = tags.filter(function(tag) {
+        return task.tags.indexOf(tag) < 0;
+      });
 
-      where('group', group).
-      where('deleted', null).
+      relations.membership(task.group, function(err, membership) {
 
-      sort('-created').
-
-      deepPopulate('priority').
-
-      exec(function(err, tasks) {
-
-        if (err) {
-          return next(err);
+        if (err || !membership.group) {
+          debug('Group %s not found', req.body.group);
+          return res.sendStatus(400);
         }
 
-        tasks.forEach(function(task) {
+        if (!membership.isMember(user)) {
+          debug('User is not part of group %s', user, membership.group._id);
+          return res.sendStatus(403);
+        }
 
-          for (i = 0; i < task.collaborators.length; i++) {
-            /** Check if user is actual collaborator of task */
-            if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
-              /** Remove it from the array and reallocate index */
-              task.collaborators.splice(i, 1);
-              i -= 1;
+        tags.forEach(function(tag) {
+
+          Tag.findOne().
+          where('name', tag).
+
+          exec(function(err, found) {
+            if (err) {
+              debug('Error! : %s', err);
+            } else if (found) {
+              debug('Tag found : %s', found.name);
+              onTagReady(found);
+            } else {
+              debug('Creating new Tag : %s', tag);
+              new Tag({
+                name: tag
+              }).
+              save(function(err, newTag) {
+                if (err) {
+                  debug('Error! : %s', err);
+                } else {
+                  onTagReady(newTag);
+                }
+              });
             }
-          }
+          });
         });
-
-        res.send(tasks);
-
       });
     });
 
@@ -186,8 +236,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/close/:id', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -232,8 +282,8 @@ module.exports = function(router, mongoose) {
    */
   router.delete('/:id', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -268,7 +318,6 @@ module.exports = function(router, mongoose) {
           res.end();
 
         });
-
       });
     });
 
@@ -279,8 +328,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/re-open/:id', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -325,8 +374,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/objective', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -371,8 +420,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/priority', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -417,8 +466,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/date-time', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -469,8 +518,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/worked-time', function(req, res, next) {
 
-    var task = req.params.id;
     var collaborator = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, relation) {
 
@@ -513,9 +562,9 @@ module.exports = function(router, mongoose) {
    **/
   router.get('/:id', function(req, res, next) {
 
-    var i;
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
+    var i;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -543,7 +592,7 @@ module.exports = function(router, mongoose) {
           }
         }
 
-        task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
+        task.deepPopulate('group.profile collaborators.user entries.entry priority', function(err, task) {
           if (err) {
             return next(err);
           }

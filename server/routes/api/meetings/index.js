@@ -7,6 +7,8 @@ var relations = component('relations');
 module.exports = function(router, mongoose) {
 
   var Meeting = mongoose.model('meeting');
+  var Tag = mongoose.model('tag');
+
 
   /**
    * Get session user meetings
@@ -50,13 +52,22 @@ module.exports = function(router, mongoose) {
   /**
    * Get meetings by keywords
    */
-  router.get('/like*', function(req, res, next) {
+  router.get('/like', function(req, res, next) {
 
     var keywords = req.query.keywords;
     var limit = req.query.limit;
     var skip = req.query.skip;
-    var score = { score: { $meta: "textScore" }};
-    var find = { $text: { $search: keywords }};
+
+    var score = {
+      score: {
+        $meta: "textScore"
+      }
+    };
+    var find = {
+      $text: {
+        $search: keywords
+      }
+    };
 
     Meeting.find(find, score).
 
@@ -83,9 +94,9 @@ module.exports = function(router, mongoose) {
    */
   router.post('/', function(req, res, next) {
 
-    var group = req.body.group;
     var dateTime = req.body.dateTime || null;
     var creator = req.session.user._id;
+    var group = req.body.group;
 
     relations.membership(group, function(err, membership) {
 
@@ -102,11 +113,11 @@ module.exports = function(router, mongoose) {
       }
 
       new Meeting({
-        group: group._id,
-        creator: creator,
         objective: req.body.objective,
-        dateTime: dateTime,
         notes: req.body.notes,
+        dateTime: dateTime,
+        group: group._id,
+        creator: creator
       }).
 
       save(function(err, meeting) {
@@ -122,58 +133,98 @@ module.exports = function(router, mongoose) {
 
   });
 
-
-
   /**
-   * Get meetings of a group
+   * Add Tags to a Meeting
    */
-  router.get('/of-group/:id', function(req, res, next) {
+  router.post('/:id/tags', function(req, res, next) {
 
-    var i;
     var user = req.session.user._id;
-    var group = req.params.id;
+    var tags = req.body.tags;
+    var tagsSaved = 0;
+    var meeting;
 
-    relations.membership(group, function(err, relation) {
+    /* Check if all tags were found and/or created */
+    function onTagReady(tag) {
 
-      if (err || !relation.group) {
-        debug('Group  %s was not found', group);
+      meeting.tags.push(tag.name);
+
+      tagsSaved += 1;
+
+      if (tagsSaved === req.body.tags.length) {
+        meeting.save(function(err) {
+          if (err) {
+            return next(err);
+          }
+          res.sendStatus(204);
+
+        });
+      }
+    }
+
+    if (!tags || !tags.length) {
+      return res.sendStatus(400);
+    }
+
+    /* Convert the tags string to array if necessary */
+    if (typeof req.body.tags === 'string') {
+      req.body.tags = [req.body.tags];
+    }
+
+    Meeting.findById(req.params.id).
+
+    exec(function(err, data) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!data) {
         return res.sendStatus(404);
       }
 
-      if (!relation.isMember(user)) {
-        debug('User %s is not part of group %s', req.session.user._id, group);
-        return res.sendStatus(403);
-      }
+      meeting = data;
 
-      Meeting.find().
+      tags = tags.filter(function(tag) {
+        return meeting.tags.indexOf(tag) < 0;
+      });
 
-      where('group', group).
-      where('deleted', null).
+      relations.membership(meeting.group, function(err, membership) {
 
-      sort('-created').
-
-      deepPopulate('').
-
-      exec(function(err, meetings) {
-
-        if (err) {
-          return next(err);
+        if (err || !membership.group) {
+          debug('Group %s not found', req.body.group);
+          return res.sendStatus(400);
         }
 
-        meetings.forEach(function(meeting) {
+        if (!membership.isMember(user)) {
+          debug('User is not part of group %s', user, membership.group._id);
+          return res.sendStatus(403);
+        }
 
-          for (i = 0; i < meeting.attendants.length; i++) {
-            /** Check if user is actual attendant of meeting */
-            if (meeting.attendants[i].left.length && (meeting.attendants[i].left.length === meeting.attendants[i].joined.length)) {
-              /** Remove it from the array and reallocate index */
-              meeting.attendants.splice(i, 1);
-              i -= 1;
+        tags.forEach(function(tag) {
+
+          Tag.findOne().
+          where('name', tag).
+
+          exec(function(err, found) {
+            if (err) {
+              debug('Error! : %s', err);
+            } else if (found) {
+              debug('Tag found : %s', found.name);
+              onTagReady(found);
+            } else {
+              debug('Creating new Tag : %s', tag);
+              new Tag({
+                name: tag
+              }).
+              save(function(err, newTag) {
+                if (err) {
+                  debug('Error! : %s', err);
+                } else {
+                  onTagReady(newTag);
+                }
+              });
             }
-          }
+          });
         });
-
-        res.send(meetings);
-
       });
     });
 
@@ -358,7 +409,7 @@ module.exports = function(router, mongoose) {
           }
         }
 
-        meeting.deepPopulate('group.profile attendants.user entries.entry  notes', function(err, meeting) {
+        meeting.deepPopulate('group.profile attendants.user entries.entry', function(err, meeting) {
           if (err) {
             return next(err);
           }

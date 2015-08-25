@@ -18,33 +18,32 @@ module.exports = function(router, mongoose) {
         return next(err);
       }
 
-      if (profile) {
-
-        profile.name = (req.body.name && req.body.name !== 'own' && req.body.name) || profile.name;
-
-        profile.birthdate = req.body.birthdate || profile.birthdate;
-
-        profile.gender = req.body.gender || profile.gender;
-
-        profile.location = req.body.location || profile.location;
-
-        profile.save(function(err) {
-          if (err) {
-            if (err.name && err.name === 'CastError') {
-              res.sendStatus(400);
-            } else {
-              next(err);
-            }
-          } else {
-
-            res.sendStatus(204);
-
-          }
-        });
-      } else {
+      if (!profile) {
         debug('No profile found for user %s', req.session.user._id);
-        res.sendStatus(404);
+        return res.sendStatus(404);
       }
+
+      profile.name = (req.body.name && req.body.name !== 'own' && req.body.name) || profile.name;
+
+      profile.birthdate = req.body.birthdate || profile.birthdate;
+
+      profile.gender = req.body.gender || profile.gender;
+
+      profile.location = req.body.location || profile.location;
+
+      profile.save(function(err) {
+        if (err) {
+          if (err.name && err.name === 'CastError') {
+            res.sendStatus(400);
+          } else {
+            next(err);
+          }
+        } else {
+
+          res.sendStatus(204);
+
+        }
+      });
     });
 
   });
@@ -54,8 +53,8 @@ module.exports = function(router, mongoose) {
    */
   router.post('/pictures', function(req, res, next) {
 
-    var profile; /* This is the target schema */
     var saved = 0;
+    var profile; /* This is the target schema */
 
     /**
      * Create the document with the saved File ids
@@ -114,18 +113,17 @@ module.exports = function(router, mongoose) {
         return next(err);
       }
 
-      if (data) {
+      if (!data) {
+        return res.sendStatus(404);
+      }
 
-        profile = data;
+      profile = data;
 
-        if (req.files && req.files.length) { /* If there are any files, save them */
-          savePictures();
-        } else { /* If not, just save the profile */
-          debug('No files saved');
-          saveProfile();
-        }
-      } else {
-        res.sendStatus(404);
+      if (req.files && req.files.length) { /* If there are any files, save them */
+        savePictures();
+      } else { /* If not, just save the profile */
+        debug('No files saved');
+        saveProfile();
       }
     });
 

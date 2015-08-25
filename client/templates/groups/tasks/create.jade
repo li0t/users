@@ -37,6 +37,25 @@ md-content.md-padding
           type='date')
           
       div(layout='row')  
+        h4 Tags
+          
+        md-button.md-raised(ng-repeat='tag in data.tags' type='button') {{ tag }}
+          md-icon(md-font-icon='material-icons' ng-click='removeTag(tag)') close
+          
+      md-divider
+        
+      md-autocomplete(
+        md-selected-item-change="selectedTagChange(tag.name)"
+        placeholder='Agrega tags a la tarea'
+        md-items='tag in searchTags(text)'
+        md-selected-item='selectedTag'
+        md-search-text='text'
+        md-no-cache='true'
+        md-delay='100')   
+        md-item-template
+          span {{ tag.name }}  
+          
+      div(layout='row')  
         h4 Collaboradores
           
         md-button.md-raised(ng-repeat='collaborator in collaborators.list' type='button')

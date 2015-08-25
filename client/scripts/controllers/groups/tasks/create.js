@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Groups:Tasks:Create', [
-    '$scope', '$http', '$location', '$session', 'priorities',
+    '$scope', '$http', '$location', '$session', 'priorities', '$timeout',
 
-    function($scope, $http, $location, $session, priorities) {
+    function($scope, $http, $location, $session, priorities, $timeout) {
 
       $scope.fetching = false;
 
@@ -14,9 +14,10 @@
 
       $scope.data = {
         group: $session.get('group')._id,
+        collaborators: [],
         objetive: null,
         priority: null,
-        collaborators: []
+        tags: []
       };
 
       $scope.fetch = function() {
@@ -40,24 +41,32 @@
 
         success(function(task) {
 
-          $http.post('/api/tasks/collaborators/add-to/' + task, $scope.data).
+          if ($scope.data.collaborators.length) {
 
-          success(function() {
+            $http.post('/api/tasks/collaborators/add-to/' + task, $scope.data).
 
-            $session.flash('Tarea creada');
-          }).
+            error(function() {
+              $session.flash('Hubo un error agregando colaboradores a la tarea, por favor inténtalo denuevo');
+            });
+          }
 
-          error(function() {
-            $session.flash('La tarea no pudo ser creada');
-          }).
+          if ($scope.data.tags.length) {
 
-          finally(function() {
-            $location.path('/groups/' + $session.get('group')._id + '/tasks');
-          });
+            $http.post('/api/tasks/' + task + '/tags', $scope.data).
+
+            error(function() {
+              $session.flash('Hubo un error agregando tags a la tarea, por favor inténtalo denuevo');
+            });
+          }
+
+          $session.flash('success', 'Tarea creada con éxito!');
+
         }).
-
         error(function() {
           $session.flash('La tarea no pudo ser creada');
+        }).
+        finally(function() {
+          $location.path('/groups/' + $session.get('group')._id + '/tasks');
         });
       };
 
@@ -81,6 +90,50 @@
         remove: function remove($index) {
           $scope.data.collaborators.splice($index, 1);
           this.list.splice($index, 1);
+        }
+      };
+
+      $scope.removeTag = function(tag) {
+        var index = $scope.data.tags.indexOf(tag);
+        if (index >= 0) {
+          $scope.data.tags.splice(index, 1);
+        }
+      };
+
+      $scope.searchTags = function(tag) {
+
+        if (tag && tag.replace(/\s+/g, '').length) {
+
+          var
+            limit = 'limit=' + $scope.limit + '&',
+            skip = 'skip=' + $scope.skip + '&',
+            keywords = 'keywords=' + tag,
+            tags = '/api/tags/like?' + limit + skip + keywords;
+
+          return $http.get(tags).
+          then(function(tags) {
+            return (tags.data.length && tags.data) || $timeout(function() {
+              return [{
+                name: tag
+              }];
+            }, 600);
+          });
+        }
+      };
+
+      $scope.selectedTagChange = function(tag) {
+
+        tag = tag && tag.replace(/\s+/g, '');
+
+        if (tag && tag.length) {
+
+          var index = $scope.data.tags.indexOf(tag);
+          if (index < 0) {
+            $scope.data.tags.push(tag);
+          }
+
+          $scope.selectedTag = null;
+          $scope.text = '';
         }
       };
 

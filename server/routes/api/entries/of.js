@@ -52,8 +52,8 @@ module.exports = function(router, mongoose) {
    */
   router.get('/user/:id/type/:type', function(req, res, next) {
 
-    var user = req.params.id;
     var type = req.params.type;
+    var user = req.params.id;
 
     relations.contact(user, function(err, relation) {
 
@@ -92,11 +92,11 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries of a group
    */
-  router.get('/group/:id*', function(req, res, next) {
+  router.get('/group/:id', function(req, res, next) {
 
     var user = req.session.user._id;
-    var group = req.params.id;
     var limit = req.query.limit;
+    var group = req.params.id;
     var skip = req.query.skip;
 
     relations.membership(group, function(err, relation) {
@@ -140,8 +140,8 @@ module.exports = function(router, mongoose) {
   router.get('/group/:id/type/:type', function(req, res, next) {
 
     var user = req.session.user._id;
-    var group = req.params.id;
     var type = req.params.type;
+    var group = req.params.id;
 
     relations.membership(group, function(err, relation) {
 

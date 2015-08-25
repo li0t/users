@@ -35,13 +35,22 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries by keywords
    */
-  router.get('/like*', function(req, res, next) {
+  router.get('/like', function(req, res, next) {
 
     var keywords = req.query.keywords;
     var limit = req.query.limit;
     var skip = req.query.skip;
-    var score = { score: { $meta: "textScore" }};
-    var find = { $text: { $search: keywords }};
+
+    var score = {
+      score: {
+        $meta: "textScore"
+      }
+    };
+    var find = {
+      $text: {
+        $search: keywords
+      }
+    };
 
     Entry.find(find, score).
 
@@ -68,120 +77,139 @@ module.exports = function(router, mongoose) {
    */
   router.post('/', function(req, res, next) {
 
-    var entry; /* This is the target schema */
     var group = req.body.group;
-    var tagsSaved = 0;
 
-    /**
-     * Save the document
-     */
-    function saveEntry() {
-      entry.save(function(err, entry) {
-        if (err) {
-          return next(err);
-        }
+    /** Get the group model */
+    relations.membership(group, function(err, relation) {
 
-        res.status(201).send(entry._id);
+      if (err || !relation.group) {
+        debug('Group %s not found', group);
+        return res.sendStatus(404);
 
-      });
-    }
-
-    /**
-     * Lookup for tags provided by the user
-     * If one is not found create a new tag
-     */
-    function saveTags() {
-
-      /* Check if all tags were found and/or created */
-      function onTagReady(tag) {
-        entry.tags.push(tag.name);
-
-        tagsSaved += 1;
-
-        if (tagsSaved === req.body.tags.length) {
-          saveEntry();
-        }
       }
 
-      /* Convert the tags string to array if necessary */
-      if (typeof req.body.tags === 'string') {
-        req.body.tags = [req.body.tags];
+      if (!relation.isMember(req.session.user._id)) {
+        debug('User %s is not part of group %s', req.session.user._id, group);
+        return res.sendStatus(403);
       }
-
-      req.body.tags.forEach(function(tag) {
-
-        Tag.findOne().
-        where('name', tag).
-
-        exec(function(err, found) {
-          if (err) {
-            debug('Error! : %s', err);
-          } else if (found) {
-            debug('Tag found : %s', found.name);
-            onTagReady(found);
-          } else {
-            debug('Creating new Tag : %s', tag);
-            new Tag({
-              name: tag
-            }).
-            save(function(err, newTag) {
-              if (err) {
-                debug('Error! : %s', err);
-              } else {
-                onTagReady(newTag);
-              }
-            });
-          }
-        });
-      });
-    }
-
-    function createEntry() {
 
       new Entry({
         user: req.session.user._id,
-        group: group,
+        content: req.body.content,
         title: req.body.title,
-        content: req.body.content /* Markdown text */
+        group: group
       }).
 
-      save(function(err, data) {
+      save(function(err, entry) {
         if (err) {
           if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {
             res.sendStatus(400);
           } else {
             next(err);
           }
-        } else {
-
-          entry = data;
-
-          if (req.body.tags && req.body.tags.length) { /* If there are any tags, save them */
-            saveTags();
-
-          } else { /* If not, just save the entry */
-            saveEntry();
-          }
+          return;
         }
-      });
 
+        res.status(201).send(entry._id);
+
+      });
+    });
+
+  });
+
+  /**
+   * Add Tags to a entry
+   */
+  router.post('/:id/tags', function(req, res, next) {
+
+    var user = req.session.user._id;
+    var tags = req.body.tags;
+    var tagsSaved = 0;
+    var entry;
+
+    /* Check if all tags were found and/or created */
+    function onTagReady(tag) {
+
+      entry.tags.push(tag.name);
+
+      tagsSaved += 1;
+
+      if (tagsSaved === req.body.tags.length) {
+        entry.save(function(err) {
+          if (err) {
+            return next(err);
+          }
+          res.sendStatus(204);
+
+        });
+      }
     }
 
-    /** Get the group model */
-    relations.membership(group, function(err, relation) {
+    if (!tags || !tags.length) {
+      return res.sendStatus(400);
+    }
 
-      if (err || !relation.group) {
-        debug('User %s is not part of group %s', req.session.user._id, group);
-        return res.sendStatus(403);
+    /* Convert the tags string to array if necessary */
+    if (typeof req.body.tags === 'string') {
+      req.body.tags = [req.body.tags];
+    }
+
+    Entry.findById(req.params.id).
+
+    exec(function(err, data) {
+      if (err) {
+        return next(err);
       }
 
-      if (!relation.isMember(req.session.user._id)) {
-        debug('Group %s not found', group);
+      if (!data) {
         return res.sendStatus(404);
       }
 
-      createEntry();
+      entry = data;
 
+      tags = tags.filter(function(tag) {
+        return entry.tags.indexOf(tag) < 0;
+      });
+
+      relations.membership(entry.group, function(err, membership) {
+
+        if (err || !membership.group) {
+          debug('Group %s not found', req.body.group);
+          return res.sendStatus(400);
+        }
+
+        if (!membership.isMember(user)) {
+          debug('User is not part of group %s', user, membership.group._id);
+          return res.sendStatus(403);
+        }
+
+        tags.forEach(function(tag) {
+
+          Tag.findOne().
+          where('name', tag).
+
+          exec(function(err, found) {
+            if (err) {
+              debug('Error! : %s', err);
+            } else if (found) {
+              debug('Tag found : %s', found.name);
+              onTagReady(found);
+            } else {
+              debug('Creating new Tag : %s', tag);
+              new Tag({
+                name: tag
+              }).
+              save(function(err, newTag) {
+                if (err) {
+                  debug('Error! : %s', err);
+                } else {
+                  onTagReady(newTag);
+                }
+              });
+            }
+          });
+        });
+      });
     });
 
   });

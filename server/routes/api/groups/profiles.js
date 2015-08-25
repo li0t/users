@@ -19,38 +19,36 @@ module.exports = function(router, mongoose) {
 
     relations.membership(group, function(err, membership) {
 
-      if (!err && membership.group) {
-
-        group = membership.group;
-
-        if (membership.isAdmin(user)) {
-
-          Profile.findById(group.profile, function(err, profile) {
-            if (err) {
-              return next(err);
-            }
-
-            profile.name = (req.body.name && req.body.name !== 'own' && req.body.name) || profile.name;
-
-            profile.location = req.body.location || profile.location;
-
-            profile.save(function(err) {
-              if (err) {
-                return next(err);
-              }
-
-              res.sendStatus(204);
-
-            });
-          });
-        } else {
-          debug('User %s is not admin of group %s', user, group._id);
-          res.sendStatus(403);
-        }
-      } else {
+      if (err || !membership.group) {
         debug('No group found with id %s', req.params.id);
-        res.sendStatus(404);
+        return res.sendStatus(404);
       }
+
+      group = membership.group;
+
+      if (!membership.isAdmin(user)) {
+        debug('User %s is not admin of group %s', user, group._id);
+        return res.sendStatus(403);
+      }
+
+      Profile.findById(group.profile, function(err, profile) {
+        if (err) {
+          return next(err);
+        }
+
+        profile.name = (req.body.name && req.body.name !== 'own' && req.body.name) || profile.name;
+
+        profile.location = req.body.location || profile.location;
+
+        profile.save(function(err) {
+          if (err) {
+            return next(err);
+          }
+
+          res.sendStatus(204);
+
+        });
+      });
     });
 
   });
@@ -117,31 +115,29 @@ module.exports = function(router, mongoose) {
 
     relations.membership(group, function(err, membership) {
 
-      if (!err && membership.group) {
-
-        group = membership.group; /** The group model */
-
-        if (membership.isMember(user)) {
-
-          Profile.findById(group.profile, function(err, data) {
-
-            profile = data;
-
-            if (req.files && req.files.length) { /* If there are any files, save them */
-              savePictures();
-            } else { /* If not, just save the profile */
-              debug('No files saved');
-              saveProfile();
-            }
-          });
-        } else {
-          debug('User %s is not member of group %s', user, group._id);
-          res.sendStatus(403);
-        }
-      } else {
+      if (err || !membership.group) {
         debug('No group found with id %s', req.params.id);
-        res.sendStatus(404);
+        return res.sendStatus(404);
       }
+
+      group = membership.group; /** The group model */
+
+      if (!membership.isMember(user)) {
+        debug('User %s is not member of group %s', user, group._id);
+        return res.sendStatus(403);
+      }
+
+      Profile.findById(group.profile, function(err, data) {
+
+        profile = data;
+
+        if (req.files && req.files.length) { /* If there are any files, save them */
+          savePictures();
+        } else { /* If not, just save the profile */
+          debug('No files saved');
+          saveProfile();
+        }
+      });
     });
 
   });
