@@ -18,9 +18,9 @@ module.exports = function(router, mongoose) {
   router.get('/', function(req, res, next) {
 
     var user = req.session.user._id;
-    var groups = [];
     var toCheck = 0;
     var checked = 0;
+    var groups = [];
 
     Group.find().
 
@@ -96,7 +96,9 @@ module.exports = function(router, mongoose) {
 
     if (name) {
 
-      new Profile({ name: name }).
+      new Profile({
+        name: name
+      }).
       save(function(err, profile) {
         if (err) {
           if (err.name && (err.name === 'CastError') || (err.name === 'ValidationError')) {

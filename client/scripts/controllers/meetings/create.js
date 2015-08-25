@@ -56,7 +56,7 @@
 
           success(function(meeting) {
 
-            if ($scope.data.tags.lenght) {
+            if ($scope.data.tags.length) {
 
               $http.post('/api/meetings/' + meeting + '/tags', $scope.data).
 

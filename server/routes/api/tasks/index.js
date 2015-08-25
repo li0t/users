@@ -52,11 +52,12 @@ module.exports = function(router, mongoose) {
   /**
    * Get tasks by keywords
    */
-  router.get('/like*', function(req, res, next) {
+  router.get('/like', function(req, res, next) {
 
     var keywords = req.query.keywords;
     var limit = req.query.limit;
     var skip = req.query.skip;
+
     var score = {
       score: {
         $meta: "textScore"
@@ -231,67 +232,12 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get tasks of a group
-   */
-  router.get('/of-group/:id', function(req, res, next) {
-
-    var i;
-    var user = req.session.user._id;
-    var group = req.params.id;
-
-    relations.membership(group, function(err, relation) {
-
-      if (err || !relation.group) {
-        debug('Group  %s was not found', group);
-        return res.sendStatus(404);
-      }
-
-      if (!relation.isMember(user)) {
-        debug('User %s is not part of group %s', req.session.user._id, group);
-        return res.sendStatus(403);
-      }
-
-      Task.find().
-
-      where('group', group).
-      where('deleted', null).
-
-      sort('-created').
-
-      deepPopulate('priority').
-
-      exec(function(err, tasks) {
-
-        if (err) {
-          return next(err);
-        }
-
-        tasks.forEach(function(task) {
-
-          for (i = 0; i < task.collaborators.length; i++) {
-            /** Check if user is actual collaborator of task */
-            if (task.collaborators[i].left.length && (task.collaborators[i].left.length === task.collaborators[i].joined.length)) {
-              /** Remove it from the array and reallocate index */
-              task.collaborators.splice(i, 1);
-              i -= 1;
-            }
-          }
-        });
-
-        res.send(tasks);
-
-      });
-    });
-
-  });
-
-  /**
    * Set task as completed
    */
   router.put('/close/:id', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -336,8 +282,8 @@ module.exports = function(router, mongoose) {
    */
   router.delete('/:id', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -372,7 +318,6 @@ module.exports = function(router, mongoose) {
           res.end();
 
         });
-
       });
     });
 
@@ -383,8 +328,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/re-open/:id', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -429,8 +374,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/objective', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -475,8 +420,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/priority', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -521,8 +466,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/date-time', function(req, res, next) {
 
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, collaboration) {
 
@@ -573,8 +518,8 @@ module.exports = function(router, mongoose) {
    */
   router.put('/:id/worked-time', function(req, res, next) {
 
-    var task = req.params.id;
     var collaborator = req.session.user._id;
+    var task = req.params.id;
 
     relations.collaboration(task, function(err, relation) {
 
@@ -617,9 +562,9 @@ module.exports = function(router, mongoose) {
    **/
   router.get('/:id', function(req, res, next) {
 
-    var i;
-    var task = req.params.id;
     var user = req.session.user._id;
+    var task = req.params.id;
+    var i;
 
     relations.collaboration(task, function(err, collaboration) {
 

@@ -19,6 +19,7 @@
       };
 
       $scope.submit = function() {
+
         $scope.submitting = true;
 
         $scope.data.group = $session.get('group')._id;
@@ -38,31 +39,26 @@
 
               $http.post('/api/entries/' + entry + '/tags', $scope.data).
 
-              success(function() {
-                $session.flash('success', 'Entrada creada con éxito!');
-              }).
-
-              error(function(data) {
-                $session.flash('danger', data);
-              }).
-
-              finally(function() {
-                $location.path('/groups/' + $session.get('group')._id + '/entries/note');
+              error(function() {
+                $session.flash('danger', 'Hubo un error agregando tags a la imagen!');
               });
-
-            } else {
-              $location.path('/groups/' + $session.get('group')._id + '/entries/note');
-              $session.flash('success', 'Entrada creada con éxito!');
             }
+
+            $session.flash('success', 'Entrada creada con éxito!');
 
           }).
           error(function() {
-            $session.flash('danger', "No crear la entrada");
+            $session.flash('danger', "Hubo un error creando la entrada"); /** TODO: Rollback */
+          }).
+          finally(function() {
+            $scope.submitting = false;
+            $location.path('/groups/' + $session.get('group')._id + '/entries/image');
           });
         }).
         error(function() {
           $session.flash('danger', 'Hubo un error creando la entrada');
         });
+
       };
 
       $scope.removeTag = function(tag) {
@@ -85,8 +81,10 @@
           return $http.get(tags).
           then(function(tags) {
             return (tags.data.length && tags.data) || $timeout(function() {
-                return [{ name : tag}];
-              }, 600);
+              return [{
+                name: tag
+              }];
+            }, 600);
           });
         }
       };

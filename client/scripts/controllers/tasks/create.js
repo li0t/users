@@ -12,6 +12,7 @@
 
       $scope.data = {
         group: $session.get('user').group._id,
+        collaborators: [$session.get('user')],
         objetive: null,
         priority: null,
         tags:  []
@@ -23,33 +24,25 @@
 
         success(function(task) {
 
-          $http.post('/api/tasks/collaborators/add-to/' + task, {
-            collaborators: [$session.get('user')._id]
-          }).
+          if ($scope.data.collaborators.length) {
 
-          success(function(task) {
+            $http.post('/api/tasks/collaborators/add-to/' + task, $scope.data).
 
-            if ($scope.data.tags.lenght) {
+            error(function() {
+              $session.flash('Hubo un error agregando colaboradores a la tarea, por favor inténtalo denuevo');
+            });
+          }
 
-              $http.post('/api/tasks/' + task + '/tags', $scope.data).
+          if ($scope.data.tags.length) {
 
-              success(function() {
-                $location.path('/tasks/collaborator');
-                $session.flash('success', 'Tarea creada con éxito!');
-              }).
+            $http.post('/api/tasks/' + task + '/tags', $scope.data).
 
-              error(function(data) {
-                $session.flash('danger', data);
-              });
-            } else {
-              $location.path('/tasks/collaborator');
-              $session.flash('success', 'Tarea creada con éxito!');
-            }
-          }).
+            error(function() {
+              $session.flash('Hubo un error agregando tags a la tarea, por favor inténtalo denuevo');
+            });
+          }
 
-          error(function() {
-            $session.flash('La tarea no pudo ser creada');
-          });
+          $session.flash('success', 'Tarea creada con éxito!');
         }).
         error(function() {
           $session.flash('La tarea no pudo ser creada');

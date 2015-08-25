@@ -14,12 +14,12 @@ module.exports = function (router, mongoose) {
     Tag.find().
 
     exec(function(err, tags) {
-
       if (err) {
-        next(err);
-      } else {
-        res.send(tags);
+        return next(err);
       }
+
+        res.send(tags);
+
     });
 
   });
@@ -27,21 +27,14 @@ module.exports = function (router, mongoose) {
   /**
    * Get Tags by keywords
    */
-  router.get('/like*', function(req, res, next) {
+  router.get('/like', function(req, res, next) {
 
     var keywords = req.query.keywords;
     var limit = req.query.limit;
     var skip = req.query.skip;
-    var score = {
-      score: {
-        $meta: "textScore"
-      }
-    };
-    var find = {
-      $text: {
-        $search: keywords
-      }
-    };
+
+    var score = { score: { $meta: "textScore" }};
+    var find = { $text: { $search: keywords }};
 
     Tag.find(find, score).
 

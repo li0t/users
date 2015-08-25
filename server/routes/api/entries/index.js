@@ -35,13 +35,22 @@ module.exports = function(router, mongoose) {
   /**
    * Get entries by keywords
    */
-  router.get('/like*', function(req, res, next) {
+  router.get('/like', function(req, res, next) {
 
     var keywords = req.query.keywords;
     var limit = req.query.limit;
     var skip = req.query.skip;
-    var score = { score: { $meta: "textScore" }};
-    var find = { $text: { $search: keywords }};
+
+    var score = {
+      score: {
+        $meta: "textScore"
+      }
+    };
+    var find = {
+      $text: {
+        $search: keywords
+      }
+    };
 
     Entry.find(find, score).
 

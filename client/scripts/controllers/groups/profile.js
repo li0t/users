@@ -12,11 +12,13 @@
       $scope.skip = 0;
 
       $scope.fetchGroup = function() {
+
         $scope.fetching = true;
 
         $http.post('/api/groups/set/' + $routeParams.id).
 
         success(function(data) {
+
           $scope.group = data;
           $session.set('group', data);
 
@@ -24,19 +26,37 @@
 
           success(function(data) {
             $scope.entries = data;
-          }).
 
+            $http.get('/api/tasks/of/group/' + $session.get('group')._id + '?limit=' + $scope.limit + '&skip=' + $scope.skip).
+
+            success(function(data) {
+              $scope.entries = $scope.entries.concat(data);
+
+              $http.get('/api/meetings/of/group/' + $session.get('group')._id + '?limit=' + $scope.limit + '&skip=' + $scope.skip).
+
+              success(function(data) {
+                $scope.entries = $scope.entries.concat(data);
+              }).
+
+              error(function() {
+                $session.flash('danger', "Hubo un error obteniendo las reuniones del grupo");
+              }).
+              finally(function() {
+                $scope.fetching = false;
+              });
+            }).
+            error(function() {
+              $session.flash('danger', "Hubo un error obteniendo las tareas del grupo");
+            });
+          }).
           error(function() {
-            $session.flash('danger', "Hubo un error obteniendo las entradas");
-          }).
-
-          finally(function() {
-            $scope.fetching = false;
+            $session.flash('danger', "Hubo un error obteniendo las entradas del grupo");
           });
         }).
         error(function() {
           $session.flash('danger', "Hubo un error la información del grupo");
         });
+
       };
 
       $scope.fetchGroup();

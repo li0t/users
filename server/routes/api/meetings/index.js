@@ -52,13 +52,22 @@ module.exports = function(router, mongoose) {
   /**
    * Get meetings by keywords
    */
-  router.get('/like*', function(req, res, next) {
+  router.get('/like', function(req, res, next) {
 
     var keywords = req.query.keywords;
     var limit = req.query.limit;
     var skip = req.query.skip;
-    var score = { score: { $meta: "textScore" }};
-    var find = { $text: { $search: keywords }};
+
+    var score = {
+      score: {
+        $meta: "textScore"
+      }
+    };
+    var find = {
+      $text: {
+        $search: keywords
+      }
+    };
 
     Meeting.find(find, score).
 
@@ -85,9 +94,9 @@ module.exports = function(router, mongoose) {
    */
   router.post('/', function(req, res, next) {
 
-    var group = req.body.group;
     var dateTime = req.body.dateTime || null;
     var creator = req.session.user._id;
+    var group = req.body.group;
 
     relations.membership(group, function(err, membership) {
 
@@ -216,63 +225,6 @@ module.exports = function(router, mongoose) {
             }
           });
         });
-      });
-    });
-
-  });
-
-
-
-  /**
-   * Get meetings of a group
-   */
-  router.get('/of-group/:id', function(req, res, next) {
-
-    var i;
-    var user = req.session.user._id;
-    var group = req.params.id;
-
-    relations.membership(group, function(err, relation) {
-
-      if (err || !relation.group) {
-        debug('Group  %s was not found', group);
-        return res.sendStatus(404);
-      }
-
-      if (!relation.isMember(user)) {
-        debug('User %s is not part of group %s', req.session.user._id, group);
-        return res.sendStatus(403);
-      }
-
-      Meeting.find().
-
-      where('group', group).
-      where('deleted', null).
-
-      sort('-created').
-
-      deepPopulate('').
-
-      exec(function(err, meetings) {
-
-        if (err) {
-          return next(err);
-        }
-
-        meetings.forEach(function(meeting) {
-
-          for (i = 0; i < meeting.attendants.length; i++) {
-            /** Check if user is actual attendant of meeting */
-            if (meeting.attendants[i].left.length && (meeting.attendants[i].left.length === meeting.attendants[i].joined.length)) {
-              /** Remove it from the array and reallocate index */
-              meeting.attendants.splice(i, 1);
-              i -= 1;
-            }
-          }
-        });
-
-        res.send(meetings);
-
       });
     });
 

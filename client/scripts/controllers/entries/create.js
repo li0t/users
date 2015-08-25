@@ -19,7 +19,7 @@
 
         success(function(entry) {
 
-          if ($scope.data.tags.lenght) {
+          if ($scope.data.tags.length) {
 
             $http.post('/api/entries/' + entry +'/tags', $scope.data).
 

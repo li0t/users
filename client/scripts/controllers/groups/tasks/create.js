@@ -41,35 +41,32 @@
 
         success(function(task) {
 
-          $http.post('/api/tasks/collaborators/add-to/' + task, $scope.data).
+          if ($scope.data.collaborators.length) {
 
-          success(function() {
+            $http.post('/api/tasks/collaborators/add-to/' + task, $scope.data).
 
-            if ($scope.data.tags.lenght) {
+            error(function() {
+              $session.flash('Hubo un error agregando colaboradores a la tarea, por favor inténtalo denuevo');
+            });
+          }
 
-              $http.post('/api/tasks/' + task + '/tags', $scope.data).
+          if ($scope.data.tags.length) {
 
-              success(function() {
-                $location.path('/groups/' + $session.get('group')._id + '/tasks');
-                $session.flash('success', 'Tarea creada con éxito!');
-              }).
+            $http.post('/api/tasks/' + task + '/tags', $scope.data).
 
-              error(function(data) {
-                $session.flash('danger', data);
-              });
-            } else {
-              $location.path('/groups/' + $session.get('group')._id + '/tasks');
-              $session.flash('success', 'Tarea creada con éxito!');
-            }
-          }).
+            error(function() {
+              $session.flash('Hubo un error agregando tags a la tarea, por favor inténtalo denuevo');
+            });
+          }
 
-          error(function() {
-            $session.flash('La tarea no pudo ser creada');
-          });
+          $session.flash('success', 'Tarea creada con éxito!');
+
         }).
-
         error(function() {
           $session.flash('La tarea no pudo ser creada');
+        }).
+        finally(function() {
+          $location.path('/groups/' + $session.get('group')._id + '/tasks');
         });
       };
 
@@ -116,8 +113,10 @@
           return $http.get(tags).
           then(function(tags) {
             return (tags.data.length && tags.data) || $timeout(function() {
-                return [{ name : tag}];
-              }, 600);
+              return [{
+                name: tag
+              }];
+            }, 600);
           });
         }
       };
