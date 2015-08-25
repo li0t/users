@@ -12,7 +12,7 @@
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/tasks/of-group/' + $routeParams.id).
+        $http.get('/api/tasks/of/group/' + $routeParams.id).
 
         success(function(data) {
           $scope.tasks = data;

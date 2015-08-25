@@ -113,12 +113,13 @@ module.exports = function(router, mongoose) {
       }
 
       new Task({
-        group: group._id,
-        creator: creator,
+        activities: req.body.activities,
         objective: req.body.objective,
         priority: req.body.priority,
-        dateTime: dateTime,
         notes: req.body.notes,
+        dateTime: dateTime,
+        group: group._id,
+        creator: creator
       }).
 
       save(function(err, task) {

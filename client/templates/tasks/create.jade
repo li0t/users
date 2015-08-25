@@ -36,6 +36,21 @@ md-content
       input.form-control(
         ng-model='data.dateTime'
         type='date')
+    
+    div(layout='column')
+      md-checkbox(
+        ng-repeat='activity in data.activities'
+        aria-label='task-activity'
+        ng-disabled='true')
+        | {{ activity.description }}
+        
+        md-icon(md-font-icon='material-icons' ng-click='removeActivity($index)' ) close
+      
+      div(layout='row')
+        md-input-container
+          label Agrega una actividad...
+          input(ng-model='activity')    
+        md-icon(md-font-icon='material-icons' ng-click='activity && addActivity(activity)' ) add
         
     div(layout='row')  
       h4 Tags

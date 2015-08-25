@@ -12,7 +12,8 @@
 
       $scope.data = {
         group: $session.get('user').group._id,
-        collaborators: [$session.get('user')],
+        collaborators: [$session.get('user')._id],
+        activities: [],
         objetive: null,
         priority: null,
         tags:  []
@@ -35,7 +36,7 @@
 
           if ($scope.data.tags.length) {
 
-            $http.post('/api/tasks/' + task + '/tags', $scope.data).
+            $http.post('/api/tasks/tags/add-to/' + task, $scope.data).
 
             error(function() {
               $session.flash('Hubo un error agregando tags a la tarea, por favor inténtalo denuevo');
@@ -46,7 +47,19 @@
         }).
         error(function() {
           $session.flash('La tarea no pudo ser creada');
+        }).
+        finally(function() {
+          $location.path('/tasks/creator');
         });
+      };
+
+      $scope.addActivity = function(activity) {
+        $scope.data.activities.push({description: activity});
+        $scope.activity = null;
+      };
+
+      $scope.removeActivity = function(index) {
+        $scope.data.activities.splice(index,1);
       };
 
       $scope.removeTag = function(tag) {

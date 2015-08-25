@@ -40,6 +40,22 @@ md-content.md-padding(layout='column' ng-show='!fetching && task')
       md-icon(md-font-icon='material-icons') edit
       | Editar
   
+  div(layout='column')
+    md-checkbox(ng-repeat='activity in task.activities'
+      ng-click='toogleActivity(activity)'
+      ng-disabled='task.completed'
+      ng-checked='activity.checked'
+      aria-label='task-activity')
+      | {{ activity.description }}
+      
+      md-icon(md-font-icon='material-icons' ng-click='removeActivity(activity.description)' ) close
+    
+    div(layout='row' ng-show='!task.completed')
+      md-input-container
+        label Agrega una actividad...
+        input(ng-model='activity')    
+      md-icon(md-font-icon='material-icons' ng-click='activity && addActivity(activity)' ) add
+  
   div(ng-show='!task.notes.length')
     p No hay notas
   

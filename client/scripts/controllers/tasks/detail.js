@@ -90,6 +90,83 @@
         });
       };
 
+      $scope.addActivity = function(activity) {
+
+        $http.post('/api/tasks/activities/add-to/' + $routeParams.id, {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error agregando la actividad!');
+        }).
+
+        finally(function() {
+          $scope.activity = null;
+        });
+      };
+
+      $scope.removeActivity = function(activity) {
+
+        $http.post('/api/tasks/activities/remove-from/' + $routeParams.id, {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la actividad!');
+        });
+      };
+
+      $scope.activityCompleted = function(activity) {
+
+        $http.put('/api/tasks/activities/of/' + $routeParams.id + '/check', {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error completando la actividad!');
+        }).
+
+        finally(function() {
+          $scope.activity = null;
+        });
+      };
+
+      $scope.activityUncompleted = function(activity) {
+
+        $http.put('/api/tasks/activities/of/' + $routeParams.id + '/uncheck', {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la actividad!');
+        });
+      };
+
+      $scope.toogleActivity = function(activity) {
+
+        return !activity.checked ?
+          $scope.activityCompleted(activity.description) :
+          $scope.activityUncompleted(activity.description);
+
+      };
+
+
       $scope.editDateTime = function() {
 
         $http.put('/api/tasks/' + $scope.task._id + '/date-time' , {

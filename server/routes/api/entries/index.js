@@ -345,7 +345,6 @@ module.exports = function(router, mongoose) {
         } else {
 
           relations.contact(entry.user, function(err, relation) {
-
             if (err || !relation.contact) {
               return res.sendStatus(400);
             }

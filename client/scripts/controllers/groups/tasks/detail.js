@@ -19,7 +19,7 @@
         }).
 
         error(function(data) {
-          $location.path($routeParams.id +  '/tasks');
+          $location.path($routeParams.id + '/tasks');
           $session.flash('danger', data);
         }).
 
@@ -72,13 +72,15 @@
         }).
 
         finally(function() {
-            $scope.note = null;
+          $scope.note = null;
         });
       };
 
       $scope.removeNote = function(note) {
 
-        $http.post('/api/tasks/notes/remove-from/' + $routeParams.task, { notes: [note] }).
+        $http.post('/api/tasks/notes/remove-from/' + $routeParams.task, {
+          notes: [note]
+        }).
 
         success(function() {
           $scope.fetch();
@@ -94,9 +96,85 @@
         });
       };
 
+      $scope.addActivity = function(activity) {
+
+        $http.post('/api/tasks/activities/add-to/' + $routeParams.task, {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error agregando la actividad!');
+        }).
+
+        finally(function() {
+          $scope.activity = null;
+        });
+      };
+
+      $scope.removeActivity = function(activity) {
+
+        $http.post('/api/tasks/activities/remove-from/' + $routeParams.task, {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la actividad!');
+        });
+      };
+
+      $scope.activityCompleted = function(activity) {
+
+        $http.put('/api/tasks/activities/of/' + $routeParams.task + '/check', {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error completando la actividad!');
+        }).
+
+        finally(function() {
+          $scope.activity = null;
+        });
+      };
+
+      $scope.activityUncompleted = function(activity) {
+
+        $http.put('/api/tasks/activities/of/' + $routeParams.task + '/uncheck', {
+          activities: [activity]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la actividad!');
+        });
+      };
+
+      $scope.toogleActivity = function(activity) {
+
+        return !activity.checked ?
+          $scope.activityCompleted(activity.description) :
+          $scope.activityUncompleted(activity.description);
+
+      };
+
       $scope.editDateTime = function() {
 
-        $http.put('/api/tasks/' + $routeParams.task + '/date-time' , {
+        $http.put('/api/tasks/' + $routeParams.task + '/date-time', {
           dateTime: $scope.task.dateTime
         }).
 
@@ -109,7 +187,7 @@
         }).
 
         finally(function() {
-            $scope.dateTimeChanged = null;
+          $scope.dateTimeChanged = null;
         });
       };
 
