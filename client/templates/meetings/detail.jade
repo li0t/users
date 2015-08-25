@@ -41,7 +41,11 @@ md-content.md-padding(ng-show='!fetching && meeting' layout='column')
   div(ng-show='!meeting.completed')
     textarea(ng-model='note')
     md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar  
-            
+  
+  h5 Asistentes  
+  div(layout='row')
+    md-button.md-raised(ng-repeat='attendant in meeting.attendants') {{ attendant.user.profile.name || attendant.user.email }}  
+  
   h5 Tags  
   div(layout='row')
     md-button.md-raised(ng-repeat='tag in entry.tags') {{ tag }}  

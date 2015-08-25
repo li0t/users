@@ -592,7 +592,7 @@ module.exports = function(router, mongoose) {
           }
         }
 
-        task.deepPopulate('group.profile collaborators.user entries.entry priority notes', function(err, task) {
+        task.deepPopulate('group.profile collaborators.user entries.entry priority', function(err, task) {
           if (err) {
             return next(err);
           }

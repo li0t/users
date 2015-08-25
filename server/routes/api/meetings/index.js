@@ -409,7 +409,7 @@ module.exports = function(router, mongoose) {
           }
         }
 
-        meeting.deepPopulate('group.profile attendants.user entries.entry  notes', function(err, meeting) {
+        meeting.deepPopulate('group.profile attendants.user entries.entry', function(err, meeting) {
           if (err) {
             return next(err);
           }
