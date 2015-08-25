@@ -58,6 +58,10 @@ md-content(layout='column')
     div(ng-show='!task.completed')
       textarea(ng-model='note')
       md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar
+    
+    h5 Tags  
+    div(layout='row')
+      md-button.md-raised(ng-repeat='tag in task.tags') {{ tag }}
       
             
       

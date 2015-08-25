@@ -23,7 +23,7 @@
 
         success(function(task) {
 
-          $http.post('/api/tasks/collaborators/' + task, {
+          $http.post('/api/tasks/collaborators/add-to/' + task, {
             collaborators: [$session.get('user')._id]
           }).
 

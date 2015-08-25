@@ -23,7 +23,6 @@
             $scope.members = members.filter(function(member) {
               return member.user._id !== $session.get('user')._id;
             });
-            console.log($scope.members);
           }).
           error(function() {
             $session.flash('danger', 'Hubo un error obteniendo los miembros del grupo');

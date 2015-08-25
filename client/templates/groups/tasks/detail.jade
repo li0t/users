@@ -57,6 +57,10 @@ md-content.md-padding(layout='column')
     md-button(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/collaborators')
       md-icon(md-font-icon='material-icons') group
       | Collaboradores
+      
+    h5 Tags  
+    div(layout='row')
+      md-button.md-raised(ng-repeat='tag in task.tags') {{ tag }}  
     
       
               

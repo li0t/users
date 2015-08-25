@@ -57,6 +57,10 @@ md-content.md-padding(layout='column')
     md-button(ng-href='/groups/{{session.group._id}}/meetings/{{meeting._id}}/attendants')
       md-icon(md-font-icon='material-icons') group
       | Asistentes
+      
+    h5 Tags  
+    div(layout='row')
+      md-button.md-raised(ng-repeat='tag in meeting.tags') {{ tag }}    
     
       
               
