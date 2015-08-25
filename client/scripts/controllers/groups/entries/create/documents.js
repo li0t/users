@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Groups:Entries:Documents', [
-    '$scope', '$http', '$location', '$session', 'Upload',
+    '$scope', '$http', '$location', '$session', 'Upload', '$timeout',
 
-    function($scope, $http, $location, $session, $upload) {
+    function($scope, $http, $location, $session, $upload, $timeout) {
 
       $scope.filesSupported = 'application/*';
       $scope.files = [];
@@ -74,9 +74,7 @@
 
       $scope.searchTags = function(tag) {
 
-        tag = tag && tag.replace(/\s+/g, '');
-
-        if (tag && tag.length) {
+        if (tag && tag.replace(/\s+/g, '').length) {
 
           var
             limit = 'limit=' + $scope.limit + '&',
@@ -86,7 +84,9 @@
 
           return $http.get(tags).
           then(function(tags) {
-            return (tags.data.length && tags.data) || [{ name : tag}];
+            return (tags.data.length && tags.data) || $timeout(function() {
+                return [{ name : tag}];
+              }, 750);
           });
         }
       };

@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Groups:Tasks:Create', [
-    '$scope', '$http', '$location', '$session', 'priorities',
+    '$scope', '$http', '$location', '$session', 'priorities', '$timeout',
 
-    function($scope, $http, $location, $session, priorities) {
+    function($scope, $http, $location, $session, priorities, $timeout) {
 
       $scope.fetching = false;
 
@@ -105,9 +105,7 @@
 
       $scope.searchTags = function(tag) {
 
-        tag = tag && tag.replace(/\s+/g, '');
-
-        if (tag && tag.length) {
+        if (tag && tag.replace(/\s+/g, '').length) {
 
           var
             limit = 'limit=' + $scope.limit + '&',
@@ -117,7 +115,9 @@
 
           return $http.get(tags).
           then(function(tags) {
-            return (tags.data.length && tags.data) || [{ name : tag}];
+            return (tags.data.length && tags.data) || $timeout(function() {
+                return [{ name : tag}];
+              }, 750);
           });
         }
       };

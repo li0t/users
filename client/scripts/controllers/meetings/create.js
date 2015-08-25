@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Meetings:Create', [
-    '$scope', '$location', '$http', '$session',
+    '$scope', '$location', '$http', '$session', '$timeout',
 
-    function($scope, $location, $http, $session) {
+    function($scope, $location, $http, $session, $timeout) {
 
       $scope.fetching = false;
 
@@ -117,9 +117,7 @@
 
       $scope.searchTags = function(tag) {
 
-        tag = tag && tag.replace(/\s+/g, '');
-
-        if (tag && tag.length) {
+        if (tag && tag.replace(/\s+/g, '').length) {
 
           var
             limit = 'limit=' + $scope.limit + '&',
@@ -129,7 +127,9 @@
 
           return $http.get(tags).
           then(function(tags) {
-            return (tags.data.length && tags.data) || [{ name : tag}];
+            return (tags.data.length && tags.data) || $timeout(function() {
+                return [{ name : tag}];
+              }, 750);
           });
         }
       };
