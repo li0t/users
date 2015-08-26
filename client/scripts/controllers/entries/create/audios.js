@@ -6,6 +6,7 @@
 
     function($scope, $http, $location, $session, $upload, $timeout) {
 
+      $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
       $scope.filesSupported = 'audio/*';
       $scope.files = [];
 
@@ -33,6 +34,7 @@
         }).
 
         finally(function() {
+          $scope.data.group = $scope.sessionGroup;
           $scope.fetching = false;
         });
 

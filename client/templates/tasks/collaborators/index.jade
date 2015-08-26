@@ -1,20 +1,14 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 {{ session.group.profile.name }}
+    h2 TAREAS
     
     div(layout='row')
-      md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/tasks/{{task._id}}/collaborators/add')
-        md-icon(md-font-icon='material-icons') add
-        
-      group-items 
+      creator
       
-md-content.md-padding    
-  div(ng-show='fetching && !task.collaborators')        
-    md-icon(md-font-icon='material-icons') sync
-    | Recopilando Informaciòn 
-      
-  div(ng-show='!fetching && task.collaborators')
+md-content.md-padding(ng-show='!fetching && task.collaborators')        
     h3 Collaboradores
+    
+    md-button(ng-href='/tasks/{{task._id}}/collaborators/add') Agregar
     
     h4(ng-show='!task.collaborators.length') No hay colaboradores
     

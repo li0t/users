@@ -7,12 +7,14 @@
     function($scope, $http, $location, $session, $routeParams) {
 
       $scope.group = $session.get('group');
+      $scope.membersToRemove = null;
       $scope.fetching = null;
       $scope.members = null;
-      $scope.membersToRemove = null;
+
       $scope.admin = $scope.group && ($scope.group.admin._id === $session.get('user')._id) ? $scope.group.admin._id : null;
 
       $scope.fetch = function() {
+
         $scope.membersToRemove = [];
         $scope.fetching = true;
 
@@ -49,6 +51,7 @@
       };
 
       $scope.addOrRemove = function(member) {
+
         if ($scope.admin) {
           if (member !== $scope.admin) {
             var indexOf = $scope.membersToRemove.indexOf(member);
@@ -63,6 +66,7 @@
       };
 
       $scope.removeMembers = function() {
+
         if ($scope.admin) {
 
           $http.post('/api/groups/members/remove-from/' + $routeParams.id, {

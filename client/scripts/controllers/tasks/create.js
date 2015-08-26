@@ -6,6 +6,8 @@
 
     function($scope, $location, $http, $session, priorities, $timeout) {
 
+      $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
+
       $scope.statics = {
         priorities: priorities.priorities
       };
@@ -53,6 +55,7 @@
         }).
 
         finally(function() {
+          $scope.data.group = $scope.sessionGroup;
           $scope.fetching = false;
         });
 

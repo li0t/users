@@ -1,30 +1,38 @@
-div.panel.panel-default
-  div.panel-heading
-    h3.panel-title
-      i.fa.fa-mr.fa-th-large
-      | Entradas 
-      
-  div.panel-body
-    a.btn.btn-block.btn-lg.btn-default(ng-href='/entries')
-      i.fa.fa-mr.fa-user
-      | Volver 
-          
-  div.panel-body.text-center(ng-show='fetching && !entry')
-    h4
-      i.fa.fa-mr.fa-circle-o-notch.fa-spin
-      | Recopilando Información
-      
-  div.panel-body.text-center(ng-show='!fetching && entry')
-    h3 {{entry.title}}
-    p {{entry.content}}
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 {{ session.group.profile.name }}   
     
-    div.row(ng-show='entry.tags.length')
-      p Tags:
+    div(layout='row' )
+      creator
+        
+      group-items
+        
+md-content.md-padding(ng-show='!fetching && entry')
+  md-input-container
+    input(readonly aria-label='entry-title') 
+    | Titulo : {{ entry.title && entry.title || "Sin título" }}
+  
+  md-input-container
+    input(readonly aria-label='entry-group') 
+    | Grupo:  {{ entry.group.profile && entry.group.profile.name }}
+        
+  div(ng-if='entry.type == "image"')
+    div(ng-repeat='pic in entry.pictures')
+      img(ng-src='{{"api/files/" + pic._id }}' alt='{{pic.filename}}' style='max-height: 400px; max-width:400px;')
+      
+  div(ng-if='entry.type == "document"')
+    div(ng-repeat='doc in entry.documents')
+      iframe(ng-src='{{"api/files/" + doc._id }}' alt='{{doc.filename}}' height='1000px' width='1000px')
+  
+  div(ng-if='entry.type == "audio"')
+    div(ng-repeat='audio in entry.audios')
+      audio(ng-src='{{"api/files/" + audio._id }}' alt='{{audio.filename}}' controls)
+        p Tu navegador no soporta el elemento audio.
+      
+  div(ng-if='entry.type == "note"')
+    p {{ entry.content }}
     
-    div.row
-      div.col-sm-4(ng-repeat='tag in entry.tags', ng-show='entry.tags.length')
-        p {{ tag }}
-              
-    div.row
-      div.col-sm-4(ng-repeat='picture in entry.pictures', ng-show='entry.pictures.length', ng-init='href = ("/api/files/{0}" | format : picture._id)')
-        img(src='{{ href }}', style="max-heigth: 200px; max-width:200px;")
+  h5 Tags  
+  div(layout='row')
+    md-button.md-raised(ng-repeat='tag in entry.tags') {{ tag }}  
+  

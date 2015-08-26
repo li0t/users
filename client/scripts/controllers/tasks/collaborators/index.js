@@ -1,20 +1,20 @@
 (function(ng) {
   'use strict';
 
-  ng.module('App').controller('Groups:Tasks:Collaborators', [
+  ng.module('App').controller('Tasks:Collaborators', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
 
       $scope.collaboratorsToRemove = [];
-      $scope.task = $routeParams.task;
+      $scope.task = $routeParams.id;
       $scope.fetching = null;
 
       $scope.fetch = function() {
         $scope.collaboratorsToRemove = [];
         $scope.fetching = true;
 
-        $http.get('/api/tasks/' + $routeParams.task).
+        $http.get('/api/tasks/' + $routeParams.id).
 
         success(function(task) {
 
@@ -49,7 +49,7 @@
 
       $scope.removeMembers = function() {
 
-        $http.post('/api/tasks/collaborators/remove-from/' + $routeParams.task, {
+        $http.post('/api/tasks/collaborators/remove-from/' + $routeParams.id, {
           collaborators: $scope.collaboratorsToRemove
         }).
 

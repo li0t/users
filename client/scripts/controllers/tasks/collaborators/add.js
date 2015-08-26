@@ -1,12 +1,12 @@
 (function(ng) {
   'use strict';
 
-  ng.module('App').controller('Groups:Tasks:Collaborators:Add', [
+  ng.module('App').controller('Tasks:Collaborators:Add', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      $scope.task = $routeParams.task;
+      $scope.task = $routeParams.id;
       $scope.fetching = false;
 
       $scope.data = {
@@ -32,13 +32,15 @@
 
         $scope.fetching = true;
 
-        $http.get('/api/groups/members/of/' + $session.get('group')._id).
+        $http.get('/api/tasks/' + $routeParams.id).
+
+        success(function(task) {
+
+        $http.get('/api/groups/members/of/' + task.group._id).
 
         success(function(members) {
 
-          $http.get('/api/tasks/' + $routeParams.task).
 
-          success(function(task) {
             $scope.members = filterContacts(members, task.collaborators);
           }).
 
@@ -50,10 +52,10 @@
 
       $scope.submit = function() {
 
-        $http.post('/api/tasks/collaborators/add-to/' + $routeParams.task, $scope.data).
+        $http.post('/api/tasks/collaborators/add-to/' + $routeParams.id, $scope.data).
 
         success(function() {
-          $location.path('/groups/' + $session.get('group')._id + '/tasks/' + $routeParams.task + '/collaborators');
+          $location.path('/');
           $session.flash('Colaboradores agregados');
         }).
 

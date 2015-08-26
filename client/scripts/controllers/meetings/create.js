@@ -6,6 +6,7 @@
 
     function($scope, $location, $http, $session, $timeout) {
 
+      $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
       $scope.fetching = false;
 
       $scope.data = {
@@ -53,6 +54,7 @@
         }).
 
         finally(function() {
+          $scope.data.group = $scope.sessionGroup;
           $scope.fetching = false;
         });
 

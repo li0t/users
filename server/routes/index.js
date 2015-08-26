@@ -25,41 +25,22 @@ module.exports = function(router) {
     /* Groups */
     '/groups',
     '/groups/create',
+    '/groups/:id/tasks',
     '/groups/:id/profile',
+    '/groups/:id/meetings',
+    '/groups/:id/entries/:type',
 
-    /* Groups Members */
+    /* Groups Members*/
     '/groups/:id/members',
     '/groups/:id/members/add',
-    '/groups/:id/members/remove',
 
-    /* Groups Entries */
-    '/groups/:id/entries',
-    '/groups/:id/entries/:type',
-    '/groups/:id/entries/create/note',
-    '/groups/:id/entries/create/image',
-    '/groups/:id/entries/create/audio',
-    '/groups/:id/entries/create/document',
-    '/groups/:id/entries/:entry/detail',
-
-    /* Groups Tasks */
-    '/groups/:id/tasks',
-    '/groups/:id/tasks/create',
-    '/groups/:id/tasks/:task/detail',
-    '/groups/:id/tasks/:task/collaborators',
-    '/groups/:id/tasks/:task/collaborators/add',
-
-    /* Groups Meetings */
-    '/groups/:id/meetings',
-    '/groups/:id/meetings/create',
-    '/groups/:id/meetings/:meeting/detail',
-    '/groups/:id/meetings/:meeting/attendants',
-    '/groups/:id/meetings/:meeting/attendants/add',
 
     /* Entries */
     '/entries',
     '/entries/:type',
     '/entries/:id/detail',
     '/entries/create/note',
+    '/entries/create/audio',
     '/entries/create/image',
     '/entries/create/document',
 

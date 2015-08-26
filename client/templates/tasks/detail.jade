@@ -5,10 +5,6 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     div(layout='row')
       creator
       
-      md-button(ng-href='/tasks/collaborator')  Mis Tareas
-        
-      md-button(ng-href='/tasks/creator')  Tareas Asignadas
-      
 md-content.md-padding(layout='column' ng-show='!fetching && task')
   md-button(
     ng-show='task.completed'
@@ -73,6 +69,10 @@ md-content.md-padding(layout='column' ng-show='!fetching && task')
   h5 Tags  
   div(layout='row')
     md-button.md-raised(ng-repeat='tag in task.tags') {{ tag }}
+    
+  md-button(ng-href='/tasks/{{task._id}}/collaborators')
+    md-icon(md-font-icon='material-icons') group
+    | Collaboradores  
     
           
     

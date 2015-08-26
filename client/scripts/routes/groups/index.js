@@ -21,6 +21,21 @@
       when('/groups/:id/profile', {
         controller: 'Groups:Profile',
         templateUrl: '/assets/templates/groups/profile.html',
+      }).
+
+      when('/groups/:id/tasks', {
+        controller: 'Groups:Tasks',
+        templateUrl: '/assets/templates/groups/tasks.html'
+      }).
+
+      when('/groups/:id/meetings', {
+        controller: 'Groups:Meetings',
+        templateUrl: '/assets/templates/groups/meetings.html'
+      }).
+
+      when('/groups/:id/entries/:type', {
+        controller: 'Groups:Entries',
+        templateUrl: '/assets/templates/groups/entries.html',
       });
 
     }
