@@ -1,0 +1,25 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 TAGS
+    
+    creator
+      
+md-content.md-padding
+  form(
+    ng-submit='form.$valid && submit()'
+    name='form'
+    role='form'
+    novalidate)
+    
+    md-input-container.form-group
+      label Ingresa el nombre del tag
+      input.form-control(
+        ng-model='data.name'
+        required)
+      md-tooltip Un tag puede servirte para identificar un proyecto o tarea    
+      
+    md-button(
+      ng-disabled='form.$invalid || submitting'
+      type='submit') crear
+      
+      

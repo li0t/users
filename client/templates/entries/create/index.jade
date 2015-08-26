@@ -1,13 +1,9 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
-    h2 TAREAS
+    h2 OBJETOS
     
-    div(layout='row')
-      creator
-      
-      md-button.md-raised(ng-href='/tasks/collaborator')  Mis Tareas
-        
-      md-button(ng-href='/tasks/creator')  Tareas Asignadas
+    div
+      creator 
       
 md-content.md-padding
   md-grid-list(
@@ -19,8 +15,7 @@ md-content.md-padding
     md-row-height="1:1")
     md-grid-tile.whitebg(
       layout='column',
-      ng-repeat='task in tasks',
+      ng-repeat='example in examples',
       md-rowspan='1',
       md-colspan='1')
-      em-card(card='task' ng-click='$navigateTo("/tasks/" + task._id + "/detail")')
-            
+      em-card(card='example' ng-click='$navigateTo(example.href)')

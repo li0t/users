@@ -15,16 +15,7 @@
 
       when('/groups/create', {
         controller: 'Groups:Create',
-        templateUrl: '/assets/templates/groups/create.html',
-        resolve: {
-          posibleMembers: [
-            '$http',
-
-            function ($http) {
-              return $http.get('/api/contacts');
-            }
-          ]
-        }
+        templateUrl: '/assets/templates/groups/create.html'
       }).
 
       when('/groups/:id/profile', {

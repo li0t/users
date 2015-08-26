@@ -82,6 +82,10 @@ module.exports = function(router) {
     '/meetings/attendant',
     '/meetings/:id/detail',
 
+    /* Tags */
+    '/tags',
+    '/tags/create',
+
     /* Settings */
     '/settings',
 
