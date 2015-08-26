@@ -76,25 +76,27 @@ md-content.md-padding
           
         md-button.md-raised(ng-repeat='attendant in attendants.list' type='button')
           | {{ attendant.user.email }}
-          md-icon(
-            ng-if='attendant.user.email !== session.user.email'
-            ng-click='attendants.remove($index)'
-            md-font-icon='material-icons') close
-      
+          //
+            md-icon(
+              ng-if='attendant.user.email !== session.user.email'
+              ng-click='attendants.remove($index)'
+              md-font-icon='material-icons') close
+    
       md-divider
       
-      md-input-container
-        label Agrega asistentes
-        md-select(
-          ng-disabled='!members'
-          ng-change='attendants.add()'
-          ng-model='form.attendant')
-          
-          md-option(
-            ng-repeat='member in members'
-            value='{{ $index }}')
-            | {{ member.user.email }}
-              
+      //
+        md-input-container
+          label Agrega asistentes
+          md-select(
+            ng-disabled='!members'
+            ng-change='attendants.add()'
+            ng-model='form.attendant')
+            
+            md-option(
+              ng-repeat='member in members'
+              value='{{ $index }}')
+              | {{ member.user.email }} 
+                
       div(layout='row')
         md-button(ng-href='/groups/{{session.group._id}}/profile')
           md-icon(md-font-icon='material-icons') chevron_left
