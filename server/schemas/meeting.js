@@ -28,10 +28,12 @@ module.exports = function(Schema) {
       default: null
     },
 
-    objective: {
+    objective: { 
       type: String,
       required: true
     },
+
+    items: [{ description : String, checked: Date }],
 
     attendants: [{
 

@@ -114,6 +114,7 @@ module.exports = function(router, mongoose) {
 
       new Meeting({
         objective: req.body.objective,
+        items: req.body.items,
         notes: req.body.notes,
         dateTime: dateTime,
         group: group._id,

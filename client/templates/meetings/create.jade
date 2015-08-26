@@ -37,6 +37,21 @@ md-content.md-padding
           ng-model='data.dateTime'
           type='date')
           
+      div(layout='column')
+        md-checkbox(
+          ng-repeat='item in data.items'
+          aria-label='meeting-item'
+          ng-disabled='true')
+          | {{ item.description }}
+          
+          md-icon(md-font-icon='material-icons' ng-click='removeItem($index)' ) close
+        
+        div(layout='row')
+          md-input-container
+            label Agrega un item...
+            input(ng-model='item')    
+          md-icon(md-font-icon='material-icons' ng-click='item && addItem(item)' ) add    
+          
       div(layout='row')  
         h4 Tags
           

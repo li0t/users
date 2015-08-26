@@ -10,6 +10,7 @@
 
       $scope.data = {
         attendants: [$session.get('user')._id],
+        items: [],
         tags: []
       };
 
@@ -50,31 +51,29 @@
 
         $http.post('/api/meetings', $scope.data).
 
-        success(function(task) {
+        success(function(meeting) {
 
-          $http.post('/api/meetings/attendants/add-to/' + task, $scope.data).
+          $http.post('/api/meetings/attendants/add-to/' + meeting, $scope.data).
 
-          success(function(meeting) {
+          success(function() {
 
             if ($scope.data.tags.length) {
 
               $http.post('/api/meetings/' + meeting + '/tags', $scope.data).
 
-              success(function() {
-                $location.path('/meetings/creator');
-                $session.flash('success', 'Reunión creada con éxito!');
-              }).
-
               error(function(data) {
                 $session.flash('danger', data);
               });
-            } else {
-              $location.path('/meetings/creator');
-              $session.flash('success', 'Reunión creada con éxito!');
             }
+
+            $session.flash('success', 'Reunión creada con éxito!');
+
           }).
           error(function() {
             $session.flash('danger', 'La reunión no pudo ser creada');
+          }).
+          finally(function() {
+            $location.path('/meetings/creator');
           });
         }).
         error(function() {
@@ -107,6 +106,17 @@
         }
       };
 
+      $scope.addItem = function(item) {
+        $scope.data.items.push({
+          description: item
+        });
+        $scope.item = null;
+      };
+
+      $scope.removeItem = function(index) {
+        $scope.data.items.splice(index, 1);
+      };
+
       $scope.removeTag = function(tag) {
         var index = $scope.data.tags.indexOf(tag);
         if (index >= 0) {
@@ -127,8 +137,10 @@
           return $http.get(tags).
           then(function(tags) {
             return (tags.data.length && tags.data) || $timeout(function() {
-                return [{ name : tag}];
-              }, 600);
+              return [{
+                name: tag
+              }];
+            }, 600);
           });
         }
       };

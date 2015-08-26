@@ -20,13 +20,89 @@
         }).
 
         error(function(data) {
-          $location.path('/meetings/collaborator');
+          $location.path('/meetings/attendant');
           $session.flash('danger', data);
         }).
 
         finally(function() {
           $scope.fetching = false;
         });
+      };
+
+      $scope.addItem = function(item) {
+
+        $http.post('/api/meetings/items/add-to/' + $routeParams.id, {
+          items: [item]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error agregando la item!');
+        }).
+
+        finally(function() {
+          $scope.item = null;
+        });
+      };
+
+      $scope.removeItem = function(item) {
+
+        $http.post('/api/meetings/items/remove-from/' + $routeParams.id, {
+          items: [item]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la item!');
+        });
+      };
+
+      $scope.itemCompleted = function(item) {
+
+        $http.put('/api/meetings/items/of/' + $routeParams.id + '/check', {
+          items: [item]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error completando la item!');
+        }).
+
+        finally(function() {
+          $scope.item = null;
+        });
+      };
+
+      $scope.itemUncompleted = function(item) {
+
+        $http.put('/api/meetings/items/of/' + $routeParams.id + '/uncheck', {
+          items: [item]
+        }).
+
+        success(function() {
+          $scope.fetch();
+        }).
+
+        error(function() {
+          $session.flash('danger', 'Hubo un error eliminando la item!');
+        });
+      };
+
+      $scope.toogleItem = function(item) {
+
+        return !item.checked ?
+          $scope.itemCompleted(item.description) :
+          $scope.itemUncompleted(item.description);
+
       };
 
       $scope.addNote = function(note) {
