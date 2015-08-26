@@ -1,0 +1,26 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 REUNIONES
+    
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/meetings/create')
+        md-icon(md-font-icon='material-icons') add
+        
+      md-button(ng-href='/meetings/attendant')  Mis Reuniones
+        
+      md-button.md-raised(ng-href='/meetings/creator')  Reuniones Creadas
+            
+md-content.md-padding
+  md-grid-list(
+    md-gutter="12px",
+    md-gutter-gt-sm="8px",
+    md-cols-sm="1",
+    md-cols-md="2",
+    md-cols-gt-lg="4",
+    md-row-height="1:1")
+    md-grid-tile.whitebg(
+      layout='column',
+      ng-repeat='meeting in meetings',
+      md-rowspan='1',
+      md-colspan='1')
+      em-card(card='meeting' ng-click='$navigateTo("/meetings/" + meeting._id + "/detail")')

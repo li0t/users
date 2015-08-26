@@ -1,0 +1,52 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 REUNIONES
+    
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/meetings/attendant')
+        md-icon(md-font-icon='material-icons') chevron_left
+        
+      md-button(ng-href='/meetings/attendant')  Mis Reuniones
+        
+      md-button(ng-href='/meetings/creator')  Reuniones Creadas
+      
+md-content.md-padding(ng-show='!fetching && meeting' layout='column')        
+  div
+    h3 {{ meeting.objective }}
+
+  div(layout='row')  
+    md-input-containera
+      label Fecha
+      input.form-control(
+        ng-change='dateTimeChanged = true'
+        ng-disabled='meeting.completed'
+        ng-model='meeting.dateTime'
+        type='date')
+    
+    md-button(ng-click='editDateTime()' ng-show='!meeting.completed' ng-disabled='!dateTimeChanged') 
+      md-icon(md-font-icon='material-icons') edit
+      | Editar
+  
+  div(ng-show='!meeting.notes.length')
+    p No hay notas
+  
+  div(ng-show='meeting.notes.length')
+    p Notas:
+  
+  div
+    div(ng-repeat='note in meeting.notes', ng-show='meeting.notes.length')
+      p * {{ note.note }}
+        md-icon(md-font-icon='material-icons' ng-show='!meeting.completed' ng-click='removeNote(note.note)' ) close
+        
+  div(ng-show='!meeting.completed')
+    textarea(ng-model='note')
+    md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar  
+  
+  h5 Asistentes  
+  div(layout='row')
+    md-button.md-raised(ng-repeat='attendant in meeting.attendants') {{ attendant.user.profile.name || attendant.user.email }}  
+  
+  h5 Tags  
+  div(layout='row')
+    md-button.md-raised(ng-repeat='tag in entry.tags') {{ tag }}  
+  

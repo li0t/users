@@ -105,7 +105,7 @@
         }).
 
         error(function() {
-          $session.flash('danger', 'Hubo un editando la tarea!');
+          $session.flash('danger', 'Hubo un error editando la tarea!');
         }).
 
         finally(function() {

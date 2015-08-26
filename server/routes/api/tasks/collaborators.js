@@ -112,12 +112,12 @@ module.exports = function(router, mongoose) {
    */
   router.post('/add-to/:id', function(req, res, next) {
 
-    var task = req.params.id;
-    var inviter = req.session.user._id;
     var collaborators = req.body.collaborators;
-    var saved = 0;
+    var inviter = req.session.user._id;
+    var task = req.params.id;
     var now = new Date();
     var wasCollaborator;
+    var saved = 0;
 
     if (!collaborators || !collaborators.length) {
       return res.sendStatus(400);
@@ -200,12 +200,12 @@ module.exports = function(router, mongoose) {
    */
   router.post('/remove-from/:id', function(req, res, next) {
 
-    var removed = 0;
+    var collaborators = req.body.collaborators;
     var remover = req.session.user._id;
     var task = req.params.id;
-    var collaborators = req.body.collaborators;
-    var collaborator;
     var now = new Date();
+    var collaborator;
+    var removed = 0;
 
     if (!collaborators || !collaborators.length) {
       return res.sendStatus(400);

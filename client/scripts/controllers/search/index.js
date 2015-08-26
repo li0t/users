@@ -85,9 +85,8 @@
           success(function(tasks) {
 
             entries = entries.concat(tasks);
-
             $scope.entries = quicksort(entries);
-            console.log($scope.entries);
+            
           }).
           error(function(error) {
             console.log(error);

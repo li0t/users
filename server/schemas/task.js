@@ -79,7 +79,9 @@ module.exports = function(Schema) {
 
       added: Date
 
-    }]
+    }],
+    
+    tags: [String]
 
   });
 
@@ -140,10 +142,6 @@ module.exports = function(Schema) {
   /** Lets populate reach any level */
   TaskSchema.plugin(deepPopulate, {
     populate: {
-
-      'notes': {
-        select: 'note added'
-      },
 
       'group.profile': {
         select: 'name location pictures'

@@ -1,0 +1,37 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 {{ session.group.profile.name }}
+    
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/meetings/{{meeting._id}}/attendants')
+        md-icon(md-font-icon='material-icons') chevron_left
+        
+      group-items 
+      
+md-content.md-padding
+  div(ng-show='!fetching && members')  
+    md-input-container
+      label Agrega asistentes
+      md-select(
+        ng-change='attendants.add()'
+        ng-model='form.attendant')
+        
+        md-option(
+          ng-repeat='member in members'
+          value='{{ $index }}')
+          | {{ member.user.email }}
+    
+    div(layout='row')
+      md-button(ng-href='/groups/{{session.group._id}}/meetings/{{meeting}}/attendants')
+        md-icon(md-font-icon='material-icons') chevron_left
+        | Cancelar
+
+      md-button(
+        ng-disabled='!attendants.list.length',
+        ng-click='submit()')
+        | Listo
+        md-icon(md-font-icon='material-icons') check
+        
+    md-button.md-raised(ng-repeat='attendant in attendants.list')
+      | {{ attendant.user.email }}
+      md-icon(md-font-icon='material-icons', ng-click='attendants.remove($index)') close

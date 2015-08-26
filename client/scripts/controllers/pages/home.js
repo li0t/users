@@ -24,34 +24,7 @@
         'title': 'Medir perímetro',
         'description': 'Blah blah vlad...'
       }];
-/*
-      var meetings = [{
-        'title': 'Reunión inicial',
-        'author': 'Egbert Dool',
-        'created': '2015-07-10 17:28:33.208Z',
-        'type': 'audio'
-      }, {
-        'title': 'Junta de amigos',
-        'author': 'Champion amigo',
-        'created': '2015-03-22 17:28:33.208Z',
-        'type': 'document'
-      }, {
-        'title': 'Partido de Futbol',
-        'author': 'Don Pedro',
-        'created': '2015-05-22 17:28:33.208Z',
-        'type': 'note'
-      }, {
-        'title': 'Presentación Servicios',
-        'author': 'Amateru Caupolican',
-        'created': '2015-07-12 17:28:33.208Z',
-        'type': 'image'
-      }, {
-        'title': 'Estado financiero',
-        'author': 'Lucas Cofre',
-        'created': '2015-09-22 17:28:33.208Z',
-        'type': 'meeting'
-      }];
-*/
+
       /* Shuffle an array, Based on Fisher–Yates shuffle algorithm */
       function shuffle(a) {
         var n = a.length;
@@ -96,13 +69,24 @@
               success(function(data) {
 
                 $scope.entries = $scope.entries.concat(data);
-                //$scope.entries = $scope.entries.concat(meetings);
 
-              }).
+                $http.get('/api/meetings').
 
-              finally(function() {
-                $scope.fetching = false;
-                $scope.entries = shuffle($scope.entries);
+                success(function(data) {
+
+                  $scope.entries = $scope.entries.concat(data);
+
+                  $http.get('/api/meetings/attendants/me').
+
+                  success(function(data) {
+                    $scope.entries = $scope.entries.concat(data);
+                  }).
+
+                  finally(function() {
+                    $scope.entries = shuffle($scope.entries);
+                    $scope.fetching = false;
+                  });
+                });
               });
             });
           });

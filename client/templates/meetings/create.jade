@@ -1,0 +1,92 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 REUNIONES
+    
+    div(layout='row')
+      md-button.md-fab.md-warn(ng-href='/meetings/create')
+        md-icon(md-font-icon='material-icons') add
+      
+md-content.md-padding
+  div(ng-show='!fetching && groups')
+    form(
+      ng-submit='form.$valid && submit()'
+      role='form'
+      name='form')
+      
+      md-input-container
+        label Grupo
+        md-select(
+          ng-change='fetchGroupMembers()'
+          ng-model='data.group'
+          required)
+          
+          md-option(
+            ng-repeat='group in groups'
+            value='{{ group._id }}')
+            | {{ group.profile.name }}
+
+      md-input-container.form-group
+        label Objetivo
+        input.form-control(
+          ng-model='data.objective'
+          required)
+          
+      md-input-container.form-group
+        label Fecha
+        input.form-control(
+          ng-model='data.dateTime'
+          type='date')
+          
+      div(layout='row')  
+        h4 Tags
+          
+        md-button.md-raised(ng-repeat='tag in data.tags' type='button') {{ tag }}
+          md-icon(md-font-icon='material-icons' ng-click='removeTag(tag)') close
+          
+      md-divider
+        
+      md-autocomplete(
+        md-selected-item-change="selectedTagChange(tag.name)"
+        placeholder='Agrega tags a la tarea'
+        md-items='tag in searchTags(text)'
+        md-selected-item='selectedTag'
+        md-search-text='text'
+        md-no-cache='true'
+        md-delay='100')  
+        md-item-template
+          span {{ tag.name }}      
+          
+      div(layout='row')  
+        h4 Asistentes
+          
+        md-button.md-raised(ng-repeat='attendant in attendants.list' type='button')
+          | {{ attendant.user.email }}
+          md-icon(
+            ng-if='attendant.user.email !== session.user.email'
+            ng-click='attendants.remove($index)'
+            md-font-icon='material-icons') close
+      
+      md-divider
+      
+      md-input-container
+        label Agrega asistentes
+        md-select(
+          ng-disabled='!members'
+          ng-change='attendants.add()'
+          ng-model='form.attendant')
+          
+          md-option(
+            ng-repeat='member in members'
+            value='{{ $index }}')
+            | {{ member.user.email }}
+              
+      div(layout='row')
+        md-button(ng-href='/groups/{{session.group._id}}/profile')
+          md-icon(md-font-icon='material-icons') chevron_left
+          | Cancelar
+
+        md-button(
+          ng-disabled='form.$invalid',
+          type='submit')
+          | Crear
+          md-icon(md-font-icon='material-icons') chevron_right
