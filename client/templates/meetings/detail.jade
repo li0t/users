@@ -3,8 +3,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     h2 REUNIONES
     
     div(layout='row')
-      md-button.md-fab.md-warn(ng-href='/meetings/attendant')
-        md-icon(md-font-icon='material-icons') chevron_left
+      creator
         
       md-button(ng-href='/meetings/attendant')  Mis Reuniones
         
@@ -26,6 +25,22 @@ md-content.md-padding(ng-show='!fetching && meeting' layout='column')
     md-button(ng-click='editDateTime()' ng-show='!meeting.completed' ng-disabled='!dateTimeChanged') 
       md-icon(md-font-icon='material-icons') edit
       | Editar
+  
+  div(layout='column')
+    md-checkbox(ng-repeat='item in meeting.items'
+      ng-click='toogleItem(item)'
+      ng-disabled='meeting.completed'
+      ng-checked='item.checked'
+      aria-label='meeting-item')
+      | {{ item.description }}
+      
+      md-icon(md-font-icon='material-icons' ng-click='removeItem(item.description)' ) close
+    
+    div(layout='row' ng-show='!meeting.completed')
+      md-input-container
+        label Agrega un item...
+        input(ng-model='item')    
+      md-icon(md-font-icon='material-icons' ng-click='item && addItem(item)' ) add
   
   div(ng-show='!meeting.notes.length')
     p No hay notas

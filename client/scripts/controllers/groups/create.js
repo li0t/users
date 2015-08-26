@@ -4,11 +4,31 @@
   'use strict';
 
   ng.module('App').controller('Groups:Create', [
-    '$scope', '$location', '$http', '$session', 'posibleMembers',
+    '$scope', '$location', '$http', '$session',
 
-    function ($scope, $location, $http, $session, posibleMembers) {
+    function ($scope, $location, $http, $session) {
 
-      $scope.posibleMembers = posibleMembers.data;
+      $scope.posibleMembers = [];
+
+      $scope.fetch = function() {
+
+        $scope.fetching = true;
+
+        $http.get('/api/contacts').
+
+        success(function (contacts) {
+          $scope.posibleMembers = contacts;
+        }).
+
+        error(function () {
+          $session.flash('Hubo un error obteniendo los contactos');
+        }).
+
+        finally(function() {
+          $scope.fetching = false;
+        });
+
+      };
 
       $scope.data = {
         name: null,
@@ -39,15 +59,24 @@
       };
 
       $scope.submit = function () {
+
         $http.post('/api/groups', $scope.data).
+
         success(function () {
           $session.flash('Grupo creado');
-          $location.path('/groups');
         }).
+
         error(function () {
           $session.flash('El grupo no pudo ser creado');
+        }).
+
+        finally(function() {
+          $location.path('/groups');
         });
+
       };
+
+      $scope.fetch();
 
     }
 

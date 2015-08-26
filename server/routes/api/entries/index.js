@@ -84,7 +84,7 @@ module.exports = function(router, mongoose) {
 
       if (err || !relation.group) {
         debug('Group %s not found', group);
-        return res.sendStatus(404);
+        return res.sendStatus(400);
 
       }
 
@@ -345,7 +345,6 @@ module.exports = function(router, mongoose) {
         } else {
 
           relations.contact(entry.user, function(err, relation) {
-
             if (err || !relation.contact) {
               return res.sendStatus(400);
             }

@@ -34,6 +34,8 @@ module.exports = function(Schema) {
       required: true
     },
 
+    activities: [{ description : String, checked: Date }],
+
     collaborators: [{
 
       user: {
@@ -80,7 +82,7 @@ module.exports = function(Schema) {
       added: Date
 
     }],
-    
+
     tags: [String]
 
   });

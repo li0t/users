@@ -6,17 +6,61 @@
 
     function($scope, $location, $http, $session, priorities, $timeout) {
 
+      $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
+
       $scope.statics = {
         priorities: priorities.priorities
       };
 
       $scope.data = {
-        group: $session.get('user').group._id,
-        collaborators: [$session.get('user')],
+        collaborators: [],
+        activities: [],
         objetive: null,
         priority: null,
-        tags:  []
+        group: null,
+        tags: []
       };
+
+      $scope.fetchGroupMembers = function() {
+
+        if ($scope.data.group) {
+
+          $http.get('/api/groups/members/of/' + $scope.data.group).
+
+          success(function(members) {
+            $scope.members = members;
+
+          }).
+          error(function() {
+            $session.flash('danger', 'Hubo un error obteniendo los miembros del grupo');
+          });
+        }
+      };
+
+      $scope.fetchGroups = function() {
+
+        $scope.fetching = true;
+
+        $http.get('/api/groups').
+
+        success(function(groups) {
+          $scope.groups = groups;
+
+          $scope.groups.unshift({
+            _id: $session.get('user').group._id,
+            profile: {
+              name: 'Personal',
+            }
+          });
+        }).
+
+        finally(function() {
+          $scope.data.group = $scope.sessionGroup;
+          $scope.fetching = false;
+        });
+
+      };
+
 
       $scope.submit = function() {
 
@@ -35,7 +79,7 @@
 
           if ($scope.data.tags.length) {
 
-            $http.post('/api/tasks/' + task + '/tags', $scope.data).
+            $http.post('/api/tasks/tags/add-to/' + task, $scope.data).
 
             error(function() {
               $session.flash('Hubo un error agregando tags a la tarea, por favor inténtalo denuevo');
@@ -46,7 +90,44 @@
         }).
         error(function() {
           $session.flash('La tarea no pudo ser creada');
+        }).
+        finally(function() {
+          $location.path('/tasks/creator');
         });
+      };
+
+      $scope.collaborators = {
+        list: [],
+
+        add: function add() {
+          var item = $scope.members[$scope.form.collaborator];
+
+          if (this.list.indexOf(item) < 0) {
+            this.list.push(item);
+          }
+
+          if ($scope.data.collaborators.indexOf(item.user._id) < 0) {
+            $scope.data.collaborators.push(item.user._id);
+          }
+
+          $scope.form.collaborator = '';
+        },
+
+        remove: function remove($index) {
+          $scope.data.collaborators.splice($index, 1);
+          this.list.splice($index, 1);
+        }
+      };
+
+      $scope.addActivity = function(activity) {
+        $scope.data.activities.push({
+          description: activity
+        });
+        $scope.activity = null;
+      };
+
+      $scope.removeActivity = function(index) {
+        $scope.data.activities.splice(index, 1);
       };
 
       $scope.removeTag = function(tag) {
@@ -69,8 +150,10 @@
           return $http.get(tags).
           then(function(tags) {
             return (tags.data.length && tags.data) || $timeout(function() {
-                return [{ name : tag}];
-              }, 600);
+              return [{
+                name: tag
+              }];
+            }, 600);
           });
         }
       };
@@ -90,6 +173,8 @@
           $scope.text = '';
         }
       };
+
+      $scope.fetchGroups();
 
     }
 

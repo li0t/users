@@ -2,19 +2,31 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 TAREAS
     
-    md-button(ng-href='/tasks/collaborator')  Mis Tareas
-      
-    md-button(ng-href='/tasks/own')  Tareas Creadas
-    
-md-button.md-fab.md-warn(ng-href='/tasks/collaborator')
-  md-icon(md-font-icon='material-icons') chevron_left
+    div(layout='row')
+      creator
+        
+      md-button(ng-href='/tasks/collaborator')  Mis Tareas
+        
+      md-button(ng-href='/tasks/creator')  Tareas Asignadas
 
-md-content
+md-content.md-padding(ng-show='!fetching && groups')
   form(
     ng-submit='form.$valid && submit()',
     role='form',
     name='form')
-
+    
+    md-input-container.form-group
+      label Grupo
+      md-select(
+        ng-change='fetchGroupMembers()'
+        ng-model='data.group'
+        required)
+        
+        md-option(
+          ng-repeat='group in groups'
+          value='{{ group._id }}')
+          | {{ group.profile.name }}
+    
     md-input-container.form-group
       label Objetivo
       input.form-control(
@@ -35,6 +47,21 @@ md-content
       input.form-control(
         ng-model='data.dateTime'
         type='date')
+    
+    div(layout='column')
+      md-checkbox(
+        ng-repeat='activity in data.activities'
+        aria-label='task-activity'
+        ng-disabled='true')
+        | {{ activity.description }}
+        
+        md-icon(md-font-icon='material-icons' ng-click='removeActivity($index)' ) close
+      
+      div(layout='row')
+        md-input-container.form-group
+          label Agrega una actividad...
+          input(ng-model='activity')    
+        md-icon(md-font-icon='material-icons' ng-click='activity && addActivity(activity)' ) add
         
     div(layout='row')  
       h4 Tags
@@ -45,7 +72,7 @@ md-content
     md-divider
       
     md-autocomplete(
-      md-selected-item-change="selectedTagChange(tag.name)"
+      md-selected-item-change='selectedTagChange(tag.name)'
       placeholder='Agrega tags a la tarea'
       md-items='tag in searchTags(text)'
       md-selected-item='selectedTag'
@@ -53,7 +80,27 @@ md-content
       md-no-cache='true'
       md-delay='100')   
       md-item-template
-        span {{ tag.name }}      
+        span {{ tag.name }}    
+        
+    div(layout='row')  
+      h4 Collaboradores
+        
+      md-button.md-raised(ng-repeat='collaborator in collaborators.list' type='button')
+        | {{ collaborator.user.email }}
+        md-icon(md-font-icon='material-icons' ng-click='collaborators.remove($index)') close
+    
+    md-divider
+    
+    md-input-container
+      label Agrega colaboradores
+      md-select(
+        ng-change='collaborators.add()'
+        ng-model='form.collaborator')
+        
+        md-option(
+          ng-repeat='member in members'
+          value='{{ $index }}')
+          | {{ member.user.email }}  
               
     div(layout='row')
       md-button(ng-href='/tasks/collaborator')

@@ -12,6 +12,7 @@
       };
 
       function filterContacts(contacts, members) {
+
         var i, j;
 
         for (i = 0; i < contacts.length; i++) {
@@ -70,11 +71,14 @@
       };
 
       $scope.submit = function () {
+
         $http.post('/api/groups/members/add-to/' + $routeParams.id, $scope.data).
+
         success(function () {
           $session.flash('Miembros agregados');
           $location.path('/groups/' + $session.get('group')._id + '/members');
         }).
+        
         error(function () {
           $session.flash('Hubo un error agregando miembros');
         });

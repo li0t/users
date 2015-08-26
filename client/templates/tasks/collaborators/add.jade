@@ -1,0 +1,29 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 {{ session.group.profile.name }}
+    
+    div(layout='row')
+      creator
+        
+md-content.md-padding(ng-show='!fetching && members')  
+  md-input-container
+    label Agrega colaboradores
+    md-select(
+      ng-change='collaborators.add()'
+      ng-model='form.collaborator')
+      
+      md-option(
+        ng-repeat='member in members'
+        value='{{ $index }}')
+        | {{ member.user.email }}
+  
+  div(layout='row')
+    md-button(
+      ng-disabled='!collaborators.list.length',
+      ng-click='submit()')
+      | Listo
+      md-icon(md-font-icon='material-icons') check
+      
+  md-button.md-raised(ng-repeat='collaborator in collaborators.list')
+    | {{ collaborator.user.email }}
+    md-icon(md-font-icon='material-icons', ng-click='collaborators.remove($index)') close

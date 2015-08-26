@@ -1,13 +1,10 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 GRUPOS
-
-md-content.md-padding
-  md-button.md-fab.md-warn(ng-href='/groups')
-    md-icon(md-font-icon='material-icons') chevron_left  
-  
-  div(layout-padding)
-  
+    
+    creator
+      
+md-content.md-padding(ng-show='!fetching && posibleMembers')
   form(
     ng-submit='form.$valid && submit()'
     role='form'

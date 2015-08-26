@@ -3,18 +3,19 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     h2 {{ session.group.profile.name }}
     
     div(layout='row')
-      md-button.md-fab.md-warn(ng-href='/groups/{{session.group._id}}/members/add')
-        md-icon(md-font-icon='material-icons') add
+      creator
         
       group-items 
       
-md-content.md-padding
-  div(ng-show='!fetching && members')
-    h3 Miembros del grupo 
+md-content.md-padding(ng-show='!fetching && members')
+  h3 Miembros del grupo 
   
+  md-button(ng-href='/groups/{{session.group._id}}/members/add') Agregar
+  
+  div(layout='row')
     md-button.md-raised(ng-repeat='member in members' ng-click='addOrRemove(member.user._id)')
       h4 {{ member.user.profile.name || member.user.email }}  
-          
-    md-button(ng-show='admin && membersToRemove.length' ng-click='removeMembers()')
-      md-icon(md-font-icon='material-icons') remove_circle
-      | Eliminar miembros
+        
+  md-button(ng-show='admin && membersToRemove.length' ng-click='removeMembers()')
+    md-icon(md-font-icon='material-icons') remove_circle
+    | Eliminar miembros

@@ -6,10 +6,13 @@
 
     function($scope, $location, $http, $session, $timeout) {
 
+      $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
       $scope.fetching = false;
 
       $scope.data = {
-        attendants: [$session.get('user')._id],
+        //attendants: ['$session.get('user')._id'],
+        attendants: [],
+        items: [],
         tags: []
       };
 
@@ -20,9 +23,19 @@
           $http.get('/api/groups/members/of/' + $scope.data.group).
 
           success(function(members) {
-            $scope.members = members.filter(function(member) {
+
+            /*$scope.members = members.filter(function(member) {
               return member.user._id !== $session.get('user')._id;
+            });*/
+
+            $scope.data.attendants = members.map(function(member) {
+              return member.user._id;
             });
+
+            $scope.attendants.list = members;
+
+            console.log($scope.data.attendants);
+
           }).
           error(function() {
             $session.flash('danger', 'Hubo un error obteniendo los miembros del grupo');
@@ -41,6 +54,7 @@
         }).
 
         finally(function() {
+          $scope.data.group = $scope.sessionGroup;
           $scope.fetching = false;
         });
 
@@ -50,31 +64,29 @@
 
         $http.post('/api/meetings', $scope.data).
 
-        success(function(task) {
+        success(function(meeting) {
 
-          $http.post('/api/meetings/attendants/add-to/' + task, $scope.data).
+          $http.post('/api/meetings/attendants/add-to/' + meeting, $scope.data).
 
-          success(function(meeting) {
+          success(function() {
 
             if ($scope.data.tags.length) {
 
               $http.post('/api/meetings/' + meeting + '/tags', $scope.data).
 
-              success(function() {
-                $location.path('/meetings/creator');
-                $session.flash('success', 'Reunión creada con éxito!');
-              }).
-
               error(function(data) {
                 $session.flash('danger', data);
               });
-            } else {
-              $location.path('/meetings/creator');
-              $session.flash('success', 'Reunión creada con éxito!');
             }
+
+            $session.flash('success', 'Reunión creada con éxito!');
+
           }).
           error(function() {
             $session.flash('danger', 'La reunión no pudo ser creada');
+          }).
+          finally(function() {
+            $location.path('/meetings/creator');
           });
         }).
         error(function() {
@@ -83,6 +95,10 @@
       };
 
       $scope.attendants = {
+        list : []
+      };
+
+    /*  $scope.attendants = {
         list: [{
           user: $session.get('user')
         }],
@@ -105,6 +121,17 @@
           $scope.data.attendants.splice($index, 1);
           this.list.splice($index, 1);
         }
+      };*/
+
+      $scope.addItem = function(item) {
+        $scope.data.items.push({
+          description: item
+        });
+        $scope.item = null;
+      };
+
+      $scope.removeItem = function(index) {
+        $scope.data.items.splice(index, 1);
       };
 
       $scope.removeTag = function(tag) {
@@ -127,8 +154,10 @@
           return $http.get(tags).
           then(function(tags) {
             return (tags.data.length && tags.data) || $timeout(function() {
-                return [{ name : tag}];
-              }, 600);
+              return [{
+                name: tag
+              }];
+            }, 600);
           });
         }
       };

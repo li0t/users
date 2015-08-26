@@ -1,0 +1,20 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 TAREAS
+    
+    div(layout='row')
+      creator
+      
+md-content.md-padding(ng-show='!fetching && task.collaborators')        
+    h3 Collaboradores
+    
+    md-button(ng-href='/tasks/{{task._id}}/collaborators/add') Agregar
+    
+    h4(ng-show='!task.collaborators.length') No hay colaboradores
+    
+    md-button.md-raised(ng-repeat='collaborator in task.collaborators' ng-click='addOrRemove(collaborator.user._id)')
+      h4 {{ collaborator.user.profile.name || collaborator.user.email }}  
+          
+    md-button(ng-show='collaboratorsToRemove.length' ng-click='removeMembers()')
+      md-icon(md-font-icon='material-icons') remove_circle
+      | Eliminar Collaboradores

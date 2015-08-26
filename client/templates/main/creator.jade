@@ -1,0 +1,29 @@
+md-menu
+  md-button.md-fab.md-warn(ng-click='$mdOpenMenu()')
+    md-icon(md-menu-origin, md-font-icon='material-icons') add
+  
+  md-menu-content(width='4')
+    md-menu-item
+      md-button(ng-href='/groups/create', ng-click='$mdCloseMenu()')
+        md-icon(md-menu-align-target, md-font-icon='material-icons') group
+        | Grupo
+        
+    md-menu-item
+      md-button(ng-href='/tags/create', ng-click='$mdCloseMenu()')
+        md-icon(md-menu-align-target, md-font-icon='material-icons') label
+        | Tag    
+        
+    md-menu-item
+      md-button(ng-href='/meetings/create', ng-click='$mdCloseMenu()')
+        md-icon(md-menu-align-target, md-font-icon='material-icons') event_note
+        | Reunion    
+        
+    md-menu-item
+      md-button(ng-href='/tasks/create', ng-click='$mdCloseMenu()')
+        md-icon(md-menu-align-target, md-font-icon='material-icons') more
+        | Tareas
+        
+    md-menu-item
+      md-button(ng-href='/entries/create', ng-click='$mdCloseMenu()')
+        md-icon(md-menu-align-target, md-font-icon='material-icons') blur_circular
+        | Objeto

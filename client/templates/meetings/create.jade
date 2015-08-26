@@ -2,9 +2,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     h2 REUNIONES
     
-    div(layout='row')
-      md-button.md-fab.md-warn(ng-href='/meetings/create')
-        md-icon(md-font-icon='material-icons') add
+    creator
       
 md-content.md-padding
   div(ng-show='!fetching && groups')
@@ -37,6 +35,21 @@ md-content.md-padding
           ng-model='data.dateTime'
           type='date')
           
+      div(layout='column')
+        md-checkbox(
+          ng-repeat='item in data.items'
+          aria-label='meeting-item'
+          ng-disabled='true')
+          | {{ item.description }}
+          
+          md-icon(md-font-icon='material-icons' ng-click='removeItem($index)' ) close
+        
+        div(layout='row')
+          md-input-container
+            label Agrega un item...
+            input(ng-model='item')    
+          md-icon(md-font-icon='material-icons' ng-click='item && addItem(item)' ) add    
+          
       div(layout='row')  
         h4 Tags
           
@@ -61,30 +74,28 @@ md-content.md-padding
           
         md-button.md-raised(ng-repeat='attendant in attendants.list' type='button')
           | {{ attendant.user.email }}
-          md-icon(
-            ng-if='attendant.user.email !== session.user.email'
-            ng-click='attendants.remove($index)'
-            md-font-icon='material-icons') close
-      
+          //
+            md-icon(
+              ng-if='attendant.user.email !== session.user.email'
+              ng-click='attendants.remove($index)'
+              md-font-icon='material-icons') close
+    
       md-divider
       
-      md-input-container
-        label Agrega asistentes
-        md-select(
-          ng-disabled='!members'
-          ng-change='attendants.add()'
-          ng-model='form.attendant')
-          
-          md-option(
-            ng-repeat='member in members'
-            value='{{ $index }}')
-            | {{ member.user.email }}
-              
+      //
+        md-input-container
+          label Agrega asistentes
+          md-select(
+            ng-disabled='!members'
+            ng-change='attendants.add()'
+            ng-model='form.attendant')
+            
+            md-option(
+              ng-repeat='member in members'
+              value='{{ $index }}')
+              | {{ member.user.email }} 
+                
       div(layout='row')
-        md-button(ng-href='/groups/{{session.group._id}}/profile')
-          md-icon(md-font-icon='material-icons') chevron_left
-          | Cancelar
-
         md-button(
           ng-disabled='form.$invalid',
           type='submit')

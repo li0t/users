@@ -1,0 +1,80 @@
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div
+    h2 DOCUMENTO  
+    
+    div(layout='row')
+      creator
+          
+      entries-items
+          
+md-content.md-padding(ng-show='!fetching && groups')
+  form(
+    ng-submit='form.$valid && submit()'
+    name='form'
+    role='form'
+    novalidate)
+    
+    md-input-container.form-group
+      label Grupo
+      md-select(
+        ng-model='data.group'
+        required)
+        
+        md-option(
+          ng-repeat='group in groups'
+          value='{{ group._id }}')
+          | {{ group.profile.name }}
+    
+    md-input-container.form-group
+      label Titulo
+      input.form-control(
+        ng-model='data.title'
+        required)
+    
+    div(layout='row')  
+      h4 Tags
+        
+      md-button.md-raised(ng-repeat='tag in data.tags' type='button') {{ tag }}
+        md-icon(md-font-icon='material-icons' ng-click='removeTag(tag)') close
+        
+    md-divider
+      
+    md-autocomplete(
+      md-selected-item-change="selectedTagChange(tag.name)"
+      placeholder='Agrega tags al documento'
+      md-items='tag in searchTags(text)'
+      md-selected-item='selectedTag'
+      md-search-text='text'
+      md-no-cache='true'
+      md-delay='100')
+      md-item-template
+        span {{ tag.name }}    
+        
+    md-button(
+      ngf-accept='filesSupported'
+      ng-disabled='submitting'
+      ngf-multiple='true'
+      ng-model='files'
+      ngf-keep='true'
+      ngf-select)
+      
+      md-icon(md-font-icon='material-icons') file_upload
+      | Agregar archivos                 
+                          
+    div(layout='row')
+      md-button(
+        ng-disabled='!files.length || form.$invalid || submitting'
+        type='submit')
+        | Crear
+        
+        md-icon(md-font-icon='material-icons') chevron_right
+        
+    div.form-group(ng-repeat='file in files')
+      md-icon(md-font-icon='material-icons') insert_drive_file
+      | {{ file.name }}
+      
+      md-button(
+        type='button'
+        ng-click='discard($index)'
+        ng-disabled='submitting')
+        md-icon(md-font-icon='material-icons') close
