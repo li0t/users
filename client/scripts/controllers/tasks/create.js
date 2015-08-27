@@ -55,8 +55,9 @@
         }).
 
         finally(function() {
-          $scope.data.group = $scope.sessionGroup;
           $scope.fetching = false;
+          $scope.data.group = $scope.sessionGroup;
+          return $scope.data.group && $scope.fetchGroupMembers();
         });
 
       };

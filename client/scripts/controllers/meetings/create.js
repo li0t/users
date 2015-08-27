@@ -17,8 +17,6 @@
 
       $scope.fetchGroupMembers = function() {
 
-        if ($scope.data.group) {
-
           $http.get('/api/groups/members/of/' + $scope.data.group).
 
           success(function(members) {
@@ -33,7 +31,7 @@
           error(function() {
             $session.flash('danger', 'Hubo un error obteniendo los miembros del grupo');
           });
-        }
+
       };
 
       $scope.fetchGroups = function() {
@@ -47,8 +45,9 @@
         }).
 
         finally(function() {
-          $scope.data.group = $scope.sessionGroup;
           $scope.fetching = false;
+          $scope.data.group = $scope.sessionGroup;
+          return $scope.data.group && $scope.fetchGroupMembers();
         });
 
       };
@@ -143,6 +142,7 @@
       };
 
       $scope.fetchGroups();
+
 
     }
 
