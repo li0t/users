@@ -10,7 +10,6 @@
       $scope.fetching = false;
 
       $scope.data = {
-        //attendants: ['$session.get('user')._id'],
         attendants: [],
         items: [],
         tags: []
@@ -24,17 +23,11 @@
 
           success(function(members) {
 
-            /*$scope.members = members.filter(function(member) {
-              return member.user._id !== $session.get('user')._id;
-            });*/
+            $scope.groupMembers = members;
 
             $scope.data.attendants = members.map(function(member) {
               return member.user._id;
             });
-
-            $scope.attendants.list = members;
-
-            console.log($scope.data.attendants);
 
           }).
           error(function() {
@@ -93,35 +86,6 @@
           $session.flash('danger', 'La reunión no pudo ser creada');
         });
       };
-
-      $scope.attendants = {
-        list : []
-      };
-
-    /*  $scope.attendants = {
-        list: [{
-          user: $session.get('user')
-        }],
-
-        add: function add() {
-          var item = $scope.members[$scope.form.attendant];
-
-          if (this.list.indexOf(item) < 0) {
-            this.list.push(item);
-          }
-
-          if ($scope.data.attendants.indexOf(item.user._id) < 0) {
-            $scope.data.attendants.push(item.user._id);
-          }
-
-          $scope.form.attendant = '';
-        },
-
-        remove: function remove($index) {
-          $scope.data.attendants.splice($index, 1);
-          this.list.splice($index, 1);
-        }
-      };*/
 
       $scope.addItem = function(item) {
         $scope.data.items.push({

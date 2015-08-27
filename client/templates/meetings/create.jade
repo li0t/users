@@ -69,32 +69,14 @@ md-content.md-padding
         md-item-template
           span {{ tag.name }}      
           
-      div(layout='row')  
+      div
         h4 Asistentes
-          
-        md-button.md-raised(ng-repeat='attendant in attendants.list' type='button')
-          | {{ attendant.user.email }}
-          //
-            md-icon(
-              ng-if='attendant.user.email !== session.user.email'
-              ng-click='attendants.remove($index)'
-              md-font-icon='material-icons') close
-    
-      md-divider
-      
-      //
-        md-input-container
-          label Agrega asistentes
-          md-select(
-            ng-disabled='!members'
-            ng-change='attendants.add()'
-            ng-model='form.attendant')
-            
-            md-option(
-              ng-repeat='member in members'
-              value='{{ $index }}')
-              | {{ member.user.email }} 
-                
+
+        md-chips(
+          ng-model='groupMembers'
+          readonly='true')
+          md-chip-template {{ $chip.user.email }}    
+
       div(layout='row')
         md-button(
           ng-disabled='form.$invalid',

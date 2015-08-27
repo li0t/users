@@ -3,7 +3,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     h2 EMEETER
     //timer(interval='1000') {{hours}} hour{{hoursS}}, {{minutes}} minute{{minutesS}}, {{seconds}} second{{secondsS}}
     div
-      creator
+      creator(ng-if='session.user')
 
 md-content.darkGray(ng-show='session.user')
 
