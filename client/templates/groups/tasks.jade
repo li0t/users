@@ -20,7 +20,7 @@ md-content.md-padding
       ng-repeat='task in tasks',
       md-rowspan='1',
       md-colspan='1')
-      em-card(card='task' ng-click='$navigateTo("/groups/" + session.group._id + "/tasks/" + task._id + "/detail")')
+      em-card(card='task' ng-click='$navigateTo("/tasks/" + task._id + "/detail")')
 
       
   

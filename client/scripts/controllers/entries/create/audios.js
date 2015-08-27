@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Entries:Create:Audios', [
-    '$scope', '$http', '$location', '$session', 'Upload', '$timeout',
+    '$scope', '$http', '$location', '$session', 'Upload', 
 
-    function($scope, $http, $location, $session, $upload, $timeout) {
+    function($scope, $http, $location, $session, $upload) {
 
       $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
       $scope.filesSupported = 'audio/*';
@@ -57,7 +57,7 @@
             file: $scope.files,
           }).
 
-          success(function(entry) {
+          success(function() {
 
             if ($scope.data.tags.length) {
 
@@ -85,46 +85,21 @@
 
       };
 
-      $scope.removeTag = function(tag) {
-        var index = $scope.data.tags.indexOf(tag);
-        if (index >= 0) {
-          $scope.data.tags.splice(index, 1);
-        }
-      };
-
       $scope.searchTags = function(tag) {
 
-        if (tag && tag.replace(/\s+/g, '').length) {
+        var
+          limit = 'limit=' + $scope.limit + '&',
+          skip = 'skip=' + $scope.skip + '&',
+          keywords = 'keywords=' + tag,
+          tags = '/api/tags/like?' + limit + skip + keywords;
 
-          var
-            limit = 'limit=' + $scope.limit + '&',
-            skip = 'skip=' + $scope.skip + '&',
-            keywords = 'keywords=' + tag,
-            tags = '/api/tags/like?' + limit + skip + keywords;
+        return $http.get(tags).
+        then(function(tags) {
+          return (tags.data.length && tags.data.map(function(tag) {
+            return tag.name;
+          }));
+        });
 
-          return $http.get(tags).
-          then(function(tags) {
-            return (tags.data.length && tags.data) || $timeout(function() {
-                return [{ name : tag}];
-              }, 600);
-          });
-        }
-      };
-
-      $scope.selectedTagChange = function(tag) {
-
-        tag = tag && tag.replace(/\s+/g, '');
-
-        if (tag && tag.length) {
-
-          var index = $scope.data.tags.indexOf(tag);
-          if (index < 0) {
-            $scope.data.tags.push(tag);
-          }
-
-          $scope.selectedTag = null;
-          $scope.text = '';
-        }
       };
 
       $scope.fetchGroups();

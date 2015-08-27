@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Meetings:Create', [
-    '$scope', '$location', '$http', '$session', '$timeout',
+    '$scope', '$location', '$http', '$session',
 
-    function($scope, $location, $http, $session, $timeout) {
+    function($scope, $location, $http, $session) {
 
       $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
       $scope.fetching = false;
@@ -17,20 +17,20 @@
 
       $scope.fetchGroupMembers = function() {
 
-          $http.get('/api/groups/members/of/' + $scope.data.group).
+        $http.get('/api/groups/members/of/' + $scope.data.group).
 
-          success(function(members) {
+        success(function(members) {
 
-            $scope.groupMembers = members;
+          $scope.groupMembers = members;
 
-            $scope.data.attendants = members.map(function(member) {
-              return member.user._id;
-            });
-
-          }).
-          error(function() {
-            $session.flash('danger', 'Hubo un error obteniendo los miembros del grupo');
+          $scope.data.attendants = members.map(function(member) {
+            return member.user._id;
           });
+
+        }).
+        error(function() {
+          $session.flash('danger', 'Hubo un error obteniendo los miembros del grupo');
+        });
 
       };
 
@@ -97,53 +97,24 @@
         $scope.data.items.splice(index, 1);
       };
 
-      $scope.removeTag = function(tag) {
-        var index = $scope.data.tags.indexOf(tag);
-        if (index >= 0) {
-          $scope.data.tags.splice(index, 1);
-        }
-      };
-
       $scope.searchTags = function(tag) {
 
-        if (tag && tag.replace(/\s+/g, '').length) {
+        var
+          limit = 'limit=' + $scope.limit + '&',
+          skip = 'skip=' + $scope.skip + '&',
+          keywords = 'keywords=' + tag,
+          tags = '/api/tags/like?' + limit + skip + keywords;
 
-          var
-            limit = 'limit=' + $scope.limit + '&',
-            skip = 'skip=' + $scope.skip + '&',
-            keywords = 'keywords=' + tag,
-            tags = '/api/tags/like?' + limit + skip + keywords;
+        return $http.get(tags).
+        then(function(tags) {
+          return (tags.data.length && tags.data.map(function(tag) {
+            return tag.name;
+          }));
+        });
 
-          return $http.get(tags).
-          then(function(tags) {
-            return (tags.data.length && tags.data) || $timeout(function() {
-              return [{
-                name: tag
-              }];
-            }, 600);
-          });
-        }
-      };
-
-      $scope.selectedTagChange = function(tag) {
-
-        tag = tag && tag.replace(/\s+/g, '');
-
-        if (tag && tag.length) {
-
-          var index = $scope.data.tags.indexOf(tag);
-          if (index < 0) {
-            $scope.data.tags.push(tag);
-          }
-
-          $scope.selectedTag = null;
-          $scope.text = '';
-        }
       };
 
       $scope.fetchGroups();
-
-
     }
 
   ]);

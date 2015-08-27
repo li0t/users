@@ -66,9 +66,12 @@ md-content.md-padding(layout='column' ng-show='!fetching && task')
     textarea(ng-model='note')
     md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar
   
-  h5 Tags  
-  div(layout='row')
-    md-button.md-raised(ng-repeat='tag in task.tags') {{ tag }}
+  div
+    h5 Tags  
+    md-chips(
+      ng-model='task.tags'
+      readonly='true')
+      md-chip-template {{ $chip }}
     
   md-button(ng-href='/tasks/{{task._id}}/collaborators')
     md-icon(md-font-icon='material-icons') group

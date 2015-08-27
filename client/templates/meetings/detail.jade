@@ -59,13 +59,15 @@ md-content.md-padding(ng-show='!fetching && meeting' layout='column')
   
   div
     h4 Asistentes
-
     md-chips(
       ng-model='meeting.attendants'
       readonly='true')
       md-chip-template {{ $chip.user.email }}
-  
-  h5 Tags  
-  div(layout='row')
-    md-button.md-raised(ng-repeat='tag in entry.tags') {{ tag }}  
+      
+  div
+    h5 Tags  
+    md-chips(
+      ng-model='meeting.tags'
+      readonly='true')
+      md-chip-template {{ $chip }}
   

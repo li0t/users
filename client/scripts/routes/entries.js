@@ -13,6 +13,11 @@
         templateUrl: '/assets/templates/entries/create/index.html'
       }).
 
+      when('/entries/:id/detail', {
+        controller: 'Entries:Detail',
+        templateUrl: '/assets/templates/entries/detail.html'
+      }).
+
       when('/entries/create/document', {
         controller: 'Entries:Create:Documents',
         templateUrl: '/assets/templates/entries/create/document.html',

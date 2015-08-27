@@ -44,10 +44,6 @@ md-content.md-padding(ng-show='!fetching && posibleMembers')
           | {{ member.user.profile.name || member.user.email }}
 
     div(layout='row')
-      md-button(ng-href='/groups')
-        md-icon(md-font-icon='material-icons') chevron_left
-        | Cancelar
-
       md-button(
         ng-disabled='form.$invalid'
         type='submit')

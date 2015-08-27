@@ -32,5 +32,5 @@ md-content.md-padding
       ng-repeat='entry in entries',
       md-rowspan='1',
       md-colspan='1')
-      em-card(card='entry' ng-click='$navigateTo("/groups/" + entry.group + "/entries/" + entry._id + "/detail")')
+      em-card(card='entry' ng-click='$navigateTo("/entries/" + entry._id + "/detail")')
     

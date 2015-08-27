@@ -233,7 +233,7 @@ module.exports = function(router, mongoose) {
         }
 
         debug('%s files saved to entry %s', filesSaved, entry._id);
-        res.send(filesSaved + ' files save to entry ' + entry._id);
+        res.sendStatus(204);
 
       });
     }
