@@ -6,20 +6,25 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       
 md-content.md-padding
   form(
-    ng-submit='form.$valid && submit()'
+    ng-submit='submit()'
     name='form'
     role='form'
     novalidate)
     
-    md-input-container.form-group
-      label Ingresa el nombre del tag
-      input.form-control(
-        ng-model='data.name'
-        required)
-      md-tooltip Un tag puede servirte para identificar un proyecto o tarea    
+
+    md-autocomplete(
+      placeholder="Busca o crea un nuevo tag"
+      md-items='tag in searchTags(text)'
+      md-selected-item='selectedTag'
+      md-search-text='text'
+      md-autoselect='true'
+      md-item-text='tag')
+      
+      span(md-highlight-text='text') {{ tag }}
+    md-tooltip Un tag puede servirte para identificar un proyecto o tarea    
       
     md-button(
-      ng-disabled='form.$invalid || submitting'
+      ng-disabled='selectedTag || !text || submitting'
       type='submit') crear
       
       

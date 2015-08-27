@@ -56,4 +56,22 @@ module.exports = function (router, mongoose) {
     });
   });
 
+  /**
+   * Create a new Tag
+   */
+  router.post('/', function(req, res, next){
+
+    new Tag(req.body).
+
+    save(function(err, tag) {
+      if (err) {
+        return next(err);
+      }
+
+        res.status(201).send(tag._id);
+
+    });
+
+  });
+
 };
