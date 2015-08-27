@@ -11,6 +11,27 @@
       $scope.limit = 10;
       $scope.skip = 0;
 
+      $scope.getHref = function(entry) {
+
+        var href = '';
+
+        switch (entry.type) {
+
+          case 'task':
+            href = '/tasks/' + entry.id + '/detail';
+            break;
+
+          case 'meeting':
+            href = '/meetings/' + entry.id + '/detail';
+            break;
+
+          default:
+            href = '/entries/' + entry.id + '/detail';
+            break;
+        }
+        return href;
+      };
+
       $scope.fetchGroup = function() {
 
         $scope.fetching = true;
