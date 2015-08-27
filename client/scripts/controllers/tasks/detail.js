@@ -7,6 +7,7 @@
     function($scope, $http, $location, $session, $route, $routeParams) {
 
       $scope.fetching = null;
+      $scope.group = null;
       $scope.task = null;
 
       $scope.fetch = function() {
@@ -16,6 +17,7 @@
 
         success(function(data) {
           $scope.task = data;
+          $scope.group = data.group._id;
           $scope.task.dateTime = data.dateTime && new Date(data.dateTime);
         }).
 

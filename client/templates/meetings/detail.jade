@@ -5,9 +5,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     div(layout='row')
       creator
         
-      md-button(ng-href='/meetings/attendant')  Mis Reuniones
-        
-      md-button(ng-href='/meetings/creator')  Reuniones Creadas
+      group-items(ng-show='group' group)
       
 md-content.md-padding(ng-show='!fetching && meeting' layout='column')        
   div

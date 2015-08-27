@@ -1,12 +1,14 @@
-(function (ng) {
+(function(ng) {
   'use strict';
 
   ng.module('App').controller('Groups:Members:Add', [
     '$scope', '$http', '$location', '$session', '$routeParams',
 
-    function ($scope, $http, $location, $session, $routeParams) {
+    function($scope, $http, $location, $session, $routeParams) {
 
+      $scope.group = $routeParams.id;
       $scope.fetching = false;
+
       $scope.data = {
         members: []
       };
@@ -27,7 +29,7 @@
         return contacts;
       }
 
-      $scope.fetch = function () {
+      $scope.fetch = function() {
 
         $scope.fetching = true;
 
@@ -35,13 +37,13 @@
 
         success(function(contacts) {
 
-          $http.get('/api/groups/members/of/' + $session.get('group')._id).
+          $http.get('/api/groups/members/of/' + $scope.group).
 
           success(function(members) {
             $scope.contacts = filterContacts(contacts, members);
           }).
 
-          finally(function(){
+          finally(function() {
             $scope.fetching = false;
           });
         });
@@ -70,17 +72,20 @@
         }
       };
 
-      $scope.submit = function () {
+      $scope.submit = function() {
 
-        $http.post('/api/groups/members/add-to/' + $routeParams.id, $scope.data).
+        $http.post('/api/groups/members/add-to/' + $scope.group, $scope.data).
 
-        success(function () {
+        success(function() {
           $session.flash('Miembros agregados');
-          $location.path('/groups/' + $session.get('group')._id + '/members');
         }).
-        
-        error(function () {
+
+        error(function() {
           $session.flash('Hubo un error agregando miembros');
+        }).
+
+        finally(function() {
+          $location.path('/groups/' + $scope.group + '/members');
         });
       };
 

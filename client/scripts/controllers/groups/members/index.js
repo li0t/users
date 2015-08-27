@@ -6,19 +6,20 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      $scope.group = $session.get('group');
+      $scope.group = $routeParams.id;
       $scope.membersToRemove = null;
       $scope.fetching = null;
       $scope.members = null;
 
-      $scope.admin = $scope.group && ($scope.group.admin._id === $session.get('user')._id) ? $scope.group.admin._id : null;
+      $scope.admin = $session.get('group') && ($session.get('group').admin._id === $session.get('user')._id) ? $session.get('group').admin._id : null;
+
 
       $scope.fetch = function() {
 
         $scope.membersToRemove = [];
         $scope.fetching = true;
 
-        $http.get('/api/groups/members/of/' + $routeParams.id).
+        $http.get('/api/groups/members/of/' + $scope.group).
 
         success(function(data) {
 
@@ -32,7 +33,7 @@
               }
             }
 
-            if ($scope.group && member.user._id === $scope.group.admin._id) {
+            if ($scope.admin && member.user._id === $scope.admin) {
 
               if (member.user.profile.name) {
                 member.user.profile.name += " (admin)";
@@ -69,7 +70,7 @@
 
         if ($scope.admin) {
 
-          $http.post('/api/groups/members/remove-from/' + $routeParams.id, {
+          $http.post('/api/groups/members/remove-from/' + $scope.group, {
             members: $scope.membersToRemove
           }).
 

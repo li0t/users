@@ -8,6 +8,7 @@
 
       $scope.fetching = null;
       $scope.meeting = null;
+      $scope.group = null;
 
       $scope.fetch = function() {
         $scope.fetching = true;
@@ -16,6 +17,7 @@
 
         success(function(data) {
           $scope.meeting = data;
+          $scope.group = data.group._id;
           $scope.meeting.dateTime = data.dateTime && new Date(data.dateTime);
         }).
 

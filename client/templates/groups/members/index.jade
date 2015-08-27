@@ -5,12 +5,12 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     div(layout='row')
       creator
         
-      group-items 
+      group-items(ng-show='group' group)
       
 md-content.md-padding(ng-show='!fetching && members')
   h3 Miembros del grupo 
   
-  md-button(ng-href='/groups/{{session.group._id}}/members/add') Agregar
+  md-button(ng-href='/groups/{{ group }}/members/add') Agregar
   
   div(layout='row')
     md-button.md-raised(ng-repeat='member in members' ng-click='addOrRemove(member.user._id)')

@@ -5,6 +5,7 @@
     '$scope', '$http', '$location', '$session',
 
     function ($scope, $http, $location, $session) {
+      
       $scope.groups = null;
       $scope.fetching = false;
 

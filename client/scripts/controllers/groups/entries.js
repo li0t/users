@@ -7,6 +7,7 @@
     function($scope, $http, $location, $session, $routeParams) { /** TODO: add watch to reduce server calls */
 
       $scope.type = $routeParams.type;
+      $scope.group = $routeParams.id;
       $scope.fetching = null;
       $scope.entries = null;
       $scope.limit = 0;
@@ -15,7 +16,7 @@
       $scope.fetch = function() {
         $scope.fetching = true;
 
-        $http.get('/api/entries/of/group/' + $session.get('group')._id + '?limit=' + $scope.limit).
+        $http.get('/api/entries/of/group/' + $scope.group + '?limit=' + $scope.limit).
 
         success(function(data) {
 

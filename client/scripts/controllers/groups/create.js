@@ -13,7 +13,6 @@
       $scope.fetch = function() {
 
         $scope.fetching = true;
-
         $http.get('/api/contacts').
 
         success(function (contacts) {

@@ -13,7 +13,10 @@
 
       return {
         restrict : 'E',
-        templateUrl: '/assets/templates/groups/items.html'
+        templateUrl: '/assets/templates/groups/items.html',
+        link: function ($scope) {
+
+        }
       };
     }
 
