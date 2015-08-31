@@ -10,6 +10,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       md-icon(md-font-icon='material-icons') group
       | Personas
   
+md-progress-circular(ng-show='fetchingContacts || fetchingPending' md-mode='indeterminate') 
+  
 md-content.md-padding
   div.form-group(ng-show='!fetchingContacts && contacts')
     md-input-container
@@ -22,11 +24,7 @@ md-content.md-padding
       ng-click='search()'
       ng-show='!fetchingContacts && searchContact.length && !filteredContacts.length')
       | Buscar en eMeeter
-  
-  div(ng-show='fetchingContacts && !contacts && fetchingPending && !pendings')   
-    md-icon(md-font-icon='material-icons' ) sync
-    | Buscando contactos
-    
+       
   div(ng-show='!fetchingPending && pendings.length')
     h4
       md-icon(md-font-icon='material-icons' ) add

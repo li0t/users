@@ -4,6 +4,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     
     creator
       
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
+      
 md-content.md-padding(ng-show='!fetching && posibleMembers')
   form(
     ng-submit='form.$valid && submit()'

@@ -6,6 +6,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       creator
         
       group-items(ng-show='group' group)
+        
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')        
       
 md-content.md-padding(ng-show='!fetching && meeting' layout='column')        
   div

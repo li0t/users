@@ -8,6 +8,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       md-button(ng-href='/tasks/collaborator')  Mis Tareas
         
       md-button.md-raised(ng-href='/tasks/creator')  Tareas Asignadas
+      
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
 
 md-content.md-padding
   md-grid-list(

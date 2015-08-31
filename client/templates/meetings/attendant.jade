@@ -9,6 +9,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
         
       md-button(ng-href='/meetings/creator')  Reuniones Creadas
             
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')
+            
 md-content.md-padding
   md-grid-list(
     md-gutter="12px",

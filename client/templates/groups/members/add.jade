@@ -7,6 +7,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
         
       group-items(ng-show='group' group)
         
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')        
+        
 md-content.md-padding(ng-show='!fetching && contacts')  
   md-input-container
     label Agrega miembros
