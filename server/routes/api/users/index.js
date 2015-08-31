@@ -392,7 +392,10 @@ module.exports = function(router, mongoose) {
    */
   router.put('/validate/:token', function(req, res, next) {
 
+    var i;
+
     Token.findById(req.params.token).
+
     exec(function(err, token) {
       if (err) {
         if (err.name && err.name === 'CastError') {
@@ -413,15 +416,36 @@ module.exports = function(router, mongoose) {
       }, {
         state: statics.model('state', 'active')._id
       }).
+
       deepPopulate('profile.gender').
+
       exec(function(err, user) {
         if (err) {
           return next(err);
         }
 
-        req.session.user = user;
-        res.status(204).end();
+        Group.find().
 
+        where('members.user', user).
+
+        populate('profile').
+
+        exec(function(err, groups) {
+          if (err) {
+            return next(err);
+          }
+
+          for (i = 0; i < groups.length; i++) {
+            if (groups[i].profile.name === 'own') {
+
+              user = user.toObject();
+              user.group = groups[i];
+              req.session.user = user;
+              return res.status(204).end();
+
+            }
+          }
+        });
         token.remove(function(err) {
           if (err) {
             debug(err);
