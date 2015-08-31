@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Tasks:Create', [
-    '$scope', '$location', '$http', '$session', 'priorities', '$timeout',
+    '$scope', '$location', '$http', '$session', 'priorities',
 
-    function($scope, $location, $http, $session, priorities, $timeout) {
+    function($scope, $location, $http, $session, priorities) {
 
       $scope.sessionGroup = $session.get('group') && $session.get('group')._id;
 
@@ -55,8 +55,9 @@
         }).
 
         finally(function() {
-          $scope.data.group = $scope.sessionGroup;
           $scope.fetching = false;
+          $scope.data.group = $scope.sessionGroup;
+          return $scope.data.group && $scope.fetchGroupMembers();
         });
 
       };
@@ -64,9 +65,14 @@
 
       $scope.submit = function() {
 
+        $scope.submitting = true;
+
         $http.post('/api/tasks', $scope.data).
 
         success(function(task) {
+
+          $location.path('/tasks/creator');
+          $session.flash('success', 'Tarea ha sido creada');
 
           if ($scope.data.collaborators.length) {
 
@@ -86,13 +92,10 @@
             });
           }
 
-          $session.flash('success', 'Tarea creada con éxito!');
         }).
         error(function() {
+          $scope.submitting = false;
           $session.flash('La tarea no pudo ser creada');
-        }).
-        finally(function() {
-          $location.path('/tasks/creator');
         });
       };
 
@@ -130,48 +133,21 @@
         $scope.data.activities.splice(index, 1);
       };
 
-      $scope.removeTag = function(tag) {
-        var index = $scope.data.tags.indexOf(tag);
-        if (index >= 0) {
-          $scope.data.tags.splice(index, 1);
-        }
-      };
-
       $scope.searchTags = function(tag) {
 
-        if (tag && tag.replace(/\s+/g, '').length) {
+        var
+          limit = 'limit=' + $scope.limit + '&',
+          skip = 'skip=' + $scope.skip + '&',
+          keywords = 'keywords=' + tag,
+          tags = '/api/tags/like?' + limit + skip + keywords;
 
-          var
-            limit = 'limit=' + $scope.limit + '&',
-            skip = 'skip=' + $scope.skip + '&',
-            keywords = 'keywords=' + tag,
-            tags = '/api/tags/like?' + limit + skip + keywords;
+        return $http.get(tags).
+        then(function(tags) {
+          return (tags.data.length && tags.data.map(function(tag) {
+            return tag.name;
+          }));
+        });
 
-          return $http.get(tags).
-          then(function(tags) {
-            return (tags.data.length && tags.data) || $timeout(function() {
-              return [{
-                name: tag
-              }];
-            }, 600);
-          });
-        }
-      };
-
-      $scope.selectedTagChange = function(tag) {
-
-        tag = tag && tag.replace(/\s+/g, '');
-
-        if (tag && tag.length) {
-
-          var index = $scope.data.tags.indexOf(tag);
-          if (index < 0) {
-            $scope.data.tags.push(tag);
-          }
-
-          $scope.selectedTag = null;
-          $scope.text = '';
-        }
       };
 
       $scope.fetchGroups();

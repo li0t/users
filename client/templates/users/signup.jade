@@ -39,7 +39,7 @@ div.md-padding
           md-button(ng-href='/users/signin') Ya tengo una cuenta
 
           md-button(
-            ng-disabled='form.$invalid'
+            ng-disabled='form.$invalid || submitting'
             type='submit')
 
             md-icon(md-font-icon='material-icons') check

@@ -8,6 +8,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       md-button(ng-href='/tasks/collaborator')  Mis Tareas
         
       md-button.md-raised(ng-href='/tasks/creator')  Tareas Asignadas
+      
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
 
 md-content.md-padding
   md-grid-list(
@@ -23,3 +25,6 @@ md-content.md-padding
       md-rowspan='1',
       md-colspan='1')
       em-card(card='task' ng-click='$navigateTo("/tasks/" + task._id + "/detail")')
+        
+  md-icon(md-font-icon='material-icons' ng-show='!fetching && !tasks.length') panorama_fish_eye
+  | No has creado tareas

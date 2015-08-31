@@ -8,8 +8,6 @@
 
       $scope.filesSupported = 'image/*';
       $scope.statics = statics;
-      $scope.fetching = false;
-      $scope.user = null;
       $scope.files = [];
 
       function updateProfilePic() {
@@ -52,6 +50,7 @@
       };
 
       $scope.submit = function() {
+
         $scope.submitting = true;
 
         $http.put('/api/users/profiles', $scope.user.profile).

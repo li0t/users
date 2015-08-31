@@ -5,8 +5,10 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     div(layout='row' )
       creator
         
-      group-items
-        
+      group-items(ng-show='group' group)
+
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')
+  
 md-content.md-padding(ng-show='!fetching && entry')
   md-input-container
     input(readonly aria-label='entry-title') 
@@ -32,7 +34,10 @@ md-content.md-padding(ng-show='!fetching && entry')
   div(ng-if='entry.type == "note"')
     p {{ entry.content }}
     
-  h5 Tags  
-  div(layout='row')
-    md-button.md-raised(ng-repeat='tag in entry.tags') {{ tag }}  
+  div
+    h5 Tags  
+    md-chips(
+      ng-model='entry.tags'
+      readonly='true')
+      md-chip-template {{ $chip }}  
   

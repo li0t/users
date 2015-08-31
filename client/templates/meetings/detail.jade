@@ -5,9 +5,9 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     div(layout='row')
       creator
         
-      md-button(ng-href='/meetings/attendant')  Mis Reuniones
+      group-items(ng-show='group' group)
         
-      md-button(ng-href='/meetings/creator')  Reuniones Creadas
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')        
       
 md-content.md-padding(ng-show='!fetching && meeting' layout='column')        
   div
@@ -57,11 +57,17 @@ md-content.md-padding(ng-show='!fetching && meeting' layout='column')
     textarea(ng-model='note')
     md-button(ng-click='addNote(note)' ng-disabled='!note') Agregar  
   
-  h5 Asistentes  
-  div(layout='row')
-    md-button.md-raised(ng-repeat='attendant in meeting.attendants') {{ attendant.user.profile.name || attendant.user.email }}  
-  
-  h5 Tags  
-  div(layout='row')
-    md-button.md-raised(ng-repeat='tag in entry.tags') {{ tag }}  
+  div
+    h4 Asistentes
+    md-chips(
+      ng-model='meeting.attendants'
+      readonly='true')
+      md-chip-template {{ $chip.user.email }}
+      
+  div
+    h5 Tags  
+    md-chips(
+      ng-model='meeting.tags'
+      readonly='true')
+      md-chip-template {{ $chip }}
   

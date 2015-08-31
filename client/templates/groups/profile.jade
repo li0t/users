@@ -5,7 +5,9 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     div(layout='row')
       creator
         
-      group-items
+      group-items(ng-show='group' group)
+        
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')           
       
 md-content.md-padding
   md-grid-list(
@@ -20,4 +22,4 @@ md-content.md-padding
       ng-repeat='entry in entries',
       md-rowspan='1',
       md-colspan='1')
-      em-card(card='entry' ng-click='$navigateTo("/groups/" + session.group._id + "/entries/" + entry._id + "/detail")')
+      em-card(card='entry' ng-click='$navigateTo(getHref(entry))')

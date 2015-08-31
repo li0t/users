@@ -8,6 +8,7 @@
 
       $scope.fetching = null;
       $scope.entry = null;
+      $scope.group = null;
 
       $scope.fetch = function() {
 
@@ -17,6 +18,7 @@
 
         success(function(data) {
           $scope.entry = data;
+          $scope.group = data.group._id;
         }).
 
         finally(function(){

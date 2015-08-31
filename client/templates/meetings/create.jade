@@ -4,100 +4,79 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     
     creator
       
-md-content.md-padding
-  div(ng-show='!fetching && groups')
-    form(
-      ng-submit='form.$valid && submit()'
-      role='form'
-      name='form')
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
       
-      md-input-container
-        label Grupo
-        md-select(
-          ng-change='fetchGroupMembers()'
-          ng-model='data.group'
-          required)
-          
-          md-option(
-            ng-repeat='group in groups'
-            value='{{ group._id }}')
-            | {{ group.profile.name }}
-
-      md-input-container.form-group
-        label Objetivo
-        input.form-control(
-          ng-model='data.objective'
-          required)
-          
-      md-input-container.form-group
-        label Fecha
-        input.form-control(
-          ng-model='data.dateTime'
-          type='date')
-          
-      div(layout='column')
-        md-checkbox(
-          ng-repeat='item in data.items'
-          aria-label='meeting-item'
-          ng-disabled='true')
-          | {{ item.description }}
-          
-          md-icon(md-font-icon='material-icons' ng-click='removeItem($index)' ) close
-        
-        div(layout='row')
-          md-input-container
-            label Agrega un item...
-            input(ng-model='item')    
-          md-icon(md-font-icon='material-icons' ng-click='item && addItem(item)' ) add    
-          
-      div(layout='row')  
-        h4 Tags
-          
-        md-button.md-raised(ng-repeat='tag in data.tags' type='button') {{ tag }}
-          md-icon(md-font-icon='material-icons' ng-click='removeTag(tag)') close
-          
-      md-divider
-        
-      md-autocomplete(
-        md-selected-item-change="selectedTagChange(tag.name)"
-        placeholder='Agrega tags a la tarea'
-        md-items='tag in searchTags(text)'
-        md-selected-item='selectedTag'
-        md-search-text='text'
-        md-no-cache='true'
-        md-delay='100')  
-        md-item-template
-          span {{ tag.name }}      
-          
-      div(layout='row')  
-        h4 Asistentes
-          
-        md-button.md-raised(ng-repeat='attendant in attendants.list' type='button')
-          | {{ attendant.user.email }}
-          //
-            md-icon(
-              ng-if='attendant.user.email !== session.user.email'
-              ng-click='attendants.remove($index)'
-              md-font-icon='material-icons') close
+md-content.md-padding(ng-show='!fetching && groups')
+  form(
+    ng-submit='form.$valid && submit()'
+    role='form'
+    name='form')
     
-      md-divider
+    md-input-container
+      label Grupo
+      md-select(
+        ng-change='fetchGroupMembers()'
+        ng-model='data.group'
+        required)
+        
+        md-option(
+          ng-repeat='group in groups'
+          value='{{ group._id }}')
+          | {{ group.profile.name }}
+
+    md-input-container.form-group
+      label Objetivo
+      input.form-control(
+        ng-model='data.objective'
+        required)
+        
+    md-input-container.form-group
+      label Fecha
+      input.form-control(
+        ng-model='data.dateTime'
+        type='date')
+        
+    div(layout='column')
+      md-checkbox(
+        ng-repeat='item in data.items'
+        aria-label='meeting-item'
+        ng-disabled='true')
+        | {{ item.description }}
+        
+        md-icon(md-font-icon='material-icons' ng-click='removeItem($index)' ) close
       
-      //
-        md-input-container
-          label Agrega asistentes
-          md-select(
-            ng-disabled='!members'
-            ng-change='attendants.add()'
-            ng-model='form.attendant')
-            
-            md-option(
-              ng-repeat='member in members'
-              value='{{ $index }}')
-              | {{ member.user.email }} 
-                
       div(layout='row')
-        md-button(
-          ng-disabled='form.$invalid',
-          type='submit')
-          | Crear
-          md-icon(md-font-icon='material-icons') chevron_right
+        md-input-container
+          label Agrega un item...
+          input(ng-model='item')    
+        md-icon(md-font-icon='material-icons' ng-click='item && addItem(item)' ) add    
+        
+    div(layout='row')  
+      h4 Tags
+        
+      md-chips(ng-model='data.tags')
+        md-autocomplete(
+          placeholder="Busca o crea un nuevo tag"
+          md-items='tag in searchTags(text)'
+          md-selected-item='selectedTag'
+          md-search-text='text'
+          md-autoselect='true'
+          md-item-text='tag')
+          
+          span(md-highlight-text='text') {{ tag }} 
+
+        
+    div
+      h4 Asistentes
+
+      md-chips(
+        ng-model='groupMembers'
+        readonly='true')
+        md-chip-template {{ $chip.user.email }}    
+
+    div(layout='row')
+      md-button(
+        ng-disabled='form.$invalid || submitting',
+        type='submit')
+        | Crear
+        md-icon(md-font-icon='material-icons') chevron_right

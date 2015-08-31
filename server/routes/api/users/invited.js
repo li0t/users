@@ -117,7 +117,9 @@ module.exports = function(router, mongoose) {
         return res.sendStatus(498);
       }
 
-      User.findById(token.user, function(err, user) {
+      User.findById(token.user).
+      deepPopulate('profile.gender').
+      exec(function(err, user) {
         if (err) {
           return next(err);
 

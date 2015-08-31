@@ -6,12 +6,14 @@
 
     function($scope, $http, $location, $session, $routeParams) {
 
-      $session.signout();
       $session.set('group', null);
+      $session.signout();
 
       $session.flash('success', 'Bienvenido, porfavor llena el formulario!');
 
       $scope.submit = function() {
+
+        $scope.submitting = true;
 
         $http.put('/api/users/invited/validate/' + $routeParams.token, { password: $scope.data.password }).
 

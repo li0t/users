@@ -14,13 +14,14 @@
           $scope.APP_NAME = APP_NAME;
           $scope.YEAR = YEAR;
 
-          $scope.submitting = false;
           $scope.data = {};
 
           $scope.submit = function () {
+
             $scope.submitting = true;
 
             $http.post('api/contact', $scope.data).
+
             success(function () {
               $session.flash('success', "¡Muchas gracias!", "Tu mensaje fue recibido.");
               $scope.data = null;

@@ -4,6 +4,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     
     creator
       
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
+      
 md-content.md-padding(ng-show='!fetching && posibleMembers')
   form(
     ng-submit='form.$valid && submit()'
@@ -44,12 +46,8 @@ md-content.md-padding(ng-show='!fetching && posibleMembers')
           | {{ member.user.profile.name || member.user.email }}
 
     div(layout='row')
-      md-button(ng-href='/groups')
-        md-icon(md-font-icon='material-icons') chevron_left
-        | Cancelar
-
       md-button(
-        ng-disabled='form.$invalid'
+        ng-disabled='form.$invalid || submitting'
         type='submit')
         | Crear
         md-icon(md-font-icon='material-icons') chevron_right
