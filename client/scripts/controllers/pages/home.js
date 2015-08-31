@@ -12,7 +12,7 @@
         'title': 'Terminar presentación',
         'description': 'Blah blah'
       }, {
-        'title': 'Llamar proeedores',
+        'title': 'Llamar proveedores',
         'description': 'Blah blah blah'
       }, {
         'title': 'Prepara reunión de mark',

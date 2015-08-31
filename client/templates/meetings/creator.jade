@@ -23,3 +23,6 @@ md-content.md-padding
       md-rowspan='1',
       md-colspan='1')
       em-card(card='meeting' ng-click='$navigateTo("/meetings/" + meeting._id + "/detail")')
+ 
+  md-icon(md-font-icon='material-icons' ng-show='!fetching && !meetings.length') panorama_fish_eye
+  | No has creado reuniones
