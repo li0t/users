@@ -2,7 +2,7 @@
   'use strict';
 
   ng.module('App').controller('Entries:Create:Notes', [
-    '$scope', '$http', '$location', '$session', 
+    '$scope', '$http', '$location', '$session',
 
     function($scope, $http, $location, $session) {
 
@@ -45,6 +45,9 @@
 
         success(function(entry) {
 
+          $location.path('/');
+          $session.flash('success', 'La nota ha sido creada');
+
           if ($scope.data.tags.length) {
 
             $http.post('/api/entries/' + entry + '/tags', $scope.data).
@@ -53,16 +56,10 @@
               $session.flash('danger', 'Hubo un error agregando tags a la nota!');
             });
           }
-
-          $session.flash('success', 'Entrada creada con éxito!');
-
         }).
         error(function(data) {
           $session.flash('danger', data);
-        }).
-        finally(function() {
           $scope.submitting = false;
-          $location.path('/');
         });
 
       };

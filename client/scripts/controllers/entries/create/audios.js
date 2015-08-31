@@ -2,7 +2,7 @@
   'use strict';
 
   ng.module('App').controller('Entries:Create:Audios', [
-    '$scope', '$http', '$location', '$session', 'Upload', 
+    '$scope', '$http', '$location', '$session', 'Upload',
 
     function($scope, $http, $location, $session, $upload) {
 
@@ -68,19 +68,18 @@
               });
             }
 
-            $session.flash('success', 'Entrada creada con éxito!');
-
-          }).
-          error(function() {
-            $session.flash('danger', "Hubo un error creando la entrada"); /** TODO: Rollback */
-          }).
-          finally(function() {
-            $scope.submitting = false;
             $location.path('/');
+            $session.flash('success', 'Entrada creada con éxito!');
+          }).
+
+          error(function() {
+            $session.flash('danger', "Hubo un error creando el audio"); /** TODO: Rollback */
+            $scope.submitting = false;
           });
         }).
         error(function() {
-          $session.flash('danger', 'Hubo un error creando la entrada');
+          $session.flash('danger', 'Hubo un error creando el audio');
+          $scope.submitting = false;
         });
 
       };

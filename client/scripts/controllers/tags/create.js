@@ -21,14 +21,12 @@
           $http.post('/api/tags', {name : $scope.text}).
 
           success(function() {
-            $session.flash('danger', 'Has creado un nuevo tag');
+            $location.path('/');
+            $session.flash('success', 'Has creado un nuevo tag');
           }).
           error(function() {
+                        $scope.submitting = false;
             $session.flash('danger', 'Hubo un error creando el tag');
-          }).
-          finally(function() {
-            $scope.submitting = false;
-            $location.path('/');
           });
         }
       };

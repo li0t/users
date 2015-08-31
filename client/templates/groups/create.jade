@@ -45,7 +45,7 @@ md-content.md-padding(ng-show='!fetching && posibleMembers')
 
     div(layout='row')
       md-button(
-        ng-disabled='form.$invalid'
+        ng-disabled='form.$invalid || submitting'
         type='submit')
         | Crear
         md-icon(md-font-icon='material-icons') chevron_right

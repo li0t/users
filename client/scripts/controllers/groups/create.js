@@ -1,12 +1,12 @@
 /* global angular */
 
-(function (ng) {
+(function(ng) {
   'use strict';
 
   ng.module('App').controller('Groups:Create', [
     '$scope', '$location', '$http', '$session',
 
-    function ($scope, $location, $http, $session) {
+    function($scope, $location, $http, $session) {
 
       $scope.posibleMembers = [];
 
@@ -15,11 +15,11 @@
         $scope.fetching = true;
         $http.get('/api/contacts').
 
-        success(function (contacts) {
+        success(function(contacts) {
           $scope.posibleMembers = contacts;
         }).
 
-        error(function () {
+        error(function() {
           $session.flash('Hubo un error obteniendo los contactos');
         }).
 
@@ -57,20 +57,20 @@
         }
       };
 
-      $scope.submit = function () {
+      $scope.submit = function() {
+
+        $scope.submitting = true;
 
         $http.post('/api/groups', $scope.data).
 
-        success(function () {
+        success(function() {
+          $location.path('/groups');
           $session.flash('Grupo creado');
         }).
 
-        error(function () {
+        error(function() {
+          $scope.submitting = false;
           $session.flash('El grupo no pudo ser creado');
-        }).
-
-        finally(function() {
-          $location.path('/groups');
         });
 
       };

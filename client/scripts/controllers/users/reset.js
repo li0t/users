@@ -7,13 +7,13 @@
     '$scope', '$http', '$location', '$routeParams', '$session',
 
     function ($scope, $http, $location, $routeParams, $session) {
-      $scope.submitting = false;
+
       $scope.validating = true;
 
       $scope.submit = function () {
+
         $scope.submitting = true;
 
-        //2///////////////////////////////////
         $http.post('/api/users/reset/' + $routeParams.token, {
           password: $scope.form.password
         }).
@@ -24,14 +24,10 @@
         }).
 
         error(function () {
+            $scope.submitting = false;
           $session.flash('No se ha podido reestablecer tu clave. Tal vez debas realizar una nueva solicitud de cambio.');
-        }).
-
-        finally(function () {
-          $scope.submitting = false;
         });
-        //2///////////////////////////////////
-
+    
       };
     }
   ]);

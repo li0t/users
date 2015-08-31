@@ -28,7 +28,7 @@ div.md-padding
 
         div(layout='row')
           md-button(
-            ng-disabled='form.$invalid'
+            ng-disabled='form.$invalid || submitting'
             type='submit')
 
             md-icon(md-font-icon='material-icons') check

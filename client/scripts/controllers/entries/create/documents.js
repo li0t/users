@@ -59,6 +59,9 @@
 
           success(function() {
 
+            $location.path('/');
+            $session.flash('success', 'El documento ha sido subido!');
+
             if ($scope.data.tags.length) {
 
               $http.post('/api/entries/' + entry + '/tags', $scope.data).
@@ -67,20 +70,15 @@
                 $session.flash('danger', 'Hubo un error agregando tags al documento!');
               });
             }
-
-            $session.flash('success', 'Entrada creada con éxito!');
-
           }).
           error(function() {
-            $session.flash('danger', "Hubo un error creando la entrada"); /** TODO: Rollback */
-          }).
-          finally(function() {
+            $session.flash('danger', "Hubo un error subiendo el documento"); /** TODO: Rollback */
             $scope.submitting = false;
-            $location.path('/');
           });
         }).
         error(function() {
-          $session.flash('danger', 'Hubo un error creando la entrada');
+          $session.flash('danger', 'Hubo un error subiendo el documento');
+          $scope.submitting = false;
         });
       };
 

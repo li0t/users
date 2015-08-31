@@ -54,9 +54,13 @@
 
       $scope.submit = function() {
 
+        $scope.submitting = true;
+
         $http.post('/api/meetings', $scope.data).
 
         success(function(meeting) {
+
+          $session.flash('success', 'La reunión ha sido creada');
 
           $http.post('/api/meetings/attendants/add-to/' + meeting, $scope.data).
 
@@ -66,22 +70,20 @@
 
               $http.post('/api/meetings/' + meeting + '/tags', $scope.data).
 
-              error(function(data) {
-                $session.flash('danger', data);
+              error(function() {
+                $session.flash('danger', 'Hubo un problema agregando tags a la reunión');
               });
             }
-
-            $session.flash('success', 'Reunión creada con éxito!');
-
           }).
           error(function() {
-            $session.flash('danger', 'La reunión no pudo ser creada');
+            $session.flash('danger', 'Hubo un problema agregando asistentes a la reunión');
           }).
           finally(function() {
             $location.path('/meetings/creator');
           });
         }).
         error(function() {
+          $scope.submitting = false;
           $session.flash('danger', 'La reunión no pudo ser creada');
         });
       };

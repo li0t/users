@@ -2,7 +2,7 @@
   'use strict';
 
   ng.module('App').controller('Entries:Create:Images', [
-    '$scope', '$http', '$location', '$session', 'Upload', 
+    '$scope', '$http', '$location', '$session', 'Upload',
 
     function($scope, $http, $location, $session, $upload) {
 
@@ -59,6 +59,9 @@
 
           success(function() {
 
+            $location.path('/');
+            $session.flash('success', 'La imagen ha sido subida');
+
             if ($scope.data.tags.length) {
 
               $http.post('/api/entries/' + entry + '/tags', $scope.data).
@@ -68,19 +71,15 @@
               });
             }
 
-            $session.flash('success', 'Entrada creada con éxito!');
-
           }).
           error(function() {
-            $session.flash('danger', "Hubo un error creando la entrada"); /** TODO: Rollback */
-          }).
-          finally(function() {
+            $session.flash('danger', "Hubo un error subiendo la imagen"); /** TODO: Rollback */
             $scope.submitting = false;
-            $location.path('/');
           });
         }).
         error(function() {
-          $session.flash('danger', 'Hubo un error creando la entrada');
+          $session.flash('danger', 'Hubo un error subiendo la imagen');
+          $scope.submitting = false;
         });
 
       };

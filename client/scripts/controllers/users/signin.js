@@ -5,27 +5,28 @@
     '$scope', '$http', '$location', '$session',
 
     function ($scope, $http, $location, $session) {
+
       $scope.error = false;
-      $scope.submitting = false;
 
       $scope.submit = function () {
+
         $scope.submitting = true;
         $session.flash();
 
         $http.post('/api/users/signin', {
           email: $scope.data.email,
           password: $scope.data.password
+        }).
 
-        }).success(function (user) {
+        success(function (user) {
           $session.signin(user);
           $location.path('/');
           $session.flash('success', 'Welcome back ' + user.email + '!');
+        }).
 
-        }).error(function () {
-          $session.flash('danger', 'Wrong email or password');
-
-        }).finally(function () {
+        error(function () {
           $scope.submitting = false;
+          $session.flash('danger', 'Wrong email or password');
         });
 
       };

@@ -65,9 +65,14 @@
 
       $scope.submit = function() {
 
+        $scope.submitting = true;
+
         $http.post('/api/tasks', $scope.data).
 
         success(function(task) {
+
+          $location.path('/tasks/creator');
+          $session.flash('success', 'Tarea ha sido creada');
 
           if ($scope.data.collaborators.length) {
 
@@ -87,13 +92,10 @@
             });
           }
 
-          $session.flash('success', 'Tarea creada con éxito!');
         }).
         error(function() {
+          $scope.submitting = false;
           $session.flash('La tarea no pudo ser creada');
-        }).
-        finally(function() {
-          $location.path('/tasks/creator');
         });
       };
 

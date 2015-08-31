@@ -6,9 +6,8 @@
 
     function($scope, $http, $location, $session) {
 
-      $scope.submitting = false;
-
       $scope.submit = function() {
+
         $scope.submitting = true;
         $session.flash();
 
@@ -24,20 +23,19 @@
           }).
 
           success(function() {
+            $location.path('/');
             $session.flash('success', 'Te ha sido enviado un mail de confirmación');
           }).
 
           error(function(data) {
-            $session.flash('danger', data);
-          }).
-
-          finally(function() {
-            $location.path('/');
             $scope.submitting = false;
+            $session.flash('danger', data);
           });
         }).
 
         error(function(data, status) {
+          $scope.submitting = false;
+
           if (status === 409) {
             /* TODO: Mail already exists! do something! */
             $session.flash('warning', 'That email account is already registered. Do you need to recover your password?');

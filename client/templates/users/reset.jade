@@ -43,7 +43,7 @@ form(
 
       div.col-sm-7
         md-button(
-          ng-disabled='form.$invalid || validating || form.password !== form.vpassword'
+          ng-disabled='form.$invalid || validating || form.password !== form.vpassword || submitting'
           type='submit')
 
           |Cambiar clave
