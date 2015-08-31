@@ -413,6 +413,7 @@ module.exports = function(router, mongoose) {
       }, {
         state: statics.model('state', 'active')._id
       }).
+      deepPopulate('profile.gender').
       exec(function(err, user) {
         if (err) {
           return next(err);
