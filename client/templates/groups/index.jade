@@ -7,11 +7,8 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
         
 md-progress-circular(ng-show='fetching' md-mode='indeterminate')           
         
-md-content(layout='column' layout-align="center start" ng-show='!fetching && groups') 
-  md-icon(md-font-icon='material-icons' ng-show='!groups.length') circle
-    | No hay Grupos    
-          
-  table(layout="column" layout-align="center")
+md-content.md-padding(ng-show='!fetching && groups')           
+  table(layout="column" layout-align="center" ng-show='groups.length')
     thead
       tr
         th
@@ -39,5 +36,7 @@ md-content(layout='column' layout-align="center start" ng-show='!fetching && gro
             
         td
           md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.updated | toLocal }}
-
-        
+  
+  div(ng-show='!groups.length')
+    md-icon(md-font-icon='material-icons') panorama_fish_eye
+    | No hay grupos
