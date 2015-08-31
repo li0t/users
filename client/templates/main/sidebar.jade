@@ -11,7 +11,7 @@ md-toolbar.lightBlue
       ng-click='$navigateTo("/")'
       ng-if='session.user')
       img.profilePicture(
-        ng-src='{{"api/files/" + session.user.profile.pictures[0] }}'
+        ng-src='{{ (session.user.profile.pictures.length && "api/files/" + session.user.profile.pictures[0]) || "http://lorempixel.com/50/50/abstract" }}'
         alt='{{pic.filename}}'
         class='md-avatar')
         
