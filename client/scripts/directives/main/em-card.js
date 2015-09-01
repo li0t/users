@@ -1,8 +1,8 @@
 /**
-* emCard Directive.
-*
-* @type AngularJS Directive.
-*/
+ * emCard Directive.
+ *
+ * @type AngularJS Directive.
+ */
 
 (function(ng) {
   'use strict';
@@ -70,65 +70,48 @@
               background: "green"
             }
           };
-          // Type to int helper for switch
-          function typeToInt(type) {
-            if (type === 'note') {
-              return 0;
-            } else if (type === 'document') {
-              return 1;
-            } else if (type === 'image') {
-              return 2;
-            } else if (type === 'audio') {
-              return 3;
-            } else if (type === 'group') {
-              return 4;
-            } else if (type === 'task') {
-              return 5;
-            } else if (type === 'meeting') {
-              return 6;
-            }
-          }
 
           // Cards basic configuration, will be override when needed
-          $scope.card.icon = config[$scope.card.type].icon;
-          $scope.card.color = config[$scope.card.type].color;
-          $scope.card.span = config[$scope.card.type].span;
           $scope.card.background = config[$scope.card.type].background;
+          $scope.card.color = config[$scope.card.type].color;
+          $scope.card.icon = config[$scope.card.type].icon;
+          $scope.card.span = config[$scope.card.type].span;
           $scope.card.relevantDate = $scope.card.created;
 
           // Specific configuration for each card
-          switch (typeToInt($scope.card.type)) {
+          switch ($scope.card.type) {
 
-            case 5:
-            // Card is Task
-            if ($scope.card.isCollaborator) {
+            case 'task':
+              // Card is Task
+              if ($scope.card.isCollaborator) {
 
-              $scope.card.isWorking = !!$scope.card.isWorking;
-              $scope.hasTimer = !$scope.card.completed;
+                $scope.card.isWorking = !!$scope.card.isWorking;
+                $scope.hasTimer = !$scope.card.completed;
 
-              $scope.toogleWorking = function(task) {
+                $scope.toogleWorking = function(task) {
 
-                $http.put('/api/tasks/' + task + '/worked-time').
+                  $http.put('/api/tasks/' + task + '/worked-time').
 
-                error(function() {
-                  console.log('Hubo un error con la tarea');
-                });
+                  error(function() {
+                    console.log('Hubo un error con la tarea');
+                  });
 
-              };
-            }
+                };
+              }
 
-            $scope.card.span = $scope.card.objective;
-            $scope.card.relevantDate = $scope.card.dateTime;
+              $scope.card.relevantDate = $scope.card.dateTime;
+              $scope.card.span = $scope.card.objective;
 
-            break;
+              break;
 
-            case 6:
-            // Card is Meeting
-            $scope.hasTimer = true;
-            $scope.card.span = $scope.card.title;
-            break;
+            case 'meeting':
+              // Card is Meeting
+              $scope.card.relevantDate = $scope.card.dateTime;
+              $scope.card.span = $scope.card.objective;
+              $scope.hasTimer = true;
+              break;
           }
-          
+
           $scope.card.action = function() {
             $emCard.setCard($scope.card);
             $emCard.showDetailsBar(true);
