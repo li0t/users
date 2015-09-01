@@ -11,6 +11,7 @@
     'Moment',
     'Session',
     'Formatter'
+
   ]);
 
 }(angular));

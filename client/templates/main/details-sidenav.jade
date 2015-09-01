@@ -1,0 +1,41 @@
+md-toolbar
+  div.md-toolbar-tools
+    div(layout-padding)
+      md-icon.icon48(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
+    p {{ activeCard.span }}
+    span(flex)
+    md-button(ng-click='close()')
+      md-icon(md-font-icon='material-icons', style='color: #747474;') close
+
+md-content.border(layout='row', layout-align='space-around center', layout-padding)
+  md-switch.md-primary(
+    ng-change='toogleWorking(card._id)',
+    aria-label='em-card-switch',
+    ng-model='card.isWorking')
+
+  p 
+    strong Tiempo trabajado
+    br
+    | {{ activeCard.workedTime && (activeCard.workedTime | fromNow) || 'Sin información'}}
+  
+  p 
+    strong Fecha límite
+    br
+    | {{ activeCard.relevantDate && (activeCard.relevantDate | fromNow) || 'Sin Fecha de Entrega'}}
+
+md-content(layout='row', layout-align='space-around center', layout-padding)
+  p 
+    strong Grupo
+    br
+    | {{ activeCard.group.profile.name || 'Sin información'}}
+  
+  p 
+    strong Prioridad
+    br
+    | {{ activeCard.priority.name || 'Sin información'}}
+    
+md-content(layout='row', layout-align='space-around center', layout-padding)
+  p 
+    strong Participantes
+    br
+    span(ng-repeat='collaborator in activeCard.collaborators') {{ collaborator.user.email || 'Sin información'}}

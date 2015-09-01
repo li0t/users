@@ -11,6 +11,7 @@ html(
 
   body(layout='row')
     md-sidenav.md-sidenav-left.md-whiteframe-z4(
+      ng-if='!showDetails',
       md-is-locked-open='$mdMedia("gt-sm")',
       md-component-id='left',
       main-sidebar)
@@ -28,4 +29,6 @@ html(
         ng-view,
         flex)
 
+    details-sidenav(flex='30', ng-if='showDetails')
+          
     include ./elements/scripts

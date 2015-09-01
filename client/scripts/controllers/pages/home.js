@@ -2,9 +2,9 @@
   'use strict';
 
   ng.module('App').controller('Pages:Home', [
-    '$scope', '$http', '$location', '$session', '$timeout',
+    '$scope', '$http', '$location', '$session', '$timeout', '$emCard',
 
-    function($scope, $http, $location, $session, $timeout) {
+    function($scope, $http, $location, $session, $timeout, $emCard) {
       $scope.fetching = false;
       $scope.entries = [];
 

@@ -83,3 +83,6 @@ md-content.md-padding(layout='column' ng-show='!fetching && task')
     
           
     
+    h5 Tags  
+    div(layout='row')
+      md-button.md-raised(ng-repeat='tag in task.tags') {{ tag }}
