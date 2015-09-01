@@ -22,7 +22,7 @@ md-content.md-padding
       ng-repeat='entry in entries',
       md-rowspan='1',
       md-colspan='1')
-      em-card(card='entry' ng-click='$navigateTo("/entries/" + entry._id + "/detail")')
+      em-card(card='entry')
   
   div(ng-show='!fetching && !entries.length')
     md-icon(md-font-icon='material-icons') panorama_fish_eye

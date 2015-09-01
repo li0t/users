@@ -18,5 +18,10 @@ span(layout='column', layout-align='center center', style="color: #747474;")
       span(style='font-size: small;')
         | {{ card.completed && 'Completada'}}
 
+  md-button.md-icon-button(aria-label='emcard-detail' ng-href='{{ card.href }}')
+    md-icon(md-font-icon='material-icons') launch
+    md-tooltip {{ (card._id && "Ver detalle") || "Crear" }}    
+    
 md-grid-tile-footer(layout-padding, layout-align='center center', style="background: none; color: #747474;")  
   p(style='font-size: small;') {{ card.footer }}
+  
