@@ -12,6 +12,8 @@ md-content.md-padding(ng-show='!fetching && groups')
     thead
       tr
         th
+        
+        th
           md-button Grupo
 
         th
@@ -25,8 +27,9 @@ md-content.md-padding(ng-show='!fetching && groups')
         ng-repeat='group in groups',
         ng-init='href = ("/groups/{0}/profile" | format : group._id)')
         
-        td 
-          md-button.md-fab(ng-href='{{ href }}' aria-label="grupo")
+        td
+          md-button.md-fab.md-primary.md-hue-3(ng-href='{{ href }}' aria-label="grupo")
+          
         
         td
           md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.profile.name }}
