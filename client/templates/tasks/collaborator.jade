@@ -6,8 +6,10 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       creator
       
       md-button.md-raised(ng-href='/tasks/collaborator')  Mis Tareas
+        md-tooltip Tareas que en las que estoy colaborando   
         
       md-button(ng-href='/tasks/creator')  Tareas Asignadas
+        md-tooltip Tareas que he creado en las que no estoy colaborando
       
 md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
       
