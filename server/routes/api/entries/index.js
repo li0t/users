@@ -20,6 +20,7 @@ module.exports = function(router, mongoose) {
 
     where('user', req.session.user._id).
 
+    populate('user').
     sort('-created').
 
     exec(function(err, entries) {

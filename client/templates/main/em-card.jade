@@ -19,4 +19,4 @@ span(layout='column', layout-align='center center', style="color: #747474;")
         | {{ card.completed && 'Completada'}}
 
 md-grid-tile-footer(layout-padding, layout-align='center center', style="background: none; color: #747474;")  
-  p(style='font-size: small;') {{ card.type === "card" && card.title + " : " +  card.content || card.type === "group" && card.admin.email + " ha creado un nuevo grupo" || card.type == "task" && card.objective || card.author + " ha modificado una tarea" }}
+  p(style='font-size: small;') {{ card.footer }}
