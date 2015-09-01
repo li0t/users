@@ -35,6 +35,16 @@
       when('/tasks/:id/detail', {
         controller: 'Tasks:Detail',
         templateUrl: '/assets/templates/tasks/detail.html'
+      }).
+
+      when('/tasks/:id/collaborators', {
+        controller: 'Tasks:Collaborators',
+        templateUrl: '/assets/templates/tasks/collaborators/index.html'
+      }).
+
+      when('/tasks/:id/collaborators/add', {
+        controller: 'Tasks:Collaborators:Add',
+        templateUrl: '/assets/templates/tasks/collaborators/add.html'
       });
 
     }
