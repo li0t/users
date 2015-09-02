@@ -69,6 +69,9 @@ module.exports = function(router) {
 
     /* Settings */
     '/settings',
+    
+    /* Tokens */
+    '/tokens/:secret',
 
     /* Analitycs */
     '/analitycs',
