@@ -8,6 +8,7 @@ var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
+  var Interaction = mongoose.model('interaction');
   var Contact = mongoose.model('contact');
   var Token = mongoose.model('token');
 
@@ -145,35 +146,37 @@ module.exports = function(router, mongoose) {
     var receiver = null;
     var sender = null;
 
-    Token.findById(req.params.token, function(err, token) {
+    Interaction.findOne().
+
+    where('token', req.params.token).
+
+    exec(function(err, inter) {
       if (err) {
         if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
+          return res.sendStatus(400);
         }
-        return;
 
+        return next(err);
       }
 
-      if (!token || !token.sender) {
-        debug('Token %s not active', req.params.id);
+      if (!inter || !inter.sender || !inter.receiver) {
+        debug('Token %s not active', req.params.token);
         return res.sendStatus(498);
       }
 
-      relations.contact(token.user, function(err, receiverRelation) {
+      relations.contact(inter.receiver, function(err, receiverRelation) {
 
         if (err || !receiverRelation.contact) {
-          debug('No contacts list found for user with id %s', token.user);
+          debug('No contacts list found for user with id %s', inter.receiver);
           return res.sendStatus(404);
         }
 
         receiver = receiverRelation.contact;
 
-        relations.contact(token.sender, function(err, senderRelation) {
+        relations.contact(inter.sender, function(err, senderRelation) {
 
           if (err || !senderRelation.contact) {
-            debug('No contacts list found for user with id %s', req.session.user._id);
+            debug('No contacts list found for user with id %s', inter.sender);
             return res.sendStatus(404);
           }
 
@@ -202,12 +205,19 @@ module.exports = function(router, mongoose) {
               debug('User %s and %s are now contacts!', receiver.user, sender.user);
               res.end();
 
-              token.remove(function(err) {
+              Token.remove({
+                _id: inter.token
+              }, function(err) {
                 if (err) {
                   debug(err);
                 }
               });
 
+              inter.remove(function(err) {
+                if (err) {
+                  debug(err);
+                }
+              });
             });
           });
         });

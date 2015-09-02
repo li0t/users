@@ -6,11 +6,11 @@ var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
-  var User = mongoose.model('user');
+  var Interaction = mongoose.model('interaction');
   var Profile = mongoose.model('profile');
   var Contact = mongoose.model('contact');
-  var Token = mongoose.model('token');
   var Group = mongoose.model('group');
+  var User = mongoose.model('user');
 
   /**
    * Create a new user and invite it to emeeter
@@ -105,38 +105,43 @@ module.exports = function(router, mongoose) {
       return res.sendStatus(400);
     }
 
-    Token.findById(req.params.token, function(err, token) {
+    Interaction.findOne().
+
+    where('token', req.params.token).
+
+    exec(function(err, inter) {
       if (err) {
         if (err.name && err.name === 'CastError') {
           return res.sendStatus(400);
         }
         return next(err);
       }
-      debug(token);
-      if (!token || !token.user || !token.sender) {
+
+      if (!inter || !inter.sender || !inter.receiver) {
         return res.sendStatus(498);
       }
 
-      User.findById(token.user).
+      User.findById(inter.receiver).
+
       deepPopulate('profile.gender').
+
       exec(function(err, user) {
         if (err) {
           return next(err);
-
         }
 
         if (!user) {
-          return res.sendStatus(404);
+          return res.sendStatus(400);
         }
 
-        user.password = password;
-
         user.state = statics.model('state', 'active')._id;
+        user.password = password;
 
         user.save(function(err) {
           if (err) {
             return next(err);
           }
+
 
           Group.find().
 
@@ -156,7 +161,7 @@ module.exports = function(router, mongoose) {
                 user.group = groups[i];
 
                 req.session.user = user;
-                return res.send(token._id);
+                return res.send(inter.token);
 
               }
             }

@@ -58,7 +58,7 @@
         }
       }).
 
-      when('/users/invited/validate/:token', {
+      when('/users/invited/validate/:secret', {
         controller: 'Users:Invited:Validate',
         templateUrl: '/assets/templates/users/invited/validate.html'
       });

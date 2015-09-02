@@ -10,7 +10,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       md-icon(md-font-icon='material-icons') group
       | Personas
   
-md-progress-circular(ng-show='fetchingContacts || fetchingPending' md-mode='indeterminate') 
+md-progress-circular(ng-show='fetchingContacts || fetchingPending || inviting' md-mode='indeterminate') 
   
 md-content.md-padding
   div.form-group(ng-show='!fetchingContacts && contacts')
@@ -62,7 +62,7 @@ md-content.md-padding
     md-icon(md-font-icon='material-icons' ) add
     | Agregar
   
-  md-button(ng-show='notFoundUser' ng-click='inviteNotFound()')
+  md-button(ng-disabled='inviting' ng-show='notFoundUser' ng-click='inviteNotFound()')
     p {{ notFoundUser }}
     md-icon(md-font-icon='material-icons' ) add
     | Invitar a emeeter          
@@ -70,4 +70,4 @@ md-content.md-padding
   div(ng-show='foundPendingUser')
     p {{ foundPendingUser.email }}
     md-icon(md-font-icon='material-icons' ) access_time
-    | Esperando confirmación         
+    | Esperando confirmación      

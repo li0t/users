@@ -15,21 +15,30 @@
 
         $scope.submitting = true;
 
-        $http.put('/api/users/invited/validate/' + $routeParams.token, { password: $scope.data.password }).
+        $http.get('/api/tokens/' + $routeParams.secret).
 
         success(function(token) {
 
-          $http.put('/api/contacts/confirm/' + token).
+          $http.put('/api/users/invited/validate/' + token._id, { password: $scope.data.password }).
 
           success(function() {
-            $session.flash('success', 'Cuenta activada, bienvenido a emeeter!');
-          }).
 
-          error(function() {
-            $session.flash('danger', 'This token is not valid!');
+            $http.put('/api/contacts/confirm/' + token._id).
+
+            success(function() {
+              $session.flash('success', 'Cuenta activada, bienvenido a emeeter!');
+            }).
+
+            error(function() {
+              $session.flash('danger', 'This token is not valid!');
+            }).
+            finally(function() {
+              $location.path('/');
+            });
           }).
-          finally(function() {
+          error(function() {
             $location.path('/');
+            $session.flash('danger', 'This token is not valid!');
           });
         }).
         error(function() {

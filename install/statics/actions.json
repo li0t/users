@@ -14,5 +14,9 @@
   {
     "slug": "group-invite",
     "name": "Group Invite"
+  },
+  {
+    "slug": "user-invite",
+    "name": "User Invite"
   }
 ]

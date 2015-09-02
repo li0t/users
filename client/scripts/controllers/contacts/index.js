@@ -72,31 +72,53 @@
 
       $scope.inviteNotFound = function() {
 
-        $http.post('/api/users/invited', { email: $scope.notFoundUser }).
+        $scope.inviting = true;
+
+        $http.post('/api/users/invited', {
+          email: $scope.notFoundUser
+        }).
 
         success(function(user) {
 
-          $http.post('/api/contacts', { id: user }).
+          $http.post('/api/contacts', {
+            id: user
+          }).
 
           success(function(user) {
 
-            $http.post('/api/mandrill/invite', { id: user }).
+            $http.post('/api/interactions/user-invite', {
+              receiver: user
+            }).
 
-            success(function() {
-              $scope.searchContact = null;
-              $scope.notFoundUser = null;
-              $session.flash('success', 'Bien! Has invitado un amigo a emeeter.');
+            success(function(data) {
 
-            }).error(function() {
-              $session.flash('danger', 'An error ocurred!');
+              $http.post('/api/mandrill/user-invite', {
+                email: $scope.notFoundUser,
+                token: data.token
+              }).
+
+              success(function() {
+
+                $scope.searchContact = null;
+                $scope.notFoundUser = null;
+                $scope.inviting = false;
+                $session.flash('success', 'Bien! Has invitado un amigo a emeeter.');
+
+              }).
+              error(function(data) {
+                $session.flash('danger', data);
+              });
+            }).
+            error(function(data) {
+              $session.flash('danger', data);
             });
-          }).error(function() {
-            $session.flash('danger', 'An error ocurred!');
+          }).
+          error(function(data) {
+            $session.flash('danger', data);
           });
-        }).error(function(err, data) {
-          console.log(err);
-          console.log(data);
-          $session.flash('danger', 'An error ocurred!');
+        }).
+        error(function(data) {
+          $session.flash('danger', data);
         });
       };
 

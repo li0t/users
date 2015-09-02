@@ -61,6 +61,7 @@ module.exports = function(router, mongoose) {
     }
 
     Token.findById(req.body.token).
+
     exec(function(err, token) {
       if (err) {
         return next(err);
@@ -178,69 +179,58 @@ module.exports = function(router, mongoose) {
   /**
    * Send an invite
    */
-  router.post('/invite', function(req, res, next) {
+  router.post('/user-invite', function(req, res, next) {
 
-    if (api) {
+    var email = req.body.email;
+    var message;
 
-      var message = null;
-
-      User.findById(req.body.id, function(err, user) {
-        if (err) {
-          return next(err);
-        }
-
-        if (!user) {
-          debug('No user found with id %s ', +req.params.id);
-          return res.sendStatus(404);
-        }
-
-        new Token({
-          user: user._id,
-          sender: req.session.user._id
-        }).
-
-        save(function(err, token) {
-          if (err) {
-            return next(err);
-          }
-
-          message = {
-            "html": "<a href='http://" + url + "/users/invited/validate/" + token._id + "'/>Go to emeeter</a>",
-            "text": "Have you tried emeeter? Check it now!",
-            "subject": "emeeter invitation",
-            "from_email": senderEmail,
-            "from_name": req.session.user.email,
-            "to": [{
-              "email": user.email,
-              "name": user.email,
-              "type": "to"
-            }],
-            "headers": {
-              "Reply-To": "noreply@emeeter.com"
-            },
-            "track_opens": true,
-            "track_clicks": true,
-            "important": false
-          };
-
-          api.messages.send({ /* Send a invite email*/
-            "message": message
-
-          }, function(result) {
-            debug(result);
-            res.send(user._id);
-
-          }, function(err) {
-            debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-            res.sendStatus(500);
-          });
-        });
-
-      });
-    } else {
+    if (!api) {
       debug('A error occurred with the Mandrill client');
-      res.sendStatus(500);
+      return res.sendStatus(500);
     }
+
+    Token.findById(req.body.token).
+
+    exec(function(err, token) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!token) {
+        return res.sendStatus(400);
+      }
+
+      message = {
+        "html": "<a href='http://" + url + "/users/invited/validate/" + token.secret + "'/>Go to emeeter</a>",
+        "text": "Have you tried emeeter? Check it now!",
+        "subject": "emeeter invitation",
+        "from_email": senderEmail,
+        "from_name": req.session.user.email,
+        "to": [{
+          "email": email,
+          "name": email,
+          "type": "to"
+        }],
+        "headers": {
+          "Reply-To": "noreply@emeeter.com"
+        },
+        "track_opens": true,
+        "track_clicks": true,
+        "important": false
+      };
+
+      api.messages.send({ /* Send a invite email*/
+        "message": message
+
+      }, function(result) {
+        debug(result);
+        res.end();
+
+      }, function(err) {
+        debug('A mandrill error occurred %s : %s', +err.nam, err.message);
+        res.sendStatus(500);
+      });
+    });
 
   });
 
