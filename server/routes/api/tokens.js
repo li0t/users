@@ -13,7 +13,7 @@ module.exports = function(router, mongoose) {
 
     Token.findOne().
 
-    where('secret', req.body.secret).
+    where('secret', req.params.secret).
 
     exec(function(err, token) {
       if (err) {

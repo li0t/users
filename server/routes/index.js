@@ -63,18 +63,18 @@ module.exports = function(router) {
     '/meetings/attendant',
     '/meetings/:id/detail',
 
+    /* Settings */
+    '/settings',
+
+    /* Analitycs */
+    '/analitycs',
+
     /* Tags */
     '/tags',
     '/tags/create',
 
-    /* Settings */
-    '/settings',
-    
     /* Tokens */
     '/tokens/:secret',
-
-    /* Analitycs */
-    '/analitycs',
 
   ], function(req, res) {
 

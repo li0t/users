@@ -1,14 +1,15 @@
 'use strict';
 
+var debug = require('debug')('app:api:users');
 var bcrypt = require('bcrypt');
 var _ = require('underscore');
-var debug = require('debug')('app:api:users');
 
 var relations = component('relations');
 var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
+  var Interaction = mongoose.model('interaction');
   var Profile = mongoose.model('profile');
   var Contact = mongoose.model('contact');
   var Token = mongoose.model('token');
@@ -106,7 +107,7 @@ module.exports = function(router, mongoose) {
                   return next(err);
                 }
 
-                res.send(user._id);
+                res.status(201).send(user._id);
 
               });
             });
@@ -394,9 +395,11 @@ module.exports = function(router, mongoose) {
 
     var i;
 
-    Token.findById(req.params.token).
+    Interaction.findOne().
 
-    exec(function(err, token) {
+    where('token', req.params.token).
+
+    exec(function(err, inter) {
       if (err) {
         if (err.name && err.name === 'CastError') {
           res.sendStatus(400);
@@ -404,15 +407,14 @@ module.exports = function(router, mongoose) {
           next(err);
         }
         return;
-
       }
 
-      if (!token) {
+      if (!inter) {
         return res.sendStatus(498);
       }
 
       User.findOneAndUpdate({
-        _id: token.user
+        _id: inter.receiver
       }, {
         state: statics.model('state', 'active')._id
       }).
@@ -446,7 +448,16 @@ module.exports = function(router, mongoose) {
             }
           }
         });
-        token.remove(function(err) {
+
+        Token.remove({
+          _id: inter.token
+        }, function(err) {
+          if (err) {
+            debug(err);
+          }
+        });
+
+        inter.remove(function(err) {
           if (err) {
             debug(err);
           }

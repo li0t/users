@@ -10,8 +10,9 @@ var senderEmail = "infoemeeter@gmail.com";
 
 module.exports = function(router, mongoose) {
 
-  var User = mongoose.model('user');
+  var Interaction = mongoose.model('interaction');
   var Token = mongoose.model('token');
+  var User = mongoose.model('user');
 
   (function connectToMandrill() {
     try {
@@ -49,76 +50,58 @@ module.exports = function(router, mongoose) {
   /**
    * Send confirmation email
    */
-  router.post('/signup', function(req, res, next) {
+  router.post('/email-confirmation', function(req, res, next) {
 
-    if (api) {
+    var email = req.body.email;
+    var message;
 
-      var message = null;
-
-      User.findById(req.body.id, function(err, user) {
-
-        if (err) {
-          return next(err);
-        }
-
-        if (user) {
-
-          Token.remove({
-            user: user._id
-          }, function(err) {
-            if (err) { debug(err); }
-          });
-
-          new Token({
-            user: user._id
-          }). /* Assign a new Token to the user */
-
-          save(function(err, token) {
-            if (err) {
-              return next(err);
-            }
-
-            message = { /* Parameters to inject into Mandrill template */
-              "html": "<a href='http://" + url + "/users/validate/" + token._id + "'>Please confirm your email</a>",
-              "text": "Bievenido a eMeeter",
-              "subject": "Confirm your email",
-              "from_email": senderEmail,
-              "from_name": sender,
-              "to": [{
-                "email": user.email,
-                "name": user.email,
-                "type": "to"
-              }],
-              "headers": {
-                "Reply-To": "noreply@emeeter.com"
-              },
-              "track_opens": true,
-              "track_clicks": true,
-              "important": true
-
-            };
-
-            api.messages.send({ /* Send a confirmation email to the user */
-              "message": message
-
-            }, function(result) {
-              debug(result);
-              res.end();
-
-            }, function(err) {
-              debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-              res.status(500).send(err);
-            });
-          });
-        } else {
-          debug('No user found with id %s ', +req.params.id);
-          res.sendStatus(404);
-        }
-      });
-    } else {
+    if (!api) {
       debug('A error occurred with the Mandrill client');
-      res.sendStatus(500);
+      return res.sendStatus(500);
     }
+
+    Token.findById(req.body.token).
+    exec(function(err, token) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!token) {
+        return res.sendStatus(400);
+      }
+
+      message = { /* Parameters to inject into Mandrill template */
+        "html": "<a href='http://" + url + "/users/validate/" + token.secret + "'>Please confirm your email</a>",
+        "text": "Bievenido a eMeeter",
+        "subject": "Confirm your email",
+        "from_email": senderEmail,
+        "from_name": sender,
+        "to": [{
+          "email": email,
+          "name": email,
+          "type": "to"
+        }],
+        "headers": {
+          "Reply-To": "noreply@emeeter.com"
+        },
+        "track_opens": true,
+        "track_clicks": true,
+        "important": true
+
+      };
+
+      api.messages.send({ /* Send a confirmation email to the user */
+        "message": message
+
+      }, function(result) {
+        debug(result);
+        res.end();
+
+      }, function(err) {
+        debug('A mandrill error occurred %s : %s', +err.nam, err.message);
+        res.status(500).send(err);
+      });
+    });
 
   });
 

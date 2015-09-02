@@ -33,7 +33,7 @@
         templateUrl: '/assets/templates/users/recover.html'
       }).
 
-      when('/users/validate/:token', {
+      when('/users/validate/:secret', {
         controller: 'Users:Validate',
         templateUrl: '/assets/templates/pages/home.html'
       }).
