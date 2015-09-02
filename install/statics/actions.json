@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "contact-request",
+    "name": "Contact Request"
+  },
+  {
+    "slug": "email-confirmation",
+    "name": "Email Confirmation"
+  },
+  {
+    "slug": "task-assigned",
+    "name": "Task Asssigned"
+  },
+  {
+    "slug": "group-invite",
+    "name": "Group Invite"
+  }
+]
