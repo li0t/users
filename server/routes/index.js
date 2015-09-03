@@ -19,8 +19,8 @@ module.exports = function(router) {
     '/users/recover',
     '/users/:id/profile',
     '/users/reset/:token',
-    '/users/validate/:token',
-    '/users/invited/validate/:token',
+    '/users/validate/:secret',
+    '/users/invited/validate/:secret',
 
     /* Groups */
     '/groups',

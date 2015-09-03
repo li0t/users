@@ -143,7 +143,6 @@ module.exports = function(router, mongoose) {
     deepPopulate('profile.gender').
 
     exec(function(err, user) {
-      debug('%s & %s' , password, user.password);
       if (err) {
         if (err.name && (err.name === 'ValidationError' || err.name === 'CastError')) {
           res.sendStatus(400);

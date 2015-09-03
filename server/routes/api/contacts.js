@@ -307,23 +307,32 @@ module.exports = function(router, mongoose) {
               res.end();
 
               /* Remove contact request token */
-              Token.
-              remove({
-                user: receiver.user,
-                sender: sender.user
-              }).exec(function(err) {
+              Interaction.findOne().
+              where(
+                'receiver', receiver.user).
+              where('sender', sender.user).
+              exec(function(err, inter) {
                 if (err) {
                   debug(err);
                 }
-              });
 
-              Token.remove({
-                user: sender.user,
-                sender: receiver.user
-              }).
-              exec(function(err) {
-                if (err) {
-                  debug(err);
+                if (inter) {
+
+                  Token.remove({
+                    _id: inter.token
+                  }).
+                  exec(function(err) {
+                    if (err) {
+                      debug(err);
+                    }
+
+                    inter.remove().
+                    exec(function(err) {
+                      if (err) {
+                        debug(err);
+                      }
+                    });
+                  });
                 }
               });
             });
