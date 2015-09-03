@@ -1,5 +1,7 @@
 'use strict';
 
+var deepPopulate = require('mongoose-deep-populate');
+
 module.exports = function(Schema) {
 
   var InteractionSchema = new Schema({
@@ -26,6 +28,9 @@ module.exports = function(Schema) {
     }
 
   });
+
+  /** Lets populate reach any level */
+  InteractionSchema.plugin(deepPopulate, {});
 
   return InteractionSchema;
 
