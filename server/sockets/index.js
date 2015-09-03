@@ -1,8 +1,7 @@
-/* jshint node: true */
 'use strict';
 
-module.exports = function (io, sesscfg) {
-  
+module.exports = function (nsp, io) {
+
   /* Setup Socket.IO here */
 
 };

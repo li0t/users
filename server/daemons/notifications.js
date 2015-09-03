@@ -1,8 +1,9 @@
 'use strict';
 
-var debug = require('debug')('app:daemons:notifications');
 //var scheduler = require('node-schedule');
 //var moment = require('moment');
+var debug = require('debug')('app:daemons:notifications');
+var socket = require('socket.io-client');
 var path = require('path');
 
 /* Obtain the app's root path */
