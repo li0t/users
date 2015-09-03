@@ -6,21 +6,9 @@ module.exports = function (Schema) {
 
   var NotificationSchema = new Schema({
 
-    recipient: {
+    interaction: {
       type: Schema.Types.ObjectId,
-      ref: 'user'
-    },
-
-    sender: {
-      type: Schema.Types.ObjectId,
-      ref: 'user'
-    },
-
-
-    purpose: {
-      type: Schema.Types.ObjectId,
-      ref: 'static.purpose',
-      default: null
+      ref: 'interaction'
     },
 
     viewed: {
@@ -36,7 +24,6 @@ module.exports = function (Schema) {
     },
 
   });
-
 
   /** Show virtuals on JSON conversion */
   NotificationSchema.set('toJSON', {
