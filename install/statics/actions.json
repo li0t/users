@@ -18,5 +18,9 @@
   {
     "slug": "user-invite",
     "name": "User Invite"
+  },
+  {
+    "slug": "user-recover",
+    "name": "User Recover"
   }
 ]

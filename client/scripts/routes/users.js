@@ -38,7 +38,7 @@
         templateUrl: '/assets/templates/pages/home.html'
       }).
 
-      when('/users/reset/:token', {
+      when('/users/reset/:secret', {
         controller: 'Users:Reset',
         templateUrl: '/assets/templates/users/reset.html',
 

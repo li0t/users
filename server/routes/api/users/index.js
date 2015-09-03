@@ -211,44 +211,26 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Begin password reset.
-   */
-  router.post('/recover', function(req, res /*, next*/ ) { /* ? */
-
-    var email = req.body.email;
-
-    if (email) {
-
-      res.redirect('/api/mandrill/recover/' + email);
-
-    } else {
-      res.sendStatus(400);
-    }
-
-  });
-
-  /**
    * Reset password of user that already validated token
    */
   router.post('/reset/:token', function(req, res, next) {
 
     var password = req.body.password;
 
-    Token.findById(req.params.token).
-    exec(function(err, token) {
+    Interaction.findOne().
+
+    where('token', req.params.token).
+
+    exec(function(err, inter) {
       if (err) {
         return next(err);
       }
 
-      if (!token) {
+      if (!inter) {
         return res.sendStatus(498);
       }
 
-      if (!password) {
-        return res.sendStatus(400);
-      }
-
-      User.findById(token.user, function(err, user) { /** Find user that sent the reset request */
+      User.findById(inter.receiver, function(err, user) { /** Find user that sent the reset request */
         if (err) {
           return next(err);
         }
@@ -265,16 +247,22 @@ module.exports = function(router, mongoose) {
             return next(err);
           }
 
-          delete req.session.token;
-
           req.session.user = user;
 
           res.end();
 
-          token.remove(function(err) {
+          Token.remove({
+            _id: inter.token
+          }, function(err) {
             if (err) {
               debug(err);
             }
+
+            inter.remove(function(err) {
+              if (err) {
+                debug(err);
+              }
+            });
           });
         });
       });
