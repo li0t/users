@@ -37,7 +37,7 @@ md-content.darkGray(ng-show='session.user')
       md-row-height="1:1")
       md-grid-tile.whitebg(
         layout='column',
-        ng-repeat="entry in entries",
+        ng-repeat="entry in entries | orderBy: '-created'",
         md-rowspan="{{ entry.row }}",
         md-colspan="{{ entry.col }}")
         em-card(card='entry')

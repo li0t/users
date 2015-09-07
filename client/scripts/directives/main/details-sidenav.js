@@ -18,8 +18,8 @@
         link: function ($scope, $element, $attrs) {
 
           $scope.$watch( function () { return $emCard.activeCard }, function (data) {
-
             $scope.activeCard = data;
+            console.log($scope.activeCard);
           }, true);
 
           $scope.close = function () {

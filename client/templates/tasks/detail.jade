@@ -41,7 +41,7 @@ md-content.md-padding(layout='column' ng-show='!fetching && task')
   
   div(layout='column')
     md-checkbox(ng-repeat='activity in task.activities'
-      ng-click='toogleActivity(activity)'
+      ng-click='toggleActivity(activity)'
       ng-disabled='task.completed'
       ng-checked='activity.checked'
       aria-label='task-activity')

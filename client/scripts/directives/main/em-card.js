@@ -100,22 +100,6 @@
 
             case 'task':
               // Card is Task
-              if ($scope.card.isCollaborator) {
-
-                $scope.card.isWorking = !!$scope.card.isWorking;
-                $scope.hasTimer = !$scope.card.completed;
-
-                $scope.toogleWorking = function(task) {
-
-                  $http.put('/api/tasks/' + task + '/worked-time').
-
-                  error(function() {
-                    console.log('Hubo un error con la tarea');
-                  });
-
-                };
-              }
-
               $scope.card.relevantDate = $scope.card.dateTime;
               $scope.card.span = $scope.card.objective;
 

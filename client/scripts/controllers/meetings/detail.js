@@ -99,7 +99,7 @@
         });
       };
 
-      $scope.toogleItem = function(item) {
+      $scope.toggleItem = function(item) {
 
         return !item.checked ?
           $scope.itemCompleted(item.description) :

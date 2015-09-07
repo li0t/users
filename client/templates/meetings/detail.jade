@@ -28,7 +28,7 @@ md-content.md-padding(ng-show='!fetching && meeting' layout='column')
   
   div(layout='column')
     md-checkbox(ng-repeat='item in meeting.items'
-      ng-click='toogleItem(item)'
+      ng-click='toggleItem(item)'
       ng-disabled='meeting.completed'
       ng-checked='item.checked'
       aria-label='meeting-item')

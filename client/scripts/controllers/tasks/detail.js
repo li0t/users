@@ -160,7 +160,7 @@
         });
       };
 
-      $scope.toogleActivity = function(activity) {
+      $scope.toggleActivity = function(activity) {
 
         return !activity.checked ?
           $scope.activityCompleted(activity.description) :

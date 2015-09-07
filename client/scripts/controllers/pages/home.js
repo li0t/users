@@ -25,23 +25,6 @@
         'description': 'Blah blah vlad...'
       }];
 
-      /* Shuffle an array, Based on Fisher–Yates shuffle algorithm */
-      function shuffle(a) {
-        var n = a.length;
-        var aux;
-        var i;
-
-        while (n) {
-          i = Math.floor(Math.random() * n--);
-          aux = a[n];
-          a[n] = a[i];
-          a[i] = aux;
-        }
-
-        return a;
-
-      }
-
       $scope.loadEntries = function() {
 
         $scope.fetching = true;

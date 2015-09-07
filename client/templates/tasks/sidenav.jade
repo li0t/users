@@ -1,0 +1,68 @@
+md-toolbar
+  div.md-toolbar-tools
+    div(layout-padding)
+      md-icon.icon48(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
+    p {{ activeCard.span }}
+    span(flex)
+    md-button(ng-click='close()')
+      md-icon(md-font-icon='material-icons', style='color: #747474;') close
+
+md-content.border(layout='row', layout-align='space-around center', layout-padding)
+  md-switch.md-primary(
+    ng-change='toggleWorking(activeCard._id)',
+    aria-label='em-card-switch',
+    ng-model='card.isWorking')
+
+  p 
+    strong Tiempo trabajado
+    br
+    | {{ activeCard.workedTime && (activeCard.workedTime | fromNow) || 'Sin información'}}
+  
+  p 
+    strong Fecha límite
+    br
+    | {{ activeCard.relevantDate && (activeCard.relevantDate | fromNow) || 'Sin Fecha de Entrega'}}
+
+md-content(layout='row', layout-align='space-around center', layout-padding)
+  p 
+    strong Prioridad
+    br
+    | {{ activeCard.priority.name || 'Sin información'}}
+  
+  p 
+    strong Grupo
+    br
+    | {{ activeCard.group.profile.name || 'Sin información'}}
+    
+  p
+    strong Creador
+    br
+    | {{ activeCard.creator.profile.name || activeCard.creator.email || 'Sin información'}}
+  
+  p 
+    strong Colaboradores ({{ activeCard.collaborators.length }})
+    br
+    span(ng-repeat='collaborator in activeCard.collaborators') 
+      | {{ collaborator.user.email || 'Sin información'}}
+      br
+  
+div(layout-padding)
+  md-content(layout='column', layout-align='start start', layout-padding)
+    p
+      strong Actividades ({{ activeCard.activities.length }})
+      
+    md-checkbox(ng-repeat='activity in activeCard.activities'
+      ng-click='toggleActivity(activity)'
+      ng-disabled='task.completed'
+      ng-checked='activity.checked'
+      aria-label='task-activity')
+      | {{ activity.description }} - {{ activity.checked && (activity.checked | fromNow) || '' }}
+      
+        
+  md-content(layout='column', layout-align='space-around start', layout-padding)
+    p 
+      strong Notas ({{ activeCard.notes.length }})
+      br
+      span(ng-repeat='note in activeCard.notes') 
+        | - {{ note.note || 'Sin información'}}
+        br
