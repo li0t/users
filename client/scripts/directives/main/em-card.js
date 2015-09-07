@@ -1,8 +1,8 @@
 /**
-* emCard Directive.
-*
-* @type AngularJS Directive.
-*/
+ * emCard Directive.
+ *
+ * @type AngularJS Directive.
+ */
 
 (function(ng) {
   'use strict';
@@ -31,105 +31,105 @@
               icon: "edit",
               color: "#f34235",
               span: 'Nueva Nota',
-              background: 'yellow'
+              background: 'yellow',
+              href: ($scope.card._id && '/entries/' + $scope.card._id + '/detail') || '/entries/create/note',
+              footer: $scope.card.user && $scope.card.user.email + ' ha creado una nota.'
             },
             "document": {
               icon: "insert_drive_file",
               color: "#ffc006",
               span: 'Nuevo Documento',
-              background: 'yellow'
+              background: 'yellow',
+              href:  ($scope.card._id &&  '/entries/' + $scope.card._id + '/detail') || '/entries/create/document',
+              footer: $scope.card.user && $scope.card.user.email + ' ha agregado un documento.'
             },
             "image": {
               icon: "image",
               color: "#3e50b4",
               span: 'Nueva Imagen',
-              background: 'yellow'
+              background: 'yellow',
+              href:  ($scope.card._id &&  '/entries/' + $scope.card._id + '/detail') || '/entries/create/image',
+              footer: $scope.card.user && $scope.card.user.email + ' ha subido una imagen.'
             },
             "audio": {
               icon: "mic",
               color: "#00bbd3",
               span: 'Nuevo Audio',
-              background: 'yellow'
+              background: 'yellow',
+              href:  ($scope.card._id &&  '/entries/' + $scope.card._id + '/detail') || '/entries/create/audio',
+              footer: $scope.card.user && $scope.card.user.email + ' ha subido un audio.'
             },
             "group": {
               icon: "group",
               color: "#02A8F3",
               span: "Grupo creado",
-              background: "green"
+              background: "green",
+              href: '/groups/' + $scope.card._id + '/profile',
+              footer: $scope.card.admin && $scope.card.admin.email + ' ha creado el grupo.'
             },
             "task": {
               icon: "more",
               color: "#9b26af",
               span: "Tarea modificada",
-              background: "lightBlue"
+              background: "lightBlue",
+              href: '/tasks/' + $scope.card._id + '/detail',
+              footer: $scope.card.creator && $scope.card.creator.email + ' ha creado una tarea.'
             },
             "meeting": {
               icon: "event_note",
               color: "#8ac248",
               span: "Nueva reunión",
-              background: "green"
+              background: "green",
+              href: '/meetings/' + $scope.card._id + '/detail',
+              footer: $scope.card.creator && $scope.card.creator.email + ' ha agendado una reunión.'
             }
           };
-          // Type to int helper for switch
-          function typeToInt(type) {
-            if (type === 'note') {
-              return 0;
-            } else if (type === 'document') {
-              return 1;
-            } else if (type === 'image') {
-              return 2;
-            } else if (type === 'audio') {
-              return 3;
-            } else if (type === 'group') {
-              return 4;
-            } else if (type === 'task') {
-              return 5;
-            } else if (type === 'meeting') {
-              return 6;
-            }
-          }
 
           // Cards basic configuration, will be override when needed
-          $scope.card.icon = config[$scope.card.type].icon;
-          $scope.card.color = config[$scope.card.type].color;
-          $scope.card.span = config[$scope.card.type].span;
           $scope.card.background = config[$scope.card.type].background;
+          $scope.card.footer = config[$scope.card.type].footer;
+          $scope.card.color = config[$scope.card.type].color;
+          $scope.card.icon = config[$scope.card.type].icon;
+          $scope.card.span = config[$scope.card.type].span;
+          $scope.card.href = config[$scope.card.type].href;
           $scope.card.relevantDate = $scope.card.created;
 
+
           // Specific configuration for each card
-          switch (typeToInt($scope.card.type)) {
+          switch ($scope.card.type) {
 
-            case 5:
-            // Card is Task
-            if ($scope.card.isCollaborator) {
+            case 'task':
+              // Card is Task
+              if ($scope.card.isCollaborator) {
 
-              $scope.card.isWorking = !!$scope.card.isWorking;
-              $scope.hasTimer = !$scope.card.completed;
+                $scope.card.isWorking = !!$scope.card.isWorking;
+                $scope.hasTimer = !$scope.card.completed;
 
-              $scope.toogleWorking = function(task) {
+                $scope.toogleWorking = function(task) {
 
-                $http.put('/api/tasks/' + task + '/worked-time').
+                  $http.put('/api/tasks/' + task + '/worked-time').
 
-                error(function() {
-                  console.log('Hubo un error con la tarea');
-                });
+                  error(function() {
+                    console.log('Hubo un error con la tarea');
+                  });
 
-              };
-            }
+                };
+              }
 
-            $scope.card.span = $scope.card.objective;
-            $scope.card.relevantDate = $scope.card.dateTime;
+              $scope.card.relevantDate = $scope.card.dateTime;
+              $scope.card.span = $scope.card.objective;
 
-            break;
+              break;
 
-            case 6:
-            // Card is Meeting
-            $scope.hasTimer = true;
-            $scope.card.span = $scope.card.title;
-            break;
+            case 'meeting':
+              // Card is Meeting
+              $scope.card.relevantDate = $scope.card.dateTime;
+              $scope.card.span = $scope.card.objective;
+              $scope.hasTimer = true;
+              break;
           }
-          
-          $scope.card.action = function() {
+
+          $scope.card.action = $scope.card._id && function() {
             $emCard.setCard($scope.card);
             $emCard.showDetailsBar(true);
           };

@@ -18,15 +18,28 @@
         }).
 
         success(function(user) {
-          $http.post('/api/mandrill/signup', {
-            id: user
+
+          $http.post('/api/interactions/email-confirmation', {
+            user: user
           }).
 
-          success(function() {
-            $location.path('/');
-            $session.flash('success', 'Te ha sido enviado un mail de confirmación');
-          }).
+          success(function(data) {
 
+            $http.post('/api/mandrill/email-confirmation', {
+              email: $scope.data.email,
+              token: data.token
+            }).
+
+            success(function() {
+              $location.path('/');
+              $session.flash('success', 'Te ha sido enviado un mail de confirmación');
+            }).
+
+            error(function(data) {
+              $scope.submitting = false;
+              $session.flash('danger', data);
+            });
+          }).
           error(function(data) {
             $scope.submitting = false;
             $session.flash('danger', data);

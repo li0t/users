@@ -1,27 +1,24 @@
 'use strict';
 
-module.exports = function (Schema) {
+var base64url = require('base64url');
+var uuid = require('node-uuid');
+var crypto = require('crypto');
 
-  return new Schema({
+module.exports = function(Schema) {
 
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-      required: true
-    },
+  var TokenSchema = new Schema({
 
-    sender : {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-      default: null
-    },
-
-    createdAt: {
-      type: Date,
-      expires: '365d',
-      default: Date.now
+    secret: {
+      type: String
     }
 
   });
+
+  TokenSchema.pre('validate', function(next) {
+    this.secret = base64url(crypto.createHash('sha256').update(uuid.v4()).digest());
+    next();
+  });
+
+  return TokenSchema;
 
 };

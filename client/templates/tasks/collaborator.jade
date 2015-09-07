@@ -6,8 +6,10 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       creator
       
       md-button.md-raised(ng-href='/tasks/collaborator')  Mis Tareas
+        md-tooltip Tareas que en las que estoy colaborando   
         
       md-button(ng-href='/tasks/creator')  Tareas Asignadas
+        md-tooltip Tareas que he creado en las que no estoy colaborando
       
 md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
       
@@ -24,7 +26,8 @@ md-content.md-padding
       ng-repeat='task in tasks',
       md-rowspan='1',
       md-colspan='1')
-      em-card(card='task' ng-click='$navigateTo("/tasks/" + task._id + "/detail")')
-            
-  md-icon(md-font-icon='material-icons' ng-show='!fetching && !tasks.length') panorama_fish_eye
-  | No estas colaborando en tareas
+      em-card(card='task')
+  
+  div(ng-show='!fetching && !tasks.length')          
+    md-icon(md-font-icon='material-icons') panorama_fish_eye
+    | No estas colaborando en tareas

@@ -18,13 +18,13 @@
         link: function ($scope, $element, $attrs) {
 
           $scope.$watch( function () { return $emCard.activeCard }, function (data) {
-            console.log(data);
+
             $scope.activeCard = data;
           }, true);
 
           $scope.close = function () {
             $emCard.showDetailsBar(false);
-          }
+          };
 
         }
       };

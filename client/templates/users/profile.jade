@@ -34,7 +34,7 @@ md-content.md-padding(ng-show='!fetching && user' layout='row')
           ng-model='user.profile.birthdate'
           type='date')
       
-      md-button(ng-disabled='submitting') Editar
+      md-button(ng-disabled='submitting') Listo
     
   div.md-padding(flex)
     h4 Fotos de perfil
@@ -66,8 +66,9 @@ md-content.md-padding(ng-show='!fetching && user' layout='row')
         ngf-select)
         
         md-icon(md-font-icon='material-icons') image 
+        | Subir foto
         
-      md-button(ng-disabled='!files.length || submitting' ng-click='upload()') Subir foto
+      md-button(ng-disabled='!files.length || submitting' ng-click='upload()') Listo
       
     div(ng-repeat='file in files')
       md-icon(md-font-icon='material-icons') insert_drive_file

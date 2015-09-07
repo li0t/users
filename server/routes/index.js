@@ -9,31 +9,42 @@ module.exports = function(router) {
    */
   router.get([
 
+    /* Contacts */
+    '/contacts',
+
+    /* Settings */
+    '/settings',
+
+    /* Analitycs */
+    '/analitycs',
+
     /* Pages */
     '/', '/search',
 
-    /* Users */
-    '/users',
-    '/users/signin',
-    '/users/signup',
-    '/users/recover',
-    '/users/:id/profile',
-    '/users/reset/:token',
-    '/users/validate/:token',
-    '/users/invited/validate/:token',
+    /* Tags */
+    '/tags',
+    '/tags/create',
 
-    /* Groups */
-    '/groups',
-    '/groups/create',
-    '/groups/:id/tasks',
-    '/groups/:id/profile',
-    '/groups/:id/meetings',
-    '/groups/:id/entries/:type',
+    /* Tokens */
+    '/tokens/:secret',
+
+    /* Tasks */
+    '/tasks',
+    '/tasks/create',
+    '/tasks/creator',
+    '/tasks/:id/detail',
+    '/tasks/collaborator',
 
     /* Groups Members*/
     '/groups/:id/members',
     '/groups/:id/members/add',
 
+    /* Meetings */
+    '/meetings',
+    '/meetings/create',
+    '/meetings/creator',
+    '/meetings/attendant',
+    '/meetings/:id/detail',
 
     /* Entries */
     '/entries',
@@ -44,34 +55,23 @@ module.exports = function(router) {
     '/entries/create/image',
     '/entries/create/document',
 
-    /* Tasks */
-    '/tasks',
-    '/tasks/create',
-    '/tasks/creator',
-    '/tasks/:id/detail',
-    '/tasks/collaborator',
+    /* Groups */
+    '/groups',
+    '/groups/create',
+    '/groups/:id/tasks',
+    '/groups/:id/profile',
+    '/groups/:id/meetings',
+    '/groups/:id/entries/:type',
 
-    /* Contacts */
-    '/contacts',
-    '/contacts/add/:id',
-    '/contacts/remove/:id',
-
-    /* Meetings */
-    '/meetings',
-    '/meetings/create',
-    '/meetings/creator',
-    '/meetings/attendant',
-    '/meetings/:id/detail',
-
-    /* Tags */
-    '/tags',
-    '/tags/create',
-
-    /* Settings */
-    '/settings',
-
-    /* Analitycs */
-    '/analitycs',
+    /* Users */
+    '/users',
+    '/users/signin',
+    '/users/signup',
+    '/users/recover',
+    '/users/:id/profile',
+    '/users/reset/:token',
+    '/users/validate/:secret',
+    '/users/invited/validate/:secret'
 
   ], function(req, res) {
 

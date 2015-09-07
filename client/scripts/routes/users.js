@@ -33,12 +33,12 @@
         templateUrl: '/assets/templates/users/recover.html'
       }).
 
-      when('/users/validate/:token', {
+      when('/users/validate/:secret', {
         controller: 'Users:Validate',
         templateUrl: '/assets/templates/pages/home.html'
       }).
 
-      when('/users/reset/:token', {
+      when('/users/reset/:secret', {
         controller: 'Users:Reset',
         templateUrl: '/assets/templates/users/reset.html',
 
@@ -58,7 +58,7 @@
         }
       }).
 
-      when('/users/invited/validate/:token', {
+      when('/users/invited/validate/:secret', {
         controller: 'Users:Invited:Validate',
         templateUrl: '/assets/templates/users/invited/validate.html'
       });

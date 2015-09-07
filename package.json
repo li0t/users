@@ -17,12 +17,15 @@
   },
   "scripts": {
     "setup": "npm install && bower install && node install/statics",
-    "dev": "NODE_PATH=. NODE_ENV=development PORT=3030 DEBUG=app:* node server",
     "start": "NODE_PATH=. NODE_ENV=production PORT=3030 node server",
+    "dev": "NODE_PATH=. NODE_ENV=development PORT=3030 DEBUG=app:* node server",
+    "notifications": "NODE_PATH=. DEBUG=app:* node server/daemons/notifications",
+    "pm2-notifications": "NODE_PATH=. pm2 start server/daemons/notifications.js -i 0 --name 'emeeter-notifications'",
     "reinstall": "rm -Rf node_modules/ client/assets/components/ && npm install && bower install",
     "prestart": "gulp"
   },
   "dependencies": {
+    "base64url": "^1.0.4",
     "bcrypt": "^0.8.3",
     "body-parser": "^1.12.1",
     "busboy": "^0.2.9",
@@ -46,6 +49,7 @@
     "mongoose": "~3.8.x",
     "mongoose-deep-populate": "^1.0.2",
     "morgan": "^1.5.2",
+    "node-schedule": "^0.2.9",
     "node-uuid": "^1.4.3",
     "serve-favicon": "^2.2.0",
     "session.socket.io": "^0.1.6",

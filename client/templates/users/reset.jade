@@ -1,50 +1,41 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
+  div
     h2 EMEETER
     
-md-icon(md-font-icon='material-icons') edit
-|Crear nueva clave
+md-progress-circular(ng-show='submitting' md-mode='indeterminate')     
 
-form(
-  ng-submit='form.$valid && submit()'
-  name='form'
-  role='form'
-  novalidate)
-
-  div.panel-body
-    md-input-container.form-group
-      span.input-group-addon
-        md-icon(md-font-icon='material-icons') 
+md-content.md-padding
+  md-icon(md-font-icon='material-icons') edit
+  |Crear nueva clave
+  
+  form(
+    ng-submit='form.$valid && submit()'
+    name='form'
+    role='form'
+    novalidate)
+  
+    md-input-container
       label Ingresa tu nueva clave
       input.form-control(
-        ng-disabled='validating'
+        ng-disabled='submitting'
         ng-model='form.password'
         ng-minlength='4'
         type='password'
         required)
 
-    md-input-container.form-group
-      span.input-group-addon
-        md-icon(md-font-icon='material-icons') 
+    md-input-container
       label Confirma tu nueva clave
       input.form-control(
-        ng-disabled='form.password.length < 4 || validating'
+        ng-disabled='form.password.length < 4 || submitting'
         ng-model='form.vpassword'
         ng-minlength='4'
         type='password'
         required)
 
-  div.panel-footer.text-right
-    div.row
-      div.col-sm-5
-        a.md-button(ng-href='/') 
-          md-icon(md-font-icon='material-icons') chevron_left
-          |Cancelar
 
-      div.col-sm-7
-        md-button(
-          ng-disabled='form.$invalid || validating || form.password !== form.vpassword || submitting'
-          type='submit')
-
-          |Cambiar clave
-          md-icon(md-font-icon='material-icons') check
+    md-button(
+      ng-disabled='form.$invalid || submitting || form.password !== form.vpassword'
+      type='submit')  
+      | Cambiar clave
+      md-icon(md-font-icon='material-icons') check
+  

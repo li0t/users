@@ -7,7 +7,8 @@ module.exports = {
   models: [
     'state',
     'priority',
-    'gender'
+    'gender',
+    'action'
   ]
 
 };

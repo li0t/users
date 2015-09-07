@@ -10,32 +10,31 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       md-icon(md-font-icon='material-icons') group
       | Personas
   
-md-progress-circular(ng-show='fetchingContacts || fetchingPending' md-mode='indeterminate') 
+md-progress-circular(ng-show='fetchingContacts || fetchingPending || inviting || confirming || deleting || adding' md-mode='indeterminate') 
   
-md-content.md-padding
-  div.form-group(ng-show='!fetchingContacts && contacts')
-    md-input-container
-      label Busca un Contacto
-      input.form-control(
-        ng-model='searchContact',
-        ng-change='resetFound()')
-        
-    md-button(
-      ng-click='search()'
-      ng-show='!fetchingContacts && searchContact.length && !filteredContacts.length')
-      | Buscar en eMeeter
+md-content.md-padding(ng-show='!fetchingContacts && contacts')
+  md-input-container
+    label Busca un Contacto
+    input.form-control(
+      ng-model='searchContact'
+      ng-change='resetFound()')
+      
+  md-button(
+    ng-click='search()'
+    ng-show='!fetchingContacts && searchContact.length && !filteredContacts.length')
+    | Buscar en eMeeter
        
   div(ng-show='!fetchingPending && pendings.length')
     h4
       md-icon(md-font-icon='material-icons' ) add
       | Solicitudes de contacto
               
-  md-list(ng-show='!fetchingPending && pendings')
-    md-list-item(ng-repeat='pending in pendings', ng-init='confirm = ("/contacts/confirm/{0}" | format : pending.token); reject = ("/contacts/reject/{0}" | format : pending._id)')
-      p {{ pending.profile.name || pending.email }}
-      div
-        md-button(ng-href='{{ confirm }}') Confirmar
-        md-button(ng-href='{{ reject }}') Rechazar        
+
+  md-list-item(ng-repeat='pending in pendings')
+    p {{ pending.sender.profile.name || pending.sender.email }}
+    div
+      md-button(ng-click='confirm(pending.token)' ng-disabled='confirming || deleting') Confirmar
+      md-button(ng-click='delete(pending.sender._id)' ng-disabled='confirming || deleting') Rechazar        
 
   div(ng-show='!fetchingContacts && contacts')
     h4
@@ -50,19 +49,18 @@ md-content.md-padding
     md-grid-tile(
       md-rowspan="1"
       md-colspan="1"
-      ng-repeat='contact in filteredContacts = (contacts | filter: searchContact)'
-      ng-init='href = ("/users/{0}/detail" | format : contact._id); delete = ("/contacts/delete/{0}" | format : contact._id)')
+      ng-repeat='contact in filteredContacts = (contacts | filter: searchContact)')
         p {{ contact.user.profile.name || contact.user.email }}
-        md-button(ng-href='{{ delete }}')
+        md-button(ng-click='delete(contact.user._id)' ng-disabled='confirming || deleting')
           md-icon(md-font-icon='material-icons' ) close
           |  Eliminar
         
-  md-button(ng-show='foundUser' ng-href='/contacts/add/{{foundUser._id}}')
+  md-button(ng-show='foundUser' ng-click='add(foundUser._id)' ng-disabled='adding')
     p {{ foundUser.email }}
     md-icon(md-font-icon='material-icons' ) add
     | Agregar
   
-  md-button(ng-show='notFoundUser' ng-click='inviteNotFound()')
+  md-button(ng-disabled='inviting' ng-show='notFoundUser' ng-click='inviteNotFound()')
     p {{ notFoundUser }}
     md-icon(md-font-icon='material-icons' ) add
     | Invitar a emeeter          
@@ -70,4 +68,4 @@ md-content.md-padding
   div(ng-show='foundPendingUser')
     p {{ foundPendingUser.email }}
     md-icon(md-font-icon='material-icons' ) access_time
-    | Esperando confirmación         
+    | Esperando confirmación      

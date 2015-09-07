@@ -18,5 +18,11 @@ span(layout='column', layout-align='center center', style="color: #747474;")
       span(style='font-size: small;')
         | {{ card.completed && 'Completada'}}
 
+  md-button.md-icon-button(aria-label='emcard-detail' ng-href='{{ card.href }}')
+    md-icon(md-font-icon='material-icons' ng-if='card._id') launch
+    md-icon(md-font-icon='material-icons' ng-if='!card._id' style='size:48px') add
+    md-tooltip {{ (card._id && "Ver detalle") || "Crear" }}    
+    
 md-grid-tile-footer(layout-padding, layout-align='center center', style="background: none; color: #747474;")  
-  p(style='font-size: small;') {{ card.type === "card" && card.title + " : " +  card.content || card.type === "group" && card.admin.email + " ha creado un nuevo grupo" || card.type == "task" && card.objective || card.author + " ha modificado una tarea" }}
+  p(style='font-size: small;') {{ card.footer }}
+  

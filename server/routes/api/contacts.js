@@ -8,6 +8,7 @@ var statics = component('statics');
 
 module.exports = function(router, mongoose) {
 
+  var Interaction = mongoose.model('interaction');
   var Contact = mongoose.model('contact');
   var Token = mongoose.model('token');
 
@@ -43,6 +44,27 @@ module.exports = function(router, mongoose) {
 
     });
 
+  });
+
+  /**
+   * Get pending contact requests of session user
+   */
+  router.get('/pending', function(req, res, next) {
+
+    Interaction.find().
+
+    where('action', statics.model('action', 'contact-request')._id).
+    where('receiver', req.session.user._id).
+
+    deepPopulate('sender.profile').
+
+    exec(function(err, reqs) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(reqs);
+    });
   });
 
   /**
@@ -145,35 +167,37 @@ module.exports = function(router, mongoose) {
     var receiver = null;
     var sender = null;
 
-    Token.findById(req.params.token, function(err, token) {
+    Interaction.findOne().
+
+    where('token', req.params.token).
+
+    exec(function(err, inter) {
       if (err) {
         if (err.name && err.name === 'CastError') {
-          res.sendStatus(400);
-        } else {
-          next(err);
+          return res.sendStatus(400);
         }
-        return;
 
+        return next(err);
       }
 
-      if (!token || !token.sender) {
-        debug('Token %s not active', req.params.id);
+      if (!inter || !inter.sender || !inter.receiver) {
+        debug('Token %s not active', req.params.token);
         return res.sendStatus(498);
       }
 
-      relations.contact(token.user, function(err, receiverRelation) {
+      relations.contact(inter.receiver, function(err, receiverRelation) {
 
         if (err || !receiverRelation.contact) {
-          debug('No contacts list found for user with id %s', token.user);
+          debug('No contacts list found for user with id %s', inter.receiver);
           return res.sendStatus(404);
         }
 
         receiver = receiverRelation.contact;
 
-        relations.contact(token.sender, function(err, senderRelation) {
+        relations.contact(inter.sender, function(err, senderRelation) {
 
           if (err || !senderRelation.contact) {
-            debug('No contacts list found for user with id %s', req.session.user._id);
+            debug('No contacts list found for user with id %s', inter.sender);
             return res.sendStatus(404);
           }
 
@@ -202,12 +226,19 @@ module.exports = function(router, mongoose) {
               debug('User %s and %s are now contacts!', receiver.user, sender.user);
               res.end();
 
-              token.remove(function(err) {
+              Token.remove({
+                _id: inter.token
+              }, function(err) {
                 if (err) {
                   debug(err);
                 }
               });
 
+              inter.remove(function(err) {
+                if (err) {
+                  debug(err);
+                }
+              });
             });
           });
         });
@@ -221,19 +252,19 @@ module.exports = function(router, mongoose) {
    */
   router.delete('/:id', function(req, res, next) {
 
-    var receiverIsContact;
-    var senderIsContact;
-    var receiver = null;
-    var sender = null;
+    var user1IsContact;
+    var user2IsContact;
+    var user1 = null;
+    var user2 = null;
 
-    relations.contact(req.params.id, function(err, receiverRelation) {
+    relations.contact(req.params.id, function(err, user2Relation) {
 
-      if (err || !receiverRelation.contact) {
+      if (err || !user2Relation.contact) {
         debug('No contacts list found for user with id %s', req.params.id);
         return res.sendStatus(404);
       }
 
-      receiver = receiverRelation.contact;
+      user2 = user2Relation.contact;
 
       relations.contact(req.session.user._id, function(err, senderRelation) {
 
@@ -242,160 +273,104 @@ module.exports = function(router, mongoose) {
           return res.sendStatus(404);
         }
 
-        sender = senderRelation.contact;
+        user1 = senderRelation.contact;
 
-        senderIsContact = receiverRelation.isContact(sender.user);
-        receiverIsContact = senderRelation.isContact(receiver.user);
+        user1IsContact = user2Relation.isContact(user1.user);
+        user2IsContact = senderRelation.isContact(user2.user);
 
-        if (receiverIsContact) {
+        if (user2IsContact) {
 
-          receiver.contacts[senderIsContact.index].state = statics.model('state', 'disabled')._id;
-          sender.contacts[receiverIsContact.index].state = statics.model('state', 'disabled')._id;
+          user1.contacts[user2IsContact.index].state = statics.model('state', 'disabled')._id;
+          user2.contacts[user1IsContact.index].state = statics.model('state', 'disabled')._id;
 
-          receiver.save(function(err) {
+          user1.save(function(err) {
             if (err) {
               return next(err);
             }
 
-            sender.save(function(err) {
+            user2.save(function(err) {
               if (err) {
                 return next(err);
               }
 
-              debug('User %s and %s are no longer contacts!', receiver.user, sender.user);
+              debug('User %s and %s are no longer contacts!', user2.user, user1.user);
               res.end();
 
             });
-
           });
-
         } else {
 
-          senderIsContact = receiverRelation.isContact(sender.user, true);
-          receiverIsContact = senderRelation.isContact(receiver.user, true);
+          user1IsContact = user2Relation.isContact(user1.user, true);
+          user2IsContact = senderRelation.isContact(user2.user, true);
 
           /** Check if the contact is present in a pending state */
-          if (!receiverIsContact || !_.isEqual(receiverIsContact.state, statics.model('state', 'pending')._id)) {
-            debug('User %s and %s are no contacts with each other!', receiver.user, sender.user);
+          if (!user2IsContact || !_.isEqual(user2IsContact.state, statics.model('state', 'pending')._id)) {
+            debug('User %s and %s are no contacts with each other!', user2.user, user1.user);
             return res.sendStatus(400);
           }
 
-          receiver.contacts[senderIsContact.index].state = statics.model('state', 'disabled')._id;
-          sender.contacts[receiverIsContact.index].state = statics.model('state', 'disabled')._id;
+          user1.contacts[user2IsContact.index].state = statics.model('state', 'disabled')._id;
+          user2.contacts[user1IsContact.index].state = statics.model('state', 'disabled')._id;
 
-          receiver.save(function(err) {
+          user1.save(function(err) {
             if (err) {
               return next(err);
             }
 
-            sender.save(function(err) {
+            user2.save(function(err) {
               if (err) {
                 return next(err);
               }
 
-              debug('The contact request between %s and %s has been deleted!', receiver.user, sender.user);
+              debug('The contact request between %s and %s has been deleted!', user2.user, user1.user);
               res.end();
-
-              /* Remove contact request token */
-              Token.
-              remove({
-                user: receiver.user,
-                sender: sender.user
-              }).exec(function(err) {
-                if (err) {
-                  debug(err);
-                }
-              });
-
-              Token.remove({
-                user: sender.user,
-                sender: receiver.user
-              }).
-              exec(function(err) {
-                if (err) {
-                  debug(err);
-                }
-              });
             });
           });
         }
-      });
-    });
 
-  });
+        /* Remove contact request  */
+        Interaction.findOne().
 
-  /**
-   * Get pending contact requests of session user
-   */
-  router.get('/pending', function(req, res, next) {
+        or([{
+          $and: [{
+            sender: user1.user
+          }, {
+            receiver: user2.user
+          }]
+        }, {
+          $and: [{
+            sender: user2.user
+          }, {
+            receiver: user1.user
+          }]
+        }]).
 
-    var sessionUser = req.session.user._id;
-    var contacts = [];
-    var checked = 0;
-    var toCheck = 0;
+        where('action', statics.model('action', 'contact-request')._id).
 
-    function send() {
+        exec(function(err, inter) {
+          if (err) {
+            debug(err);
+          }
 
-      if (checked === toCheck) {
-        res.send(contacts);
-      }
-    }
+          if (inter) {
 
-    Contact.findOne().
-
-    where('user', sessionUser).
-
-    deepPopulate('contacts.user.profile').
-
-    exec(function(err, found) {
-      if (err) {
-        return next(err);
-      }
-
-      if (found.contacts.length) {
-
-        toCheck = found.contacts.length;
-
-        found.contacts.forEach(function(contact) {
-
-          checked += 1;
-
-          if (_.isEqual(contact.state, statics.model('state', 'pending')._id)) {
-
-            checked -= 1;
-
-            Token.findOne().
-
-            where('user', sessionUser).
-            where('sender', contact.user._id).
-
-            exec(function(err, token) {
+            Token.remove({
+              _id: inter.token
+            }).
+            exec(function(err) {
               if (err) {
                 debug(err);
               }
 
-              if (token) {
-
-                contact = contact.user.toObject();
-                contact.token = token._id;
-                contacts.push(contact);
-
-              }
-
-              checked += 1;
-
-              if (checked === toCheck) {
-                send();
-
-              }
+              inter.remove(function(err) {
+                if (err) {
+                  debug(err);
+                }
+              });
             });
-          } else if (checked === toCheck) {
-            send();
           }
         });
-      } else {
-        res.send(found.contacts);
-      }
+      });
     });
 
   });

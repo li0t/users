@@ -1,31 +1,34 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  md-button(ng-href='/')
+  div
     h2 EMEETER
     
-md-icon(md-font-icon='material-icons') edit
-| Recuperar cuenta
+md-progress-circular(ng-show='submitting' md-mode='indeterminate')     
 
-form(
-  name='form'
-  role='form'
-  ng-submit='form.$valid && submit()'
-  novalidate)
-
-  md-input-container.form-group
-    label Ingrese su email
-    input.form-control(
-      ng-model='form.email'
-      type='email'
-      required)
-
-  div(layout='row')
-    md-button(ng-href='/')
-      md-icon(md-font-icon='material-icons') chevron_left
-      |Ya tengo mi clave
-
-    md-button(
-      ng-disabled='form.$invalid || submitting',
-      type='submit')
-
-      |Enviar
-      md-icon(md-font-icon='material-icons') chevron_right
+md-content.md-padding
+  md-icon(md-font-icon='material-icons') edit
+  | Recuperar cuenta    
+  
+  form( 
+    name='form'
+    role='form'
+    ng-submit='form.$valid && submit()'
+    novalidate)
+  
+    md-input-container.form-group
+      label Ingrese su email
+      input.form-control(
+        ng-model='form.email'
+        type='email'
+        required)
+  
+    div(layout='row')
+      md-button(ng-href='/')
+        md-icon(md-font-icon='material-icons') chevron_left
+        |Ya tengo mi clave
+   
+      md-button(
+        ng-disabled='form.$invalid || submitting',
+        type='submit')
+   
+        |Enviar
+        md-icon(md-font-icon='material-icons') chevron_right
