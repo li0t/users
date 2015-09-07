@@ -14,6 +14,7 @@ module.exports = function (nsp, io) {
         socket.join(room);
         socket.emit('joined');
       });
+
     });
 
 };

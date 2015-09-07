@@ -2,6 +2,8 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
+var Notifications = component('notifications');
+
 module.exports = function(Schema) {
 
   var InteractionSchema = new Schema({
@@ -31,6 +33,15 @@ module.exports = function(Schema) {
 
   /** Lets populate reach any level */
   InteractionSchema.plugin(deepPopulate, {});
+
+  InteractionSchema.post('save', function(doc) {
+    Notifications.notify(doc);
+  });
+
+  InteractionSchema.pre('remove', function(next) {
+    Notifications.clean(this);
+    next();
+  });
 
   return InteractionSchema;
 
