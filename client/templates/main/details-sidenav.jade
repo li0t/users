@@ -1,1 +1,10 @@
-em-task(ng-show="activeCard.type=='task'")
+md-toolbar
+  div.md-toolbar-tools
+    div(layout-padding)
+      md-icon.icon48(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
+    p {{ activeCard.span }}
+    span(flex)
+    md-button(ng-click='close()')
+      md-icon(md-font-icon='material-icons', style='color: #747474;') close
+
+em-sidenav-task(ng-show="activeCard.type=='task'")

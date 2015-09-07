@@ -7,7 +7,7 @@
 (function (ng) {
   'use strict';
 
-  ng.module('App').directive('emTask', [
+  ng.module('App').directive('emSidenavTask', [
     '$emCard', '$http',
 
     function ($emCard, $http) {
@@ -19,7 +19,7 @@
 
         link: function ($scope, $element, $attrs) {
 
-          // Explicit one-way sync between activeCard and $emCard service
+          // Explicit sync between activeCard and $emCard service
           $scope.activeCard = $emCard.activeCard;
 
           if ($scope.activeCard.isCollaborator) {
@@ -32,7 +32,7 @@
               $http.put('/api/tasks/' + task + '/worked-time').
 
               error(function() {
-                console.log('Hubo un error con la tarea');
+                console.log('No se ha podido rescatar el tiempo trabajado en esta tarea.');
               });
 
             };

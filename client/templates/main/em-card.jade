@@ -1,5 +1,8 @@
 span(layout='column', layout-align='center center', style="color: #747474;")
   md-grid-tile-header(style="background: none; color: #747474;")
+    md-button.md-icon-button(aria-label='emcard-detail' ng-href='{{ card.href }}')
+      md-icon(md-font-icon='material-icons' ng-if='card._id') launch
+      md-tooltip {{ (card._id && "Ver detalle") }} 
     
   div(layout='column', layout-align='center center', style='cursor: pointer;', ng-click='card.action()')
     md-icon.icon48(md-font-icon='material-icons', style="color: {{ card.color }};") {{ card.icon }}
@@ -12,11 +15,14 @@ span(layout='column', layout-align='center center', style="color: #747474;")
       br
       span(style='font-size: small;')
         | {{ card.completed && 'Completada'}}
-
-  md-button.md-icon-button(aria-label='emcard-detail' ng-href='{{ card.href }}')
-    md-icon(md-font-icon='material-icons' ng-if='card._id') launch
-    md-icon(md-font-icon='material-icons' ng-if='!card._id' style='size:48px') add
-    md-tooltip {{ (card._id && "Ver detalle") || "Crear" }}    
+  div(layout="row")
+    md-button.md-icon-button(ng-if='!card._id', aria-label='emcard-detail', ng-href='{{ card.href }}')
+      md-icon(md-font-icon='material-icons', style='size:48px') add
+      md-tooltip Crear
+      
+    md-button.md-icon-button(ng-if="card.type == 'task'", aria-label='emcard-detail', ng-href='{{ card.href }}')
+      md-icon(md-font-icon='material-icons' ng-if='card._id') play_circle_outline
+      md-tooltip {{ (card._id && "Iniciar un sprint")}}    
     
 md-grid-tile-footer(layout-padding, layout-align='center center', style="background: none; color: #747474;")  
   p(style='font-size: small;') {{ card.footer }}
