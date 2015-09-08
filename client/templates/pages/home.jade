@@ -1,11 +1,11 @@
 md-toolbar.md-padding.lightBlue(layout='row')
-  div(flex)
+  div(flex='66')
     h2 EMEETER
     //timer(interval='1000') {{hours}} hour{{hoursS}}, {{minutes}} minute{{minutesS}}, {{seconds}} second{{secondsS}}
     div
       creator(ng-if='session.user')
   
-  main-notification(ng-if='session.user' flex='99')
+  main-notification(ng-if='session.user' )
    
 md-content.darkGray(ng-show='session.user')
 

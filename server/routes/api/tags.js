@@ -38,7 +38,7 @@ module.exports = function (router, mongoose) {
 
     Tag.find(find, score).
 
-    sort('created').
+    sort('-_id').
     sort(score).
 
     skip(skip).

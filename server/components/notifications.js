@@ -28,7 +28,7 @@ function notify(inter) {
         if (err) {
           return debug(err);
         }
-
+        debug('yoh!');
         sockets.of('/notifications').to(inter.receiver).emit('notification');
 
       });
@@ -49,8 +49,6 @@ function clean(inter) {
     if (err) {
       return debug(err);
     }
-
-    sockets.of('/notifications').to(inter.receiver).emit('notification');
 
   });
 

@@ -33,7 +33,7 @@ module.exports = function(router, mongoose) {
 
       populate('pictures documents audios').
 
-      sort('-created').
+      sort('-_id').
 
       exec(function(err, entries) {
         if (err) {
@@ -74,7 +74,7 @@ module.exports = function(router, mongoose) {
 
       populate('pictures documents').
 
-      sort('-created').
+      sort('-_id').
 
       exec(function(err, entries) {
         if (err) {
@@ -120,7 +120,7 @@ module.exports = function(router, mongoose) {
 
       populate('pictures documents audios').
 
-      sort('-created').
+      sort('-_id').
 
       exec(function(err, entries) {
         if (err) {
@@ -162,7 +162,7 @@ module.exports = function(router, mongoose) {
 
       populate('pictures documents').
 
-      sort('-created').
+      sort('-_id').
 
       exec(function(err, entries) {
         if (err) {

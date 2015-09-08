@@ -21,7 +21,7 @@ module.exports = function(router, mongoose) {
     where('user', req.session.user._id).
 
     populate('user').
-    sort('-created').
+    sort('-_id').
 
     exec(function(err, entries) {
       if (err) {
@@ -55,7 +55,7 @@ module.exports = function(router, mongoose) {
 
     Entry.find(find, score).
 
-    sort('created').
+    sort('-_id').
     sort(score).
 
     skip(skip).

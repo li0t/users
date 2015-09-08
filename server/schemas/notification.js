@@ -13,15 +13,7 @@ module.exports = function (Schema) {
 
     viewed: {
       type: Date
-    },
-
-    accepted: {
-      type: Date
-    },
-
-    declined: {
-      type: Date
-    },
+    }
 
   });
 
@@ -39,6 +31,9 @@ module.exports = function (Schema) {
   /** Lets populate reach any level */
   NotificationSchema.plugin(deepPopulate);
 
+  NotificationSchema.virtual('created').get(function () {
+    return this._id.getTimestamp();
+  });
 
   return NotificationSchema;
 };

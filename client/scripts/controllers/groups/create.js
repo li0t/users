@@ -66,6 +66,18 @@
         success(function() {
           $location.path('/groups');
           $session.flash('Grupo creado');
+
+          $scope.data.members.forEach(function(member) {
+
+            if (member !== $session.get('user')._id) {
+
+              $http.post('/api/interactions/group-invite', { receiver: member }).
+              error(function(data) {
+                console.log(data);
+
+              });
+            }
+          });
         }).
 
         error(function() {

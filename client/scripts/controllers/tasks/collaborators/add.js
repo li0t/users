@@ -57,6 +57,18 @@
         success(function() {
           $location.path('/');
           $session.flash('Colaboradores agregados');
+          
+          $scope.data.collaborators.forEach(function(collaborator) {
+
+            if (collaborator !== $session.get('user')._id) {
+
+              $http.post('/api/interactions/task-assigned', { receiver: collaborator }).
+              error(function(data) {
+                console.log(data);
+
+              });
+            }
+          });
         }).
 
         error(function() {

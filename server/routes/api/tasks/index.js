@@ -24,7 +24,7 @@ module.exports = function(router, mongoose) {
 
     deepPopulate('group.profile creator.profile collaborators entries priority').
 
-    sort('-created').
+    sort('-_id').
 
     exec(function(err, tasks) {
       if (err) {
@@ -71,7 +71,7 @@ module.exports = function(router, mongoose) {
 
     Task.find(find, score).
 
-    sort('created').
+    sort('-_id').
     sort(score).
 
     skip(skip).

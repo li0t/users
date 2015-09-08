@@ -1,7 +1,9 @@
-md-menu
-  md-button(ng-click='$mdOpenMenu()') {{ notifications.length && ( notifications.length > 1 && "Tienes " + notifications.length + " nuevas notificaciones" || "Tienes una nueva notificación" ) || "No tienes notificaciones"}}
-  
-  md-menu-content(width='4')
-    md-menu-item(ng-repeat='not in notifications' ng-init='message=notMessage(not.interaction.sender.email, not.interaction.action.slug)')
-      md-button {{ message }}
-      
+div
+  md-button(ng-click='$mdOpenMenu()') Notificaciones
+  md-divider
+  div(style='max-height:100px; max-width:600px; overflow:scroll;')
+    md-button.notification(
+      ng-click='viewed(not)'
+      ng-init='message=notMessage(not.interaction.sender.email, not.interaction.action.slug)'
+      ng-repeat='not in notifications | orderBy:"-created"'  
+      ng-disabled='not.viewed' ) {{ message }}

@@ -71,6 +71,43 @@ module.exports = function(router, mongoose) {
 
   });
 
+  router.post('/group-invite', function(req, res, next) {
+
+
+    new Interaction({
+      action: statics.model('action', 'group-invite')._id,
+      sender: req.session.user._id,
+      receiver: req.body.receiver
+    }).
+    save(function(err, data) {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(201).send(data);
+
+    });
+
+  });
+
+  router.post('/task-assigned', function(req, res, next) {
+
+    new Interaction({
+      action: statics.model('action', 'task-assigned')._id,
+      sender: req.session.user._id,
+      receiver: req.body.receiver
+    }).
+    save(function(err, data) {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(201).send(data);
+
+    });
+
+  });
+
   router.post('/contact-request', function(req, res, next) {
 
     new Token().

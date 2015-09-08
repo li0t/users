@@ -26,7 +26,7 @@ module.exports = function(router, mongoose) {
 
     where('members.user', user).
 
-    sort('created').
+    sort('-_id').
 
     select('id admin profile members created').
 

@@ -34,6 +34,10 @@ module.exports = function(Schema) {
   /** Lets populate reach any level */
   InteractionSchema.plugin(deepPopulate, {});
 
+  InteractionSchema.virtual('created').get(function () {
+    return this._id.getTimestamp();
+  });
+
   InteractionSchema.post('save', function(doc) {
     Notifications.notify(doc);
   });
