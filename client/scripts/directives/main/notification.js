@@ -10,14 +10,15 @@
   ng.module('App').directive('mainNotification', [
 
     '$http',
+    '$timeout',
     '$session',
 
-    function($http, $session) {
+    function($http, $timeout, $session) {
 
       return {
         restrict: 'E',
         templateUrl: '/assets/templates/main/notification.html',
-        link: function($scope, $element, $attrs) {
+        link: function($scope) {
 
           var socket;
 
@@ -33,8 +34,11 @@
             $http.get('api/notifications?' + actions + limit + skip).
 
             success(function(nots) {
-              console.log(nots.length);
-              console.log(nots);
+
+              nots.forEach(function(not) {
+                config(not);
+              });
+
               $scope.notifications = nots;
 
             });
@@ -42,28 +46,21 @@
 
           $scope.viewed = function(not) {
 
-            $http.put('api/notifications/' + not._id + '/viewed').
+            if (!not.viewed) {
 
-            success(function() {
-              not.viewed = true;
-            }).
+              $http.put('api/notifications/' + not._id + '/viewed').
 
-            error(function(err) {
-              console.log(err);
-            });
-          };
+              success(function() {
+                $timeout(function() {
+                    not.viewed = true;
+                }, 500);
+              }).
 
-          $scope.notMessage = function(sender, action) {
+              error(function(err) {
+                console.log(err);
+              });
+            }
 
-            var message = {
-              "contact-request": sender + ' te ha enviado una solicitud de contacto!',
-
-              "task-assigned": sender + ' te ha asignado una tarea!',
-
-              "group-invite": sender + ' te ha invitado a un grupo!',
-            };
-
-            return message[action];
           };
 
           $scope.filter = function(nots) {
@@ -91,34 +88,56 @@
 
           };
 
-          $scope.getLast = function() {
-            console.log('gemeyoh!');
+          function getLast() {
+
             var actions = 'actions=contact-request&actions=task-assigned&actions=group-invite';
 
             $http.get('api/notifications/last?' + actions).
 
             success(function(not) {
-              console.log(not);
+              config(not);
               $scope.notifications.unshift(not);
             });
-          };
+          }
+
+          function config(not) {
+
+            var cfg = {
+              "contact-request": {
+                message: not.interaction.sender.email + ' te ha enviado una solicitud de contacto!',
+                href: '/contacts'
+              },
+
+              "task-assigned": {
+                message: not.interaction.sender.email + ' te ha asignado una tarea!',
+                href: '/tasks/collaborator'
+              },
+
+              "group-invite": {
+                message: not.interaction.sender.email + ' te ha invitado a un grupo!',
+                href: '/groups'
+              },
+            };
+
+            not.message = cfg[not.interaction.action.slug].message;
+            not.href = cfg[not.interaction.action.slug].href;
+
+          }
 
           socket = io.connect(window.location.origin + '/notifications', {
             multiplex: false
           });
 
           socket.on('connect', function() {
-            socket.emit('join', $session.get('user')._id);
+            socket.emit('join', $session.user('_id'));
           });
 
           socket.on('joined', function() {
             console.log('joined event');
-            $scope.message = 'JOINED!!!';
           });
 
           socket.on('notification', function() {
-            console.log('ok notified! thx');
-            $scope.getLast();
+            getLast();
           });
 
           $scope.update();

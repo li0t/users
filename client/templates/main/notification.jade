@@ -3,7 +3,7 @@ div
   md-divider
   div(style='max-height:100px; max-width:600px; overflow:scroll;')
     md-button.notification(
-      ng-click='viewed(not)'
-      ng-init='message=notMessage(not.interaction.sender.email, not.interaction.action.slug)'
       ng-repeat='not in notifications | orderBy:"-created"'  
-      ng-disabled='not.viewed' ) {{ message }}
+      ng-style='not.viewed && { opacity: "0.3" } || {}', 
+      ng-mouseleave='!not.viewed && viewed(not)'
+      ng-href='{{ not.href }}') {{ not.message }}
