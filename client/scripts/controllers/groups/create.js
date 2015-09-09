@@ -63,7 +63,7 @@
 
         $http.post('/api/groups', $scope.data).
 
-        success(function() {
+        success(function(group) {
           $location.path('/groups');
           $session.flash('Grupo creado');
 
@@ -71,7 +71,7 @@
 
             if (member !== $session.get('user')._id) {
 
-              $http.post('/api/interactions/group-invite', { receiver: member }).
+              $http.post('/api/interactions/group-invite', { group: group, receiver: member }).
               error(function(data) {
                 console.log(data);
 

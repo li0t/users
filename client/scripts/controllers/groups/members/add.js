@@ -82,7 +82,7 @@
 
           $scope.data.members.forEach(function(member) {
 
-              $http.post('/api/interactions/group-invite', { receiver: member }).
+              $http.post('/api/interactions/group-invite', {group: $scope.group, receiver: member }).
               error(function(data) {
                 console.log(data);
               });

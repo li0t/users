@@ -84,7 +84,7 @@
 
                 if (collaborator !== $session.get('user')._id) {
 
-                  $http.post('/api/interactions/task-assigned', { receiver: collaborator }).
+                  $http.post('/api/interactions/task-assigned', { task: task, receiver: collaborator }).
                   error(function(data) {
                     console.log(data);
 

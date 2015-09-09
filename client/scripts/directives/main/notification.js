@@ -27,7 +27,7 @@
 
           $scope.update = function() {
 
-            var actions = 'actions=contact-request&actions=task-assigned&actions=group-invite';
+            var actions = 'actions=contact-request&actions=task-assigned&actions=task-expired-one-week&actions=group-invite';
             var limit = '&limit=' + $scope.limit;
             var skip = '&skip=' + $scope.skip;
 
@@ -110,12 +110,17 @@
 
               "task-assigned": {
                 message: not.interaction.sender.email + ' te ha asignado una tarea!',
-                href: '/tasks/collaborator'
+                href: '/tasks/' + not.interaction.modelRelated + '/detail'
+              },
+
+              "task-expired-one-week": {
+                message: 'Tienes una tarea pendiente hace una semana!',
+                href: '/tasks/' + not.interaction.modelRelated + '/detail'
               },
 
               "group-invite": {
                 message: not.interaction.sender.email + ' te ha invitado a un grupo!',
-                href: '/groups'
+                href: '/groups/' + not.interaction.modelRelated + '/profile'
               },
             };
 

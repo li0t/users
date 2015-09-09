@@ -1,9 +1,9 @@
 'use strict';
 
-//var scheduler = require('node-schedule');
-//var moment = require('moment');
 var debug = require('debug')('app:daemons:notifications');
-var socket = require('socket.io-client');
+var scheduler = require('node-schedule');
+var request = require('request');
+var moment = require('moment');
 var path = require('path');
 
 /* Obtain the app's root path */
@@ -12,19 +12,17 @@ var root = path.resolve(__dirname, '..');
 require(root + '/globals')(global);
 
 var statics = component('statics');
+var host = 'http://192.168.0.112:3030';
+var url = '/api/interactions/task-expired-one-week';
 
 /**
  * The time to send all the briefs (UTC time).
  */
-// var schedule = {
-//   hour: 0,
-//   minute: 1
-// };
+var taskSchedule = {
+  hour: 18,
+  minute: 6
+};
 
-//var spans = [30, 60, 90];
-
-var delay = 60000;
-var or;
 
 /**
  * Initializes the daemon.
@@ -33,55 +31,59 @@ function startDaemon() {
 
   debug("Starting the notifications daemon...");
 
-  or = [{
-    action: statics.model('action', 'contact-request')._id
-  }, {
-    action: statics.model('action', 'task-assigned')._id
-  }, {
-    action: statics.model('action', 'group-invite')._id
-  }];
 
-  function sendNotifications() {
+  function sendExpiredTasks() {
+    debug('Checking expired tasks...');
 
     var mongoose = require('mongoose');
 
-    var Notification = mongoose.model('notification');
     var Interaction = mongoose.model('interaction');
+    var Task = mongoose.model('task');
+    var now = moment();
 
-    Interaction.find().
+    Task.find().
 
-    or(or).
+    exists('completed', false).
+    exists('deleted', false).
+    exists('dateTime').
 
-    exec(function(err, inters) {
+    where('dateTime').lt(now).
+
+    exec(function(err, tasks) {
       if (err) {
         debug(err);
       }
 
-      inters.forEach(function(inter) {
+      tasks.forEach(function(task) {
 
-        Notification.findOne().
+        if (now.diff(task.dateTime, 'days') > 6) {
 
-        where('interaction', inter._id).
+          Interaction.count().
 
-        exec(function(err, not) {
-          if (err) {
-            debug(err);
-          }
+          where('modelRelated', task._id).
+          where('action', statics.model('action', 'task-expired-one-week')._id).
 
-          if (!not) {
+          exec(function(err, count) {
+            if (err) {
+              return debug(err);
+            }
 
-            debug('Creating new %s notification for user %s', inter.action, inter.receiver);
+            if (!count) {
 
-            new Notification({
-              interaction: inter._id
-            }).
-            save(function(err) {
-              if (err) {
-                debug(err);
-              }
-            });
-          }
-        });
+              request.post({
+                  url: host + url,
+                  json: {
+                    task: task._id
+                  }
+                },
+                function(err, httpResponse, body) {
+                  debug('ERROR: %s', err);
+                  debug('HTTP-RESPONSE: %s', JSON.stringify(httpResponse));
+                  debug('BODY: %s', body);
+                });
+            }
+          });
+        }
       });
     });
 
@@ -90,7 +92,7 @@ function startDaemon() {
   /**
    * Schedule the task to send all the available briefs.
    */
-  setInterval(sendNotifications, delay);
+  scheduler.scheduleJob(taskSchedule, sendExpiredTasks);
 
   debug("Task is scheduled");
 }

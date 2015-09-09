@@ -3,12 +3,14 @@
 var debug = require('debug')('app:notifications');
 var mongoose = require('mongoose');
 
-var sockets = require('fi-seed-component-sockets');
+var sockets;
 //var statics = component('statics');
 
 function notify(inter) {
 
   var Notification = mongoose.model('notification');
+
+  sockets = require('fi-seed-component-sockets');
 
   Notification.count().
 

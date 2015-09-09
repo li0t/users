@@ -20,13 +20,11 @@ module.exports = function(Schema) {
     },
 
     completed: {
-      type: Date,
-      default: null
+      type: Date
     },
 
     deleted: {
-      type: Date,
-      default: null
+      type: Date
     },
 
     objective: {

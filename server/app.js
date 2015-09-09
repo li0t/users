@@ -82,11 +82,11 @@ app.use(bodyParser.urlencoded({
 }));
 //app.use(fileman.multiparser);
 app.use(multiParser()); /* Form multipart body parser */
-app.use(security.csrf(configs.security.csrf));
-app.use(security.csp(configs.security.csp));
-app.use(security.xframe(configs.security.xframe));
-app.use(security.hsts(configs.security.hsts));
-app.use(security.xssProtection(configs.security.xssProtection));
+//app.use(security.csrf(configs.security.csrf));
+// app.use(security.csp(configs.security.csp));
+// app.use(security.xframe(configs.security.xframe));
+// app.use(security.hsts(configs.security.hsts));
+// app.use(security.xssProtection(configs.security.xssProtection));
 //app.use(fileman.uploadedFilesCleaner);
 app.use(compression());
 

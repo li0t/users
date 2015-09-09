@@ -8,6 +8,7 @@ module.exports = function(router, mongoose) {
 
   var Interaction = mongoose.model('interaction');
   var Token = mongoose.model('token');
+  var Task = mongoose.model('task');
   var User = mongoose.model('user');
 
   router.post('/email-confirmation', function(req, res, next) {
@@ -76,6 +77,7 @@ module.exports = function(router, mongoose) {
 
     new Interaction({
       action: statics.model('action', 'group-invite')._id,
+      modelRelated: req.body.group,
       sender: req.session.user._id,
       receiver: req.body.receiver
     }).
@@ -95,6 +97,7 @@ module.exports = function(router, mongoose) {
     new Interaction({
       action: statics.model('action', 'task-assigned')._id,
       sender: req.session.user._id,
+      modelRelated: req.body.task,
       receiver: req.body.receiver
     }).
     save(function(err, data) {
@@ -183,5 +186,36 @@ module.exports = function(router, mongoose) {
 
   });
 
+  router.post('/task-expired-one-week', function(req, res, next) {
+
+    debug(req.body);
+
+    Task.findById(req.body.task).
+
+    exec(function(err, task) {
+      if (err) {
+        return next(err);
+      }
+
+      if (!task) {
+        return res.sendStatus(400);
+      }
+
+      task.collaborators.forEach(function(collaborator) {
+
+        new Interaction({
+          action: statics.model('action', 'task-expired-one-week')._id,
+          receiver: collaborator.user,
+          modelRelated: task._id
+        }).
+        save(function(err) {
+          if (err) {
+            debug(err);
+          }
+        });
+      });
+    });
+
+  });
 
 };

@@ -27,7 +27,9 @@ module.exports = function(Schema) {
     token: {
       type: Schema.Types.ObjectId,
       ref: 'token'
-    }
+    },
+
+    modelRelated: Schema.Types.ObjectId
 
   });
 
