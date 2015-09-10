@@ -19,8 +19,8 @@ var url = '/api/interactions/task-expired-one-week';
  * The time to send all the briefs (UTC time).
  */
 var taskSchedule = {
-  hour: 18,
-  minute: 6
+  hour: 10,
+  minute: 56
 };
 
 

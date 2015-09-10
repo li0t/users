@@ -25,6 +25,7 @@ var server = http.createServer(app);
 
 /**** Components ****/
 //var fileman = component('fileman');
+var notifications = component('notifications');
 var multiParser = component('multiparse');
 var schemas = component('schemas');
 var statics = component('statics');
@@ -82,11 +83,11 @@ app.use(bodyParser.urlencoded({
 }));
 //app.use(fileman.multiparser);
 app.use(multiParser()); /* Form multipart body parser */
-//app.use(security.csrf(configs.security.csrf));
-// app.use(security.csp(configs.security.csp));
-// app.use(security.xframe(configs.security.xframe));
-// app.use(security.hsts(configs.security.hsts));
-// app.use(security.xssProtection(configs.security.xssProtection));
+app.use(security.csrf(configs.security.csrf));
+app.use(security.csp(configs.security.csp));
+app.use(security.xframe(configs.security.xframe));
+app.use(security.hsts(configs.security.hsts));
+app.use(security.xssProtection(configs.security.xssProtection));
 //app.use(fileman.uploadedFilesCleaner);
 app.use(compression());
 
@@ -140,6 +141,14 @@ function startServer() {
 }
 
 /**
+ * Initializes Notifications component
+ */
+function initNotifications() {
+  notifications.init();
+  startServer();
+}
+
+/**
  * Initializes SocketIO.
  */
 function initSockets() {
@@ -147,7 +156,7 @@ function initSockets() {
     basedir: path.normalize(path.join(__dirname, 'sockets')),
     debug: require('debug')('app:sockets')
   });
-  startServer();
+  initNotifications();
 }
 
 /**

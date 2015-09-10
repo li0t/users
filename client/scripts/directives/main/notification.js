@@ -20,6 +20,7 @@
         templateUrl: '/assets/templates/main/notification.html',
         link: function($scope) {
 
+          var actions = 'actions=contact-request&actions=task-assigned&actions=task-expired-one-week&actions=group-invite';
           var socket;
 
           $scope.limit = 10;
@@ -27,7 +28,7 @@
 
           $scope.update = function() {
 
-            var actions = 'actions=contact-request&actions=task-assigned&actions=task-expired-one-week&actions=group-invite';
+
             var limit = '&limit=' + $scope.limit;
             var skip = '&skip=' + $scope.skip;
 
@@ -90,8 +91,6 @@
 
           function getLast() {
 
-            var actions = 'actions=contact-request&actions=task-assigned&actions=group-invite';
-
             $http.get('api/notifications/last?' + actions).
 
             success(function(not) {
@@ -104,12 +103,12 @@
 
             var cfg = {
               "contact-request": {
-                message: not.interaction.sender.email + ' te ha enviado una solicitud de contacto!',
+                message: not.interaction.sender && not.interaction.sender.email + ' te ha enviado una solicitud de contacto!',
                 href: '/contacts'
               },
 
               "task-assigned": {
-                message: not.interaction.sender.email + ' te ha asignado una tarea!',
+                message: not.interaction.sender && not.interaction.sender.email + ' te ha asignado una tarea!',
                 href: '/tasks/' + not.interaction.modelRelated + '/detail'
               },
 
@@ -119,7 +118,7 @@
               },
 
               "group-invite": {
-                message: not.interaction.sender.email + ' te ha invitado a un grupo!',
+                message: not.interaction.sender && not.interaction.sender.email + ' te ha invitado a un grupo!',
                 href: '/groups/' + not.interaction.modelRelated + '/profile'
               },
             };
