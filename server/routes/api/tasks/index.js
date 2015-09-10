@@ -14,15 +14,17 @@ module.exports = function(router, mongoose) {
    */
   router.get('/', function(req, res, next) {
 
-    var i;
+    var filter = req.query.filter && req.query.filter === 'collaborators';
+    var i, query;
 
-    Task.find().
+    query = Task.find().
 
     where('creator', req.session.user._id).
-    where('collaborators.user').ne(req.session.user._id).
-    where('deleted', null).
+    where('deleted', null);
 
-    deepPopulate('group.profile creator.profile collaborators entries priority').
+    query = filter && query.where('collaborators.user').ne(req.session.user._id) || query;
+
+    query.deepPopulate('group.profile creator.profile collaborators entries priority').
 
     sort('-_id').
 
