@@ -9,7 +9,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
         
 md-progress-circular(ng-show='fetching' md-mode='indeterminate')        
         
-md-content.md-padding(layout='column' ng-show='!fetching && task')
+md-content.main-content.md-padding(layout='column', ng-show='!fetching && task')
   md-button(
     ng-show='task.completed'
     ng-click='reOpen()')
@@ -23,12 +23,14 @@ md-content.md-padding(layout='column' ng-show='!fetching && task')
   div
     h3 {{ task.objective }}
   
-  div
-    h4 {{ task.completed && ("Completada el " + (task.completed | toLocal)) || "Abierta"}}
+  div 
+    h4 
+      span Estado: 
+      | {{ task.completed && ("Completada el " + (task.completed | toLocal)) || "Abierta"}}
 
-  div(layout='row')  
+  div(layout='row') 
     md-input-container
-      label Fecha de Entrega
+      label Fecha de Término
       input.form-control(
         ng-change='dateTimeChanged = true'
         ng-disabled='task.completed'

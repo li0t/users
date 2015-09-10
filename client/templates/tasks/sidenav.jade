@@ -24,7 +24,8 @@ md-content(layout='row', layout-align='space-around center', layout-padding)
     strong Grupo
     br
     | {{ activeCard.group.profile.name || 'Sin información'}}
-    
+
+md-content(layout='row', layout-align='space-around center', layout-padding)
   p
     strong Creador
     br
@@ -57,3 +58,7 @@ div(layout-padding)
       span(ng-repeat='note in activeCard.notes') 
         | - {{ note.note || 'Sin información'}}
         br
+          
+div(layout='row', layout-align='center center')
+  md-button(flex='60')
+    | Terminar
