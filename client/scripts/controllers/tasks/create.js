@@ -25,6 +25,9 @@
 
         if ($scope.data.group) {
 
+          $scope.collaborators.list = [];
+          $scope.data.collaborators = [];
+
           $http.get('/api/groups/members/of/' + $scope.data.group).
 
           success(function(members) {
