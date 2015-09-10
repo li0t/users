@@ -6,9 +6,11 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       creator
         
       md-button(ng-href='/meetings/attendant')  Mis Reuniones
+        md-tooltip Reuniones a las que asistir
         
       md-button.md-raised(ng-href='/meetings/creator')  Reuniones Creadas
-            
+        md-tooltip Reuniones que he creado 
+      
 md-progress-circular(ng-show='fetching' md-mode='indeterminate')            
             
 md-content.md-padding
