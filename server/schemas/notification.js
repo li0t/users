@@ -6,37 +6,16 @@ module.exports = function (Schema) {
 
   var NotificationSchema = new Schema({
 
-    recipient: {
+    interaction: {
       type: Schema.Types.ObjectId,
-      ref: 'user'
-    },
-
-    sender: {
-      type: Schema.Types.ObjectId,
-      ref: 'user'
-    },
-
-
-    purpose: {
-      type: Schema.Types.ObjectId,
-      ref: 'static.purpose',
-      default: null
+      ref: 'interaction'
     },
 
     viewed: {
       type: Date
-    },
-
-    accepted: {
-      type: Date
-    },
-
-    declined: {
-      type: Date
-    },
+    }
 
   });
-
 
   /** Show virtuals on JSON conversion */
   NotificationSchema.set('toJSON', {
@@ -52,6 +31,9 @@ module.exports = function (Schema) {
   /** Lets populate reach any level */
   NotificationSchema.plugin(deepPopulate);
 
+  NotificationSchema.virtual('created').get(function () {
+    return this._id.getTimestamp();
+  });
 
   return NotificationSchema;
 };

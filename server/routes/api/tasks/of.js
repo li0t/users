@@ -34,7 +34,7 @@ module.exports = function(router, mongoose) {
       where('group', group).
       where('deleted', null).
 
-      sort('-created').
+      sort('-_id').
 
       deepPopulate('priority').
 

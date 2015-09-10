@@ -24,7 +24,7 @@ module.exports = function(router, mongoose) {
 
     deepPopulate('group.profile creator.profile attendants entries ').
 
-    sort('-created').
+    sort('-_id').
 
     exec(function(err, meetings) {
       if (err) {
@@ -71,7 +71,7 @@ module.exports = function(router, mongoose) {
 
     Meeting.find(find, score).
 
-    sort('created').
+    sort('_id').
     sort(score).
 
     skip(skip).

@@ -2,6 +2,8 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
+var Notifications = component('notifications');
+
 module.exports = function(Schema) {
 
   var InteractionSchema = new Schema({
@@ -25,12 +27,27 @@ module.exports = function(Schema) {
     token: {
       type: Schema.Types.ObjectId,
       ref: 'token'
-    }
+    },
+
+    modelRelated: Schema.Types.ObjectId
 
   });
 
   /** Lets populate reach any level */
   InteractionSchema.plugin(deepPopulate, {});
+
+  InteractionSchema.virtual('created').get(function () {
+    return this._id.getTimestamp();
+  });
+
+  InteractionSchema.post('save', function(doc) {
+    Notifications.notify(doc);
+  });
+
+  InteractionSchema.pre('remove', function(next) {
+    Notifications.clean(this);
+    next();
+  });
 
   return InteractionSchema;
 

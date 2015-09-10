@@ -63,9 +63,21 @@
 
         $http.post('/api/groups', $scope.data).
 
-        success(function() {
+        success(function(group) {
           $location.path('/groups');
           $session.flash('Grupo creado');
+
+          $scope.data.members.forEach(function(member) {
+
+            if (member !== $session.get('user')._id) {
+
+              $http.post('/api/interactions/group-invite', { group: group, receiver: member }).
+              error(function(data) {
+                console.log(data);
+
+              });
+            }
+          });
         }).
 
         error(function() {

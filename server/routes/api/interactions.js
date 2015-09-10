@@ -10,6 +10,10 @@ module.exports = function(router, mongoose) {
   var Token = mongoose.model('token');
   var User = mongoose.model('user');
 
+
+  /**
+   * Create the email-confirmation interaction and token
+   */
   router.post('/email-confirmation', function(req, res, next) {
 
     new Token().
@@ -40,6 +44,9 @@ module.exports = function(router, mongoose) {
 
   });
 
+  /**
+   * Create the user-invite interaction and token
+   */
   router.post('/user-invite', function(req, res, next) {
 
     new Token().
@@ -71,6 +78,53 @@ module.exports = function(router, mongoose) {
 
   });
 
+  /**
+   * Create the group-invite interaction
+   */
+  router.post('/group-invite', function(req, res, next) {
+
+    new Interaction({
+      action: statics.model('action', 'group-invite')._id,
+      modelRelated: req.body.group,
+      sender: req.session.user._id,
+      receiver: req.body.receiver
+    }).
+    save(function(err, data) {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(201).send(data);
+
+    });
+
+  });
+
+  /**
+   * Create the task-assigned interaction
+   */
+  router.post('/task-assigned', function(req, res, next) {
+
+    new Interaction({
+      action: statics.model('action', 'task-assigned')._id,
+      sender: req.session.user._id,
+      modelRelated: req.body.task,
+      receiver: req.body.receiver
+    }).
+    save(function(err, data) {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(201).send(data);
+
+    });
+
+  });
+
+  /**
+   * Create the contact-request interaction and token
+   */
   router.post('/contact-request', function(req, res, next) {
 
     new Token().
@@ -102,6 +156,9 @@ module.exports = function(router, mongoose) {
 
   });
 
+  /**
+   * Create the user-recover interaction and token
+   */
   router.post('/user-recover', function(req, res, next) {
 
     User.findOne().
@@ -145,6 +202,5 @@ module.exports = function(router, mongoose) {
     });
 
   });
-
 
 };

@@ -25,6 +25,9 @@
 
         if ($scope.data.group) {
 
+          $scope.collaborators.list = [];
+          $scope.data.collaborators = [];
+
           $http.get('/api/groups/members/of/' + $scope.data.group).
 
           success(function(members) {
@@ -77,6 +80,22 @@
           if ($scope.data.collaborators.length) {
 
             $http.post('/api/tasks/collaborators/add-to/' + task, $scope.data).
+
+            success(function() {
+
+              $scope.data.collaborators.forEach(function(collaborator) {
+
+                if (collaborator !== $session.get('user')._id) {
+
+                  $http.post('/api/interactions/task-assigned', { task: task, receiver: collaborator }).
+                  error(function(data) {
+                    console.log(data);
+
+                  });
+                }
+              });
+
+            }).
 
             error(function() {
               $session.flash('Hubo un error agregando colaboradores a la tarea, por favor inténtalo denuevo');

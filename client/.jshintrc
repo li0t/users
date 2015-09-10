@@ -89,6 +89,7 @@
     "globals"       : {
       "imagesLoaded": true,
       "angular": true,
-      "google": true
+      "google": true,
+      "io": true
     }        // additional predefined global variables
 }

@@ -4,6 +4,7 @@
   ng.module('App', [
     /** Angular dependencies **/
     'ngRoute',
+    'ngAnimate',
     'ngMaterial',
     'ngFileUpload',
 

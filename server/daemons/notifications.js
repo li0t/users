@@ -1,8 +1,9 @@
 'use strict';
 
 var debug = require('debug')('app:daemons:notifications');
-//var scheduler = require('node-schedule');
-//var moment = require('moment');
+var scheduler = require('node-schedule');
+var request = require('request');
+var moment = require('moment');
 var path = require('path');
 
 /* Obtain the app's root path */
@@ -11,34 +12,87 @@ var root = path.resolve(__dirname, '..');
 require(root + '/globals')(global);
 
 var statics = component('statics');
+var host = 'http://192.168.0.112:3030';
+var url = '/api/interactions/task-expired-one-week';
 
 /**
  * The time to send all the briefs (UTC time).
  */
-// var schedule = {
-//   hour: 0,
-//   minute: 1
-// };
+var taskSchedule = {
+  hour: 10,
+  minute: 56
+};
 
-//var spans = [30, 60, 90];
-
-var delay = 30000;
 
 /**
  * Initializes the daemon.
  */
 function startDaemon() {
+
   debug("Starting the notifications daemon...");
 
-  function sendNotifications() {
+
+  function sendExpiredTasks() {
+    debug('Checking expired tasks...');
+
     var mongoose = require('mongoose');
-    debug('NOTIFY!!!!');
+
+    var Interaction = mongoose.model('interaction');
+    var Task = mongoose.model('task');
+    var now = moment();
+
+    Task.find().
+
+    exists('completed', false).
+    exists('deleted', false).
+    exists('dateTime').
+
+    where('dateTime').lt(now).
+
+    exec(function(err, tasks) {
+      if (err) {
+        debug(err);
+      }
+
+      tasks.forEach(function(task) {
+
+        if (now.diff(task.dateTime, 'days') > 6) {
+
+          Interaction.count().
+
+          where('modelRelated', task._id).
+          where('action', statics.model('action', 'task-expired-one-week')._id).
+
+          exec(function(err, count) {
+            if (err) {
+              return debug(err);
+            }
+
+            if (!count) {
+
+              request.post({
+                  url: host + url,
+                  json: {
+                    task: task._id
+                  }
+                },
+                function(err, httpResponse, body) {
+                  debug('ERROR: %s', err);
+                  debug('HTTP-RESPONSE: %s', JSON.stringify(httpResponse));
+                  debug('BODY: %s', body);
+                });
+            }
+          });
+        }
+      });
+    });
+
   }
 
   /**
    * Schedule the task to send all the available briefs.
    */
-setInterval(sendNotifications, delay);
+  scheduler.scheduleJob(taskSchedule, sendExpiredTasks);
 
   debug("Task is scheduled");
 }
@@ -49,7 +103,7 @@ setInterval(sendNotifications, delay);
 function registerStatics() {
   debug("Registering statics...");
 
-  statics.load(config('statics'), function () {
+  statics.load(config('statics'), function() {
     startDaemon();
   });
 }

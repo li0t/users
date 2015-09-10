@@ -57,7 +57,6 @@ module.exports = function(router) {
 
     /* Groups */
     '/groups',
-    '/groups/create',
     '/groups/:id/tasks',
     '/groups/:id/profile',
     '/groups/:id/meetings',

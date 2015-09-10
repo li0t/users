@@ -1,0 +1,10 @@
+div
+  md-button(ng-click='$mdOpenMenu()') Notificaciones
+  md-divider
+  div(style='max-height:100px; max-width:600px; overflow:scroll;')
+    md-button.notification(
+      ng-repeat='not in notifications | orderBy:"-created"'  
+      ng-style='not.viewed && { opacity: "0.3" } || {}', 
+      ng-mouseleave='!not.viewed && viewed(not)'
+      ng-click='!not.viewed && viewed(not)'
+      ng-href='{{ not.href }}') {{ not.message }}

@@ -238,7 +238,7 @@ module.exports = function(router, mongoose) {
 
     deepPopulate('group.profile entries.user entries.pictures entries.documents').
 
-    sort('created').
+    sort('-_id').
 
     exec(function(err, task) {
       if (err) {

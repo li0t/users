@@ -6,6 +6,7 @@ require('colors');
 require('./globals')(global);
 
 /**** Modules *****/
+var sockets = require('fi-seed-component-sockets');
 var debug = require('debug')('app:main');
 var compression = require('compression');
 var session = require('express-session');
@@ -24,6 +25,7 @@ var server = http.createServer(app);
 
 /**** Components ****/
 //var fileman = component('fileman');
+var notifications = component('notifications');
 var multiParser = component('multiparse');
 var schemas = component('schemas');
 var statics = component('statics');
@@ -139,11 +141,30 @@ function startServer() {
 }
 
 /**
+ * Initializes Notifications component
+ */
+function initNotifications() {
+  notifications.init();
+  startServer();
+}
+
+/**
+ * Initializes SocketIO.
+ */
+function initSockets() {
+  sockets.init(server, {
+    basedir: path.normalize(path.join(__dirname, 'sockets')),
+    debug: require('debug')('app:sockets')
+  });
+  initNotifications();
+}
+
+/**
  * Initializes MongoDB's GridFS.
  */
 function initGridFS() {
   gridfs.init(mongoose.connection.db, mongoose.mongo);
-  startServer();
+  initSockets();
 }
 
 /**

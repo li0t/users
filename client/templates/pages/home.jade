@@ -1,10 +1,12 @@
-md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  div
+md-toolbar.md-padding.lightBlue(layout='row')
+  div(flex='66')
     h2 EMEETER
     //timer(interval='1000') {{hours}} hour{{hoursS}}, {{minutes}} minute{{minutesS}}, {{seconds}} second{{secondsS}}
     div
       creator(ng-if='session.user')
-
+  
+  main-notification(ng-if='session.user' )
+   
 md-content.darkGray(ng-show='session.user')
 
   div#maincontiner(layout-padding, layout='row', style='padding-right: 0;')

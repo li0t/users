@@ -77,7 +77,16 @@
         $http.post('/api/groups/members/add-to/' + $scope.group, $scope.data).
 
         success(function() {
+
           $session.flash('Miembros agregados');
+
+          $scope.data.members.forEach(function(member) {
+
+              $http.post('/api/interactions/group-invite', {group: $scope.group, receiver: member }).
+              error(function(data) {
+                console.log(data);
+              });
+          });
         }).
 
         error(function() {
