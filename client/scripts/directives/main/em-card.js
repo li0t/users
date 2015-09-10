@@ -24,7 +24,6 @@
 
         link: function($scope, $element, $attrs) {
 
-
           switch ($scope.card.type) {
 
             case 'task':

@@ -18,7 +18,7 @@ span(layout='column', layout-align='center center', style="color: #747474;")
       md-icon(md-font-icon='material-icons', style='size:48px') add
       md-tooltip Crear
       
-    md-button.md-icon-button(ng-if="card.type == 'task' || card.type == 'meeting'", aria-label='emcard-detail', ng-href='{{ card.href }}')
+    md-button.md-icon-button(ng-if="card.type == 'task' || card.type == 'meeting'", aria-label='emcard-detail')
       md-icon(md-font-icon='material-icons' ng-if='card._id') play_circle_outline
       md-tooltip {{ (card._id && "Iniciar un sprint")}}    
     

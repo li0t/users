@@ -53,6 +53,7 @@
 
             return  card;
           }
+
         },
 
         // Meeting Object and API Definition
