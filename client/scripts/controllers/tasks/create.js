@@ -38,6 +38,7 @@
             $session.flash('danger', 'Hubo un error obteniendo los miembros del grupo');
           });
         }
+
       };
 
       $scope.fetchGroups = function() {
@@ -87,16 +88,17 @@
 
                 if (collaborator !== $session.get('user')._id) {
 
-                  $http.post('/api/interactions/task-assigned', { task: task, receiver: collaborator }).
+                  $http.post('/api/interactions/task-assigned', {
+                    task: task,
+                    receiver: collaborator
+                  }).
                   error(function(data) {
                     console.log(data);
 
                   });
                 }
               });
-
             }).
-
             error(function() {
               $session.flash('Hubo un error agregando colaboradores a la tarea, por favor inténtalo denuevo');
             });
@@ -110,7 +112,6 @@
               $session.flash('Hubo un error agregando tags a la tarea, por favor inténtalo denuevo');
             });
           }
-
         }).
         error(function() {
           $scope.submitting = false;
@@ -170,9 +171,6 @@
       };
 
       $scope.fetchGroups();
-
     }
-
   ]);
-
 }(angular));

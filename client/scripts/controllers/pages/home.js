@@ -58,7 +58,7 @@
 
             $scope.entries = $scope.entries.concat(data);
 
-            $http.get('/api/tasks?filter=collaborators').
+            $http.get('/api/tasks?filter=collaborator').
 
             success(function(data) {
 
@@ -70,7 +70,7 @@
 
                 $scope.entries = $scope.entries.concat(data);
 
-                $http.get('/api/meetings').
+                $http.get('/api/meetings?filter=attendant').
 
                 success(function(data) {
 

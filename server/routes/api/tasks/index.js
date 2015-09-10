@@ -14,7 +14,7 @@ module.exports = function(router, mongoose) {
    */
   router.get('/', function(req, res, next) {
 
-    var filter = req.query.filter && req.query.filter === 'collaborators';
+    var filter = req.query.filter && req.query.filter === 'collaborator';
     var i, query;
 
     query = Task.find().
@@ -24,7 +24,7 @@ module.exports = function(router, mongoose) {
 
     query = filter && query.where('collaborators.user').ne(req.session.user._id) || query;
 
-    query.deepPopulate('group.profile creator.profile collaborators entries priority').
+    query.deepPopulate('group.profile creator.profile entries priority').
 
     sort('-_id').
 

@@ -15,14 +15,17 @@ module.exports = function(router, mongoose) {
    */
   router.get('/', function(req, res, next) {
 
-    var i;
+    var filter = req.query.filter && req.query.filter === 'attendant';
+    var i, query;
 
-    Meeting.find().
+    query = Meeting.find().
 
     where('creator', req.session.user._id).
-    where('deleted', null).
+    where('deleted', null);
 
-    deepPopulate('group.profile creator.profile attendants entries ').
+    query = filter && query.where('attendants.user').ne(req.session.user._id) || query;
+
+    query.deepPopulate('group.profile creator.profile  entries').
 
     sort('-_id').
 

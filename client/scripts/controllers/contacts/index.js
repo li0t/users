@@ -62,6 +62,7 @@
         } else {
           $session.flash('success', 'Ese eres tu, genial!');
         }
+
       };
 
       $scope.resetFound = function() {
@@ -200,8 +201,6 @@
 
       $scope.fetchContacts();
       $scope.fetchPending();
-
     }
   ]);
-
 }(angular));
