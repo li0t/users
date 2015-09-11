@@ -7,10 +7,10 @@
 (function (ng) {
   'use strict';
 
-  ng.module('App').directive('emSidenavTask', [
-    '$emCard', '$http',
+  ng.module('App').directive('emTaskSidenav', [
+    '$emCard', '$http', '$session',
 
-    function ($emCard, $http) {
+    function ($emCard, $http, $session) {
 
       return {
         restrict: 'E',
@@ -79,6 +79,34 @@
             $scope.activityCompleted(activity) :
             $scope.activityUncompleted(activity);
 
+          };
+
+          $scope.closeTask = function() {
+
+            $http.put('/api/tasks/close/' + $scope.activeCard._id).
+
+            success(function() {
+              $scope.activeCard.completed = Date.now();
+              $session.flash('success', 'La tarea ha sido completada!');
+            }).
+
+            error(function() {
+              $session.flash('danger', 'Hubo un error completando la tarea!');
+            });
+
+          };
+
+          $scope.reOpenTask = function() {
+            $http.put('/api/tasks/re-open/' + $scope.activeCard.id).
+
+            success(function() {
+              $scope.activeCard.completed = false;
+              $session.flash('success', 'La tarea ha sido abierta!');
+            }).
+
+            error(function() {
+              $session.flash('danger', 'Hubo un error abriendo la tarea!');
+            });
           };
 
         }

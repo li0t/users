@@ -1,7 +1,48 @@
 // emCard styles
-em-card{
+em-card {
   p,
   h1, h2, h3, h4 {
     font-weight: 300;
   }
+
+  span {
+
+    color: #747474;
+
+    md-grid-tile-header {
+      background: none;
+      color: #747474;
+    }
+
+    .action {
+      cursor: pointer;
+      md-icon {
+        size: 48px;
+      }
+
+      h4 {
+        text-align: center;
+      }
+
+      &.completed {
+        h4 {
+          text-decoration: line-through;
+        }
+      }
+
+    }
+
+
+  }
+
+  md-grid-tile-footer.nobg {
+
+    background: none;
+    color: #747474;
+
+    p {
+      font-size: small;
+    }
+  }
+
 }

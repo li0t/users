@@ -1,7 +1,7 @@
 md-toolbar.md-padding.lightBlue(layout='row')
   div(flex='66')
     h2 EMEETER
-    //timer(interval='1000') {{hours}} hour{{hoursS}}, {{minutes}} minute{{minutesS}}, {{seconds}} second{{secondsS}}
+
     div
       creator(ng-if='session.user')
   
@@ -40,6 +40,7 @@ md-content.darkGray(ng-show='session.user')
       md-grid-tile.whitebg(
         layout='column',
         ng-repeat="entry in entries | orderBy: '-created'",
+        ng-if='!entry.completed',
         md-rowspan="{{ entry.row }}",
         md-colspan="{{ entry.col }}")
         em-card(card='entry')

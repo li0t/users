@@ -44,9 +44,9 @@ div(layout-padding)
       strong Actividades ({{ activeCard.activities.length }})
       
     md-checkbox(ng-repeat='activity in activeCard.activities'
-      ng-click='toggleActivity(activity)'
-      ng-disabled='task.completed'
-      ng-checked='activity.checked'
+      ng-disabled='activeCard.completed',
+      ng-click='toggleActivity(activity)',
+      ng-checked='activity.checked',
       aria-label='task-activity')
       | {{ activity.description }} - {{ activity.checked && (activity.checked | fromNow) || '' }}
       
@@ -60,5 +60,12 @@ div(layout-padding)
         br
           
 div(layout='row', layout-align='center center')
-  md-button(flex='60')
-    | Terminar
+  md-button(
+    ng-if='activeCard.completed'
+    ng-click='reOpenTask()')
+    | Abrir
+    
+  md-button(
+    ng-if='!activeCard.completed'
+    ng-click='closeTask()')
+    | Cerrar  
