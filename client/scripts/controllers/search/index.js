@@ -2,69 +2,13 @@
   'use strict';
 
   ng.module('App').controller('Search:Index', [
-    '$scope', '$http', '$location', '$session',
+    '$scope', '$http', '$location', '$session', '$utils',
 
-    function($scope, $http, $location, $session) {
+    function($scope, $http, $location, $session, $utils) {
 
       $scope.keywords = null;
       $scope.limit = 0;
       $scope.skip = 0;
-
-
-      /** Bigger score, lower index  */
-      function quicksort(array, left, right) {
-
-        var index;
-
-        if (array.length > 1) {
-
-          left = (typeof left === 'number') ? left : 0;
-          right = (typeof right === 'number') ? right : array.length - 1;
-
-          index = partition(array, left, right);
-
-          if (left < index - 1) {
-            quicksort(array, left, index - 1);
-          }
-
-          if (right > index) {
-            quicksort(array, index, right);
-          }
-
-        }
-
-        return array;
-      }
-
-      function partition(array, left, right) {
-
-        var pivot = array[Math.floor((right + left) / 2)];
-
-        while (left <= right) {
-
-          while (array[left].score > pivot.score) {
-            left++;
-          }
-
-          while (array[right].score < pivot.score) {
-            right--;
-          }
-
-          if (left <= right) {
-            swap(array, left, right);
-            left++;
-            right--;
-          }
-        }
-
-        return left;
-      }
-
-      function swap(array, left, right) {
-        var temp = array[left];
-        array[left] = array[right];
-        array[right] = temp;
-      }
 
       $scope.search = function() {
         $scope.searching = true;
@@ -91,7 +35,8 @@
 
               entries = entries.concat(tasks);
               entries = entries.concat(meetings);
-              $scope.entries = quicksort(entries);
+
+              $scope.entries = $utils.quicksort(entries, 'score');
 
             }).
             error(function(error) {
