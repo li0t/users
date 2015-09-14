@@ -8,9 +8,9 @@
   'use strict';
 
   ng.module('App').directive('emTaskSidenav', [
-    '$emCard', '$http', '$session',
+    '$emCard', '$http', '$session', '$moment',
 
-    function ($emCard, $http, $session) {
+    function ($emCard, $http, $session, $moment) {
 
       return {
         restrict: 'E',
@@ -36,6 +36,46 @@
               });
 
             };
+          }
+
+          $scope.showWorkedTime = function () {
+            $scope.activeCard.collaborators.forEach(function (element, index, array) {
+
+              var init, end;
+              var worked = 0;
+              var totalTime = 0;
+
+              for (var i = 0; i < element.workedTimes.length; i ++) {
+
+                if (i % 2 == 0) {
+
+                  //init = $moment().valueOf(element.workedTimes[i]);
+                  init = element.workedTimes[i];
+
+                  if (typeof element.workedTimes[i + 1] === 'undefinded') {
+
+                    end = Date.now();
+
+                  } else {
+
+                    //end = $moment().valueOf(element.workedTimes[i + 1]);
+                    end = element.workedTimes[i + 1];
+
+                  }
+
+                  console.log(init, ' : ' , end);
+                  worked = $moment().subtract(end, init).milliseconds();
+                  totalTime = totalTime + worked;
+
+                  console.log(worked, totalTime);
+
+                }
+
+              }
+
+              array[index].totalTime = totalTime;
+
+            });
           }
 
           $scope.activityCompleted = function(activity) {

@@ -4,7 +4,7 @@ md-content.border(layout='row', layout-align='space-around center', layout-paddi
     md-icon(md-font-icon='material-icons', ng-if='activeCard._id && !activeCard.completed') play_circle_outline
     md-tooltip {{ (activeCard._id && "Iniciar un sprint")}} 
 
-  p(flex='40')
+  p(flex='40', ng-click="showWorkedTime()")
     strong Tiempo trabajado
     br
     | {{ 'Tiempo trabajado...' || 'Sin información'}}
