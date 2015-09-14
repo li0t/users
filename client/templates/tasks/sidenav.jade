@@ -1,15 +1,15 @@
 md-content.border(layout='row', layout-align='space-around center', layout-padding)
-  md-switch.md-primary(
-    ng-change='toggleWorking(activeCard._id)',
-    aria-label='em-card-switch',
-    ng-model='card.isWorking')
+  
+  md-button.md-icon-button(flex='20', ng-click="toggleWorking(activeCard._id)", aria-label='emcard-detail', style="line-height: 0.2em;")
+    md-icon(md-font-icon='material-icons', ng-if='activeCard._id && !activeCard.completed') play_circle_outline
+    md-tooltip {{ (activeCard._id && "Iniciar un sprint")}} 
 
-  p 
+  p(flex='40')
     strong Tiempo trabajado
     br
-    | {{ activeCard.workedTime && (activeCard.workedTime | fromNow) || 'Sin información'}}
+    | {{ 'Tiempo trabajado...' || 'Sin información'}}
   
-  p 
+  p(flex='40')
     strong Fecha límite
     br
     | {{ activeCard.relevantDate && (activeCard.relevantDate | fromNow) || 'Sin Fecha de Entrega'}}

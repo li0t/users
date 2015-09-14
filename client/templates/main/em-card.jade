@@ -6,7 +6,7 @@ span(layout='column', layout-align='center center')
     
   div.action(layout='column', layout-align='center center', ng-click='card.action()', class="{{ card.completed && 'completed' }}")
     md-icon.icon48(md-font-icon='material-icons', style="color: {{ card.color }};") {{ card.completed && 'check' || card.icon }}
-    h4(style='text-align: center;')
+    h4
       span(style='text-transform: uppercase;')
         | {{ card.span }}
       br
@@ -19,7 +19,7 @@ span(layout='column', layout-align='center center')
       md-tooltip Crear
       
     md-button.md-icon-button(ng-if="card.type == 'task' || card.type == 'meeting'", aria-label='emcard-detail')
-      md-icon(md-font-icon='material-icons' ng-if='card._id && !card.completed') play_circle_outline
+      md-icon(md-font-icon='material-icons', ng-if='card._id && !card.completed') play_circle_outline
       md-tooltip {{ (card._id && "Iniciar un sprint")}}    
     
 md-grid-tile-footer.nobg(layout-padding, layout-align='center center')  
