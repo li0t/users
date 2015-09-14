@@ -18,6 +18,8 @@ md-content.md-padding
     
     md-button(ng-disabled='!keywords || searching' type='submit')
       md-icon(md-font-icon='material-icons' ) search
+  
+  md-progress-circular(ng-show='searching' md-mode='indeterminate')  
     
   md-grid-list(
     ng-show='entries',
