@@ -24,7 +24,7 @@
           index = partition(array, left, right);
 
           if (left < index - 1) {
-            quicksort(array, left, index -1);
+            quicksort(array, left, index - 1);
           }
 
           if (right > index) {
@@ -73,6 +73,7 @@
           limit = 'limit=' + $scope.limit + '&',
           skip = 'skip=' + $scope.skip + '&',
           keywords = 'keywords=' + $scope.keywords,
+          meetings = '/api/meetings/like?' + limit + skip + keywords,
           entries = '/api/entries/like?' + limit + skip + keywords,
           tasks = '/api/tasks/like?' + limit + skip + keywords;
 
@@ -84,18 +85,29 @@
 
           success(function(tasks) {
 
-            entries = entries.concat(tasks);
-            $scope.entries = quicksort(entries);
-            
+            $http.get(meetings).
+
+            success(function(meetings) {
+
+              entries = entries.concat(tasks);
+              entries = entries.concat(meetings);
+              $scope.entries = quicksort(entries);
+
+            }).
+            error(function(error) {
+              console.log(error);
+            }).
+            finally(function() {
+              $scope.searching = false;
+            });
           }).
           error(function(error) {
-            console.log(error);
-          }).
-          finally(function() {
             $scope.searching = false;
+            console.log(error);
           });
         }).
         error(function(error) {
+          $scope.searching = false;
           console.log(error);
         });
       };

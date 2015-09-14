@@ -74,6 +74,37 @@ module.exports = function(router, mongoose) {
   });
 
   /**
+   * Get entries by tags stored
+   */
+  router.get('/tags', function(req, res, next) {
+
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    var tags = req.query.tags;
+
+    tags = (typeof tags === 'string') ? [tags] : tags;
+    
+    Entry.find().
+
+    where('tags').in(tags).
+
+    skip(skip).
+    limit(limit).
+
+    sort('-_id').
+    deepPopulate('group.profile').
+
+    exec(function(err, entries) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(entries);
+
+    });
+  });
+
+  /**
    * Create a new entry
    */
   router.post('/', function(req, res, next) {

@@ -93,6 +93,37 @@ module.exports = function(router, mongoose) {
   });
 
   /**
+   * Get meetings by tags stored
+   */
+  router.get('/tags', function(req, res, next) {
+
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    var tags = req.query.tags;
+
+    tags = (typeof tags === 'string') ? [tags] : tags;
+
+    Meeting.find().
+
+    where('tags').in(tags).
+
+    skip(skip).
+    limit(limit).
+
+    sort('-_id').
+    deepPopulate('group.profile').
+
+    exec(function(err, meetings) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(meetings);
+
+    });
+  });
+
+  /**
    * Create a new meeting
    */
   router.post('/', function(req, res, next) {

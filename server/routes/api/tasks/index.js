@@ -92,6 +92,37 @@ module.exports = function(router, mongoose) {
   });
 
   /**
+   * Get tasks by tags stored
+   */
+  router.get('/tags', function(req, res, next) {
+
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    var tags = req.query.tags;
+
+    tags = (typeof tags === 'string') ? [tags] : tags;
+
+    Task.find().
+
+    where('tags').in(tags).
+
+    skip(skip).
+    limit(limit).
+
+    sort('-_id').
+    deepPopulate('group.profile').
+
+    exec(function(err, tasks) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(tasks);
+
+    });
+  });
+
+  /**
    * Create a new task
    */
   router.post('/', function(req, res, next) {
