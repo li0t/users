@@ -18,47 +18,105 @@
         templateUrl: '/assets/templates/main/d3example.html',
         link: function($scope) {
 
-          var color, pack, svg;
-
-          var diameter = 960;
-          var margin = 20;
-
-          color = d3.scale.
-          linear().
-          domain([-1, 5]).
-          range(["hsl(152,80%,80%)", "hsl(228,30%,40%)"]).
-          interpolate(d3.interpolateHcl);
+          var pack, vis, node, root;
+          var width = 1280;
+          var height = 800;
+          var r = 720;
+          var x = d3.scale.linear().range([0, r]);
+          var y = d3.scale.linear().range([0, r]);
 
           pack = d3.layout.pack().
-          padding(2).
-          size([diameter - margin, diameter - margin]).
-          value(function(d) {
-            return d.size;
-          });
+          size([r, r]);
 
-          svg = d3.select(".content").
-          append("svg").
-          attr("width", diameter).
-          attr("height", diameter).
-          append("g").
-          attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+          vis = d3.selectAll(".content").
+          insert("svg:svg", "h2").
+          attr("width", width).
+          attr("height", height).
+          append("svg:g").
+          attr("transform", "translate(" + (width - r) / 2 + "," + (height - r) / 2 + ")");
 
-          d3.json("/api/analytics/groups", function(error, root) {
-            if (error) throw error;
-console.log(root);
-            var circle, text, node, transition, view;
+          d3.json("/api/analytics/circles", function(data) {
 
-            var focus = root;
+            node = root = data;
+
             var nodes = pack.nodes(root);
-console.log(nodes);
 
+            vis.selectAll("circle").
+            data(nodes).
+            enter().
+            append("svg:circle").
+            attr("class", function(d) {
+              return d.children ? "parent" : "child";
+            }).
+            attr("cx", function(d) {
+              return d.x;
+            }).
+            attr("cy", function(d) {
+              return d.y;
+            }).
+            attr("r", function(d) {
+              return d.r;
+            }).
+            on("click", function(d) {
+              return zoom(node == d ? root : d);
+            });
+
+            vis.selectAll("text").data(nodes).enter().append("svg:text").attr("class", function(d) {
+              return d.children ? "parent" : "child";
+            }).
+            attr("x", function(d) {
+              return d.x;
+            }).
+            attr("y", function(d) {
+              return d.y;
+            }).
+            attr("dy", ".35em").attr("text-anchor", "middle").style("opacity", function(d) {
+              return d.r > 20 ? 1 : 0;
+            }).
+            text(function(d) {
+              return d.name;
+            });
+
+            d3.select(window).on("click", function() {
+              zoom(root);
+            });
           });
 
-          d3.select(self.frameElement).style("height", diameter + "px");
+          function zoom(d, i) {
+            var k = r / d.r / 2;
+            x.domain([d.x - d.r, d.x + d.r]);
+            y.domain([d.y - d.r, d.y + d.r]);
+
+            var t = vis.transition().duration(d3.event.altKey ? 7500 : 750);
+
+            t.selectAll("circle").attr("cx", function(d) {
+              return x(d.x);
+            }).
+            attr("cy", function(d) {
+              return y(d.y);
+            }).
+            attr("r", function(d) {
+              return k * d.r;
+            });
+
+            t.
+            selectAll("text").attr("x", function(d) {
+              return x(d.x);
+            }).
+            attr("y", function(d) {
+              return y(d.y);
+            }).
+            style("opacity", function(d) {
+              return k * d.r > 20 ? 1 : 0;
+            });
+
+            node = d;
+            d3.event.stopPropagation();
+          }
+
         }
       };
     }
-
   ]);
 
 }(angular));
