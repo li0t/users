@@ -34,6 +34,7 @@ module.exports = function(router) {
     '/tasks/creator',
     '/tasks/:id/detail',
     '/tasks/collaborator',
+    '/tasks/:id/collaborators',
 
     /* Groups Members*/
     '/groups/:id/members',

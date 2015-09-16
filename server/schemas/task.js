@@ -139,6 +139,22 @@ module.exports = function(Schema) {
 
   }, 'You must set a valid priority!');
 
+  /** Remove not-active task collaborators **/
+  TaskSchema.methods.cleanCollaborators = function() {
+
+    var i;
+
+    for (i = 0; i < this.collaborators.length; i++) {
+
+      if (this.collaborators[i].left.length && this.collaborators[i].left.length === this.collaborators[i].joined.length) {
+
+        this.collaborators.splice(i, 1);
+        i -= 1;
+      }
+    }
+
+  };
+
   /** Lets populate reach any level */
   TaskSchema.plugin(deepPopulate, {
     populate: {

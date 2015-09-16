@@ -16,7 +16,6 @@ md-content.md-padding(ng-show='!fetching && task.collaborators')
     
     md-button.md-raised(ng-repeat='collaborator in task.collaborators' ng-click='addOrRemove(collaborator.user._id)')
       h4 {{ collaborator.user.profile.name || collaborator.user.email }}  
-      p collaborator.workedTimes[collaborator.workedTimes.length -1] -  collaborator.workedTimes[0] 
           
     md-button(ng-show='collaboratorsToRemove.length' ng-click='removeMembers()')
       md-icon(md-font-icon='material-icons') remove_circle
