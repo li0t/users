@@ -27,6 +27,8 @@ module.exports = function(router, mongoose) {
 
       } else {
         doc[attribute][i].name = doc[attribute][i].user.profile.name && doc[attribute][i].user.profile.name || doc[attribute][i].user.email;
+        doc[attribute][i].value = leaf;
+
         delete doc[attribute][i].workedTimes;
         delete doc[attribute][i].joined;
         delete doc[attribute][i].left;

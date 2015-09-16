@@ -1,5 +1,5 @@
 /**
- * D3 example.
+ * D3 Circles.
  *
  * @type AngularJS Directive.
  */
@@ -15,7 +15,7 @@
 
       return {
         restrict: 'E',
-        templateUrl: '/assets/templates/main/d3example.html',
+        templateUrl: '/assets/templates/main/d3-circles.html',
         link: function($scope) {
 
           var pack, vis, node, root;
@@ -28,7 +28,7 @@
           pack = d3.layout.pack().
           size([r, r]);
 
-          vis = d3.selectAll(".content").
+          vis = d3.selectAll(".circles").
           insert("svg:svg", "h2").
           attr("width", width).
           attr("height", height).
@@ -61,7 +61,11 @@
               return zoom(node == d ? root : d);
             });
 
-            vis.selectAll("text").data(nodes).enter().append("svg:text").attr("class", function(d) {
+            vis.selectAll("text").
+            data(nodes).
+            enter().
+            append("svg:text").
+            attr("class", function(d) {
               return d.children ? "parent" : "child";
             }).
             attr("x", function(d) {
@@ -70,7 +74,9 @@
             attr("y", function(d) {
               return d.y;
             }).
-            attr("dy", ".35em").attr("text-anchor", "middle").style("opacity", function(d) {
+            attr("dy", ".35em").
+            attr("text-anchor", "middle").
+            style("opacity", function(d) {
               return d.r > 20 ? 1 : 0;
             }).
             text(function(d) {

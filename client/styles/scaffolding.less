@@ -42,32 +42,43 @@ md-checkbox .md-icon {
 }
 
 /** d3 example **/
-.node {
-  cursor: pointer;
-}
 
-.node:hover {
-  stroke: #000;
-  stroke-width: 1.5px;
-}
 
-.node--leaf {
-  fill: white;
-}
-
-.label {
-  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  text-anchor: middle;
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
-}
-
-.label,
-.node--root,
-.node--leaf {
+.circles text {
+  font-size: 12px;
+  fill: #000000;
   pointer-events: none;
 }
-/**/
 
+.circles text.parent {
+  font-size: 24px;
+  fill: #031DB3;
+}
+
+.circles circle {
+  fill: #7487F3;
+  stroke: #999;
+  pointer-events: all;
+}
+
+.circles circle.parent {
+  fill: #6AA9F1;
+  fill-opacity: .1;
+  stroke: steelblue;
+}
+
+.circles circle.parent:hover {
+  stroke: #FF0000;
+  stroke-width: .8px;
+}
+
+.circles circle.child {
+  pointer-events: none;
+}
+
+
+
+/**/
 em-card{
   p,
   h1, h2, h3, h4 {
