@@ -20,7 +20,7 @@ module.exports = function(router, mongoose) {
 
     where('user', req.session.user._id).
 
-    deepPopulate('user group.profile').
+    deepPopulate('user.profile group.profile pictures documents audios').
     sort('-_id').
 
     exec(function(err, entries) {

@@ -7,9 +7,9 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
         
       group-items(ng-show='group' group)
 
-md-progress-circular(ng-show='fetching' md-mode='indeterminate')
+md-progress-circular.main-display(ng-show='fetching' md-mode='indeterminate')
   
-md-content.md-padding(ng-show='!fetching && entry')
+md-content.main-display.md-padding(ng-show='!fetching && entry')
   md-input-container
     input(readonly aria-label='entry-title') 
     | Titulo : {{ entry.title && entry.title || "Sin título" }}
@@ -20,15 +20,15 @@ md-content.md-padding(ng-show='!fetching && entry')
         
   div(ng-if='entry.type == "image"')
     div(ng-repeat='pic in entry.pictures')
-      img(ng-src='{{"api/files/" + pic._id }}' alt='{{pic.filename}}' style='max-height: 400px; max-width:400px;')
+      img(ng-src='{{"api/files/" + pic._id }}', alt='{{pic.filename}}', style='max-height: 400px; max-width:400px;')
       
   div(ng-if='entry.type == "document"')
     div(ng-repeat='doc in entry.documents')
-      iframe(ng-src='{{"api/files/" + doc._id }}' alt='{{doc.filename}}' height='1000px' width='1000px')
+      iframe(ng-src='{{"api/files/" + doc._id }}', alt='{{doc.filename}}', download='{{doc.filename}}', height='1000px' width='1000px')
   
   div(ng-if='entry.type == "audio"')
     div(ng-repeat='audio in entry.audios')
-      audio(ng-src='{{"api/files/" + audio._id }}' alt='{{audio.filename}}' controls)
+      audio(ng-src='{{"api/files/" + audio._id }}', alt='{{audio.filename}}', controls)
         p Tu navegador no soporta el elemento audio.
       
   div(ng-if='entry.type == "note"')

@@ -1,35 +1,39 @@
 md-progress-circular(ng-show='fetching' md-mode='indeterminate')
   
-md-content.md-padding(ng-show='!fetching && entry')
-  md-input-container
-    input(readonly aria-label='entry-title') 
-    | Titulo : {{ activeCard.title && activeCard.title || "Sin título" }}
-  
-  md-input-container
-    input(readonly aria-label='entry-group') 
-    | Grupo:  {{ activeCard.group.profile && activeCard.group.profile.name }}
+md-content(layout='column', layout-align='start start', layout-padding, ng-show='!fetching && entry')
+
+  p(flex='20')
+    strong Titulo
+    br
+    | {{ activeCard.title && activeCard.title || "Sin título" }}
+    
+  p(flex='20')
+    strong Grupo
+    br
+    | {{ activeCard.group.profile && activeCard.group.profile.name }}
+    
         
   div(ng-if='activeCard.type == "image"')
     div(ng-repeat='pic in activeCard.pictures')
-      img(ng-src='{{"api/files/" + pic }}' alt='{{pic.filename}}' style='max-width:100%;')
+      img(ng-src='{{"api/files/" + pic._id }}', alt='{{pic.filename}}', style='max-width:100%;')
       
   div(ng-if='activeCard.type == "document"')
     div(ng-repeat='doc in activeCard.documents')
-      md-button(ng-href='{{"api/files/" + doc }}', target="_blank") Descargar Documento
+      md-button(ng-href='{{"api/files/" + doc._id }}', download='{{doc.filename}}', target="_blank") Descargar Documento: {{ doc.filename }}
         
   
   div(ng-if='activeCard.type == "audio"')
     div(ng-repeat='audio in activeCard.audios')
-      audio(ng-src='{{"api/files/" + audio }}' alt='{{audio.filename}}' controls)
+      audio(ng-src='{{"api/files/" + audio._id.toString() }}', alt='{{audio.filename}}', controls)
         p Tu navegador no soporta el elemento audio.
       
   div(ng-if='activeCard.type == "note"')
     p {{ activeCard.content }}
     
-  div
-    h5 Tags  
-    md-chips(
-      ng-model='activeCard.tags'
-      readonly='true')
-      md-chip-template {{ $chip }}  
-  
+  p(flex='50') 
+    strong Tags
+  md-chips(
+    flex='50',
+    ng-model='activeCard.tags'
+    readonly='true')
+    md-chip-template {{ $chip }}

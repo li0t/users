@@ -5,9 +5,9 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
     div  
       creator
         
-md-progress-circular(ng-show='fetching' md-mode='indeterminate')           
+md-progress-circular.main-display(ng-show='fetching' md-mode='indeterminate')           
         
-md-content.md-padding(ng-show='!fetching && groups')           
+md-content.main-display.md-padding(ng-show='!fetching && groups')           
   table(layout="column" layout-align="center" ng-show='groups.length')
     thead
       tr

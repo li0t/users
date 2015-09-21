@@ -42,7 +42,17 @@ md-content(layout='row', layout-align='start start', layout-padding)
     span(ng-repeat='collaborator in activeCard.collaborators') 
       | {{ collaborator.user.email || 'Sin información'}}
       br
-  
+
+
+md-content(layout='column', layout-align='start start', layout-padding)
+  p(flex='50') 
+    strong Tags
+  md-chips(
+    flex='50',
+    ng-model='activeCard.tags'
+    readonly='true')
+    md-chip-template {{ $chip }}
+
 div(layout-padding)
   md-content(layout='column', layout-align='start start', layout-padding)
     p
