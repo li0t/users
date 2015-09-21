@@ -1,37 +1,42 @@
-md-content.border(layout='row', layout-align='space-around center', layout-padding)
-  
-  md-button.md-icon-button(flex='20', ng-click="toggleWorking(activeCard._id)", aria-label='emcard-detail', style="line-height: 0.2em;")
-    md-icon(md-font-icon='material-icons', ng-if='activeCard._id && !activeCard.completed') play_circle_outline
-    md-tooltip {{ (activeCard._id && "Iniciar un sprint")}} 
+md-content.border(layout='row', layout-align='start center', layout-padding)
 
-  p(flex='40', ng-click="showWorkedTime()")
-    strong Tiempo trabajado
-    br
-    | {{ 'Tiempo trabajado...' || 'Sin información'}}
-  
   p(flex='40')
     strong Fecha límite
     br
     | {{ activeCard.relevantDate && (activeCard.relevantDate | fromNow) || 'Sin Fecha de Entrega'}}
+  
+  p(flex='40', ng-click="showWorkedTime()")
+    strong Tiempo trabajado
+    br
+    | {{ 'Tiempo trabajado...' || 'Sin información'}}
+    
+  md-button.md-icon-button(
+      ng-if='activeCard._id && !activeCard.completed',
+      ng-click="toggleWorking(activeCard._id)",
+      aria-label='emcard-detail',
+      style="line-height: 0.2em;")
 
-md-content(layout='row', layout-align='space-around center', layout-padding)
-  p 
+    md-icon(md-font-icon='material-icons') play_circle_outline
+    md-tooltip {{ (activeCard._id && "Iniciar un sprint")}} 
+
+md-content(layout='row', layout-align='start start', layout-padding)
+  p(flex='50') 
     strong Prioridad
     br
     | {{ activeCard.priority.name || 'Sin información'}}
   
-  p 
+  p(flex='50') 
     strong Grupo
     br
     | {{ activeCard.group.profile.name || 'Sin información'}}
 
-md-content(layout='row', layout-align='space-around center', layout-padding)
-  p
+md-content(layout='row', layout-align='start start', layout-padding)
+  p(flex='50')
     strong Creador
     br
     | {{ activeCard.creator.profile.name || activeCard.creator.email || 'Sin información'}}
   
-  p 
+  p(flex='50') 
     strong Colaboradores ({{ activeCard.collaborators.length }})
     br
     span(ng-repeat='collaborator in activeCard.collaborators') 

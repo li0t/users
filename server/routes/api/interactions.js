@@ -10,7 +10,6 @@ module.exports = function(router, mongoose) {
   var Token = mongoose.model('token');
   var User = mongoose.model('user');
 
-
   /**
    * Create the email-confirmation interaction and token
    */
@@ -109,6 +108,28 @@ module.exports = function(router, mongoose) {
       action: statics.model('action', 'task-assigned')._id,
       sender: req.session.user._id,
       modelRelated: req.body.task,
+      receiver: req.body.receiver
+    }).
+    save(function(err, data) {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(201).send(data);
+
+    });
+
+  });
+
+  /**
+   * Create the task-assigned interaction
+   */
+  router.post('/meeting-attendance', function(req, res, next) {
+
+    new Interaction({
+      action: statics.model('action', 'meeting-attendance')._id,
+      modelRelated: req.body.meeting,
+      sender: req.session.user._id,
       receiver: req.body.receiver
     }).
     save(function(err, data) {

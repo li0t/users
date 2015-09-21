@@ -3,7 +3,6 @@
  *
  * @type AngularJS Directive.
  */
-
 (function(ng) {
   'use strict';
 
@@ -20,14 +19,13 @@
         templateUrl: '/assets/templates/main/notification.html',
         link: function($scope) {
 
-          var actions = 'actions=contact-request&actions=task-assigned&actions=task-expired-one-week&actions=group-invite';
+          var actions = 'actions=contact-request&actions=task-assigned&actions=task-expired-one-week&actions=group-invite&actions=meeting-attendance';
           var socket;
 
           $scope.limit = 10;
           $scope.skip = 0;
 
           $scope.update = function() {
-
 
             var limit = '&limit=' + $scope.limit;
             var skip = '&skip=' + $scope.skip;
@@ -121,6 +119,11 @@
                 message: not.interaction.sender && not.interaction.sender.email + ' te ha invitado a un grupo!',
                 href: '/groups/' + not.interaction.modelRelated + '/profile'
               },
+
+              "meeting-attendance": {
+                message: not.interaction.sender && not.interaction.sender.email + ' te ha invitado a una reunión!',
+                href: '/meetings/' + not.interaction.modelRelated + '/detail'
+              }
             };
 
             not.message = cfg[not.interaction.action.slug].message;
@@ -149,7 +152,5 @@
         }
       };
     }
-
   ]);
-
 }(angular));

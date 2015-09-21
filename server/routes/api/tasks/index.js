@@ -14,15 +14,17 @@ module.exports = function(router, mongoose) {
    */
   router.get('/', function(req, res, next) {
 
-    var i;
+    var filter = req.query.filter && req.query.filter === 'collaborator';
+    var i, query;
 
-    Task.find().
+    query = Task.find().
 
     where('creator', req.session.user._id).
-    where('collaborators.user').ne(req.session.user._id).
-    where('deleted', null).
+    where('deleted', null);
 
-    deepPopulate('group.profile creator.profile collaborators entries priority').
+    query = filter && query.where('collaborators.user').ne(req.session.user._id) || query;
+
+    query.deepPopulate('group.profile creator.profile entries priority').
 
     sort('-_id').
 
@@ -78,6 +80,37 @@ module.exports = function(router, mongoose) {
     limit(limit).
 
     populate('group').
+
+    exec(function(err, tasks) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(tasks);
+
+    });
+  });
+
+  /**
+   * Get tasks by tags stored
+   */
+  router.get('/tags', function(req, res, next) {
+
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    var tags = req.query.tags;
+
+    tags = (typeof tags === 'string') ? [tags] : tags;
+
+    Task.find().
+
+    where('tags').in(tags).
+
+    skip(skip).
+    limit(limit).
+
+    sort('-_id').
+    deepPopulate('group.profile').
 
     exec(function(err, tasks) {
       if (err) {

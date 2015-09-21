@@ -111,7 +111,7 @@
               color: "#00bbd3",
               span: 'Nuevo Audio',
               background: 'yellow',
-              footer: 'ha creado un audio.'
+              footer: ' ha creado un audio.'
             }
           },
 
@@ -121,7 +121,7 @@
               color: "#f34235",
               span: 'Nueva Nota',
               background: 'yellow',
-              footer: 'ha creado una nota.'
+              footer: ' ha creado una nota.'
             }
           },
 
@@ -131,7 +131,7 @@
               color: "#ffc006",
               span: 'Nuevo Documento',
               background: 'yellow',
-              footer: 'ha subido un documento.'
+              footer: ' ha subido un documento.'
             }
           },
 
@@ -141,7 +141,7 @@
               color: "#3e50b4",
               span: 'Nueva Imagen',
               background: 'yellow',
-              footer: 'ha subido una imagen.'
+              footer: ' ha subido una imagen.'
             }
           },
 

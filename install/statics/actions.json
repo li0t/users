@@ -20,6 +20,11 @@
   "model": "group"
 },
 {
+  "slug": "meeting-attendance",
+  "name": "Meeting Attendance",
+  "model": "meeting"
+},
+{
   "slug": "task-assigned",
   "name": "Task Asssigned",
   "model": "task"

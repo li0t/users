@@ -6,7 +6,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
       md-button.md-fab.md-warn(ng-href='/')
         md-icon(md-font-icon='material-icons') chevron_left
         
-md-progress-circular(ng-show='fetching' md-mode='indeterminate')        
+md-progress-circular(ng-show='fetching || submitting' md-mode='indeterminate')        
         
 md-content.md-padding(ng-show='!fetching && user' layout='row')
   div.md-padding(flex)

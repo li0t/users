@@ -2,7 +2,7 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
-module.exports = function (Schema) {
+module.exports = function(Schema) {
 
   var GroupSchema = new Schema({
 
@@ -19,9 +19,12 @@ module.exports = function (Schema) {
 
     members: [{
 
-      user: { type: Schema.Types.ObjectId, ref: 'user'},
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+      },
 
-      joined : [Date],
+      joined: [Date],
 
       left: [Date]
 
@@ -35,12 +38,12 @@ module.exports = function (Schema) {
   });
 
   /** User's sign up date */
-  GroupSchema.virtual('created').get(function () {
+  GroupSchema.virtual('created').get(function() {
     return this._id.getTimestamp();
   });
 
   /** Group Object type */
-  GroupSchema.virtual('type').get(function () {
+  GroupSchema.virtual('type').get(function() {
     return 'group';
   });
 
@@ -50,28 +53,45 @@ module.exports = function (Schema) {
   });
 
   /**  */
-  GroupSchema.pre('save', function (next) {
+  GroupSchema.pre('save', function(next) {
     next();
   });
 
+
+  /** Remove not-active group members **/
+  GroupSchema.methods.cleanMembers = function() {
+
+    var i;
+
+    for (i = 0; i < this.members.length; i++) {
+
+      if (this.members[i].left.length && this.members[i].left.length === this.members[i].joined.length) {
+
+        this.members.splice(i, 1);
+        i -= 1;
+      }
+    }
+
+  };
+
   /** Lets populate reach any level */
-  GroupSchema.plugin(deepPopulate,{
-    populate :{
+  GroupSchema.plugin(deepPopulate, {
+    populate: {
 
-      'admin' : {
-        select : 'email profile'
+      'admin': {
+        select: 'email profile'
       },
 
-      'admin.profile' : {
-        select : 'name birthdate gender location'
+      'admin.profile': {
+        select: 'name birthdate gender location'
       },
 
-      'members' : {
-        select : 'email profile'
+      'members': {
+        select: 'email profile'
       },
 
-      'members.profile' : {
-        select : 'name birthdate gender location'
+      'members.profile': {
+        select: 'name birthdate gender location'
       }
 
     }

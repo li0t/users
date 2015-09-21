@@ -30,6 +30,9 @@ md-content.darkGray(ng-show='session.user')
           h4 No tienes asuntos pendientes
 
   div(layout-padding, style='padding-top: 0;')
+    
+    md-progress-circular(ng-show='fetching' md-mode='indeterminate')  
+    
     md-grid-list(
       md-gutter="12px",
       md-gutter-gt-sm="8px",

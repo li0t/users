@@ -7,7 +7,7 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
         
       entries-items
         
-md-progress-circular(ng-show='fetching' md-mode='indeterminate')        
+md-progress-circular(ng-show='fetching || submitting' md-mode='indeterminate')        
         
 md-content.md-padding(ng-show='!fetching && groups')
   form(

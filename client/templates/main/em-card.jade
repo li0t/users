@@ -1,6 +1,6 @@
 span(layout='column', layout-align='center center')
   md-grid-tile-header
-    md-button.md-icon-button(aria-label='emcard-detail' ng-click="showDetails();", ng-href='{{ card.href }}')
+    md-button.md-icon-button(aria-label='emcard-detail', ng-click="showDetails();", ng-href='{{ card.href }}')
       md-icon(md-font-icon='material-icons' ng-if='card._id') launch
       md-tooltip {{ (card._id && "Ver detalle") }} 
     

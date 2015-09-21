@@ -4,7 +4,11 @@ md-toolbar
       md-icon.icon48(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
     p {{ activeCard.span }}
     span(flex)
-    md-button(ng-click='close()')
+    md-button(flex='10', ng-click='close()', ng-href='{{ activeCard.href }}')
+      md-icon(md-font-icon='material-icons', style='color: #747474;') launch
+    md-button(flex='10', ng-click='close()')
       md-icon(md-font-icon='material-icons', style='color: #747474;') close
 
 em-task-sidenav(ng-show="activeCard.type=='task'")
+
+em-entry-sidenav(ng-show="activeCard.type=='audio' || activeCard.type=='image' || activeCard.type=='document' || activeCard.type=='note'")

@@ -20,7 +20,7 @@ module.exports = function(router, mongoose) {
 
     where('user', req.session.user._id).
 
-    populate('user').
+    deepPopulate('user group.profile').
     sort('-_id').
 
     exec(function(err, entries) {
@@ -62,6 +62,37 @@ module.exports = function(router, mongoose) {
     limit(limit).
 
     populate('group').
+
+    exec(function(err, entries) {
+      if (err) {
+        return next(err);
+      }
+
+      res.send(entries);
+
+    });
+  });
+
+  /**
+   * Get entries by tags stored
+   */
+  router.get('/tags', function(req, res, next) {
+
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    var tags = req.query.tags;
+
+    tags = (typeof tags === 'string') ? [tags] : tags;
+
+    Entry.find().
+
+    where('tags').in(tags).
+
+    skip(skip).
+    limit(limit).
+
+    sort('-_id').
+    deepPopulate('group.profile').
 
     exec(function(err, entries) {
       if (err) {

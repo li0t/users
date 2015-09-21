@@ -1,0 +1,35 @@
+md-progress-circular(ng-show='fetching' md-mode='indeterminate')
+  
+md-content.md-padding(ng-show='!fetching && entry')
+  md-input-container
+    input(readonly aria-label='entry-title') 
+    | Titulo : {{ activeCard.title && activeCard.title || "Sin título" }}
+  
+  md-input-container
+    input(readonly aria-label='entry-group') 
+    | Grupo:  {{ activeCard.group.profile && activeCard.group.profile.name }}
+        
+  div(ng-if='activeCard.type == "image"')
+    div(ng-repeat='pic in activeCard.pictures')
+      img(ng-src='{{"api/files/" + pic }}' alt='{{pic.filename}}' style='max-width:100%;')
+      
+  div(ng-if='activeCard.type == "document"')
+    div(ng-repeat='doc in activeCard.documents')
+      md-button(ng-href='{{"api/files/" + doc }}', target="_blank") Descargar Documento
+        
+  
+  div(ng-if='activeCard.type == "audio"')
+    div(ng-repeat='audio in activeCard.audios')
+      audio(ng-src='{{"api/files/" + audio }}' alt='{{audio.filename}}' controls)
+        p Tu navegador no soporta el elemento audio.
+      
+  div(ng-if='activeCard.type == "note"')
+    p {{ activeCard.content }}
+    
+  div
+    h5 Tags  
+    md-chips(
+      ng-model='activeCard.tags'
+      readonly='true')
+      md-chip-template {{ $chip }}  
+  

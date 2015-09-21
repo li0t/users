@@ -66,6 +66,22 @@
 
           success(function() {
 
+            $scope.data.attendants.forEach(function(attendant) {
+
+              if (attendant !== $session.get('user')._id) {
+
+                $http.post('/api/interactions/meeting-attendance', {
+                  meeting: meeting,
+                  receiver: attendant
+                }).
+
+                error(function() {
+                  $session.flash('danger', 'Hubo un problema agregando tags a la reunión');
+
+                });
+              }
+            });
+
             if ($scope.data.tags.length) {
 
               $http.post('/api/meetings/' + meeting + '/tags', $scope.data).
@@ -118,7 +134,5 @@
 
       $scope.fetchGroups();
     }
-
   ]);
-
 }(angular));
