@@ -46,10 +46,9 @@
             card.footer = element.creator && element.creator.email + ' ha creado una tarea.';
             card.color = this.config.color;
             card.icon = this.config.icon;
-            card.span = this.config.span;
             card.href = '/tasks/' + element._id + '/detail';
             card.relevantDate = element.dateTime;
-            card.span = element.objective;
+            card.span = element.objective || this.config.span;
 
             return  card;
           }
@@ -72,10 +71,9 @@
             card.footer = element.creator && element.creator.email + ' ha agendado una reunión.';
             card.color = this.config.color;
             card.icon = this.config.icon;
-            card.span = this.config.span;
             card.href = '/meetings/' + element._id + '/detail';
             card.relevantDate = element.dateTime;
-            card.span = element.objective;
+            card.span = element.objective || this.config.span;
 
             return  card;
           }
@@ -97,7 +95,8 @@
             card.footer = element.admin && element.admin.email + ' ha creado un grupo.';
             card.color = this.config.color;
             card.icon = this.config.icon;
-            card.span = this.config.span;
+            card.span = element.profile.name;
+            card.relevantDate = element.created;
             card.href = '/groups/' + element._id + '/profile';
 
             return  card;
@@ -171,7 +170,8 @@
             card.footer = element.user && element.user.email + config.footer;
             card.color = config.color;
             card.icon = config.icon;
-            card.span = config.span;
+            card.span = element.title || config.span;
+            card.relevantDate = element.updated;
             card.href = '/entries/' + element._id + '/detail';
 
             return  card;

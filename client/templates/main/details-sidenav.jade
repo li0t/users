@@ -1,8 +1,8 @@
 md-toolbar
   div.md-toolbar-tools
     div(layout-padding)
-      md-icon.icon48(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
-    p {{ activeCard.span }}
+      md-icon.icon36(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
+    h4 {{ activeCard.span }}
     span(flex)
     md-button(flex='10', ng-click='close()', ng-href='{{ activeCard.href }}')
       md-icon(md-font-icon='material-icons', style='color: #747474;') launch

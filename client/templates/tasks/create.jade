@@ -1,113 +1,108 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  div
-    h2 TAREAS
+  div(flex='66', style="margin-left: 4em; margin-bottom: -1em;")
+    br
+    br
+    h2(style="font-weight: 400;") TAREAS
     
-    div(layout='row')
-      creator
-        
-      md-button(ng-href='/tasks/collaborator')  Mis Tareas
-        md-tooltip Tareas que en las que estoy colaborando
-        
-      md-button(ng-href='/tasks/creator')  Tareas Creadas
-        md-tooltip Tareas que he creado 
+  creator
       
-md-progress-circular(ng-show='fetching' md-mode='indeterminate')      
+md-progress-circular.main-display(ng-show='fetching' md-mode='indeterminate')      
 
-md-content.md-padding(ng-show='!fetching && groups')
+md-content.main-display(style="padding: 3em 1.5em 1.5em 1.5em;", ng-show='!fetching && groups')
   form(
     ng-submit='form.$valid && submit()',
     role='form',
     name='form')
     
-    md-input-container.form-group
-      label Grupo
-      md-select(
-        ng-change='fetchGroupMembers()'
-        ng-model='data.group'
-        required)
-        
-        md-option(
-          ng-repeat='group in groups'
-          value='{{ group._id }}')
-          | {{ group.profile.name }}
-    
-    md-input-container.form-group
-      label Objetivo
-      input.form-control(
-        ng-model='data.objective'
-        required)
-
-    md-input-container.form-group
-      label Prioridad
-      md-select.form-control(
-        ng-model='data.priority'
-        required)
-        
-        md-option(ng-repeat='priority in statics.priorities'
-        ng-value='priority._id') {{ priority.name }}
-      
-    md-input-container.form-group
-      label Fecha de Entrega
-      input.form-control(
-        ng-model='data.dateTime'
-        type='date')
-    
-    div(layout='column')
-      md-checkbox(
-        ng-repeat='activity in data.activities'
-        aria-label='task-activity'
-        ng-disabled='true')
-        | {{ activity.description }}
-        
-        md-icon(md-font-icon='material-icons' ng-click='removeActivity($index)' ) close
-      
-      div(layout='row')
-        md-input-container.form-group
-          label Agrega una actividad...
-          input(ng-model='activity')    
-        md-icon(md-font-icon='material-icons' ng-click='activity && addActivity(activity)' ) add
-        
-    div(layout='row')  
-      h4 Tags
-        
-      md-chips(ng-model='data.tags')
-        md-autocomplete(
-          placeholder="Busca o crea un nuevo tag"
-          md-items='tag in searchTags(text)'
-          md-selected-item='selectedTag'
-          md-search-text='text'
-          md-autoselect='true'
-          md-item-text='tag')
+    div(layout='row', layout-align='start start')
+      md-input-container.form-group(flex='50')
+        label Grupo
+        md-select(
+          ng-change='fetchGroupMembers()'
+          ng-model='data.group'
+          required)
           
-          span(md-highlight-text='text') {{ tag }}     
+          md-option(
+            ng-repeat='group in groups'
+            value='{{ group._id }}')
+            | {{ group.profile.name }}
+      
+    div(layout='row', layout-align='start start')
+      md-input-container.form-group.main-text-field(flex='100')
+        label Nombre de la Tarea
+        input.form-control(
+          ng-model='data.objective'
+          required)
+
     
-    div(layout='row')  
-      h4 Collaboradores
+    div(layout='row', layout-align='start start')
+      md-input-container.form-group(flex='50')
+        label Prioridad
+        md-select.form-control(
+          ng-model='data.priority'
+          required)
+          
+          md-option(ng-repeat='priority in statics.priorities'
+          ng-value='priority._id') {{ priority.name }}
+    
+    div(layout='row', layout-align='start start')
+      md-input-container.form-group
+        label Fecha de Entrega
+        input.form-control(
+          ng-model='data.dateTime'
+          type='date')
+    
+    div(layout='row', layout-align='start start')
+      div(layout='column', flex='100')
+        md-checkbox(
+          ng-repeat='activity in data.activities'
+          aria-label='task-activity'
+          ng-disabled='true')
+            label(style="color: black;") {{ activity.description }}
+          
+            md-icon(md-font-icon='material-icons' ng-click='removeActivity($index)' ) close
         
-      md-button.md-raised(ng-repeat='collaborator in collaborators.list' type='button')
+        div(layout='row', layout-align='start start')
+          md-input-container.form-group(flex='50')
+            label Agrega una actividad...
+            input(ng-model='activity')
+          md-icon(md-font-icon='material-icons' ng-click='activity && addActivity(activity)' ) add
+    
+    div(layout='row', layout-align='start start')    
+      md-input-container
+        label Agrega colaboradores
+        md-select(
+          ng-change='collaborators.add()'
+          ng-model='form.collaborator')
+          
+          md-option(
+            ng-repeat='member in members'
+            value='{{ $index }}')
+            | {{ member.user.email }}  
+
+      md-button(ng-repeat='collaborator in collaborators.list' type='button')
         | {{ collaborator.user.email }}
         md-icon(md-font-icon='material-icons' ng-click='collaborators.remove($index)') close
+      
     
-    md-divider
-    
-    md-input-container
-      label Agrega colaboradores
-      md-select(
-        ng-change='collaborators.add()'
-        ng-model='form.collaborator')
-        
-        md-option(
-          ng-repeat='member in members'
-          value='{{ $index }}')
-          | {{ member.user.email }}  
-              
-    div(layout='row')
-      md-button(ng-href='/tasks/collaborator')
-        md-icon(md-font-icon='material-icons') chevron_left
+    div(layout='row', layout-align='start start')
+      div(layout='row', flex='50')          
+        md-chips(ng-model='data.tags')
+          md-autocomplete(
+            placeholder="Busca o crea un nuevo tag"
+            md-items='tag in searchTags(text)'
+            md-selected-item='selectedTag'
+            md-search-text='text'
+            md-autoselect='true'
+            md-item-text='tag')
+            
+            span(md-highlight-text='text') {{ tag }}
+      
+    div(layout='row', layout-align='end end', flex='50')
+      md-button.light-blue-font(ng-href='/tasks/collaborator')
         | Cancelar
 
-      md-button(
+      md-button.light-blue-font(
         ng-disabled='form.$invalid || submitting',
         type='submit')
         | Crear
-        md-icon(md-font-icon='material-icons') chevron_right

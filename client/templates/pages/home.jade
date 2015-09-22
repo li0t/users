@@ -1,13 +1,14 @@
-md-toolbar.md-padding.lightBlue(layout='row')
-  div(flex='66')
-    h2 EMEETER
-
-    div
-      creator(ng-if='session.user')
+md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
+  div(flex='66', style="margin-left: 4em; margin-bottom: -1em;")
+    br
+    br
+    h2(style="font-weight: 400;") EMEETER
+    
+  creator(ng-if='session.user')
   
-  main-notification(ng-if='session.user' )
+  main-notification(ng-if='session.user')
    
-md-content.main-display(ng-show='session.user')
+md-content.main-background(ng-show='session.user')
 
   div#maincontiner(layout-padding, layout='row', style='padding-right: 0;')
     div(flex='60', em-graph, style='background: #fff;')
@@ -29,7 +30,7 @@ md-content.main-display(ng-show='session.user')
         md-list-item(ng-show='!pendings.length')
           h4 No tienes asuntos pendientes
 
-  div(layout-padding, style='padding-top: 0;')
+  div(layout-padding, style='padding-top: 0; background: transparent;')
     
     md-progress-circular(ng-show='fetching' md-mode='indeterminate')  
     
