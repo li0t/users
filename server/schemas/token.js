@@ -1,6 +1,5 @@
 'use strict';
 
-var base64url = require('base64url');
 var uuid = require('node-uuid');
 var crypto = require('crypto');
 
@@ -15,7 +14,7 @@ module.exports = function(Schema) {
   });
 
   TokenSchema.pre('validate', function(next) {
-    this.secret = base64url(crypto.createHash('sha256').update(uuid.v4()).digest());
+    this.secret = crypto.createHash('sha1').update(uuid.v4()).digest().toString('hex');
     next();
   });
 
