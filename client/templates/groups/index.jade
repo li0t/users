@@ -1,45 +1,79 @@
-md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  div
-    h2 GRUPOS
-    
-    div  
-      creator
-        
 md-progress-circular.main-display(ng-show='fetching' md-mode='indeterminate')           
         
 md-content.main-display.md-padding(ng-show='!fetching && groups')           
-  table(layout="column" layout-align="center" ng-show='groups.length')
-    thead
-      tr
-        th
-        
-        th
-          md-button Grupo
 
-        th
-          md-button Administrador
+  #md-table-template
+    table.md-table(md-colresize)
+        thead
+            tr.md-table-headers-row
+                th.md-table-header(ng-repeat='h in headers')
+                    a(href='#',ng-if='handleSort(h.field)',ng-click='reverse=!reverse;order(h.field,reverse)') {{h.name}} 
+                        i.ion-android-arrow-dropup(ng-show='reverse && h.field == predicate')
+                        i.ion-android-arrow-dropdown(ng-show='!reverse && h.field == predicate')
+                    span(ng-if='!handleSort(h.field)') {{h.name}}
+                th.md-table-header
+        tbody
+            tr.md-table-content-row(ng-repeat='c in content | filter:filters | startFrom:tablePage*count | limitTo: count')
+                td
+                  .md-table-thumbs(ng-repeat='h in headers',ng-if='h.field == thumbs')
+                    div(style="background-image:url({{c.thumb}})")
+                td.md-table-content(ng-repeat='h in headers',ng-class='customClass[h.field]',ng-if='h.field != thumbs') {{(h.field.indexOf('date') > 0) ? $filter('date')(c[h.field]) : c[h.field];}}
+                td.md-table-td-more
+                    md-button(aria-label='Info')
+                        i.ion-android-more-vertical
+    .md-table-footer(layout="row")
+        span.md-table-count-info Rows per page : 
+            a(href='#',ng-click='goToPage(0); count=10') 10
+            | ,
+            a(href='#',ng-click='goToPage(0); count=25') 25
+            | ,
+            a(href='#',ng-click='goToPage(0); count=50') 50
+            | ,
+            a(href='#',ng-click='goToPage(0); count=100') 100
+            | (current is {{count}})
+        span(flex)
+        span(ng-show='nbOfPages() > 1')
+            md-button.md-primary.md-hue-2(ng-disabled='tablePage==0',ng-click='tablePage=tablePage-1',aria-label='Previous Page')
+                i.ion-chevron-left(style="font-size:16px;")
+            a(href='#',ng-repeat='i in getNumber(nbOfPages()) track by $index')
+                md-button.md-primary.md-hue-2.md-table-footer-item(ng-click='goToPage($index)')
+                    span(ng-class="{ 'md-table-active-page': tablePage==$index}") {{$index+1}}
+            md-button.md-primary.md-hue-2(ng-disabled='tablePage==nbOfPages()-1',ng-click='tablePage=tablePage+1',aria-label='Next Page')
+                i.ion-chevron-right(style="font-size:16px;")
+
+
+table(layout="column" layout-align="center" ng-show='groups.length')
+  thead
+    tr
+      th
+      
+      th
+        md-button Grupo
+
+      th
+        md-button Administrador
+      
+      th
+        md-button Última actualización
+      
+  tbody      
+    tr(
+      ng-repeat='group in groups',
+      ng-init='href = ("/groups/{0}/profile" | format : group._id)')
+      
+      td
+        md-button.md-fab.md-primary.md-hue-3(ng-href='{{ href }}' aria-label="grupo")
         
-        th
-          md-button Última actualización
-        
-    tbody      
-      tr(
-        ng-repeat='group in groups',
-        ng-init='href = ("/groups/{0}/profile" | format : group._id)')
-        
-        td
-          md-button.md-fab.md-primary.md-hue-3(ng-href='{{ href }}' aria-label="grupo")
+      
+      td
+        md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.profile.name }}
+
+      td
+        md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.admin.profile.name || group.admin.email }}
           
-        
-        td
-          md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.profile.name }}
+      td
+        md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.updated | toLocal }}
 
-        td
-          md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.admin.profile.name || group.admin.email }}
-            
-        td
-          md-button(ng-href='{{ href }}' aria-label="grupo") {{ group.updated | toLocal }}
-  
-  div(ng-show='!groups.length')
-    md-icon(md-font-icon='material-icons') panorama_fish_eye
-    | No hay grupos
+div(ng-show='!groups.length')
+  md-icon(md-font-icon='material-icons') panorama_fish_eye
+  | No hay grupos

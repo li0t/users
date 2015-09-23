@@ -1,24 +1,16 @@
 md-toolbar.lightBlue
-  h1.md-toolbar-tools
-  
-  md-button(aria-label='profile-picture' ng-show='!session.user' ng-click='$navigateTo("/")')
-    md-icon.icon48(md-font-icon='material-icons') account_circle
-    br
+
+  div(layout='column', layout-align='start start')
     
-  md-list
-    md-list-item(
-      aria-label='profile-picture'
+    img(
+      ng-src='/assets/images/emeeter-logo.png'
       ng-click='$navigateTo("/")'
-      ng-if='session.user')
-      img.profilePicture(
-        ng-src='{{ (session.user.profile.pictures.length && "api/files/" + session.user.profile.pictures[0]) || "http://lorempixel.com/50/50/abstract" }}'
-        alt='{{pic.filename}}'
-        class='md-avatar')
-        
-    md-list-item
-      md-button(ng-show='session.user' ng-click='$navigateTo("/users/" + session.user._id + "/profile")') 
-        | {{ session.user.email }}
-        md-icon(md-font-icon='material-icons') arrow_drop_down
+      alt='home'
+      style="width: 35%; padding: 1em 0 0 1em;")
+
+    md-button(ng-show='session.user' ng-click='$navigateTo("/users/" + session.user._id + "/profile")') 
+      | {{ session.user.email }}
+      md-icon(md-font-icon='material-icons') arrow_drop_down
   
   
 md-list(layout-padding)

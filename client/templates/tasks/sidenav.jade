@@ -1,86 +1,75 @@
-md-content.border(layout='row', layout-align='start center', layout-padding)
+div(layout='column', layout-align='start space-arround', style="padding: 0 1.5em 0 1.5em;")
+  md-content(layout='row', layout-align='start start', style="padding-top: 1em;")
+    div(layout='row', style="padding-right: 3em;")
+      md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") group
+      p
+        | Grupo
+        br
+        strong {{ activeCard.group.profile.name || 'Sin información'}}
 
-  p(flex='40')
-    strong Fecha límite
-    br
-    | {{ activeCard.relevantDate && (activeCard.relevantDate | fromNow) || 'Sin Fecha de Entrega'}}
+    div(layout='row')
+      md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") turned_in_not
+      p
+        | Prioridad
+        br
+        strong {{ activeCard.priority.name || 'Sin información'}}
+
+  md-content(layout='column', layout-align='start start')
+    div(layout='row')
+      md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") schedule
+      p
+        | Fecha límite
+        br
+        strong {{ activeCard.relevantDate | toLocal }} - {{ activeCard.relevantDate && (activeCard.relevantDate | fromNow) || 'Sin Fecha de Entrega'}}
+   
+  md-content.border(layout='column', layout-align='start start', style="padding-bottom: 1em;")
+    div(layout='row')
+      md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") person
+      p
+        | Participantes ({{ activeCard.collaborators.length }})
+        br
+        span(ng-repeat='collaborator in activeCard.collaborators') 
+          strong {{ collaborator.user.email || 'Sin información'}}
+          br
   
-  p(flex='40', ng-click="showWorkedTime()")
-    strong Tiempo trabajado
-    br
-    | {{ 'Tiempo trabajado...' || 'Sin información'}}
-    
-  md-button.md-icon-button(
-      ng-if='activeCard._id && !activeCard.completed',
-      ng-click="toggleWorking(activeCard._id)",
-      aria-label='emcard-detail',
-      style="line-height: 0.2em;")
+  md-content(ng-show='activeCard.tags[0]', layout='column', layout-align='start start')
+    p
+      strong Tags
+    md-chips.light.borderless(
+      ng-model='activeCard.tags'
+      readonly='true')
+      md-chip-template {{ $chip }}
 
-    md-icon(md-font-icon='material-icons') play_circle_outline
-    md-tooltip {{ (activeCard._id && "Iniciar un sprint")}} 
-
-md-content(layout='row', layout-align='start start', layout-padding)
-  p(flex='50') 
-    strong Prioridad
-    br
-    | {{ activeCard.priority.name || 'Sin información'}}
-  
-  p(flex='50') 
-    strong Grupo
-    br
-    | {{ activeCard.group.profile.name || 'Sin información'}}
-
-md-content(layout='row', layout-align='start start', layout-padding)
-  p(flex='50')
-    strong Creador
-    br
-    | {{ activeCard.creator.profile.name || activeCard.creator.email || 'Sin información'}}
-  
-  p(flex='50') 
-    strong Colaboradores ({{ activeCard.collaborators.length }})
-    br
-    span(ng-repeat='collaborator in activeCard.collaborators') 
-      | {{ collaborator.user.email || 'Sin información'}}
-      br
-
-
-md-content(layout='column', layout-align='start start', layout-padding)
-  p(flex='50') 
-    strong Tags
-  md-chips(
-    flex='50',
-    ng-model='activeCard.tags'
-    readonly='true')
-    md-chip-template {{ $chip }}
-
-div(layout-padding)
-  md-content(layout='column', layout-align='start start', layout-padding)
+  md-content.border(layout='column', layout-align='start start', layout-padding)
     p
       strong Actividades ({{ activeCard.activities.length }})
       
-    md-checkbox(ng-repeat='activity in activeCard.activities'
+    md-checkbox.em-checkbox(ng-repeat='activity in activeCard.activities'
       ng-disabled='activeCard.completed',
       ng-click='toggleActivity(activity)',
       ng-checked='activity.checked',
       aria-label='task-activity')
       | {{ activity.description }} - {{ activity.checked && (activity.checked | fromNow) || '' }}
-      
-        
-  md-content(layout='column', layout-align='space-around start', layout-padding)
-    p 
-      strong Notas ({{ activeCard.notes.length }})
-      br
-      span(ng-repeat='note in activeCard.notes') 
-        | - {{ note.note || 'Sin información'}}
-        br
-          
-div(layout='row', layout-align='center center')
-  md-button(
-    ng-if='activeCard.completed'
-    ng-click='reOpenTask()')
-    | Abrir
     
-  md-button(
-    ng-if='!activeCard.completed'
-    ng-click='closeTask()')
-    | Cerrar  
+    p
+      strong Notas ({{ activeCard.notes.length }})
+    
+  md-content(layout='column', layout-align='center center', layout-padding, style="padding-top: 1em;")
+    p Iniciar Tarea 
+    md-switch
+    h1(style="color: #A8A8Ab; font-weight: 300; font-size: 300%;") 0:00:01
+    
+  div(layout='row', layout-align='end center', style="position: absolute; bottom: 1em; right: 1em;")
+    md-button.light-blue-font(
+      ng-if='activeCard.completed'
+      ng-click='reOpenTask()')
+      | Continuar Tarea
+      
+    md-button.light-blue-font(
+      ng-if='!activeCard.completed'
+      ng-click='closeTask()')
+      | Tarea Lista
+    
+    md-button.light-blue-font(
+      ng-click='close()')
+      | Cerrar  

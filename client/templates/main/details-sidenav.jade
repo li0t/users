@@ -1,14 +1,11 @@
 md-toolbar
-  div.md-toolbar-tools
+  div.md-toolbar-tools(style="padding: 2em 0 2em 1em;")
     div(layout-padding)
-      md-icon.icon36(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
+      md-icon.icon32(md-font-icon='material-icons', style="color: {{ activeCard.color }};") {{ activeCard.icon }}
     h4 {{ activeCard.span }}
     span(flex)
-    md-button(flex='10', ng-click='close()', ng-href='{{ activeCard.href }}')
-      md-icon(md-font-icon='material-icons', style='color: #747474;') launch
-    md-button(flex='10', ng-click='close()')
-      md-icon(md-font-icon='material-icons', style='color: #747474;') close
-
+    md-button(flex='10', style="margin-top: -3em; margin-right: -1em;", ng-click='close()', ng-href='{{ activeCard.href }}')
+      md-icon.icon20(md-font-icon='material-icons') launch
 
 em-task-sidenav(ng-show="activeCard.type=='task'")
 
