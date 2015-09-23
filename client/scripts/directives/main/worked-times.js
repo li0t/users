@@ -19,11 +19,9 @@
         templateUrl: '/assets/templates/main/worked-times.html',
         link: function($scope) {
 
-          var layers, yGroupMax, yStackMax, margin, color, task;
+          var layers, yGroupMax, yStackMax, margin, color, task, n, m;
           var xAxis, svg, layer, rect, width, height, timeout, x, y;
 
-          var n = 4; // number of layers
-          var m = 58; // number of samples per layer
           var stack = d3.layout.stack().values(function(d) { return d.values; });
 
 
@@ -35,18 +33,20 @@
             $http.get('api/analytics/worked-times/of/' + task).
 
             success(function(data) {
-              console.log(data);
+
+              n = data.length; // number of layers
+              m = data.length && data[0].values.length; // number of samples per layer
 
               layers = stack(data);
 
               yGroupMax = d3.max(layers, function(layer) {
-                return d3.max(layer, function(d) {
+                return d3.max(layer.values, function(d) {
                   return d.y;
                 });
               });
 
               yStackMax = d3.max(layers, function(layer) {
-                return d3.max(layer, function(d) {
+                return d3.max(layer.values, function(d) {
                   return d.y0 + d.y;
                 });
               });
