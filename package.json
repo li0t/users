@@ -20,6 +20,7 @@
     "start": "NODE_PATH=. NODE_ENV=production PORT=3030 node server",
     "dev": "NODE_PATH=. NODE_ENV=development PORT=3030 DEBUG=app:* node server",
     "notifications": "NODE_PATH=. DEBUG=app:* node server/daemons/notifications",
+    "pm2-app": "NODE_PATH=. pm2 start server/app.js -i 0 --name 'emeeter-app'",
     "pm2-notifications": "NODE_PATH=. pm2 start server/daemons/notifications.js -i 0 --name 'emeeter-notifications'",
     "reinstall": "rm -Rf node_modules/ client/assets/components/ && npm install && bower install",
     "prestart": "gulp"
