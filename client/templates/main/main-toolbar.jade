@@ -1,6 +1,7 @@
 md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div(flex='90', style="margin-left: 4em; margin-bottom: -1em;")
-    br
+    div(layout='column', layout-align='end end')
+      main-notification(ng-if='session.user')
     br
     h2(style="font-weight: 400;") EMEETER - GRUPOS - HQ EMEETER
   
@@ -9,6 +10,3 @@ md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
   div
     md-icon(md-font-icon='material-icons', style="margin-top: -0.5em;") filter_list
   
-  
-  
-  //main-notification(ng-if='session.user')

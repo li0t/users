@@ -8,9 +8,9 @@ div(layout='column', layout-align='start space-arround', style="padding: 0 1.5em
         strong {{ activeCard.group.profile.name || 'Sin información'}}
 
     div(layout='row')
-      md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") turned_in_not
+      md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") star
       p
-        | Prioridad
+        | Tipo de Reunión
         br
         strong {{ activeCard.priority.name || 'Sin información'}}
 
@@ -42,7 +42,7 @@ div(layout='column', layout-align='start space-arround', style="padding: 0 1.5em
 
   md-content.border(layout='column', layout-align='start start', layout-padding)
     p
-      strong Agenta ({{ activeCard.items.length }})
+      strong Agenda ({{ activeCard.items.length }})
       
     md-checkbox.em-checkbox(ng-repeat='item in activeCard.items'
       ng-disabled='activeCard.completed',

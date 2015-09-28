@@ -1,15 +1,3 @@
-md-toolbar.md-padding.lightBlue(layout='row' layout-align='start end')
-  div
-    h2 Contactos
-    
-    md-button(ng-href='/search')
-      md-icon(md-font-icon='material-icons') more
-      | Entradas
-      
-    md-button(ng-href='/contacts')
-      md-icon(md-font-icon='material-icons') group
-      | Personas
-  
 md-progress-circular(ng-show='fetchingContacts || fetchingPending || inviting || confirming || deleting || adding' md-mode='indeterminate') 
   
 md-content.md-padding(ng-show='!fetchingContacts && contacts')

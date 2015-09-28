@@ -6,7 +6,7 @@ md-toolbar.lightBlue
       ng-src='/assets/images/emeeter-logo.png'
       ng-click='$navigateTo("/")'
       alt='home'
-      style="width: 35%; padding: 1em 0 0 1em;")
+      style="width: 35%; padding: 1em 0 0 1em; cursor: pointer;")
 
     md-button(ng-show='session.user' ng-click='$navigateTo("/users/" + session.user._id + "/profile")') 
       | {{ session.user.email }}

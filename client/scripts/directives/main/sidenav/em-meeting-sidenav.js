@@ -1,5 +1,5 @@
 /**
-* Tasks Main Directive.
+* Meetings Sidenav Directive.
 *
 * @type AngularJS Directive.
 */
@@ -13,7 +13,7 @@
     function ($emCard, $http, $session, $moment) {
 
       return {
-        restrict: 'E',
+        restrict: 'A',
 
         templateUrl: '/assets/templates/meetings/sidenav.html',
 

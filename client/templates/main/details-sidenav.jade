@@ -7,8 +7,9 @@ md-toolbar
     md-button(flex='10', style="margin-top: -3em; margin-right: -1em;", ng-click='close()', ng-href='{{ activeCard.href }}')
       md-icon.icon20(md-font-icon='material-icons') launch
 
-em-task-sidenav(ng-show="activeCard.type=='task'")
-em-meeting-sidenav(ng-show="activeCard.type=='meeting'")
+
+em-task-sidenav(ng-show="activeCard.type=='task'")  
+div(em-meeting-sidenav, ng-show="activeCard.type=='meeting'")
 em-entry-sidenav(ng-show="activeCard.type=='audio' || activeCard.type=='image' || activeCard.type=='document' || activeCard.type=='note'")
 
 div(layout='row', layout-align='end center', style="position: absolute; bottom: 1em; right: 1em;")
