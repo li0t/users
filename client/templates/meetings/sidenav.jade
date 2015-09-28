@@ -18,7 +18,7 @@ div(layout='column', layout-align='start space-arround', style="padding: 0 1.5em
     div(layout='row')
       md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") schedule
       p
-        | Fecha límite
+        | Fecha y Hora
         br
         strong {{ activeCard.relevantDate | toLocal }} - {{ activeCard.relevantDate && (activeCard.relevantDate | fromNow) || 'Sin Fecha de Entrega'}}
    
@@ -26,10 +26,10 @@ div(layout='column', layout-align='start space-arround', style="padding: 0 1.5em
     div(layout='row')
       md-icon(md-font-icon='material-icons', style="padding-right: 0.5em;") person
       p
-        | Participantes ({{ activeCard.collaborators.length }})
+        | Participantes ({{ activeCard.attendants.length }})
         br
-        span(ng-repeat='collaborator in activeCard.collaborators') 
-          strong {{ collaborator.user.email || 'Sin información'}}
+        span(ng-repeat='attendant in activeCard.attendants') 
+          strong {{ attendant.user.email || 'Sin información'}}
           br
   
   md-content(ng-show='activeCard.tags[0]', layout='column', layout-align='start start')
@@ -42,19 +42,19 @@ div(layout='column', layout-align='start space-arround', style="padding: 0 1.5em
 
   md-content.border(layout='column', layout-align='start start', layout-padding)
     p
-      strong Actividades ({{ activeCard.activities.length }})
+      strong Agenta ({{ activeCard.items.length }})
       
-    md-checkbox.em-checkbox(ng-repeat='activity in activeCard.activities'
+    md-checkbox.em-checkbox(ng-repeat='item in activeCard.items'
       ng-disabled='activeCard.completed',
-      ng-click='toggleActivity(activity)',
-      ng-checked='activity.checked',
+      ng-click='toggleActivity(item)',
+      ng-checked='item.checked',
       aria-label='task-activity')
-      | {{ activity.description }} - {{ activity.checked && (activity.checked | fromNow) || '' }}
+      | {{ item.description }} - {{ item.checked && (item.checked | fromNow) || '' }}
     
     p
       strong Notas ({{ activeCard.notes.length }})
     
   md-content(layout='column', layout-align='center center', layout-padding, style="padding-top: 1em;")
-    p Iniciar Tarea 
+    p Iniciar Reunión 
     md-switch
     h1(style="color: #A8A8Ab; font-weight: 300; font-size: 300%;") 0:00:01

@@ -9,11 +9,6 @@ md-menu(style="position: absolute; margin-top: -25px; left: 1em;")
         | Grupo
         
     md-menu-item
-      md-button(ng-href='/tags/create', ng-click='$mdCloseMenu()')
-        md-icon(md-menu-align-target, md-font-icon='material-icons') label
-        | Tag    
-        
-    md-menu-item
       md-button(ng-href='/meetings/create', ng-click='$mdCloseMenu()')
         md-icon(md-menu-align-target, md-font-icon='material-icons') event_note
         | Reunion    
@@ -22,6 +17,11 @@ md-menu(style="position: absolute; margin-top: -25px; left: 1em;")
       md-button(ng-href='/tasks/create', ng-click='$mdCloseMenu()')
         md-icon(md-menu-align-target, md-font-icon='material-icons') more
         | Tarea
+
+    md-menu-item
+      md-button(ng-href='/tags/create', ng-click='$mdCloseMenu()')
+        md-icon(md-menu-align-target, md-font-icon='material-icons') label
+        | Tag    
         
     md-menu-item
       md-button(ng-href='/entries/create', ng-click='$mdCloseMenu()')

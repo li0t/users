@@ -62,7 +62,7 @@
                   $http.get('/api/meetings/attendants/me').
 
                   success(function(data) {
-                    //$scope.entries = $scope.entries.concat(data);
+                    $scope.entries = $scope.entries.concat(data);
                   }).
 
                   finally(function() {

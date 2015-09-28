@@ -118,7 +118,7 @@ module.exports = function(router, mongoose) {
       limit(limit).
       skip(skip).
 
-      populate('pictures documents audios').
+      deepPopulate('user.profile group.profile pictures documents audios').
 
       sort('-_id').
 

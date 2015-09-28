@@ -36,7 +36,7 @@ module.exports = function(router, mongoose) {
 
       sort('-_id').
 
-      deepPopulate('').
+      deepPopulate('group.profile creator.profile entries attendants.user').
 
       exec(function(err, meetings) {
 

@@ -36,7 +36,7 @@ module.exports = function(router, mongoose) {
 
       sort('-_id').
 
-      deepPopulate('priority').
+      deepPopulate('group.profile creator.profile entries priority collaborators.user').
 
       exec(function(err, tasks) {
 

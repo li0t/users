@@ -8,5 +8,20 @@ md-toolbar
       md-icon.icon20(md-font-icon='material-icons') launch
 
 em-task-sidenav(ng-show="activeCard.type=='task'")
-
+em-meeting-sidenav(ng-show="activeCard.type=='meeting'")
 em-entry-sidenav(ng-show="activeCard.type=='audio' || activeCard.type=='image' || activeCard.type=='document' || activeCard.type=='note'")
+
+div(layout='row', layout-align='end center', style="position: absolute; bottom: 1em; right: 1em;")
+  md-button.light-blue-font(
+    ng-if="activeCard.type=='task' && activeCard.completed"
+    ng-click='reOpenTask()')
+    | Continuar Tarea
+    
+  md-button.light-blue-font(
+    ng-if="activeCard.type=='task' && !activeCard.completed"
+    ng-click='closeTask()')
+    | Tarea Lista
+  
+  md-button.light-blue-font(
+    ng-click='close()')
+    | Cerrar  
