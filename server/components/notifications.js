@@ -146,7 +146,7 @@ module.exports = (function() {
     sockets = require('fi-seed-component-sockets');
 
     url = '/api/interactions/task-expired-one-week';
-    host = 'http://192.168.0.112:3030';
+    host = 'http://app.emeeter.net';
 
     expiredTasksSchedule = {
       hour: 13,
