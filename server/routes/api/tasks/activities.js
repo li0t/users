@@ -4,10 +4,12 @@ var debug = require('debug')('app:api:tasks:activities');
 
 var relations = component('relations');
 
-module.exports = function(router /*, mongoose*/ ) {
+module.exports = function(router) {
 
   /**
-   * Add activities to a task
+   * Add activities to a Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -19,6 +21,7 @@ module.exports = function(router /*, mongoose*/ ) {
     if (!activities || !activities.length) {
       return res.sendStatus(400);
     }
+
     /** Prevent a mistype error */
     if (typeof activities === 'string') {
       activities = [activities];
@@ -73,7 +76,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Remove activities from task
+   * Remove activities from Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 
@@ -156,7 +161,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Set activities of a task as checked
+   * Set activities of a Task as checked.
+   *
+   * @type Express Middleware.
    */
   router.put('/of/:id/check', function(req, res, next) {
 
@@ -213,7 +220,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Unset activities of a task
+   * Set activities of a Task as not-checked.
+   *
+   * @type Express Middleware.
    */
   router.put('/of/:id/uncheck', function(req, res, next) {
 
@@ -267,6 +276,5 @@ module.exports = function(router /*, mongoose*/ ) {
     });
 
   });
-
 
 };

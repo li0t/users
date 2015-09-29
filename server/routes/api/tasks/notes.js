@@ -4,10 +4,12 @@ var debug = require('debug')('app:api:tasks:notes');
 
 var relations = component('relations');
 
-module.exports = function(router /*, mongoose*/ ) {
+module.exports = function(router) {
 
   /**
-   * Add notes to a task
+   * Add notes to a Task
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -20,6 +22,7 @@ module.exports = function(router /*, mongoose*/ ) {
     if (!notes || !notes.length) {
       return res.sendStatus(400);
     }
+
     /** Prevent a mistype error */
     if (typeof notes === 'string') {
       notes = [notes];
@@ -75,7 +78,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Remove notes from task
+   * Remove notes from Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 

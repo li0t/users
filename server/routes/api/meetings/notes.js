@@ -4,10 +4,12 @@ var debug = require('debug')('app:api:meetings:notes');
 
 var relations = component('relations');
 
-module.exports = function(router /*, mongoose*/ ) {
+module.exports = function(router) {
 
   /**
-   * Add notes to a meeting
+   * Add notes to a Meeting.
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -77,7 +79,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Remove notes from meeting
+   * Remove notes from a Meeting.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 

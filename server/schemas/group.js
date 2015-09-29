@@ -4,6 +4,12 @@ var deepPopulate = require('mongoose-deep-populate');
 
 module.exports = function(Schema) {
 
+  /**
+   * Group documents schema.
+   * Groups are the central model of work and are composed by users.
+   *
+   * @type Mongoose Schema.
+   */
   var GroupSchema = new Schema({
 
     profile: {
@@ -37,12 +43,12 @@ module.exports = function(Schema) {
 
   });
 
-  /** User's sign up date */
+  /** Group creation timestamp  */
   GroupSchema.virtual('created').get(function() {
     return this._id.getTimestamp();
   });
 
-  /** Group Object type */
+  /** Declares Object type as front-end convenient data */
   GroupSchema.virtual('type').get(function() {
     return 'group';
   });
@@ -51,12 +57,6 @@ module.exports = function(Schema) {
   GroupSchema.set('toJSON', {
     virtuals: true
   });
-
-  /**  */
-  GroupSchema.pre('save', function(next) {
-    next();
-  });
-
 
   /** Remove not-active group members **/
   GroupSchema.methods.cleanMembers = function() {

@@ -7,7 +7,11 @@ var statics = component('statics');
 module.exports = function(router, mongoose) {
 
   var User = mongoose.model('user');
-
+ /**
+  * Get user by it's email.
+  *
+  * @type Express Middleware.
+  */
   router.post('/email', function(req, res, next) {
 
     var email = req.body.email;
@@ -40,7 +44,7 @@ module.exports = function(router, mongoose) {
       res.send(user);
 
     });
-    
+
   });
 
 };

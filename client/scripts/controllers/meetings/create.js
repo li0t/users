@@ -84,7 +84,7 @@
 
             if ($scope.data.tags.length) {
 
-              $http.post('/api/meetings/' + meeting + '/tags', $scope.data).
+              $http.post('/api/meetings/tags/add-to/' + meeting, $scope.data).
 
               error(function() {
                 $session.flash('danger', 'Hubo un problema agregando tags a la reunión');
@@ -120,8 +120,9 @@
         var
           limit = 'limit=' + $scope.limit + '&',
           skip = 'skip=' + $scope.skip + '&',
-          keywords = 'keywords=' + tag,
-          tags = '/api/tags/like?' + limit + skip + keywords;
+          keywords = 'keywords=' + tag + '&',
+
+          tags = '/api/tags/like?' + keywords + limit + skip;
 
         return $http.get(tags).
         then(function(tags) {

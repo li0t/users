@@ -9,7 +9,9 @@ module.exports = function(router, mongoose) {
   var Meeting = mongoose.model('meeting');
 
   /**
-   * Get meetings of a group
+   * Get Meetings of a Group.
+   *
+   * @type Express Middleware.
    */
   router.get('/group/:id', function(req, res, next) {
 

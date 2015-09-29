@@ -39,8 +39,9 @@
         var
           limit = 'limit=' + $scope.limit + '&',
           skip = 'skip=' + $scope.skip + '&',
-          keywords = 'keywords=' + tag,
-          tags = '/api/tags/like?' + limit + skip + keywords;
+          keywords = 'keywords=' + tag + '&',
+
+          tags = '/api/tags/like?' + keywords + limit + skip;
 
         return $http.get(tags).
         then(function(tags) {
@@ -68,10 +69,11 @@
         var
           limit = 'limit=' + $scope.limit + '&',
           skip = 'skip=' + $scope.skip + '&',
-          tags = 'tags=' + tag,
-          tasks = '/api/tasks/tags?' + limit + skip + tags,
-          entries = '/api/entries/tags?' + limit + skip + tags,
-          meetings = '/api/meetings/tags?' + limit + skip + tags;
+          tags = 'tags=' + tag + '&',
+
+          tasks = '/api/tasks/tags/like?' + tags + limit + skip,
+          entries = '/api/entries/tags/like?' + tags + limit + skip,
+          meetings = '/api/meetings/tags/like?' + tags + limit + skip;
 
         $http.get(entries).
 

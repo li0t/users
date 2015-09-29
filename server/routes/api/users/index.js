@@ -18,6 +18,8 @@ module.exports = function(router, mongoose) {
 
   /**
    * Get users list.
+   *
+   * @type Express Middleware.
    */
   router.get('/', function(req, res, next) {
 
@@ -38,12 +40,15 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create a new user
+   * Create a new User.
+   *
+   * @type Express Middleware.
    */
   router.post('/', function(req, res, next) {
 
+    /* Create a new Profile that will store the user information */
     new Profile().
-    save(function(err, profile) { /* Create a new Profile that will store the user information */
+    save(function(err, profile) {
       if (err) {
         return next(err);
       }
@@ -119,7 +124,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Log a user in.
+   * Log a User in.
+   *
+   * @type Express Middleware.
    */
   router.post('/signin', function(req, res, next) {
 
@@ -197,11 +204,12 @@ module.exports = function(router, mongoose) {
       }
     });
 
-
   });
 
   /**
    * Logs a user out.
+   *
+   * @type Express Middleware.
    */
   router.get('/signout', function(req, res /*, next*/ ) {
 
@@ -211,7 +219,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Reset password of user that already validated token
+   * Reset User password.
+   *
+   * @type Express Middleware.
    */
   router.post('/reset/:token', function(req, res, next) {
 
@@ -261,16 +271,20 @@ module.exports = function(router, mongoose) {
             inter.remove(function(err) {
               if (err) {
                 debug(err);
+
               }
             });
           });
         });
       });
     });
+
   });
 
   /**
-   * Changes user password
+   * Change session User password.
+   *
+   * @type Express Middleware.
    */
   router.put('/change-password', function(req, res, next) {
 
@@ -288,7 +302,8 @@ module.exports = function(router, mongoose) {
         return next(err);
       }
 
-      if (user && bcrypt.compareSync(oldPassword, user.password)) { /* Check if there's a user and compare the passwords */
+      /* Check if there's a user and compare the passwords */
+      if (user && bcrypt.compareSync(oldPassword, user.password)) {
 
         user.password = newPassword;
 
@@ -305,11 +320,12 @@ module.exports = function(router, mongoose) {
       }
     });
 
-
   });
 
   /**
-   * Disable the user's account
+   * Disable session User account.
+   *
+   * @type Express Middleware.
    */
   router.delete('/', function(req, res, next) {
 
@@ -359,7 +375,8 @@ module.exports = function(router, mongoose) {
             return next(err);
           }
 
-          user.state = statics.model('state', 'disabled')._id; /** Set itself as disabled */
+          /** Set itself as disabled */
+          user.state = statics.model('state', 'disabled')._id;
 
           user.save(function(err) {
             if (err) {
@@ -377,7 +394,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Validate email of new user
+   * Validate User email.
+   *
+   * @type Express Middleware.
    */
   router.put('/validate/:token', function(req, res, next) {
 
@@ -456,13 +475,15 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get a user and populate it's profile
+   * Get a User and populate it's Profile.
+   *
+   * @type Express Middleware.
    */
   router.get('/:id', function(req, res, next) {
 
     User.findById(req.params.id).
 
-    deepPopulate('profile.pictures'). /* Retrieve data from linked schemas */
+    deepPopulate('profile.pictures'). 
 
     exec(function(err, user) {
 
@@ -481,7 +502,6 @@ module.exports = function(router, mongoose) {
       }
 
       res.send(user);
-
     });
 
   });

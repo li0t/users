@@ -2,15 +2,17 @@
 
 var debug = require('debug')('app:api:groups:profiles');
 
-var gridfs = component('gridfs');
 var relations = component('relations');
+var gridfs = component('gridfs');
 
 module.exports = function(router, mongoose) {
 
   var Profile = mongoose.model('profile');
 
   /**
-   * Update group profile
+   * Update Group Profile.
+   *
+   * @type Express Middleware.
    */
   router.put('/:id', function(req, res, next) {
 
@@ -54,7 +56,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Upload a group picture
+   * Upload a Group Profile picture.
+   *
+   * @type Express Middleware.
    */
   router.post('/:id/pictures', function(req, res, next) {
 

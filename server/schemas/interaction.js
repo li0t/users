@@ -4,6 +4,12 @@ var deepPopulate = require('mongoose-deep-populate');
 
 var Notifications = component('notifications');
 
+/**
+ * Interaction documents schema.
+ * Interactions are temporary documents to store users actions.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function(Schema) {
 
   var InteractionSchema = new Schema({
@@ -36,14 +42,17 @@ module.exports = function(Schema) {
   /** Lets populate reach any level */
   InteractionSchema.plugin(deepPopulate, {});
 
+  /** Interaction timestamp */
   InteractionSchema.virtual('created').get(function () {
     return this._id.getTimestamp();
   });
 
+  /** Call notifications component on each created interaction */
   InteractionSchema.post('save', function(doc) {
     Notifications.notify(doc);
   });
 
+  /** Call notifications component on each removed interaction */
   InteractionSchema.pre('remove', function(next) {
     Notifications.clean(this);
     next();

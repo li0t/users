@@ -158,8 +158,9 @@
         var
           limit = 'limit=' + $scope.limit + '&',
           skip = 'skip=' + $scope.skip + '&',
-          keywords = 'keywords=' + tag,
-          tags = '/api/tags/like?' + limit + skip + keywords;
+          keywords = 'keywords=' + tag + '&',
+
+          tags = '/api/tags/like?' + keywords + limit + skip;
 
         return $http.get(tags).
         then(function(tags) {

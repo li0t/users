@@ -7,7 +7,9 @@ module.exports = function (router, mongoose) {
   var Tag = mongoose.model('tag');
 
   /**
-   * Get all tags stored in the db
+   * Get all tags stored in the db.
+   *
+   * @type Express Middleware.
    */
   router.get('/', function(req, res, next){
 
@@ -25,7 +27,9 @@ module.exports = function (router, mongoose) {
   });
 
   /**
-   * Get Tags by keywords
+   * Get Tags by keywords in a query.
+   *
+   * @type Express Middleware.
    */
   router.get('/like', function(req, res, next) {
 
@@ -54,10 +58,13 @@ module.exports = function (router, mongoose) {
       res.send(tags);
 
     });
+
   });
 
   /**
-   * Create a new Tag
+   * Create a new Tag.
+   *
+   * @type Express Middleware.
    */
   router.post('/', function(req, res, next){
 

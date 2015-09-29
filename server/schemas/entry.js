@@ -2,6 +2,13 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
+/**
+ * Entry documents schema.
+ * Entries is a category of documents that users can create
+ * or upload to the platform such as notes or images.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function (Schema) {
 
   var EntrySchema = new Schema({
@@ -50,7 +57,7 @@ module.exports = function (Schema) {
 
   });
 
-  /** Index string fields */
+/** Index entry fields with text */
   EntrySchema.index({ '$**': 'text' });
 
   /** Show virtuals on JSON conversion */
@@ -58,12 +65,12 @@ module.exports = function (Schema) {
     virtuals: true
   });
 
-  /**  */
+  /** Entry creation timestamp */
   EntrySchema.virtual('created').get(function () {
     return this._id.getTimestamp();
   });
 
-  /** Declares Object type */
+  /** Declares Object type as front-end convenient data */
   EntrySchema.virtual('type').get(function () {
     var type = 'note';
 
@@ -77,11 +84,6 @@ module.exports = function (Schema) {
 
     return type;
 
-  });
-
-  /**  */
-  EntrySchema.pre('save', function (next) {
-    next();
   });
 
   /** Lets populate reach any level */

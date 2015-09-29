@@ -2,9 +2,17 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
+/**
+ * Contact documents schema.
+ * Contacts are documents where the users store their contacts. Lol.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function (Schema) {
 
+  /** The actual contact and it's state */
   var contact = new Schema({
+
     user: {
       type: Schema.Types.ObjectId,
       ref: 'user'
@@ -33,6 +41,7 @@ module.exports = function (Schema) {
 
   });
 
+  /** The contact document with it's array of contacts */
   var ContactSchema = new Schema({
 
     user: {
@@ -48,11 +57,6 @@ module.exports = function (Schema) {
   /** Show virtuals on JSON conversion */
   ContactSchema.set('toJSON', {
     virtuals: true
-  });
-
-  /**  */
-  ContactSchema.pre('save', function (next) {
-    next();
   });
 
   /** Check for be-contact-of-myself attempt */

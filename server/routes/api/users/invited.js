@@ -13,7 +13,9 @@ module.exports = function(router, mongoose) {
   var User = mongoose.model('user');
 
   /**
-   * Create a new user and invite it to emeeter
+   * Create a new invited User.
+   *
+   * @type Express Middleware.
    */
   router.post('/', function(req, res, next) {
 
@@ -92,14 +94,18 @@ module.exports = function(router, mongoose) {
         });
       });
     });
+
   });
 
   /**
-   * Activation of invited user that already validated token
+   * Activate invited User.
+   *
+   * @type Express Middleware.
    */
   router.put('/validate/:token', function(req, res, next) {
 
-    var i, password = req.body.password;
+    var password = req.body.password;
+    var i;
 
     if (!password) {
       return res.sendStatus(400);

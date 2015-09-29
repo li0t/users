@@ -1,16 +1,16 @@
 'use strict';
 
-var debug = require('debug')('app:api:tasks:tags');
+var debug = require('debug')('app:api:entries');
 
 var relations = component('relations');
 
 module.exports = function(router, mongoose) {
 
-  var Task = mongoose.model('task');
+  var Entry = mongoose.model('entry');
   var Tag = mongoose.model('tag');
 
   /**
-   * Get Tasks by their Tags.
+   * Get Entries by their Tags.
    *
    * @type Express Middleware.
    */
@@ -22,7 +22,7 @@ module.exports = function(router, mongoose) {
 
     tags = (typeof tags === 'string') ? [tags] : tags;
 
-    Task.find().
+    Entry.find().
 
     where('tags').in(tags).
 
@@ -32,19 +32,18 @@ module.exports = function(router, mongoose) {
     sort('-_id').
     deepPopulate('group.profile').
 
-    exec(function(err, tasks) {
+    exec(function(err, entries) {
       if (err) {
         return next(err);
       }
 
-      res.send(tasks);
+      res.send(entries);
 
     });
-
   });
 
   /**
-   * Add Tags to a Task.
+   * Add Tags to an Entry.
    *
    * @type Express Middleware.
    */
@@ -53,17 +52,17 @@ module.exports = function(router, mongoose) {
     var user = req.session.user._id;
     var tags = req.body.tags;
     var tagsSaved = 0;
-    var task;
+    var entry;
 
     /* Check if all tags were found and/or created */
     function onTagReady(tag) {
 
-      task.tags.push(tag.name);
+      entry.tags.push(tag.name);
 
       tagsSaved += 1;
 
       if (tagsSaved === req.body.tags.length) {
-        task.save(function(err) {
+        entry.save(function(err) {
           if (err) {
             return next(err);
           }
@@ -82,7 +81,7 @@ module.exports = function(router, mongoose) {
       req.body.tags = [req.body.tags];
     }
 
-    Task.findById(req.params.id).
+    Entry.findById(req.params.id).
 
     exec(function(err, data) {
       if (err) {
@@ -93,13 +92,13 @@ module.exports = function(router, mongoose) {
         return res.sendStatus(404);
       }
 
-      task = data;
+      entry = data;
 
       tags = tags.filter(function(tag) {
-        return task.tags.indexOf(tag) < 0;
+        return entry.tags.indexOf(tag) < 0;
       });
 
-      relations.membership(task.group, function(err, membership) {
+      relations.membership(entry.group, function(err, membership) {
 
         if (err || !membership.group) {
           debug('Group %s not found', req.body.group);

@@ -9,7 +9,9 @@ module.exports = function(router, mongoose) {
   var Task = mongoose.model('task');
 
   /**
-   * Get tasks where session user is collaborator
+   * Get Tasks where session User is collaborator.
+   *
+   * @type Express Middleware.
    */
   router.get('/me', function(req, res, next) {
 
@@ -63,7 +65,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get tasks where session user is currently working
+   * Get Tasks where session User is currently working.
+   *
+   * @type Express Middleware.
    */
   router.get('/me/working', function(req, res, next) {
 
@@ -108,7 +112,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Add collaborators to a task
+   * Add collaborators to a Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -196,7 +202,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Remove collaborators from task
+   * Remove collaborators from a Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 

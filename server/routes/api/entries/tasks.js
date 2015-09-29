@@ -4,14 +4,15 @@ var debug = require('debug')('app:api:entries:tasks');
 
 var relations = component('relations');
 
-
 module.exports = function(router, mongoose) {
 
   var Entry = mongoose.model('entry');
   var Task = mongoose.model('task');
 
   /**
-   * Add entries to a task
+   * Add Entries to a Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -153,7 +154,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Remove entries from task
+   * Remove Entries from Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 
@@ -228,7 +231,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get task entries
+   * Get Task Entries.
+   *
+   * @type Express Middleware.
    */
   router.get('/:id', function(req, res, next) {
 

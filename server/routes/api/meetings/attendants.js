@@ -9,7 +9,9 @@ module.exports = function(router, mongoose) {
   var Meeting = mongoose.model('meeting');
 
   /**
-   * Get meetings where session user is attendant
+   * Get Meetings where session User is attendant.
+   *
+   * @type Express Middleware.
    */
   router.get('/me', function(req, res, next) {
 
@@ -60,52 +62,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get meetings where session user is currently working
-   */
-  router.get('/me/working', function(req, res, next) {
-
-    var user = req.session.user._id;
-    var meetings = [];
-    var i, j;
-
-    Meeting.find().
-
-    where('attendants.user', user).
-    where('completed', null).
-    where('deleted', null).
-
-    exec(function(err, found) {
-      if (err) {
-        return next(err);
-      }
-
-      for (i = 0; i < found.length; i++) {
-
-        for (j = 0; j < found[i].attendants.length; j++) {
-
-          if (JSON.stringify(found[i].attendants[j].user) === JSON.stringify(user)) {
-
-            if (!found[i].attendants[j].left.length || (found[i].attendants[j].joined.length > found[i].attendants[j].left.length)) {
-
-              if (found[i].attendants[j].workedTimes.length % 2 !== 0) {
-
-                meetings.push(found[i]._id);
-
-              }
-            }
-            break;
-          }
-        }
-      }
-
-      res.send(meetings);
-
-    });
-
-  });
-
-  /**
-   * Add attendants to a meeting
+   * Add attendants to a Meeting.
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -119,6 +78,7 @@ module.exports = function(router, mongoose) {
     if (!attendants || !attendants.length) {
       return res.sendStatus(400);
     }
+
     /** Prevent a mistype error */
     if (typeof attendants === 'string') {
       attendants = [attendants];
@@ -193,7 +153,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Remove attendants from meeting
+   * Remove attendants from Meeting.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 

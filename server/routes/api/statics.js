@@ -1,11 +1,14 @@
 'use strict';
 
-var util = require('util');
 var inflection = require('inflection');
 
 module.exports = function (router, mongoose) {
 
-  /** Get statics by name */
+  /**
+   * Get statics by name.
+   *
+   * @type Express Middleware.
+   */
   router.get('/', function (req, res, next) {
 
     var curr, total, regexp, model, name,
