@@ -10,7 +10,7 @@ module.exports = function(router, mongoose) {
   var Interaction = mongoose.model('interaction');
 
  /**
-  * Get notifications where receiver is the session user.
+  * Get Notifications where receiver is the session user.
   *
   * @type Express Middleware.
   */
@@ -19,7 +19,7 @@ module.exports = function(router, mongoose) {
     var limit = Number(req.query.limit);
     var skip = Number(req.query.skip);
     var user = req.session.user._id;
-    var actions = req.query.actions; // Type of notification to filter
+    var actions = req.query.actions; // Type of Notification to filter
     var present;
 
     Notification.find().
@@ -53,7 +53,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get the last generated notification for the session user.
+   * Get the last generated Notification for the session user.
    *
    * @type Express Middleware.
    */
@@ -104,7 +104,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Set a notification as viewed.
+   * Set a Notification as viewed.
    *
    * @type Express Middleware.
    */

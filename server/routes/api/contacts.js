@@ -13,7 +13,7 @@ module.exports = function(router, mongoose) {
   var Token = mongoose.model('token');
 
   /**
-   * Get contacts of session user.
+   * Get Contacts of session User.
    *
    * @type Express Middleware.
    */
@@ -49,7 +49,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get pending contact requests of session user.
+   * Get pending contact requests of session User.
    *
    * @type Express Middleware.
    */
@@ -74,7 +74,7 @@ module.exports = function(router, mongoose) {
 
   /**
    * Create contact request.
-   * This is done by adding the receiver user to the session user contacts list
+   * This is done by adding the receiver User to the session User contacts list
    * and vice-versa, both in a pending state. In case they were contacts in the
    * past change both contacts state to pending.
    *

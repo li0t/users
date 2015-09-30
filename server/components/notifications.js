@@ -8,18 +8,22 @@ module.exports = (function() {
   var moment = require('moment');
 
   var statics = component('statics');
+  var sockets;
 
   var Notification;
   var Interaction;
   var Task;
 
-  var expiredTasksSchedule;
-  var sockets;
-  var host;
-  var url;
+  /** Configuration Data **/
+  var config = {
+    expiredTasksSchedule: {},
+  };
 
   /**
-   * Create a new Notification for an Interaction and Socket-it to the client
+   * Create a new Notification for an Interaction
+   * and notify the client via socket.
+   *
+   * @param {Object} inter The Interaction document to be notified.
    */
   function notify(inter) {
 
@@ -42,18 +46,18 @@ module.exports = (function() {
             return debug(err);
           }
 
-          debug('yoh!');
           sockets.of('/notifications').to(inter.receiver).emit('notification');
 
         });
       }
     });
 
-
   }
 
   /**
-   * Delete a Notification whose Interaction is gone
+   * Delete a Notification whose Interaction is gone.
+   *
+   * @param {Object} inter The Interaction document that is about to be deleted.
    */
   function clean(inter) {
 
@@ -69,9 +73,10 @@ module.exports = (function() {
   }
 
   /**
-   * Check for expired tasks and notify them
+   * Check for Tasks whose datetime expired a week ago and notify them.
    */
   function sendExpiredTasks() {
+
     debug('Checking expired tasks...');
 
     var now = moment();
@@ -109,6 +114,9 @@ module.exports = (function() {
 
               task.collaborators.forEach(function(collaborator) {
 
+                /**
+                 * This action @fires Notifications#notify
+                 */
                 new Interaction({
                   action: statics.model('action', 'task-expired-one-week')._id,
                   receiver: collaborator.user,
@@ -135,7 +143,7 @@ module.exports = (function() {
   }
 
   /**
-   * Initialize the component settings and tasks
+   * Initialize the component settings and schedules jobs.
    */
   function init() {
 
@@ -145,15 +153,12 @@ module.exports = (function() {
 
     sockets = require('fi-seed-component-sockets');
 
-    url = '/api/interactions/task-expired-one-week';
-    host = 'http://192.168.0.112:3030';
-
-    expiredTasksSchedule = {
+    config.expiredTasksSchedule = {
       hour: 13,
       minute: 30
     };
 
-    scheduler.scheduleJob(expiredTasksSchedule, sendExpiredTasks);
+    scheduler.scheduleJob(config.expiredTasksSchedule, sendExpiredTasks);
 
     debug("Notifications Scheduled");
 

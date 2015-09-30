@@ -49,7 +49,7 @@ module.exports = function (router) {
           filename: file.filename
         });
 
-        stream.on('close', function (sfile) {
+        stream.on('close', function () {
           if (curr === req.files.length) {
             res.end();
           }

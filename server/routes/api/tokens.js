@@ -7,7 +7,7 @@ module.exports = function(router, mongoose) {
   var Token = mongoose.model('token');
 
   /**
-   * Get Token by it's secret.
+   * Get a Token by it's secret.
    *
    * @type Express Middleware.
    */

@@ -11,7 +11,7 @@ module.exports = function(router, mongoose) {
   var User = mongoose.model('user');
 
   /**
-   * Create the email-confirmation interaction and token.
+   * Create the email-confirmation Interaction and Token.
    *
    * @type Express Middleware.
    */
@@ -46,7 +46,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the user-invite interaction and token.
+   * Create the user-invite Interaction and Token.
    *
    * @type Express Middleware.
    */
@@ -82,7 +82,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the group-invite interaction.
+   * Create the group-invite Interaction.
    *
    * @type Express Middleware.
    */
@@ -106,7 +106,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the task-assigned interaction.
+   * Create the task-assigned Interaction.
    *
    * @type Express Middleware.
    */
@@ -130,7 +130,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the meeting-attendance interaction.
+   * Create the meeting-attendance Interaction.
    *
    * @type Express Middleware.
    */
@@ -154,7 +154,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the contact-request interaction and token.
+   * Create the contact-request Interaction and Token.
    *
    * @type Express Middleware.
    */
@@ -190,7 +190,7 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the user-recover interaction and token.
+   * Create the user-recover Interaction and Token.
    *
    * @type Express Middleware.
    */

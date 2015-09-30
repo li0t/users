@@ -7,7 +7,7 @@ module.exports = function (router, mongoose) {
   var Tag = mongoose.model('tag');
 
   /**
-   * Get all tags stored in the db.
+   * Get all Tags.
    *
    * @type Express Middleware.
    */

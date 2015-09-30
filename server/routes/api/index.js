@@ -48,10 +48,11 @@ module.exports = function(router, mongoose) {
     } else {
       res.sendStatus(403);
     }
+
   });
 
   /**
-   * Get current session user profile pictures.
+   * Get current session User Profile pictures.
    *
    * @type Express Middleware.
    */
@@ -82,6 +83,7 @@ module.exports = function(router, mongoose) {
       res.send(pictures);
 
     });
+
   });
 
 };

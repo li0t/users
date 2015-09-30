@@ -8,7 +8,7 @@ module.exports = function(router, mongoose) {
 
   var User = mongoose.model('user');
  /**
-  * Get user by it's email.
+  * Get a User by it's email.
   *
   * @type Express Middleware.
   */

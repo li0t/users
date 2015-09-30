@@ -9,9 +9,9 @@ module.exports = function (router, mongoose) {
    *
    * @type Express Middleware.
    */
-  router.get('/', function (req, res, next) {
+  router.get('/', function (req, res) {
 
-    var curr, total, regexp, model, name,
+    var curr, total, model, name,
         statics = req.query.statics,
         results = {};
 
