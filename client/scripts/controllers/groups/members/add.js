@@ -1,3 +1,8 @@
+/**
+ * Add members to a Group.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

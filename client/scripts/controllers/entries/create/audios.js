@@ -1,3 +1,8 @@
+/**
+ * Upload a new Audio.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

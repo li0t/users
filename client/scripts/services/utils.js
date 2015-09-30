@@ -1,3 +1,8 @@
+/**
+ * Service oriented to provide general purpose utils such as sorting methods.
+ *
+ * @type AngularJS Service.
+ */
 (function(ng) {
   'use strict';
 
@@ -5,7 +10,16 @@
 
     var attribute;
 
-    /** Validate the array and the sort attribute before sorting **/
+    /**
+     * Validate the sort parameters before sorting.
+     *
+     * @param {Object} array The array to be sorted.
+     * @param {String} _attribute The attribute of the objects
+     * in the array which will be compared inside quicksort.
+     * It can represent a numeric or date value of the object.
+     *
+     * @return {Object} array The sorted array.
+     **/
     function quicksortValidator(array, _attribute) {
 
       try {
@@ -46,7 +60,15 @@
 
     }
 
-    /** Bigger score, lower index  */
+    /**
+     * Quicksort implementation.
+     *
+     * @param {Object} array The array to be sorted.
+     * @param {Number} left The left index of the array.
+     * @param {Number} right The right index of the array.
+     *
+     * @return {Object} array The sorted array.
+     **/
     function quicksort(array, left, right) {
 
       var index;
@@ -67,6 +89,18 @@
       return array;
     }
 
+    /**
+     * Utility method of quicksort.
+     * Select a mean pivot and put all items with higher attribute value
+     * by the left side of the pivot and all items with lower attribute value
+     * by the right side of the pivot.
+     *
+     * @param {Object} array The array to be sorted.
+     * @param {Number} left The left index of the array.
+     * @param {Number} right The right index of the array.
+     *
+     * @return {Number} left The left index of the array.
+     **/
     function partition(array, left, right) {
 
       var pivot = array[Math.floor((right + left) / 2)];
@@ -91,12 +125,21 @@
       return left;
     }
 
+    /**
+     * Utility method of quicksort.
+     * Swap left and right items positions.
+     *
+     * @param {Object} array The array object.
+     * @param {Number} left The left index of the array.
+     * @param {Number} right The right index of the array.
+     *
+     * @return {Number} left The left index of the array.
+     **/
     function swap(array, left, right) {
       var temp = array[left];
       array[left] = array[right];
       array[right] = temp;
     }
-
 
     return {
       quicksort: quicksortValidator

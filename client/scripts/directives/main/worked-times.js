@@ -1,9 +1,11 @@
 /**
- * Worked Times D3 Graph.
+ * Worked Times D3 Stack Layout Graph.
+ *
+ * ¡THIS GRAPH IS NOT WORKING PROPERLY!
+ * PLEASE SEE http://bl.ocks.org/mbostock/3943967 FOR FURTHER REFERENCE.
  *
  * @type AngularJS Directive.
  */
-
 (function(ng) {
   'use strict';
 

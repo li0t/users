@@ -20,7 +20,7 @@
 
       when('/groups/:id/profile', {
         controller: 'Groups:Profile',
-        templateUrl: '/assets/templates/groups/profile.html',
+        templateUrl: '/assets/templates/groups/profile.html'
       }).
 
       when('/groups/:id/tasks', {
@@ -35,7 +35,7 @@
 
       when('/groups/:id/entries/:type', {
         controller: 'Groups:Entries',
-        templateUrl: '/assets/templates/groups/entries.html',
+        templateUrl: '/assets/templates/groups/entries.html'
       });
 
     }

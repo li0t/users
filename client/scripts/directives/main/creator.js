@@ -1,10 +1,10 @@
 /**
-
  * Main Creator Directive.
+ *
+ * This directive provides the template for the main creator button.
  *
  * @type AngularJS Directive.
  */
-
 (function (ng) {
   'use strict';
 

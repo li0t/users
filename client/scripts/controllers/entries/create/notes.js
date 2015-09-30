@@ -1,3 +1,8 @@
+/**
+ * Create a new Note.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

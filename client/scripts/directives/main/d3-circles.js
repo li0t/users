@@ -1,5 +1,8 @@
 /**
- * D3 Circles.
+ * D3 Circles Directive D3 Pack Layout Graph.
+ *
+ * PLEASE SEE http://mbostock.github.io/d3/talk/20111116/pack-hierarchy.html
+ * FOR FURTHER REFERENCE.
  *
  * @type AngularJS Directive.
  */
@@ -22,6 +25,7 @@
           var width = 1280;
           var height = 800;
           var r = 720;
+          
           var x = d3.scale.linear().range([0, r]);
           var y = d3.scale.linear().range([0, r]);
 

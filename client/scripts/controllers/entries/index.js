@@ -1,3 +1,9 @@
+
+/**
+ * Get all Entries of session User.
+ *
+ * @type AngularJS Controller.
+ */
 (function (ng) {
   'use strict';
 

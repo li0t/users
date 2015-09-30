@@ -1,3 +1,8 @@
+/**
+ * Get all Entries, Meetings and Tasks where is present a word or several words.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

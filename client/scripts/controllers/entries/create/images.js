@@ -1,3 +1,8 @@
+/**
+ * Upload a new Image.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

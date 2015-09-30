@@ -1,3 +1,8 @@
+/**
+ * Get Meetings where session User is attendant.
+ *
+ * @type AngularJS Controller.
+ */
 (function (ng) {
   'use strict';
 

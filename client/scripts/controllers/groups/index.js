@@ -1,3 +1,8 @@
+/**
+ * Get all session User Groups.
+ *
+ * @type AngularJS Controller.
+ */
 (function (ng) {
   'use strict';
 
@@ -5,7 +10,7 @@
     '$scope', '$http', '$location', '$session',
 
     function ($scope, $http, $location, $session) {
-      
+
       $scope.groups = null;
       $scope.fetching = false;
 

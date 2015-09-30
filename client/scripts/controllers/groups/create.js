@@ -1,5 +1,8 @@
-/* global angular */
-
+/**
+ * Create a new Group.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

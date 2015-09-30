@@ -1,3 +1,8 @@
+/**
+ * Get a Meeting detail.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

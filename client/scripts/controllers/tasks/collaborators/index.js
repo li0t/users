@@ -1,3 +1,8 @@
+/**
+ * Get a single Task collaborators.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

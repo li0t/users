@@ -1,3 +1,8 @@
+/**
+ * Set example data for new Entries.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

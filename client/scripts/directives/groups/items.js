@@ -1,9 +1,10 @@
 /**
  * Groups Items Directive.
  *
+ * This directive provides the template for the items displayed in groups views.
+ *
  * @type AngularJS Directive.
  */
-
 (function (ng) {
   'use strict';
 
@@ -13,10 +14,7 @@
 
       return {
         restrict : 'E',
-        templateUrl: '/assets/templates/groups/items.html',
-        link: function ($scope) {
-
-        }
+        templateUrl: '/assets/templates/groups/items.html'
       };
     }
 

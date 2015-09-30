@@ -1,3 +1,8 @@
+/**
+ * Customize session User account settings.
+ *
+ * @type AngularJS Controller.
+ */
 (function (ng) {
   'use strict';
 

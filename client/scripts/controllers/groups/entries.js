@@ -1,3 +1,8 @@
+/**
+ * Get Entries of a Group.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

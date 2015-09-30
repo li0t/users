@@ -1,5 +1,8 @@
-/* global angular */
-
+/**
+ * Reset User password.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

@@ -1,3 +1,8 @@
+/**
+ * Get Tasks of a Group.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

@@ -1,3 +1,8 @@
+/**
+ * Get Tasks where session User is creator.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

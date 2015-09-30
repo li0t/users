@@ -1,3 +1,8 @@
+/**
+ * Create a new Task.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

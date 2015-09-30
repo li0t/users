@@ -1,3 +1,9 @@
+/**
+ * Search for Tags and associated Entries, Meetings and Tasks.
+ * Create new Tags.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

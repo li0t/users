@@ -1,3 +1,8 @@
+/**
+ * Create a new Meeting..
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

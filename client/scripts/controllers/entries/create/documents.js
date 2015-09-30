@@ -1,3 +1,8 @@
+/**
+ * Upload a new Document.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 
