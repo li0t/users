@@ -10,7 +10,9 @@ module.exports = function(router, mongoose) {
   var Tag = mongoose.model('tag');
 
   /**
-   * Get session user tasks
+   * Get session User Tasks.
+   *
+   * @type Express Middleware.
    */
   router.get('/', function(req, res, next) {
 
@@ -52,7 +54,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get tasks by keywords
+   * Get Tasks by keywords in a query.
+   *
+   * @type Express Middleware.
    */
   router.get('/like', function(req, res, next) {
 
@@ -92,38 +96,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get tasks by tags stored
-   */
-  router.get('/tags', function(req, res, next) {
-
-    var limit = req.query.limit;
-    var skip = req.query.skip;
-    var tags = req.query.tags;
-
-    tags = (typeof tags === 'string') ? [tags] : tags;
-
-    Task.find().
-
-    where('tags').in(tags).
-
-    skip(skip).
-    limit(limit).
-
-    sort('-_id').
-    deepPopulate('group.profile').
-
-    exec(function(err, tasks) {
-      if (err) {
-        return next(err);
-      }
-
-      res.send(tasks);
-
-    });
-  });
-
-  /**
-   * Create a new task
+   * Create a new Task.
+   *
+   * @type Express Middleware.
    */
   router.post('/', function(req, res, next) {
 
@@ -169,104 +144,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Add Tags to a Task
-   */
-  router.post('/:id/tags', function(req, res, next) {
-
-    var user = req.session.user._id;
-    var tags = req.body.tags;
-    var tagsSaved = 0;
-    var task;
-
-    /* Check if all tags were found and/or created */
-    function onTagReady(tag) {
-
-      task.tags.push(tag.name);
-
-      tagsSaved += 1;
-
-      if (tagsSaved === req.body.tags.length) {
-        task.save(function(err) {
-          if (err) {
-            return next(err);
-          }
-          res.sendStatus(204);
-
-        });
-      }
-    }
-
-    if (!tags || !tags.length) {
-      return res.sendStatus(400);
-    }
-
-    /* Convert the tags string to array if necessary */
-    if (typeof req.body.tags === 'string') {
-      req.body.tags = [req.body.tags];
-    }
-
-    Task.findById(req.params.id).
-
-    exec(function(err, data) {
-      if (err) {
-        return next(err);
-      }
-
-      if (!data) {
-        return res.sendStatus(404);
-      }
-
-      task = data;
-
-      tags = tags.filter(function(tag) {
-        return task.tags.indexOf(tag) < 0;
-      });
-
-      relations.membership(task.group, function(err, membership) {
-
-        if (err || !membership.group) {
-          debug('Group %s not found', req.body.group);
-          return res.sendStatus(400);
-        }
-
-        if (!membership.isMember(user)) {
-          debug('User is not part of group %s', user, membership.group._id);
-          return res.sendStatus(403);
-        }
-
-        tags.forEach(function(tag) {
-
-          Tag.findOne().
-          where('name', tag).
-
-          exec(function(err, found) {
-            if (err) {
-              debug('Error! : %s', err);
-            } else if (found) {
-              debug('Tag found : %s', found.name);
-              onTagReady(found);
-            } else {
-              debug('Creating new Tag : %s', tag);
-              new Tag({
-                name: tag
-              }).
-              save(function(err, newTag) {
-                if (err) {
-                  debug('Error! : %s', err);
-                } else {
-                  onTagReady(newTag);
-                }
-              });
-            }
-          });
-        });
-      });
-    });
-
-  });
-
-  /**
-   * Set task as completed
+   * Set Task as completed.
+   *
+   * @type Express Middleware.
    */
   router.put('/close/:id', function(req, res, next) {
 
@@ -312,7 +192,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Set task as deleted
+   * Set Task as deleted.
+   *
+   * @type Express Middleware.
    */
   router.delete('/:id', function(req, res, next) {
 
@@ -358,7 +240,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Re-open task
+   * Re-open task.
+   *
+   * @type Express Middleware.
    */
   router.put('/re-open/:id', function(req, res, next) {
 
@@ -404,7 +288,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Edit task objective
+   * Edit task objective.
+   *
+   * @type Express Middleware.
    */
   router.put('/:id/objective', function(req, res, next) {
 
@@ -450,7 +336,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Edit task priority
+   * Edit task priority.
+   *
+   * @type Express Middleware.
    */
   router.put('/:id/priority', function(req, res, next) {
 
@@ -496,7 +384,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Set task datetime
+   * Set Task datetime.
+   *
+   * @type Express Middleware.
    */
   router.put('/:id/date-time', function(req, res, next) {
 
@@ -548,7 +438,9 @@ module.exports = function(router, mongoose) {
 
 
   /**
-   * Add task worked time
+   * Add Task worked time.
+   *
+   * @type Express Middleware.
    */
   router.put('/:id/worked-time', function(req, res, next) {
 
@@ -592,8 +484,10 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get a task
-   **/
+   * Get a Task.
+   *
+   * @type Express Middleware.
+   */
   router.get('/:id', function(req, res, next) {
 
     var user = req.session.user._id;

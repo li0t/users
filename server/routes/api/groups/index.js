@@ -1,11 +1,8 @@
 'use strict';
 
-/*var  _ = require('underscore');*/
 var debug = require('debug')('app:api:groups');
 
 var relations = component('relations');
-/*var statics = component('statics');*/
-
 
 module.exports = function(router, mongoose) {
 
@@ -13,7 +10,9 @@ module.exports = function(router, mongoose) {
   var Profile = mongoose.model('profile');
 
   /**
-   * Get user groups
+   * Get Groups where session User is member.
+   *
+   * @type Express Middleware.
    */
   router.get('/', function(req, res, next) {
 
@@ -70,7 +69,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create new group
+   * Create new Group.
+   *
+   * @type Express Middleware.
    */
   router.post('/', function(req, res, next) {
 
@@ -164,12 +165,14 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Change group admin
+   * Change a Group admin.
+   *
+   * @type Express Middleware.
    */
   router.put('/:id/change-admin', function(req, res, next) {
 
-    var group = req.params.id;
     var sessionUser = req.session.user._id;
+    var group = req.params.id;
     var user = req.body.id;
 
     relations.membership(group, function(err, membership) {
@@ -211,7 +214,9 @@ module.exports = function(router, mongoose) {
 
 
   /**
-   * Get a group
+   * Get a Group.
+   *
+   * @type Express Middleware.
    */
   router.get('/:id', function(req, res, next) {
 
@@ -244,7 +249,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Set session group
+   * Set session Group.
+   *
+   * @type Express Middleware.
    */
   router.post('/set/:id', function(req, res, next) {
 

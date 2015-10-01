@@ -1,9 +1,14 @@
 'use strict';
 
-var base64url = require('base64url');
 var uuid = require('node-uuid');
 var crypto = require('crypto');
 
+/**
+ * Token documents schema.
+ * Tokens are mainly used for validations and to protect database relevant data.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function(Schema) {
 
   var TokenSchema = new Schema({
@@ -14,8 +19,9 @@ module.exports = function(Schema) {
 
   });
 
+  /** Hash unique token secret string */
   TokenSchema.pre('validate', function(next) {
-    this.secret = base64url(crypto.createHash('sha256').update(uuid.v4()).digest());
+    this.secret = crypto.createHash('sha1').update(uuid.v4()).digest().toString('hex');
     next();
   });
 

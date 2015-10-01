@@ -1,3 +1,8 @@
+/**
+ * Sign in a User.
+ *
+ * @type AngularJS Controller.
+ */
 (function (ng) {
   'use strict';
 

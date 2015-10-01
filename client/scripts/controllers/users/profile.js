@@ -1,3 +1,8 @@
+/**
+ * Get User Profile.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

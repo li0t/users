@@ -20,22 +20,22 @@
 
       when('/entries/create/document', {
         controller: 'Entries:Create:Documents',
-        templateUrl: '/assets/templates/entries/create/document.html',
+        templateUrl: '/assets/templates/entries/create/document.html'
       }).
 
       when('/entries/create/note', {
         controller: 'Entries:Create:Notes',
-        templateUrl: '/assets/templates/entries/create/note.html',
+        templateUrl: '/assets/templates/entries/create/note.html'
       }).
 
       when('/entries/create/image', {
         controller: 'Entries:Create:Images',
-        templateUrl: '/assets/templates/entries/create/image.html',
+        templateUrl: '/assets/templates/entries/create/image.html'
       }).
 
       when('/entries/create/audio', {
         controller: 'Entries:Create:Audios',
-        templateUrl: '/assets/templates/entries/create/audio.html',
+        templateUrl: '/assets/templates/entries/create/audio.html'
       });
     }
 

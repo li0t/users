@@ -9,7 +9,9 @@ module.exports = function(router, mongoose) {
   var Profile = mongoose.model('profile');
 
   /**
-   * Update Profile linked to User
+   * Update Profile linked to User.
+   *
+   * @type Express Middleware.
    */
   router.put('/', function(req, res, next) {
 
@@ -49,7 +51,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Upload a picture
+   * Upload a picture.
+   *
+   * @type Express Middleware.
    */
   router.post('/pictures', function(req, res, next) {
 
@@ -57,7 +61,7 @@ module.exports = function(router, mongoose) {
     var profile; /* This is the target schema */
 
     /**
-     * Create the document with the saved File ids
+     * Save the profile.
      */
     function saveProfile() {
 
@@ -71,6 +75,9 @@ module.exports = function(router, mongoose) {
       });
     }
 
+    /**
+     * Store each picture in mongo and save the ids.
+     */
     function savePictures() {
 
       function onclose(fsFile) {
@@ -130,7 +137,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Choose main profile picture
+   * Choose main profile picture.
+   *
+   * @type Express Middleware.
    */
   router.put('/pictures/:id', function(req, res, next) {
 

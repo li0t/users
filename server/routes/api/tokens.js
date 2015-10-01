@@ -7,7 +7,9 @@ module.exports = function(router, mongoose) {
   var Token = mongoose.model('token');
 
   /**
-   * Get Token by it's secret
+   * Get a Token by it's secret.
+   *
+   * @type Express Middleware.
    */
   router.get('/:secret', function(req, res, next) {
 
@@ -26,7 +28,7 @@ module.exports = function(router, mongoose) {
       }
 
       if (!token) {
-        debug("Token %s was not found", req.body.secret);
+        debug("Token %s was not found", req.params.secret);
         return res.sendStatus(404);
       }
 

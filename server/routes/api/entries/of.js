@@ -9,7 +9,9 @@ module.exports = function(router, mongoose) {
   var Entry = mongoose.model('entry');
 
   /**
-   * Get entries of an user
+   * Get Entries of a User.
+   *
+   * @type Express Middleware.
    */
   router.get('/user/:id', function(req, res, next) {
 
@@ -48,7 +50,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get entries with files of an user
+   * Get Entries with files of a User.
+   *
+   * @type Express Middleware.
    */
   router.get('/user/:id/type/:type', function(req, res, next) {
 
@@ -90,7 +94,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get entries of a group
+   * Get Entries of a Group.
+   *
+   * @type Express Middleware.
    */
   router.get('/group/:id', function(req, res, next) {
 

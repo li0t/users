@@ -18,7 +18,6 @@
         templateUrl: '/assets/templates/groups/members/add.html'
       });
 
-
     }
 
   ]);

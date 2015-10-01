@@ -1,3 +1,8 @@
+/**
+ * Get all members of a Group.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

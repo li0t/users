@@ -16,12 +16,20 @@ var mongoose = require('mongoose');
 var express = require('express');
 var security = require('lusca');
 var logger = require('morgan');
+var https = require('https');
 var http = require('http');
 var path = require('path');
+var fs = require('fs');
+
+/** HTTPS Credentials **/
+var key = fs.readFileSync('./key.pem');
+var cert = fs.readFileSync('./cert.pem');
+var credentials = { key : key, cert : cert };
 
 /**** Application ****/
 var app = express();
 var server = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
 
 /**** Components ****/
 //var fileman = component('fileman');
@@ -36,6 +44,7 @@ var auth = component('auth');
 /**** Configuration ****/
 var configs = {
   session: config('session')(session),
+  httpsServer: config('httpsServer'),
   security: config('security'),
   mongoose: config('mongoose'),
   views: config('views')(app),
@@ -50,6 +59,7 @@ var configs = {
 };
 
 /**** Setup ****/
+app.set('httpsPort', process.env.HTTPSPORT || configs.httpsServer.port);
 app.set('port', process.env.PORT || configs.server.port);
 app.set('view engine', configs.views.engine);
 app.set('views', configs.views.basedir);
@@ -132,12 +142,60 @@ function onError(error) {
 }
 
 /**
+ * Event listener for HTTPS server "listening" event.
+ */
+function httpsOnListening() {
+  var addr = httpsServer.address();
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+
+  debug('HTTPS Server Listening on ' + bind);
+}
+
+/**
+ * Event listener for HTTPS server "error" event.
+ */
+function httpsOnError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var port = app.get('httpsPort');
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      debug("%s requires elevated privileges!", bind);
+      process.exit(1);
+      break;
+
+    case 'EADDRINUSE':
+      debug("%s is already in use!", bind);
+      process.exit(1);
+      break;
+
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Starts HTTPS server listening for requests.
+ */
+function startHTTPSServer() {
+  httpsServer.listen(app.get('httpsPort'));
+  httpsServer.on('error', httpsOnError);
+  httpsServer.on('listening', httpsOnListening);
+}
+
+/**
  * Starts listening for requests.
  */
 function startServer() {
   server.listen(app.get('port'));
   server.on('error', onError);
   server.on('listening', onListening);
+  startHTTPSServer();
 }
 
 /**

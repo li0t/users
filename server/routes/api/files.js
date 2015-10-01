@@ -1,18 +1,14 @@
 'use strict';
 
-var path = require('path');
-var util = require('util');
-var fs = require('fs');
-
 var fileman = component('fileman');
 var gridfs = component('gridfs');
 
-module.exports = function (router, mongoose) {
-
-  var FsFile = mongoose.model('fs.file');
+module.exports = function (router) {
 
   /**
    * Obtain a file.
+   *
+   * @type Express Middleware.
    */
   router.get('/:id/:name?', function (req, res, next) {
 
@@ -34,11 +30,13 @@ module.exports = function (router, mongoose) {
 
   /**
    * Upload a file.
+   *
+   * @type Express Middleware.
    */
   router.post('/', function (req, res, next) {
 
-    var file, result,
-        curr = 0;
+    var result;
+    var curr = 0;
 
     function validated(err, file) {
       curr += 1;
@@ -51,7 +49,7 @@ module.exports = function (router, mongoose) {
           filename: file.filename
         });
 
-        stream.on('close', function (sfile) {
+        stream.on('close', function () {
           if (curr === req.files.length) {
             res.end();
           }

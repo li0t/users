@@ -1,9 +1,10 @@
 /**
- * Groups Items Directive.
+ * Entries Items Directive.
+ *
+ * This directive provides the template for the items displayed in entries views.
  *
  * @type AngularJS Directive.
  */
-
 (function (ng) {
   'use strict';
 

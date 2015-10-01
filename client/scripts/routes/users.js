@@ -13,7 +13,6 @@
         templateUrl: '/assets/templates/users/signin.html'
       }).
 
-
       when('/users/signup', {
         controller: 'Users:Signup',
         templateUrl: '/assets/templates/users/signup.html',
@@ -40,8 +39,7 @@
 
       when('/users/reset/:secret', {
         controller: 'Users:Reset',
-        templateUrl: '/assets/templates/users/reset.html',
-
+        templateUrl: '/assets/templates/users/reset.html'
       }).
 
       when('/users/:id/profile', {
@@ -62,6 +60,7 @@
         controller: 'Users:Invited:Validate',
         templateUrl: '/assets/templates/users/invited/validate.html'
       });
+
     }
 
   ]);

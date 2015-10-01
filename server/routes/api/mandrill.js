@@ -2,17 +2,17 @@
 
 var Mandrill = require('mandrill-api/mandrill').Mandrill;
 var debug = require('debug')('app:api:mandrill');
-var apiKey = 'DhTgCrDsRExbzSfSU-3dLw';
-var url = '192.168.0.112:3030';
-var api = null;
-var sender = "emeeter";
-var senderEmail = "infoemeeter@gmail.com";
 
 module.exports = function(router, mongoose) {
 
-  var Interaction = mongoose.model('interaction');
   var Token = mongoose.model('token');
-  var User = mongoose.model('user');
+
+  var senderEmail = "infoemeeter@gmail.com";
+  var apiKey = 'DhTgCrDsRExbzSfSU-3dLw';
+  var url = '192.168.0.112:3030';
+  var sender = "emeeter";
+
+  var api = null;
 
   (function connectToMandrill() {
     try {
@@ -24,31 +24,9 @@ module.exports = function(router, mongoose) {
   })();
 
   /**
-   * List all users in this mandrill account
-   */
-  router.get('/users', function(req, res /*, next*/ ) {
-
-    if (api) {
-
-      api.users.info({
-
-      }, function(users) {
-        debug(users);
-
-      }, function(err) {
-        debug('A mandrill error occurred %s : %s', +err.nam, err.message);
-        res.sendStatus(500);
-      });
-
-    } else {
-      debug('A error occurred with the Mandrill client');
-      res.sendStatus(500);
-    }
-
-  });
-
-  /**
-   * Send confirmation email
+   * Send confirmation email.
+   *
+   * @type Express Middleware.
    */
   router.post('/email-confirmation', function(req, res, next) {
 
@@ -71,7 +49,7 @@ module.exports = function(router, mongoose) {
         return res.sendStatus(400);
       }
 
-      message = { /* Parameters to inject into Mandrill template */
+      message = {
         "html": "<a href='http://" + url + "/users/validate/" + token.secret + "'>Please confirm your email</a>",
         "text": "Bievenido a eMeeter",
         "subject": "Confirm your email",
@@ -91,7 +69,7 @@ module.exports = function(router, mongoose) {
 
       };
 
-      api.messages.send({ /* Send a confirmation email to the user */
+      api.messages.send({
         "message": message
 
       }, function(result) {
@@ -107,7 +85,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Send an invite
+   * Send an email invitation to the emeeter platform.
+   *
+   * @type Express Middleware.
    */
   router.post('/user-invite', function(req, res, next) {
 
@@ -149,7 +129,7 @@ module.exports = function(router, mongoose) {
         "important": false
       };
 
-      api.messages.send({ /* Send a invite email*/
+      api.messages.send({
         "message": message
 
       }, function(result) {
@@ -165,7 +145,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Provide a reset password link
+   * Send an email with a reset password link.
+   *
+   * @type Express Middleware.
    */
   router.post('/user-recover', function(req, res, next) {
 
@@ -207,7 +189,7 @@ module.exports = function(router, mongoose) {
         "important": false
       };
 
-      api.messages.send({ /* Send a recovery email to the user */
+      api.messages.send({
         "message": message
 
       }, function(result) {

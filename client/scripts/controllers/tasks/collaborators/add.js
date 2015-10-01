@@ -1,3 +1,8 @@
+/**
+ * Add collaborators to a Task.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

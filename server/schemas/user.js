@@ -1,10 +1,15 @@
 'use strict';
 
-var validator = require('validator');
-var bcrypt = require('bcrypt');
 var deepPopulate = require('mongoose-deep-populate');
+var validator = require('validator');
 var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
 
+/**
+ * User documents schema.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function (Schema) {
 
   var UserSchema = new Schema({
@@ -39,7 +44,7 @@ module.exports = function (Schema) {
     updated: {
       type: Date,
       default: Date.now
-    },
+    }
 
   });
 
@@ -72,7 +77,7 @@ module.exports = function (Schema) {
 
   });
 
-  /** Check the set priority is valid */
+  /** Check the user state is valid */
   UserSchema.path('state').validate(function(state, cb) {
 
     mongoose.model('static.state').

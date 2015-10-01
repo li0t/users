@@ -1,3 +1,8 @@
+/**
+ * Get all session User contacts.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

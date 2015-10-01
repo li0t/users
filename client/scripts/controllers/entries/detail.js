@@ -1,3 +1,8 @@
+/**
+ * Get an Entry detail.
+ *
+ * @type AngularJS Controller.
+ */
 (function (ng) {
   'use strict';
 

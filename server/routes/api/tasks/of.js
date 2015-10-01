@@ -9,7 +9,9 @@ module.exports = function(router, mongoose) {
   var Task = mongoose.model('task');
 
   /**
-   * Get tasks of a group
+   * Get tasks of a Group.
+   *
+   * @type Express Middleware.
    */
   router.get('/group/:id', function(req, res, next) {
 

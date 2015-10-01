@@ -13,7 +13,9 @@ module.exports = function(router, mongoose) {
   var Token = mongoose.model('token');
 
   /**
-   * Get contacts of session user
+   * Get Contacts of session User.
+   *
+   * @type Express Middleware.
    */
   router.get('/', function(req, res, next) {
 
@@ -47,7 +49,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Get pending contact requests of session user
+   * Get pending contact requests of session User.
+   *
+   * @type Express Middleware.
    */
   router.get('/pending', function(req, res, next) {
 
@@ -65,10 +69,16 @@ module.exports = function(router, mongoose) {
 
       res.send(reqs);
     });
+
   });
 
   /**
-   * Add contact
+   * Create contact request.
+   * This is done by adding the receiver User to the session User contacts list
+   * and vice-versa, both in a pending state. In case they were contacts in the
+   * past change both contacts state to pending.
+   *
+   * @type Express Middleware.
    */
   router.post('/', function(req, res, next) {
 
@@ -97,13 +107,15 @@ module.exports = function(router, mongoose) {
 
         receiverIsContact = senderRelation.isContact(receiver.user, true);
 
-        if (!receiverIsContact) { /** Check if the users are contacts already */
+        /** Check if the users are contacts already */
+        if (!receiverIsContact) {
 
+          /** Push each other id's and set the contact as pending*/
           sender.contacts.push({
             user: receiver.user,
             state: statics.model('state', 'pending')._id
           });
-          /** Push each other id's and set te the contact as pending*/
+
           receiver.contacts.push({
             user: sender.user,
             state: statics.model('state', 'pending')._id
@@ -122,15 +134,21 @@ module.exports = function(router, mongoose) {
 
             });
           });
-        } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'active')._id)) { /** The contact state is Active */
 
-          res.status(409).send('You are already contacts!');
+          /** The contact state is Active */
+        } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'active')._id)) {
 
-        } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'pending')._id)) { /** The contact state is Pending */
+          debug('Users %s and %s are already contacts', receiver.user, sender.user);
+          res.sendStatus(400);
 
-          res.status(409).send('Waiting for confirmation!');
+          /** The contact state is Pending */
+        } else if (_.isEqual(receiverIsContact.state, statics.model('state', 'pending')._id)) {
 
-        } else { /** The users were contacts, but in some point one of them disabled the relation */
+          debug('Contact request between %s and %s is waiting for confirmation', receiver.user, sender.user);
+          res.sendStatus(409);
+
+          /** The users were contacts, but in some point one of them disabled the relation */
+        } else {
 
           senderIsContact = receiverRelation.isContact(req.session.user._id, true);
 
@@ -158,7 +176,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   *  Confirm request
+   *  Confirm contact request.
+   *
+   * @type Express Middleware.
    */
   router.put('/confirm/:token', function(req, res, next) {
 
@@ -248,7 +268,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Delete a contact
+   * Delete a contact or reject a contact request.
+   *
+   * @type Express Middleware.
    */
   router.delete('/:id', function(req, res, next) {
 
@@ -298,6 +320,7 @@ module.exports = function(router, mongoose) {
 
             });
           });
+
         } else {
 
           user1IsContact = user2Relation.isContact(user1.user, true);
@@ -328,7 +351,7 @@ module.exports = function(router, mongoose) {
           });
         }
 
-        /* Remove contact request  */
+        /* Remove contact request interaction */
         Interaction.findOne().
 
         or([{

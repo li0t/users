@@ -6,6 +6,8 @@ module.exports = function(router, mongoose) {
 
   /**
    * Get current session's public data.
+   *
+   * @type Express Middleware.
    */
   router.get('/session', function(req, res /*, next*/ ) {
 
@@ -46,10 +48,13 @@ module.exports = function(router, mongoose) {
     } else {
       res.sendStatus(403);
     }
+
   });
 
   /**
-   * Get current session's public data.
+   * Get current session User Profile pictures.
+   *
+   * @type Express Middleware.
    */
   router.get('/session/pictures', function(req, res, next) {
 
@@ -78,6 +83,7 @@ module.exports = function(router, mongoose) {
       res.send(pictures);
 
     });
+
   });
 
 };

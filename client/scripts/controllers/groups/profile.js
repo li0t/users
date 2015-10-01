@@ -1,3 +1,8 @@
+/**
+ * Get the Profilepage data of a Group.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

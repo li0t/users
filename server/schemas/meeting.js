@@ -2,6 +2,12 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
+/**
+ * Meeting documents schema.
+ * Meetings store.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function(Schema) {
 
   var MeetingSchema = new Schema({
@@ -28,7 +34,7 @@ module.exports = function(Schema) {
       default: null
     },
 
-    objective: { 
+    objective: {
       type: String,
       required: true
     },
@@ -78,7 +84,7 @@ module.exports = function(Schema) {
     virtuals: true
   });
 
-  /** Show virtuals on JSON conversion */
+  /** Show virtuals on Object conversion */
   MeetingSchema.set('toObject', {
     virtuals: true
   });

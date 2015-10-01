@@ -3,6 +3,11 @@
 var deepPopulate = require('mongoose-deep-populate');
 var mongoose = require('mongoose');
 
+/**
+ * Task documents schema.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function(Schema) {
 
   var TaskSchema = new Schema({
@@ -66,11 +71,6 @@ module.exports = function(Schema) {
 
     }],
 
-    /*meetings: [{
-      type: Schema.Types.ObjectId,
-      //  ref: ''
-    }],*/
-
     dateTime: Date,
 
     notes: [{
@@ -85,7 +85,7 @@ module.exports = function(Schema) {
 
   });
 
-  /** Index string fields */
+  /** Index task fields with text */
   TaskSchema.index({ '$**': 'text' });
 
   /** Show virtuals on JSON conversion */
@@ -93,7 +93,7 @@ module.exports = function(Schema) {
     virtuals: true
   });
 
-  /** Show virtuals on JSON conversion */
+  /** Show virtuals on Object conversion */
   TaskSchema.set('toObject', {
     virtuals: true
   });
@@ -103,7 +103,7 @@ module.exports = function(Schema) {
     return this._id.getTimestamp();
   });
 
-  /** Declares Object type */
+  /** Declares Object type as front-end convenient data */
   TaskSchema.virtual('type').get(function() {
     return 'task';
   });
@@ -119,7 +119,7 @@ module.exports = function(Schema) {
 
   }, 'The task date time must be in the future!');
 
-  /** Check the set priority is valid */
+  /** Check the task priority is valid */
   TaskSchema.path('priority').validate(function(priority, cb) {
 
     mongoose.model('static.priority').

@@ -11,7 +11,9 @@ module.exports = function(router, mongoose) {
   var User = mongoose.model('user');
 
   /**
-   * Create the email-confirmation interaction and token
+   * Create the email-confirmation Interaction and Token.
+   *
+   * @type Express Middleware.
    */
   router.post('/email-confirmation', function(req, res, next) {
 
@@ -44,7 +46,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the user-invite interaction and token
+   * Create the user-invite Interaction and Token.
+   *
+   * @type Express Middleware.
    */
   router.post('/user-invite', function(req, res, next) {
 
@@ -78,7 +82,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the group-invite interaction
+   * Create the group-invite Interaction.
+   *
+   * @type Express Middleware.
    */
   router.post('/group-invite', function(req, res, next) {
 
@@ -100,7 +106,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the task-assigned interaction
+   * Create the task-assigned Interaction.
+   *
+   * @type Express Middleware.
    */
   router.post('/task-assigned', function(req, res, next) {
 
@@ -122,7 +130,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the task-assigned interaction
+   * Create the meeting-attendance Interaction.
+   *
+   * @type Express Middleware.
    */
   router.post('/meeting-attendance', function(req, res, next) {
 
@@ -144,7 +154,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the contact-request interaction and token
+   * Create the contact-request Interaction and Token.
+   *
+   * @type Express Middleware.
    */
   router.post('/contact-request', function(req, res, next) {
 
@@ -178,7 +190,9 @@ module.exports = function(router, mongoose) {
   });
 
   /**
-   * Create the user-recover interaction and token
+   * Create the user-recover Interaction and Token.
+   *
+   * @type Express Middleware.
    */
   router.post('/user-recover', function(req, res, next) {
 

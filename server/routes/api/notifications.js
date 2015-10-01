@@ -1,6 +1,6 @@
 'use strict';
 
-var debug = require('debug')('app:api:notifications');
+//var debug = require('debug')('app:api:notifications');
 
 var statics = component('statics');
 
@@ -9,12 +9,17 @@ module.exports = function(router, mongoose) {
   var Notification = mongoose.model('notification');
   var Interaction = mongoose.model('interaction');
 
+ /**
+  * Get Notifications where receiver is the session user.
+  *
+  * @type Express Middleware.
+  */
   router.get('/', function(req, res, next) {
 
-    var user = req.session.user._id;
-    var actions = req.query.actions; /** Type of notification to filter */
-    var skip = Number(req.query.skip);
     var limit = Number(req.query.limit);
+    var skip = Number(req.query.skip);
+    var user = req.session.user._id;
+    var actions = req.query.actions; // Type of Notification to filter
     var present;
 
     Notification.find().
@@ -47,10 +52,15 @@ module.exports = function(router, mongoose) {
 
   });
 
+  /**
+   * Get the last generated Notification for the session user.
+   *
+   * @type Express Middleware.
+   */
   router.get('/last', function(req, res, next) {
 
-    var user = req.session.user._id;
     var actions = req.query.actions;
+    var user = req.session.user._id;
     var or = [];
 
     actions.forEach(function(action) {
@@ -93,7 +103,11 @@ module.exports = function(router, mongoose) {
 
   });
 
-
+  /**
+   * Set a Notification as viewed.
+   *
+   * @type Express Middleware.
+   */
   router.put('/:id/viewed', function(req, res, next) {
 
     Notification.update({
@@ -115,8 +129,5 @@ module.exports = function(router, mongoose) {
     });
 
   });
-
-
-
 
 };

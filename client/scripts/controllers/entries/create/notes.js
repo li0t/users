@@ -1,3 +1,8 @@
+/**
+ * Create a new Note.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 
@@ -50,7 +55,7 @@
 
           if ($scope.data.tags.length) {
 
-            $http.post('/api/entries/' + entry + '/tags', $scope.data).
+            $http.post('/api/entries/tags/add-to/' + entry, $scope.data).
 
             error(function() {
               $session.flash('danger', 'Hubo un error agregando tags a la nota!');
@@ -69,8 +74,9 @@
         var
           limit = 'limit=' + $scope.limit + '&',
           skip = 'skip=' + $scope.skip + '&',
-          keywords = 'keywords=' + tag,
-          tags = '/api/tags/like?' + limit + skip + keywords;
+          keywords = 'keywords=' + tag + '&',
+
+          tags = '/api/tags/like?' + keywords + limit + skip;
 
         return $http.get(tags).
         then(function(tags) {

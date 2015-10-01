@@ -1,3 +1,8 @@
+/**
+ * Confirm Invited User email.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

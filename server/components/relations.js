@@ -1,8 +1,8 @@
 'use strict';
 
+var debug = require('debug')('app:relations');
 var mongoose = require('mongoose');
 var _ = require('underscore');
-var debug = require('debug')('app:relations');
 
 var statics = component('statics');
 
@@ -11,7 +11,15 @@ var Meeting = mongoose.model('meeting');
 var Group = mongoose.model('group');
 var Task = mongoose.model('task');
 
-function contact(id, cb) { /** Returns a relation object with the contact model and a isContact method */
+/**
+ * Get a Contact document and provide convenient methods.
+ *
+ * @param {ObjectID} id The id of the User.
+ * @param {Function} cb The callback function.
+ *
+ * @returns {Object} relation Contains the Contact and the isContact method.
+ */
+function contact(id, cb) {
 
   var i;
 
@@ -19,7 +27,16 @@ function contact(id, cb) { /** Returns a relation object with the contact model 
 
     contact: null,
 
-    isContact: function(id, notActive) { /** Looks for an active contact, if notActive === true, looks for a pending or disabled contact also */
+    /**
+     * Look for an active contact in the User contacts array.
+     *
+     * @param {ObjectID} id The id of the contact to check.
+     * @param {Boolean} nonActive If true, check for a non-active contact.
+     *
+     * @return {Object} contact The contact object and
+     * it's index in the contacts array.
+     */
+    isContact: function(id, nonActive) {
 
       var contact = null;
 
@@ -31,12 +48,14 @@ function contact(id, cb) { /** Returns a relation object with the contact model 
 
             if (JSON.stringify(relation.contact.contacts[i].user) === JSON.stringify(id)) {
 
-              if (_.isEqual(relation.contact.contacts[i].state, statics.model('state', 'active')._id)) { /** Is an active contact */
+              /** Is an active contact */
+              if (_.isEqual(relation.contact.contacts[i].state, statics.model('state', 'active')._id)) {
 
                 contact = relation.contact.contacts[i].toObject();
                 contact.index = i;
 
-              } else if (notActive && (_.isEqual(relation.contact.contacts[i].state, statics.model('state', 'pending')._id) || _.isEqual(relation.contact.contacts[i].state, statics.model('state', 'disabled')._id))) {
+                /** Check the contact state looks redundant given that it's already in the contacts array */
+              } else if (nonActive && (_.isEqual(relation.contact.contacts[i].state, statics.model('state', 'pending')._id) || _.isEqual(relation.contact.contacts[i].state, statics.model('state', 'disabled')._id))) {
                 contact = relation.contact.contacts[i].toObject();
                 contact.index = i;
 
@@ -78,8 +97,16 @@ function contact(id, cb) { /** Returns a relation object with the contact model 
 
 }
 
-
-function membership(id, cb) { /** Returns a relation object with the group model and a isMember method */
+/**
+ * Get a Group document and provide convenient methods.
+ *
+ * @param {ObjectID} id The id of the Group.
+ * @param {Function} cb The callback function.
+ *
+ * @returns {Object} relation Contains the Group and
+ * the isMember, wasMember and cleanMembers methods.
+ */
+function membership(id, cb) {
 
   var i;
 
@@ -87,6 +114,13 @@ function membership(id, cb) { /** Returns a relation object with the group model
 
     group: null,
 
+    /**
+     * Check if a member is the admin of the Group.
+     *
+     * @param {ObjectID} id The id of the member to check.
+     *
+     * @return {Boolean} isAdmin.
+     */
     isAdmin: function(id) {
 
       var isAdmin = false;
@@ -105,7 +139,15 @@ function membership(id, cb) { /** Returns a relation object with the group model
 
     },
 
-    isMember: function(id) { /** Looks for a member of a group */
+    /**
+     * Look for a User in the Group members array.
+     *
+     * @param {ObjectID} id The id of the User to check.
+     *
+     * @return {Object} member The member object and
+     * it's index in the Group members array.
+     */
+    isMember: function(id) {
 
       var member = null;
 
@@ -133,6 +175,14 @@ function membership(id, cb) { /** Returns a relation object with the group model
       return member;
     },
 
+    /**
+     * Look for a non-active member in the Group members array.
+     *
+     * @param {ObjectID} id The id of the member to check.
+     *
+     * @return {Object} member The member object and
+     * it's index in Group the members array.
+     */
     wasMember: function(id) {
 
       var member = null;
@@ -158,6 +208,9 @@ function membership(id, cb) { /** Returns a relation object with the group model
       return member;
     },
 
+    /**
+     * Remove all non-active members in the Group members array.
+     */
     cleanMembers: function() {
 
       var i;
@@ -176,6 +229,7 @@ function membership(id, cb) { /** Returns a relation object with the group model
         debug('Error! No group found');
       }
     }
+
   };
 
   Group.findById(id, function(err, group) {
@@ -196,6 +250,15 @@ function membership(id, cb) { /** Returns a relation object with the group model
 
 }
 
+/**
+ * Get a Task document and provide convenient methods.
+ *
+ * @param {ObjectID} id The id of the Task.
+ * @param {Function} cb The callback function.
+ *
+ * @returns {Object} relation Contains the Task and the isCreator,
+ * isCollaborator, wasCollaborator and cleanCollaborators methods.
+ */
 function collaboration(id, cb) {
 
   var i;
@@ -204,6 +267,13 @@ function collaboration(id, cb) {
 
     task: null,
 
+    /**
+     * Check if a User is the creator of the Task.
+     *
+     * @param {ObjectID} id The id of the User to check.
+     *
+     * @return {Boolean} isCreator.
+     */
     isCreator: function(id) {
 
       var isCreator = false;
@@ -222,7 +292,15 @@ function collaboration(id, cb) {
 
     },
 
-    isCollaborator: function(id) { /** Looks for a member of a task */
+    /**
+     * Look for an active collaborator in the Task collaborators array.
+     *
+     * @param {ObjectID} id The id of the collaborator to check.
+     *
+     * @return {Object} collaborator The collaborator object and
+     * it's index in the collaborators array.
+     */
+    isCollaborator: function(id) {
 
       var collaborator = null;
 
@@ -249,6 +327,14 @@ function collaboration(id, cb) {
       return collaborator;
     },
 
+    /**
+     * Look for a non-active collaborator in the Task collaborators array.
+     *
+     * @param {ObjectID} id The id of the collaborator to check.
+     *
+     * @return {Object} collaborator The collaborator object and
+     * it's index in the collaborators array.
+     */
     wasCollaborator: function(id) {
 
       var collaborator = null;
@@ -274,6 +360,9 @@ function collaboration(id, cb) {
       return collaborator;
     },
 
+    /**
+     * Remove all non-active collaborators from the Task collaborators array.
+     */
     cleanCollaborators: function() {
 
       var i;
@@ -318,6 +407,15 @@ function collaboration(id, cb) {
 
 }
 
+/**
+ * Get a Meeting document and provide convenient methods.
+ *
+ * @param {ObjectID} id The id of the Meeting.
+ * @param {Function} cb The callback function.
+ *
+ * @returns {Object} relation Contains the Meeting
+ * and the isAttendant and wasAttendant methods.
+ */
 function attendance(id, cb) {
 
   var i;
@@ -326,7 +424,15 @@ function attendance(id, cb) {
 
     meeting: null,
 
-    isAttendant: function(id) { /** Looks for an attendant of a meeting */
+    /**
+     * Look for an active attendant in the Meeting attendants array.
+     *
+     * @param {ObjectID} id The id of the attendant to check.
+     *
+     * @return {Object} attendant The attendant object and
+     * it's index in the attendants array.
+     */
+    isAttendant: function(id) {
 
       var attendant = null;
 
@@ -353,6 +459,14 @@ function attendance(id, cb) {
       return attendant;
     },
 
+    /**
+     * Look for a non-active attendant in the Meeting attendants array.
+     *
+     * @param {ObjectID} id The id of the attendant to check.
+     *
+     * @return {Object} attendant The attendant object and
+     * it's index in the attendants array.
+     */
     wasAttendant: function(id) {
 
       var attendant = null;
@@ -402,7 +516,6 @@ function attendance(id, cb) {
   });
 
 }
-
 
 module.exports = {
 

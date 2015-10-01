@@ -3,6 +3,12 @@
 var deepPopulate = require('mongoose-deep-populate');
 var mongoose = require('mongoose');
 
+/**
+ * Profile documents schema.
+ * Profiles are intended to store users and groups data and pictures.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function(Schema) {
 
   var ProfileSchema = new Schema({
@@ -37,11 +43,11 @@ module.exports = function(Schema) {
 
   });
 
-  /** Check the set priority is valid */
+  /** Check the profile gender is valid */
   ProfileSchema.path('gender').validate(function(gender, cb) {
 
     if (gender) {
-      
+
       mongoose.model('static.gender').
 
       findById(gender).
@@ -60,16 +66,11 @@ module.exports = function(Schema) {
       cb(true);
 
     }
-  }, 'You must set a valid priority!');
+  }, 'You must set a valid gender!');
 
   /** Show virtuals on JSON conversion */
   ProfileSchema.set('toJSON', {
     virtuals: true
-  });
-
-  /**  */
-  ProfileSchema.pre('save', function(next) {
-    next();
   });
 
   /** Lets populate reach any level */

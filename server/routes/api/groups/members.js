@@ -1,16 +1,15 @@
 'use strict';
 
-/*var  _ = require('underscore');*/
 var debug = require('debug')('app:api:groups:members');
 
 var relations = component('relations');
-/*var statics = component('statics');*/
 
-
-module.exports = function(router /*, mongoose */ ) {
+module.exports = function(router) {
 
   /**
-   * Get group members
+   * Get Group members.
+   *
+   * @type Express Middleware.
    */
   router.get('/of/:id', function(req, res, next) {
 
@@ -44,7 +43,9 @@ module.exports = function(router /*, mongoose */ ) {
   });
 
   /**
-   * Add member to a group
+   * Add member to a Group.
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -128,7 +129,9 @@ module.exports = function(router /*, mongoose */ ) {
   });
 
   /**
-   * Remove members from group
+   * Remove members from Group.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 
@@ -219,6 +222,7 @@ module.exports = function(router /*, mongoose */ ) {
 
       });
     });
+    
   });
 
 };

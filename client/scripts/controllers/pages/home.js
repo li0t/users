@@ -1,3 +1,8 @@
+/**
+ * Get Homepage data.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 

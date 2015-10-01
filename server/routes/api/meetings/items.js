@@ -4,10 +4,12 @@ var debug = require('debug')('app:api:meetings:items');
 
 var relations = component('relations');
 
-module.exports = function(router /*, mongoose*/ ) {
+module.exports = function(router) {
 
   /**
-   * Add items to a meeting
+   * Add items to a Meeting.
+   *
+   * @type Express Middleware.
    */
   router.post('/add-to/:id', function(req, res, next) {
 
@@ -19,6 +21,7 @@ module.exports = function(router /*, mongoose*/ ) {
     if (!items || !items.length) {
       return res.sendStatus(400);
     }
+
     /** Prevent a mistype error */
     if (typeof items === 'string') {
       items = [items];
@@ -73,7 +76,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Remove items from meeting
+   * Remove items from a Meeting.
+   *
+   * @type Express Middleware.
    */
   router.post('/remove-from/:id', function(req, res, next) {
 
@@ -156,7 +161,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Set items of a meeting as checked
+   * Set items of a Meeting as checked.
+   *
+   * @type Express Middleware.
    */
   router.put('/of/:id/check', function(req, res, next) {
 
@@ -213,7 +220,9 @@ module.exports = function(router /*, mongoose*/ ) {
   });
 
   /**
-   * Unset items of a meeting
+   * Set items of a Meeting as not-checked.
+   *
+   * @type Express Middleware.
    */
   router.put('/of/:id/uncheck', function(req, res, next) {
 
@@ -267,6 +276,5 @@ module.exports = function(router /*, mongoose*/ ) {
     });
 
   });
-
 
 };

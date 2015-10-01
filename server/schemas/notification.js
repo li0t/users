@@ -2,6 +2,12 @@
 
 var deepPopulate = require('mongoose-deep-populate');
 
+/**
+ * Notification documents schema.
+ * Notifications provide real time information to users.
+ *
+ * @type Mongoose Schema.
+ */
 module.exports = function (Schema) {
 
   var NotificationSchema = new Schema({
@@ -22,12 +28,6 @@ module.exports = function (Schema) {
     virtuals: true
   });
 
-  /**  */
-  NotificationSchema.pre('save', function (next) {
-    next();
-  });
-
-
   /** Lets populate reach any level */
   NotificationSchema.plugin(deepPopulate);
 
@@ -36,4 +36,5 @@ module.exports = function (Schema) {
   });
 
   return NotificationSchema;
+  
 };

@@ -1,3 +1,8 @@
+/**
+ * Get and Edit Task detail.
+ *
+ * @type AngularJS Controller.
+ */
 (function(ng) {
   'use strict';
 
