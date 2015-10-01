@@ -39,6 +39,7 @@
               });
 
               $scope.notifications = nots;
+              console.log($scope.notifications);
 
             });
           };

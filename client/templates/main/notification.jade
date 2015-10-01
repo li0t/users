@@ -4,7 +4,7 @@ div
   div(layout='column',style='max-height:100px; max-width:600px; overflow:scroll;')
     a.notification(
       ng-repeat='not in notifications | orderBy:"-created"'  
-      ng-style='not.viewed && { opacity: "0.8" } || {}', 
+      ng-style='not.viewed && { opacity: "0.6" } || {}', 
       ng-mouseleave='!not.viewed && viewed(not)'
       ng-click='!not.viewed && viewed(not)'
       ng-href='{{ not.href }}') {{ not.message }}

@@ -87,6 +87,7 @@ module.exports = (function() {
     exists('deleted', false).
     exists('dateTime').
 
+    // Issue here!!!
     where('dateTime').lt(now).
 
     exec(function(err, tasks) {
@@ -159,6 +160,7 @@ module.exports = (function() {
     };
 
     scheduler.scheduleJob(config.expiredTasksSchedule, sendExpiredTasks);
+    //setInterval(sendExpiredTasks, 5000);
 
     debug("Notifications Scheduled");
 
